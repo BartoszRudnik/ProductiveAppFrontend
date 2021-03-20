@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'screens/entry_screen.dart';
-import 'screens/sign_in_screen.dart';
-import 'screens/sign_up_screen.dart';
+import 'screens/login_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -12,8 +11,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Productive app',
       theme: ThemeData(
-        primaryColor: Colors.white,
-        accentColor: Colors.black,
+        primaryColor: Colors.black,
+        accentColor: Colors.white,
         fontFamily: 'Lato',
         textTheme: TextTheme(
           headline6: TextStyle(
@@ -40,8 +39,7 @@ class MyApp extends StatelessWidget {
       ),
       home: EntryScreen(),
       routes: {
-        SignUpScreen.routeName: (ctx) => SignUpScreen(),
-        SignInScreen.routeName: (ctx) => SignInScreen(),
+        LoginScreen.routeName: (ctx) => LoginScreen(),
       },
     );
   }
