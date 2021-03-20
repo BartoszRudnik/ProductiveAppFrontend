@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../appBars/login_appbar.dart';
 import '../buttons/login_button.dart';
 import 'sign_in_screen.dart';
 import 'sign_up_screen.dart';
@@ -8,13 +9,7 @@ class EntryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(0),
-        child: AppBar(
-          backgroundColor: Theme.of(context).accentColor,
-          brightness: Brightness.dark,
-        ),
-      ),
+      appBar: LoginAppBar(),
       backgroundColor: Theme.of(context).primaryColor,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -37,11 +32,7 @@ class EntryScreen extends StatelessWidget {
             child: Text(
               'Task manager',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 40,
-                fontFamily: 'Lato',
-              ),
+              style: Theme.of(context).textTheme.headline6,
             ),
           ),
           SizedBox(

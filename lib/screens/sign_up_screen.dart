@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/appBars/login_appbar.dart';
 import 'package:productive_app/buttons/login_button.dart';
 import 'package:productive_app/screens/sign_in_screen.dart';
 import 'package:productive_app/widgets/login_greet.dart';
@@ -9,13 +10,7 @@ class SignUpScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(0),
-        child: AppBar(
-          backgroundColor: Theme.of(context).accentColor,
-          brightness: Brightness.dark,
-        ),
-      ),
+      appBar: LoginAppBar(),
       backgroundColor: Theme.of(context).primaryColor,
       body: SingleChildScrollView(
         child: Column(
@@ -39,10 +34,7 @@ class SignUpScreen extends StatelessWidget {
               children: <Widget>[
                 Text(
                   'Already have a account',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontFamily: 'RobotoCondensed',
-                  ),
+                  style: Theme.of(context).textTheme.headline4,
                 ),
                 TextButton(
                   onPressed: () {
@@ -50,10 +42,7 @@ class SignUpScreen extends StatelessWidget {
                   },
                   child: Text(
                     'Login',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey,
-                    ),
+                    style: Theme.of(context).textTheme.headline5,
                   ),
                 ),
               ],

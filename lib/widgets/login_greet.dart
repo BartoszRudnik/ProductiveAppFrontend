@@ -27,10 +27,7 @@ class LoginGreet extends StatelessWidget {
         ),
         Text(
           this.greetText,
-          style: TextStyle(
-            fontSize: 36,
-            fontFamily: 'RobotoCondensed',
-          ),
+          style: Theme.of(context).textTheme.headline3,
         ),
         SizedBox(
           height: 50,

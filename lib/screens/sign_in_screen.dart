@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../appBars/login_appbar.dart';
 import '../buttons/login_button.dart';
 import '../widgets/login_greet.dart';
 import 'sign_up_screen.dart';
@@ -15,13 +16,7 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(0),
-          child: AppBar(
-            backgroundColor: Theme.of(context).accentColor,
-            brightness: Brightness.dark,
-          ),
-        ),
+        appBar: LoginAppBar(),
         backgroundColor: Theme.of(context).primaryColor,
         body: SingleChildScrollView(
           child: Column(
@@ -38,11 +33,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       onPressed: () {},
                       child: Text(
                         'Forgot Password?',
-                        style: TextStyle(
-                          fontFamily: 'RobotoCondensed',
-                          fontSize: 12,
-                          color: Colors.grey,
-                        ),
+                        style: Theme.of(context).textTheme.headline5,
                       ),
                     ),
                   ],
@@ -63,10 +54,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 children: <Widget>[
                   Text(
                     'Don\'t have account?',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontFamily: 'RobotoCondensed',
-                    ),
+                    style: Theme.of(context).textTheme.headline4,
                   ),
                   TextButton(
                     onPressed: () {
@@ -74,10 +62,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     },
                     child: Text(
                       'create a new account!',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
+                      style: Theme.of(context).textTheme.headline5,
                     ),
                   ),
                 ],
