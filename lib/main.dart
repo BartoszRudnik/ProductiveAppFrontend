@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/task_page/task_screens/task_screen.dart';
 
-import 'screens/entry_screen.dart';
-import 'screens/login_screen.dart';
+import 'login/screens/entry_screen.dart';
+import 'login/screens/login_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -40,6 +41,7 @@ class MyApp extends StatelessWidget {
       home: EntryScreen(),
       routes: {
         LoginScreen.routeName: (ctx) => LoginScreen(),
+        TaskScreen.routeName: (ctx) => TaskScreen(),
       },
     );
   }
