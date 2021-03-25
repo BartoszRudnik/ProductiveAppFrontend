@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:productive_app/task_page/task_screens/task_screen.dart';
+import 'package:productive_app/login/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 import 'login_greet.dart';
 
@@ -31,7 +34,7 @@ class _LoginWidgetState extends State<LoginWidget> {
     );
   }
 
-  void _trySubmit() {
+  void _trySubmit() async {
     final isValid = _formKey.currentState.validate();
     setState(() {
       this._isValid = isValid;
@@ -39,8 +42,35 @@ class _LoginWidgetState extends State<LoginWidget> {
 
     FocusScope.of(context).unfocus();
 
-    if (isValid) {
-      _formKey.currentState.save();
+    if (!isValid) {
+      return;
+    }
+
+    _formKey.currentState.save();
+
+    try {
+      if (!_isLogin) {
+        await Provider.of<AuthProvider>(context, listen: false).signUp(
+          this._email,
+          this._password,
+        );
+      }
+    } on HttpException catch (error) {
+      var errorMessage = 'Authentication failed.';
+
+      if (error.toString().contains('EMAIL_EXISTS')) {
+        errorMessage = 'This email address is already in use';
+      } else if (error.toString().contains('INVALID_EMAIL')) {
+        errorMessage = 'This is not a valid email address';
+      } else if (error.toString().contains('WEAK_PASSWORD')) {
+        errorMessage = 'This password is too weak';
+      } else if (error.toString().contains('EMAIL_NOT_FOUND')) {
+        errorMessage = 'Could not find your email address';
+      } else if (error.toString().contains('INVALID_PASSWORD')) {
+        errorMessage = 'Invalid password';
+      }
+
+      print(errorMessage);
     }
   }
 
