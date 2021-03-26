@@ -17,40 +17,43 @@ class MyApp extends StatelessWidget {
           create: (context) => AuthProvider(),
         ),
       ],
-      child: MaterialApp(
-        title: 'Productive app',
-        theme: ThemeData(
-          primaryColor: Colors.black,
-          accentColor: Colors.white,
-          fontFamily: 'Lato',
-          textTheme: TextTheme(
-            headline6: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 40,
-              fontFamily: 'Lato',
-            ),
-            headline5: TextStyle(
-              fontFamily: 'RobotoCondensed',
-              fontSize: 12,
-              color: Colors.grey,
-            ),
-            headline4: TextStyle(
-              fontSize: 12,
-              fontFamily: 'RobotoCondensed',
-              color: Colors.black,
-            ),
-            headline3: TextStyle(
-              fontSize: 36,
-              fontFamily: 'RobotoCondensed',
-              color: Colors.black,
+      child: Consumer<AuthProvider>(
+        builder: (ctx, authData, _) => MaterialApp(
+          title: 'Productive app',
+          theme: ThemeData(
+            primaryColor: Colors.black,
+            accentColor: Colors.white,
+            fontFamily: 'Lato',
+            textTheme: TextTheme(
+              headline6: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 40,
+                fontFamily: 'Lato',
+              ),
+              headline5: TextStyle(
+                fontFamily: 'RobotoCondensed',
+                fontSize: 12,
+                color: Colors.grey,
+              ),
+              headline4: TextStyle(
+                fontSize: 12,
+                fontFamily: 'RobotoCondensed',
+                color: Colors.black,
+              ),
+              headline3: TextStyle(
+                fontSize: 36,
+                fontFamily: 'RobotoCondensed',
+                color: Colors.black,
+              ),
             ),
           ),
+          home: authData.isAuth ? TaskScreen() : EntryScreen(),
+          routes: {
+            LoginScreen.routeName: (ctx) => LoginScreen(),
+            TaskScreen.routeName: (ctx) => TaskScreen(),
+            EntryScreen.routeName: (ctx) => EntryScreen(),
+          },
         ),
-        home: EntryScreen(),
-        routes: {
-          LoginScreen.routeName: (ctx) => LoginScreen(),
-          TaskScreen.routeName: (ctx) => TaskScreen(),
-        },
       ),
     );
   }

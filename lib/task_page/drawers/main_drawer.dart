@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/login/providers/auth_provider.dart';
+import 'package:productive_app/login/screens/entry_screen.dart';
+import 'package:productive_app/task_page/task_screens/task_screen.dart';
 import 'package:productive_app/task_page/widgets/drawerListTile.dart';
+import 'package:provider/provider.dart';
 
 class MainDrawer extends StatelessWidget {
   final String username;
@@ -67,6 +71,19 @@ class MainDrawer extends StatelessWidget {
             DrawerListTile(
               icon: Icons.analytics_outlined,
               title: 'Analytics',
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            ListTile(
+              minLeadingWidth: 16,
+              contentPadding: EdgeInsets.symmetric(horizontal: 0),
+              leading: Icon(Icons.logout),
+              title: Text('Logout'),
+              onTap: () {
+                Provider.of<AuthProvider>(context, listen: false).logout();
+                //Navigator.of(context).popAndPushNamed(TaskScreen.routeName);
+              },
             ),
           ],
         ),

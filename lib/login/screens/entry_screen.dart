@@ -5,6 +5,8 @@ import '../buttons/login_button.dart';
 import 'login_screen.dart';
 
 class EntryScreen extends StatelessWidget {
+  static const routeName = 'entry-screen';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

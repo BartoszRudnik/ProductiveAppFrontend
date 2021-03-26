@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:productive_app/login/providers/auth_provider.dart';
+import 'package:productive_app/task_page/task_screens/task_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'login_greet.dart';
@@ -34,7 +35,7 @@ class _LoginWidgetState extends State<LoginWidget> {
     );
   }
 
-  void _trySubmit() async {
+  Future<void> _trySubmit() async {
     final isValid = _formKey.currentState.validate();
     setState(() {
       this._isValid = isValid;
@@ -54,6 +55,13 @@ class _LoginWidgetState extends State<LoginWidget> {
           this._email,
           this._password,
         );
+        Navigator.of(context).pop();
+      } else {
+        await Provider.of<AuthProvider>(context, listen: false).signIn(
+          this._email,
+          this._password,
+        );
+        Navigator.of(context).pop();
       }
     } on HttpException catch (error) {
       var errorMessage = 'Authentication failed.';
