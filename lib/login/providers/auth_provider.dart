@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider with ChangeNotifier {
   String _token;
@@ -52,6 +53,15 @@ class AuthProvider with ChangeNotifier {
 
       this._autoLogout();
       notifyListeners();
+
+      final preferences = await SharedPreferences.getInstance();
+      final userData = json.encode(
+        {
+          'token': this._token,
+          'expiryDate': this._expiryDate.toIso8601String(),
+        },
+      );
+      preferences.setString('userData', userData);
     } catch (error) {
       throw error;
     }
@@ -87,5 +97,28 @@ class AuthProvider with ChangeNotifier {
     }
 
     notifyListeners();
+  }
+
+  Future<bool> tryAutoLogin() async {
+    final getPreferences = await SharedPreferences.getInstance();
+
+    if (!getPreferences.containsKey('userData')) {
+      return false;
+    }
+
+    final extractedUserData = json.decode(getPreferences.getString('userData')) as Map<String, Object>;
+    final expiryDate = DateTime.parse(extractedUserData['expiryDate']);
+
+    if (expiryDate.isBefore(DateTime.now())) {
+      return false;
+    }
+
+    this._token = extractedUserData['token'];
+    this._expiryDate = expiryDate;
+
+    notifyListeners();
+    this._autoLogout();
+
+    return true;
   }
 }

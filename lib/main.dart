@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/login/providers/auth_provider.dart';
+import 'package:productive_app/login/screens/splash_screen.dart';
 import 'package:productive_app/task_page/task_screens/task_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -47,7 +48,12 @@ class MyApp extends StatelessWidget {
               ),
             ),
           ),
-          home: authData.isAuth ? TaskScreen() : EntryScreen(),
+          home: authData.isAuth
+              ? TaskScreen()
+              : FutureBuilder(
+                  future: authData.tryAutoLogin(),
+                  builder: (ctx, authResult) => authResult.connectionState == ConnectionState.waiting ? SplashScreen() : EntryScreen(),
+                ),
           routes: {
             LoginScreen.routeName: (ctx) => LoginScreen(),
             TaskScreen.routeName: (ctx) => TaskScreen(),
