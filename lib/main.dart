@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/login/screens/reset_password.dart';
 import 'package:provider/provider.dart';
 
 import 'login/providers/auth_provider.dart';
@@ -58,6 +59,7 @@ class MyApp extends StatelessWidget {
             LoginScreen.routeName: (ctx) => LoginScreen(),
             InboxScreen.routeName: (ctx) => InboxScreen(),
             EntryScreen.routeName: (ctx) => EntryScreen(),
+            ResetPassword.routeName: (ctx) => ResetPassword(),
           },
         ),
       ),

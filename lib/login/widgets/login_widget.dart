@@ -1,10 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:productive_app/login/providers/auth_provider.dart';
-import 'package:productive_app/task_page/task_screens/inbox_screen.dart';
+import 'package:productive_app/login/screens/reset_password.dart';
 import 'package:provider/provider.dart';
-
+import '../providers/auth_provider.dart';
 import 'login_greet.dart';
 
 class LoginWidget extends StatefulWidget {
@@ -36,7 +35,7 @@ class _LoginWidgetState extends State<LoginWidget> {
   }
 
   Future<void> _trySubmit() async {
-    final isValid = _formKey.currentState.validate();
+    final isValid = this._formKey.currentState.validate();
     setState(() {
       this._isValid = isValid;
     });
@@ -181,7 +180,9 @@ class _LoginWidgetState extends State<LoginWidget> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: <Widget>[
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.of(context).pushNamed(ResetPassword.routeName);
+                          },
                           child: Text(
                             'Forgot Password?',
                             style: Theme.of(context).textTheme.headline5,
