@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/login/providers/auth_provider.dart';
-import 'package:productive_app/login/screens/splash_screen.dart';
-import 'package:productive_app/task_page/task_screens/task_screen.dart';
 import 'package:provider/provider.dart';
 
+import 'login/providers/auth_provider.dart';
 import 'login/screens/entry_screen.dart';
 import 'login/screens/login_screen.dart';
+import 'login/screens/splash_screen.dart';
+import 'task_page/task_screens/inbox_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -49,14 +49,14 @@ class MyApp extends StatelessWidget {
             ),
           ),
           home: authData.isAuth
-              ? TaskScreen()
+              ? InboxScreen()
               : FutureBuilder(
                   future: authData.tryAutoLogin(),
                   builder: (ctx, authResult) => authResult.connectionState == ConnectionState.waiting ? SplashScreen() : EntryScreen(),
                 ),
           routes: {
             LoginScreen.routeName: (ctx) => LoginScreen(),
-            TaskScreen.routeName: (ctx) => TaskScreen(),
+            InboxScreen.routeName: (ctx) => InboxScreen(),
             EntryScreen.routeName: (ctx) => EntryScreen(),
           },
         ),

@@ -2,11 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class TaskAppBar extends StatelessWidget with PreferredSizeWidget {
+  final String title;
+
+  TaskAppBar({
+    @required this.title,
+  });
+
   @override
   Widget build(BuildContext context) {
     return AppBar(
       title: Text(
-        'Today',
+        this.title,
         style: TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.bold,

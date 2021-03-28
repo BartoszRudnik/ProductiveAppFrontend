@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:productive_app/login/providers/auth_provider.dart';
-import 'package:productive_app/task_page/task_screens/task_screen.dart';
+import 'package:productive_app/task_page/task_screens/inbox_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'login_greet.dart';
