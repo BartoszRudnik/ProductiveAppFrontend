@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/login/screens/reset_password.dart';
+import 'package:productive_app/task_page/task_screens/tabs_screen.dart';
+import 'package:productive_app/task_page/task_screens/task_details_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'login/providers/auth_provider.dart';
@@ -49,17 +51,19 @@ class MyApp extends StatelessWidget {
               ),
             ),
           ),
-          home: authData.isAuth
-              ? InboxScreen()
-              : FutureBuilder(
-                  future: authData.tryAutoLogin(),
-                  builder: (ctx, authResult) => authResult.connectionState == ConnectionState.waiting ? SplashScreen() : EntryScreen(),
-                ),
+          home: TabsScreen(),
+          // home: authData.isAuth
+          //     ? InboxScreen()
+          //     : FutureBuilder(
+          //         future: authData.tryAutoLogin(),
+          //         builder: (ctx, authResult) => authResult.connectionState == ConnectionState.waiting ? SplashScreen() : EntryScreen(),
+          //       ),
           routes: {
             LoginScreen.routeName: (ctx) => LoginScreen(),
             InboxScreen.routeName: (ctx) => InboxScreen(),
             EntryScreen.routeName: (ctx) => EntryScreen(),
             ResetPassword.routeName: (ctx) => ResetPassword(),
+            TaskDetailScreen.routeName: (ctx) => TaskDetailScreen(),
           },
         ),
       ),

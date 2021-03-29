@@ -24,6 +24,7 @@ class _TabsScreenState extends State<TabsScreen> {
 
   @override
   void initState() {
+    super.initState();
     _pages = [
       {
         'page': InboxScreen(),
