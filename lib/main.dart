@@ -51,13 +51,12 @@ class MyApp extends StatelessWidget {
               ),
             ),
           ),
-          home: TabsScreen(),
-          // home: authData.isAuth
-          //     ? InboxScreen()
-          //     : FutureBuilder(
-          //         future: authData.tryAutoLogin(),
-          //         builder: (ctx, authResult) => authResult.connectionState == ConnectionState.waiting ? SplashScreen() : EntryScreen(),
-          //       ),
+          home: authData.isAuth
+              ? InboxScreen()
+              : FutureBuilder(
+                  future: authData.tryAutoLogin(),
+                  builder: (ctx, authResult) => authResult.connectionState == ConnectionState.waiting ? SplashScreen() : EntryScreen(),
+                ),
           routes: {
             LoginScreen.routeName: (ctx) => LoginScreen(),
             InboxScreen.routeName: (ctx) => InboxScreen(),
