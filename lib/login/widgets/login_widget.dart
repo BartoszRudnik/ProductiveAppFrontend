@@ -107,7 +107,7 @@ class _LoginWidgetState extends State<LoginWidget> {
               if (!this._isValid)
                 Container(
                   width: 310,
-                  height: 30,
+                  height: 40,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -119,10 +119,12 @@ class _LoginWidgetState extends State<LoginWidget> {
                       SizedBox(
                         width: 8,
                       ),
-                      Text(
-                        this._authenticationFailedMessage,
-                        style: TextStyle(
-                          fontSize: 16,
+                      Flexible(
+                        child: Text(
+                          this._authenticationFailedMessage,
+                          style: TextStyle(
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                     ],
@@ -139,6 +141,9 @@ class _LoginWidgetState extends State<LoginWidget> {
                 keyboardType: TextInputType.emailAddress,
                 validator: (value) {
                   if (value.isEmpty || !value.contains('@')) {
+                    setState(() {
+                      this._authenticationFailedMessage = 'Please enter a valid email address.';
+                    });
                     return 'Please enter a valid email address.';
                   }
                   return null;
@@ -165,6 +170,9 @@ class _LoginWidgetState extends State<LoginWidget> {
                 key: ValueKey('password'),
                 validator: (value) {
                   if (value.isEmpty || value.length < 7) {
+                    setState(() {
+                      this._authenticationFailedMessage = 'Password must be at least 7 characters long.';
+                    });
                     return 'Password must be at least 7 characters long.';
                   }
                   return null;

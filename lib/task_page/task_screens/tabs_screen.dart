@@ -127,7 +127,7 @@ class _TabsScreenState extends State<TabsScreen> {
                 title: SizedBox.shrink(),
               ),
               BottomNavigationBarItem(
-                icon: _buildIcon(Icons.calendar_today_outlined, 'Scheduled', 2),
+                icon: _buildIcon(Icons.calendar_today, 'Scheduled', 2),
                 title: SizedBox.shrink(),
               ),
               BottomNavigationBarItem(
