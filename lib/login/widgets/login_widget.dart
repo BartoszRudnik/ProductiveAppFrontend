@@ -15,8 +15,11 @@ class _LoginWidgetState extends State<LoginWidget> {
 
   var _isValid = true;
   var _isLogin = true;
+  var _isLoading = false;
+
   var _email = '';
   var _password = '';
+
   var _authenticationFailedMessage = '';
 
   @override
@@ -47,6 +50,10 @@ class _LoginWidgetState extends State<LoginWidget> {
     }
 
     _formKey.currentState.save();
+
+    setState(() {
+      this._isLoading = true;
+    });
 
     try {
       if (!_isLogin) {
@@ -81,6 +88,10 @@ class _LoginWidgetState extends State<LoginWidget> {
         this._isValid = false;
       });
     }
+
+    setState(() {
+      this._isLoading = false;
+    });
   }
 
   @override
@@ -193,24 +204,27 @@ class _LoginWidgetState extends State<LoginWidget> {
                       ],
                     )
                   : SizedBox(height: 48),
-              Container(
-                width: 304,
-                height: 47,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).primaryColor,
-                    side: BorderSide(color: Theme.of(context).primaryColor),
-                  ),
-                  onPressed: this._trySubmit,
-                  child: Text(
-                    this._isLogin ? 'Sign in' : 'Sign up',
-                    style: TextStyle(
-                      fontSize: 25,
-                      color: Theme.of(context).accentColor,
+              if (this._isLoading)
+                CircularProgressIndicator(backgroundColor: Theme.of(context).primaryColor)
+              else
+                Container(
+                  width: 304,
+                  height: 47,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Theme.of(context).primaryColor,
+                      side: BorderSide(color: Theme.of(context).primaryColor),
+                    ),
+                    onPressed: this._trySubmit,
+                    child: Text(
+                      this._isLogin ? 'Sign in' : 'Sign up',
+                      style: TextStyle(
+                        fontSize: 25,
+                        color: Theme.of(context).accentColor,
+                      ),
                     ),
                   ),
                 ),
-              ),
               SizedBox(
                 height: 20,
               ),

@@ -82,7 +82,7 @@ class MainDrawer extends StatelessWidget {
               leading: Icon(Icons.logout),
               title: Text('Logout'),
               onTap: () {
-                Navigator.of(context).pushReplacementNamed(EntryScreen.routeName);
+                Navigator.of(context).pop();
                 Provider.of<AuthProvider>(context, listen: false).logout();
               },
             ),
