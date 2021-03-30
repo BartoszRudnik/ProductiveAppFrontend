@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../exceptions/HttpException.dart';
+
 class AuthProvider with ChangeNotifier {
   String _token;
   DateTime _expiryDate;
@@ -43,6 +45,11 @@ class AuthProvider with ChangeNotifier {
       );
 
       final responseData = json.decode(response.body);
+
+      if (responseData['error']?.isNotEmpty == true) {
+        print(responseData['message']);
+        throw HttpException(responseData['message']);
+      }
 
       this._token = responseData['token'];
       this._expiryDate = DateTime.now().add(
@@ -99,6 +106,9 @@ class AuthProvider with ChangeNotifier {
     }
 
     notifyListeners();
+
+    final userPreferences = await SharedPreferences.getInstance();
+    userPreferences.clear();
   }
 
   Future<bool> tryAutoLogin() async {

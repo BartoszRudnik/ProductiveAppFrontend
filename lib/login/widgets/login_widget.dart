@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:productive_app/login/exceptions/HttpException.dart';
 import 'package:productive_app/login/screens/reset_password.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
@@ -18,6 +17,7 @@ class _LoginWidgetState extends State<LoginWidget> {
   var _isLogin = true;
   var _email = '';
   var _password = '';
+  var _authenticationFailedMessage = '';
 
   @override
   void initState() {
@@ -63,21 +63,23 @@ class _LoginWidgetState extends State<LoginWidget> {
         Navigator.of(context).pop();
       }
     } on HttpException catch (error) {
-      var errorMessage = 'Authentication failed.';
+      var message = 'Authentication failed';
 
-      if (error.toString().contains('EMAIL_EXISTS')) {
-        errorMessage = 'This email address is already in use';
-      } else if (error.toString().contains('INVALID_EMAIL')) {
-        errorMessage = 'This is not a valid email address';
-      } else if (error.toString().contains('WEAK_PASSWORD')) {
-        errorMessage = 'This password is too weak';
-      } else if (error.toString().contains('EMAIL_NOT_FOUND')) {
-        errorMessage = 'Could not find your email address';
-      } else if (error.toString().contains('INVALID_PASSWORD')) {
-        errorMessage = 'Invalid password';
+      if (error.toString().contains('email already taken')) {
+        message = 'Email already taken';
+      }
+      if (error.toString().contains('Wrong email or password')) {
+        message = 'E-mail or Password is incorrect';
       }
 
-      print(errorMessage);
+      setState(() {
+        this._authenticationFailedMessage = message;
+        this._isValid = false;
+      });
+    } catch (error) {
+      setState(() {
+        this._isValid = false;
+      });
     }
   }
 
@@ -107,7 +109,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                         width: 8,
                       ),
                       Text(
-                        'E-mail or Password is incorrect',
+                        this._authenticationFailedMessage,
                         style: TextStyle(
                           fontSize: 16,
                         ),

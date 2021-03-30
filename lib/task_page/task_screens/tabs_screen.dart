@@ -7,6 +7,8 @@ import 'package:productive_app/task_page/task_screens/inbox_screen.dart';
 import 'package:productive_app/task_page/task_screens/scheduled_screen.dart';
 
 class TabsScreen extends StatefulWidget {
+  static const routeName = ('/tabs-screen');
+
   @override
   _TabsScreenState createState() => _TabsScreenState();
 }

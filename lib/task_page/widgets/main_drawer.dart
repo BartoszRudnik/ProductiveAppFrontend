@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/login/providers/auth_provider.dart';
 import 'package:productive_app/login/screens/entry_screen.dart';
-import 'package:productive_app/task_page/task_screens/inbox_screen.dart';
-import 'package:productive_app/task_page/widgets/drawerListTile.dart';
+import 'package:productive_app/task_page/task_screens/tabs_screen.dart';
 import 'package:provider/provider.dart';
+
+import '../../login/providers/auth_provider.dart';
+import 'drawerListTile.dart';
 
 class MainDrawer extends StatelessWidget {
   final String username;
@@ -81,8 +82,8 @@ class MainDrawer extends StatelessWidget {
               leading: Icon(Icons.logout),
               title: Text('Logout'),
               onTap: () {
+                Navigator.of(context).pushReplacementNamed(EntryScreen.routeName);
                 Provider.of<AuthProvider>(context, listen: false).logout();
-                //Navigator.of(context).popAndPushNamed(TaskScreen.routeName);
               },
             ),
           ],
