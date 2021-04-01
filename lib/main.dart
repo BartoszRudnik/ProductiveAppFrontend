@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/task_page/task_screens/tabs_screen.dart';
+import 'package:productive_app/login/screens/splash_screen.dart';
+import 'task_page/task_screens/tabs_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'login/providers/auth_provider.dart';
 import 'login/screens/entry_screen.dart';
 import 'login/screens/login_screen.dart';
 import 'login/screens/reset_password.dart';
-import 'login/screens/splash_screen.dart';
 import 'task_page/task_screens/inbox_screen.dart';
 import 'task_page/task_screens/task_details_screen.dart';
 
@@ -46,6 +46,11 @@ class MyApp extends StatelessWidget {
               ),
               headline3: TextStyle(
                 fontSize: 36,
+                fontFamily: 'RobotoCondensed',
+                color: Colors.black,
+              ),
+              headline2: TextStyle(
+                fontSize: 26,
                 fontFamily: 'RobotoCondensed',
                 color: Colors.black,
               ),

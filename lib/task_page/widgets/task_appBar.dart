@@ -11,11 +11,12 @@ class TaskAppBar extends StatelessWidget with PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      elevation: 0,
       title: Text(
         this.title,
         style: TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
+          fontSize: 30,
+          fontWeight: FontWeight.w400,
           color: Theme.of(context).primaryColor,
         ),
       ),
@@ -33,5 +34,5 @@ class TaskAppBar extends StatelessWidget with PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(40);
+  Size get preferredSize => Size.fromHeight(50);
 }

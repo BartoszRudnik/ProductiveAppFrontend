@@ -16,6 +16,7 @@ class _LoginWidgetState extends State<LoginWidget> {
   var _isValid = true;
   var _isLogin = true;
   var _isLoading = false;
+  var _isSuccessfull = false;
 
   var _email = '';
   var _password = '';
@@ -61,7 +62,48 @@ class _LoginWidgetState extends State<LoginWidget> {
           this._email,
           this._password,
         );
-        Navigator.of(context).pop();
+        setState(() {
+          this._isLoading = false;
+          this._isSuccessfull = true;
+        });
+        return showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(
+              'Registration successful',
+              style: Theme.of(context).textTheme.headline2,
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Please check your registered email for email verification'),
+                SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: Theme.of(context).primaryColor,
+                        side: BorderSide(color: Theme.of(context).primaryColor),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop(true);
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(
+                        'OK',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Theme.of(context).accentColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
       } else {
         await Provider.of<AuthProvider>(context, listen: false).signIn(
           this._email,
@@ -218,20 +260,22 @@ class _LoginWidgetState extends State<LoginWidget> {
                 Container(
                   width: 304,
                   height: 47,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Theme.of(context).primaryColor,
-                      side: BorderSide(color: Theme.of(context).primaryColor),
-                    ),
-                    onPressed: this._trySubmit,
-                    child: Text(
-                      this._isLogin ? 'Sign in' : 'Sign up',
-                      style: TextStyle(
-                        fontSize: 25,
-                        color: Theme.of(context).accentColor,
-                      ),
-                    ),
-                  ),
+                  child: this._isSuccessfull
+                      ? null
+                      : ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: Theme.of(context).primaryColor,
+                            side: BorderSide(color: Theme.of(context).primaryColor),
+                          ),
+                          onPressed: this._trySubmit,
+                          child: Text(
+                            this._isLogin ? 'Sign in' : 'Sign up',
+                            style: TextStyle(
+                              fontSize: 25,
+                              color: Theme.of(context).accentColor,
+                            ),
+                          ),
+                        ),
                 ),
               SizedBox(
                 height: 20,

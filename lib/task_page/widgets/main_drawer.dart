@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/login/screens/entry_screen.dart';
-import 'package:productive_app/task_page/task_screens/tabs_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../../login/providers/auth_provider.dart';
@@ -80,10 +78,65 @@ class MainDrawer extends StatelessWidget {
               minLeadingWidth: 16,
               contentPadding: EdgeInsets.symmetric(horizontal: 0),
               leading: Icon(Icons.logout),
-              title: Text('Logout'),
+              title: Text('Log out'),
               onTap: () {
-                Navigator.of(context).pop();
-                Provider.of<AuthProvider>(context, listen: false).logout();
+                return showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Center(
+                      child: Text(
+                        'Log out',
+                        style: Theme.of(context).textTheme.headline3,
+                      ),
+                    ),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('Are you sure you want to log out?'),
+                        SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                primary: Theme.of(context).primaryColor,
+                                side: BorderSide(color: Theme.of(context).primaryColor),
+                              ),
+                              onPressed: () {
+                                Provider.of<AuthProvider>(context, listen: false).logout();
+                                Navigator.of(context).pop(true);
+                                Navigator.of(context).pop();
+                              },
+                              child: Text(
+                                'Yes',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Theme.of(context).accentColor,
+                                ),
+                              ),
+                            ),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                primary: Theme.of(context).primaryColor,
+                                side: BorderSide(color: Theme.of(context).primaryColor),
+                              ),
+                              onPressed: () {
+                                Navigator.of(context).pop(false);
+                              },
+                              child: Text(
+                                'No',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Theme.of(context).accentColor,
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                );
               },
             ),
           ],
