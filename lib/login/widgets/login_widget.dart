@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/login/exceptions/HttpException.dart';
-import 'package:productive_app/login/screens/reset_password.dart';
 import 'package:provider/provider.dart';
+
+import '../exceptions/HttpException.dart';
 import '../providers/auth_provider.dart';
+import '../screens/reset_password.dart';
+import 'validation_fail_widget.dart';
 import 'login_greet.dart';
 
 class LoginWidget extends StatefulWidget {
@@ -146,32 +148,7 @@ class _LoginWidgetState extends State<LoginWidget> {
           child: Column(
             children: <Widget>[
               LoginGreet(greetText: this._isLogin ? 'Welcome back' : 'Create account'),
-              if (!this._isValid)
-                Container(
-                  width: 310,
-                  height: 40,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Icon(
-                        Icons.warning_amber_outlined,
-                        size: 30,
-                      ),
-                      SizedBox(
-                        width: 8,
-                      ),
-                      Flexible(
-                        child: Text(
-                          this._authenticationFailedMessage,
-                          style: TextStyle(
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              if (!this._isValid) ValidationFailWidget(message: this._authenticationFailedMessage),
               SizedBox(
                 height: this._isValid ? 0 : 10,
               ),

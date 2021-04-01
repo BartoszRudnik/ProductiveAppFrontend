@@ -84,6 +84,8 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> resetPassword(String email) async {}
 
+  Future<void> newPassword(String email, String token, String newPassword) async {}
+
   void _autoLogout() {
     if (this._authTimer != null) {
       _authTimer.cancel();

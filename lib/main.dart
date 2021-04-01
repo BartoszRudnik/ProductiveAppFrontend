@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/login/screens/splash_screen.dart';
-import 'task_page/task_screens/tabs_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'login/providers/auth_provider.dart';
 import 'login/screens/entry_screen.dart';
 import 'login/screens/login_screen.dart';
+import 'login/screens/new_password.dart';
 import 'login/screens/reset_password.dart';
+import 'login/screens/splash_screen.dart';
 import 'task_page/task_screens/inbox_screen.dart';
+import 'task_page/task_screens/tabs_screen.dart';
 import 'task_page/task_screens/task_details_screen.dart';
 
 void main() => runApp(MyApp());
@@ -69,6 +70,7 @@ class MyApp extends StatelessWidget {
             EntryScreen.routeName: (ctx) => EntryScreen(),
             ResetPassword.routeName: (ctx) => ResetPassword(),
             TaskDetailScreen.routeName: (ctx) => TaskDetailScreen(),
+            NewPassword.routeName: (ctx) => NewPassword(),
           },
         ),
       ),
