@@ -13,6 +13,8 @@ class AuthProvider with ChangeNotifier {
   DateTime _expiryDate;
   Timer _authTimer;
 
+  String _serverUrl = 'http://192.168.1.120:8080/api/v1/';
+
   bool get isAuth {
     return token != null;
   }
@@ -25,7 +27,7 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> _authenticate(String email, String password, String urlSegment) async {
-    String url = 'http://192.168.1.120:8080/api/v1/$urlSegment';
+    String url = this._serverUrl + '$urlSegment';
 
     try {
       final response = await http.post(
@@ -61,14 +63,7 @@ class AuthProvider with ChangeNotifier {
       this._autoLogout();
       notifyListeners();
 
-      final preferences = await SharedPreferences.getInstance();
-      final userData = json.encode(
-        {
-          'token': this._token,
-          'expiryDate': this._expiryDate.toIso8601String(),
-        },
-      );
-      preferences.setString('userData', userData);
+      this._saveLocalData();
     } catch (error) {
       throw error;
     }
@@ -83,7 +78,7 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> resetPassword(String email) async {
-    String url = 'http://192.168.1.120:8080/api/v1/resetToken';
+    String url = this._serverUrl + 'resetToken';
 
     try {
       final response = await http.post(
@@ -98,22 +93,13 @@ class AuthProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      // if (response.body.isNotEmpty) {
-      //   final responseData = json.decode(response.body);
-
-      //   if (responseData['error']?.isNotEmpty == true) {
-      //     print(responseData['message']);
-      //     throw HttpException(responseData['message']);
-      //   }
-      // }
     } catch (error) {
       throw error;
     }
   }
 
   Future<void> newPassword(String email, String token, String newPassword) async {
-    String url = 'http://192.168.1.120:8080/api/v1/newPassword';
+    String url = this._serverUrl + 'newPassword';
 
     try {
       final response = await http.post(
@@ -148,17 +134,21 @@ class AuthProvider with ChangeNotifier {
       this._autoLogout();
       notifyListeners();
 
-      final preferences = await SharedPreferences.getInstance();
-      final userData = json.encode(
-        {
-          'token': this._token,
-          'expiryDate': this._expiryDate.toIso8601String(),
-        },
-      );
-      preferences.setString('userData', userData);
+      this._saveLocalData();
     } catch (error) {
       throw error;
     }
+  }
+
+  void _saveLocalData() async {
+    final preferences = await SharedPreferences.getInstance();
+    final userData = json.encode(
+      {
+        'token': this._token,
+        'expiryDate': this._expiryDate.toIso8601String(),
+      },
+    );
+    preferences.setString('userData', userData);
   }
 
   void _autoLogout() {
