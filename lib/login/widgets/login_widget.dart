@@ -221,7 +221,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                       children: <Widget>[
                         TextButton(
                           onPressed: () {
-                            Navigator.of(context).pushNamed(ResetPassword.routeName);
+                            Navigator.of(context).pushReplacementNamed(ResetPassword.routeName);
                           },
                           child: Text(
                             'Forgot Password?',

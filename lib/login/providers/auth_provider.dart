@@ -82,9 +82,84 @@ class AuthProvider with ChangeNotifier {
     return this._authenticate(email, password, 'login');
   }
 
-  Future<void> resetPassword(String email) async {}
+  Future<void> resetPassword(String email) async {
+    String url = 'http://192.168.1.120:8080/api/v1/resetToken';
 
-  Future<void> newPassword(String email, String token, String newPassword) async {}
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode(
+          {
+            'email': email,
+          },
+        ),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      // if (response.body.isNotEmpty) {
+      //   final responseData = json.decode(response.body);
+
+      //   if (responseData['error']?.isNotEmpty == true) {
+      //     print(responseData['message']);
+      //     throw HttpException(responseData['message']);
+      //   }
+      // }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  Future<void> newPassword(String email, String token, String newPassword) async {
+    String url = 'http://192.168.1.120:8080/api/v1/newPassword';
+
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode(
+          {
+            'email': email,
+            'token': token,
+            'newPassword': newPassword,
+          },
+        ),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['error']?.isNotEmpty == true) {
+        print(responseData['message']);
+        throw HttpException(responseData['message']);
+      }
+
+      this._token = responseData['token'];
+      this._expiryDate = DateTime.now().add(
+        Duration(
+          milliseconds: responseData['tokenDuration'],
+        ),
+      );
+
+      this._autoLogout();
+      notifyListeners();
+
+      final preferences = await SharedPreferences.getInstance();
+      final userData = json.encode(
+        {
+          'token': this._token,
+          'expiryDate': this._expiryDate.toIso8601String(),
+        },
+      );
+      preferences.setString('userData', userData);
+    } catch (error) {
+      throw error;
+    }
+  }
 
   void _autoLogout() {
     if (this._authTimer != null) {

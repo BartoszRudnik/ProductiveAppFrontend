@@ -6,7 +6,6 @@ import '../exceptions/HttpException.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/login_greet.dart';
 import '../widgets/validation_fail_widget.dart';
-import 'entry_screen.dart';
 import 'login_screen.dart';
 
 class NewPassword extends StatefulWidget {
@@ -85,7 +84,7 @@ class _NewPasswordState extends State<NewPassword> {
                     ),
                     onPressed: () {
                       Navigator.of(context).pop(true);
-                      Navigator.of(context).pushReplacementNamed(EntryScreen.routeName);
+                      Navigator.of(context).pop();
                     },
                     child: Text(
                       'OK',
