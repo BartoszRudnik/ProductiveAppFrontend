@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/task_page/providers/task_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'login/providers/auth_provider.dart';
@@ -20,6 +21,14 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
           create: (context) => AuthProvider(),
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, TaskProvider>(
+          create: null,
+          update: (ctx, auth, previousTasks) => TaskProvider(
+            userMail: auth.email,
+            authToken: auth.token,
+            //taskList: previousTasks == null ? [] : previousTasks.taskList,
+          ),
         ),
       ],
       child: Consumer<AuthProvider>(

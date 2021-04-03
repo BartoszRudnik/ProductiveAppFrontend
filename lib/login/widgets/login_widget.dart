@@ -23,7 +23,7 @@ class _LoginWidgetState extends State<LoginWidget> {
   var _email = '';
   var _password = '';
 
-  var _authenticationFailedMessage = '';
+  var _authenticationFailedMessage = 'Authentication failed';
 
   @override
   void initState() {

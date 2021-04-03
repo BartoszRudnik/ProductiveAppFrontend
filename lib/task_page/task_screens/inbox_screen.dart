@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/task_page/providers/task_provider.dart';
 import 'package:productive_app/task_page/task_screens/task_details_screen.dart';
+import 'package:provider/provider.dart';
 
 class InboxScreen extends StatefulWidget {
   static const routeName = '/task-screen';
@@ -11,94 +13,11 @@ class InboxScreen extends StatefulWidget {
 }
 
 class _InboxScreenState extends State<InboxScreen> {
-  var tasks = [
-    {
-      'title': 'Example taks 1 long task title test',
-      'startDate': '2021-01-11',
-      'endDate': '2021-03-14',
-      'tag': 'tag1',
-      'done': false,
-    },
-    {
-      'title': 'Example task 2',
-      'startDate': '2021-03-20',
-      'endDate': '2021-05-29',
-      'tag': 'tag2',
-      'done': false,
-    },
-    {
-      'title': 'Example taks 3',
-      'startDate': '2021-01-11',
-      'endDate': '2021-03-14',
-      'tag': 'tag1',
-      'done': false,
-    },
-    {
-      'title': 'Example taks 4',
-      'startDate': '2021-01-11',
-      'endDate': '2021-03-14',
-      'tag': 'tag1',
-      'done': false,
-    },
-    {
-      'title': 'Example taks 5',
-      'startDate': '2021-01-11',
-      'endDate': '2021-03-14',
-      'tag': 'tag1',
-      'done': false,
-    },
-    {
-      'title': 'Example taks 6',
-      'startDate': '2021-01-11',
-      'endDate': '2021-03-14',
-      'tag': 'tag1',
-      'done': false,
-    },
-    {
-      'title': 'Example taks 7',
-      'startDate': '2021-01-11',
-      'endDate': '2021-03-14',
-      'tag': 'tag1',
-      'done': false,
-    },
-    {
-      'title': 'Example taks 8',
-      'startDate': '2021-01-11',
-      'endDate': '2021-03-14',
-      'tag': 'tag1',
-      'done': false,
-    },
-    {
-      'title': 'Example taks 9',
-      'startDate': '2021-01-11',
-      'endDate': '2021-03-14',
-      'tag': 'tag1',
-      'done': false,
-    },
-    {
-      'title': 'Example taks 10',
-      'startDate': '2021-01-11',
-      'endDate': '2021-03-14',
-      'tag': 'tag1',
-      'done': false,
-    },
-    {
-      'title': 'Example taks 11',
-      'startDate': '2021-01-11',
-      'endDate': '2021-03-14',
-      'tag': 'tag1',
-      'done': false,
-    },
-  ];
-
-  void _changeTaskStatus(int index) {
-    setState(() {
-      tasks[index]['done'] = !tasks[index]['done'];
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    final loadedTasks = Provider.of<TaskProvider>(context);
+    final tasks = loadedTasks.tasks;
+
     return Container(
       child: Column(
         children: <Widget>[
@@ -142,7 +61,11 @@ class _InboxScreenState extends State<InboxScreen> {
                       IconSlideAction(
                         caption: 'Mark as done',
                         color: Theme.of(context).accentColor,
-                        onTap: () => this._changeTaskStatus(index),
+                        onTap: () {
+                          setState(() {
+                            tasks[index].changeTaskStatus();
+                          });
+                        },
                         iconWidget: Icon(
                           Icons.done,
                           color: Theme.of(context).primaryColor,
@@ -164,17 +87,21 @@ class _InboxScreenState extends State<InboxScreen> {
                           children: <Widget>[
                             RawMaterialButton(
                               focusElevation: 0,
-                              child: tasks[index]['done']
+                              child: tasks[index].done
                                   ? Icon(
                                       Icons.done,
                                       color: Colors.white,
                                       size: 14,
                                     )
                                   : null,
-                              onPressed: () => this._changeTaskStatus(index),
+                              onPressed: () {
+                                setState(() {
+                                  tasks[index].changeTaskStatus();
+                                });
+                              },
                               constraints: BoxConstraints(minWidth: 20, minHeight: 18),
                               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              fillColor: tasks[index]['done'] ? Colors.grey : Theme.of(context).accentColor,
+                              fillColor: tasks[index].done ? Colors.grey : Theme.of(context).accentColor,
                               shape: CircleBorder(
                                 side: BorderSide(
                                   color: Theme.of(context).primaryColor,
@@ -187,13 +114,13 @@ class _InboxScreenState extends State<InboxScreen> {
                               width: 7,
                             ),
                             Text(
-                              tasks[index]['title'],
+                              tasks[index].title,
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w400,
                                 fontFamily: 'RobotoCondensed',
-                                decoration: tasks[index]['done'] ? TextDecoration.lineThrough : null,
-                                color: tasks[index]['done'] ? Colors.grey : Theme.of(context).primaryColor,
+                                decoration: tasks[index].done ? TextDecoration.lineThrough : null,
+                                color: tasks[index].done ? Colors.grey : Theme.of(context).primaryColor,
                               ),
                             ),
                           ],
@@ -210,10 +137,10 @@ class _InboxScreenState extends State<InboxScreen> {
                                 Icon(Icons.calendar_today),
                                 SizedBox(width: 6),
                                 Text(
-                                  DateFormat('MMM d').format(DateTime.parse(tasks[index]['startDate'])) + ' - ',
+                                  DateFormat('MMM d').format(DateTime.parse(tasks[index].startDate)) + ' - ',
                                 ),
                                 Text(
-                                  DateFormat('MMM d').format(DateTime.parse(tasks[index]['endDate'])),
+                                  DateFormat('MMM d').format(DateTime.parse(tasks[index].endDate)),
                                 ),
                               ],
                             ),
@@ -233,7 +160,7 @@ class _InboxScreenState extends State<InboxScreen> {
                                   ),
                                   child: Center(
                                     child: Text(
-                                      tasks[index]['tag'],
+                                      tasks[index].tags[0],
                                       textAlign: TextAlign.center,
                                     ),
                                   ),

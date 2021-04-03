@@ -12,24 +12,26 @@ class AuthProvider with ChangeNotifier {
   String _token;
   DateTime _expiryDate;
   Timer _authTimer;
+  String _email;
 
-  String _serverUrl = 'http://192.168.0.101:8080/api/v1/'; //computer IP address
+  String _serverUrl = 'http://192.168.1.120:8080/api/v1/'; //computer IP address
 
   bool get isAuth {
     return token != null;
   }
 
+  String get email {
+    return this._email;
+  }
+
   String get token {
-    if (this._expiryDate != null &&
-        this._expiryDate.isAfter(DateTime.now()) &&
-        this._token != null) {
+    if (this._expiryDate != null && this._expiryDate.isAfter(DateTime.now()) && this._token != null) {
       return this._token;
     }
     return null;
   }
 
-  Future<void> _authenticate(
-      String email, String password, String urlSegment) async {
+  Future<void> _authenticate(String email, String password, String urlSegment) async {
     String url = this._serverUrl + '$urlSegment';
 
     try {
@@ -56,6 +58,7 @@ class AuthProvider with ChangeNotifier {
         throw HttpException(responseData['message']);
       }
 
+      this._email = email;
       this._token = responseData['token'];
       this._expiryDate = DateTime.now().add(
         Duration(
@@ -101,8 +104,7 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<void> newPassword(
-      String email, String token, String newPassword) async {
+  Future<void> newPassword(String email, String token, String newPassword) async {
     String url = this._serverUrl + 'newPassword';
 
     try {
@@ -128,6 +130,7 @@ class AuthProvider with ChangeNotifier {
         throw HttpException(responseData['message']);
       }
 
+      this._email = email;
       this._token = responseData['token'];
       this._expiryDate = DateTime.now().add(
         Duration(
@@ -189,8 +192,7 @@ class AuthProvider with ChangeNotifier {
       return false;
     }
 
-    final extractedUserData = json.decode(getPreferences.getString('userData'))
-        as Map<String, Object>;
+    final extractedUserData = json.decode(getPreferences.getString('userData')) as Map<String, Object>;
     final expiryDate = DateTime.parse(extractedUserData['expiryDate']);
 
     if (expiryDate.isBefore(DateTime.now())) {
