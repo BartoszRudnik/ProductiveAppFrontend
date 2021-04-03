@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/task_page/widgets/new_task.dart';
 import 'package:productive_app/task_page/widgets/task_appBar.dart';
 import 'package:productive_app/task_page/widgets/main_drawer.dart';
 import 'package:productive_app/task_page/task_screens/anyTime_screen.dart';
@@ -45,6 +46,22 @@ class _TabsScreenState extends State<TabsScreen> {
         'title': 'Delegated',
       }
     ];
+  }
+
+  void _addNewTaskForm(BuildContext buildContext) {
+    showModalBottomSheet(
+      enableDrag: true,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).accentColor,
+      context: buildContext,
+      builder: (_) {
+        return GestureDetector(
+          onTap: () {},
+          child: NewTask(),
+          behavior: HitTestBehavior.opaque,
+        );
+      },
+    );
   }
 
   void _selectPage(int index) {
@@ -101,7 +118,9 @@ class _TabsScreenState extends State<TabsScreen> {
             color: Theme.of(context).accentColor,
             size: 50,
           ),
-          onPressed: () {},
+          onPressed: () {
+            this._addNewTaskForm(context);
+          },
           backgroundColor: Theme.of(context).primaryColor,
         ),
         bottomNavigationBar: Container(

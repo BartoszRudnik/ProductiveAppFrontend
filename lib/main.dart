@@ -26,6 +26,7 @@ class MyApp extends StatelessWidget {
         builder: (ctx, authData, _) => MaterialApp(
           title: 'Productive app',
           theme: ThemeData(
+            scaffoldBackgroundColor: Colors.white,
             primaryColor: Colors.black,
             accentColor: Colors.white,
             fontFamily: 'Lato',
