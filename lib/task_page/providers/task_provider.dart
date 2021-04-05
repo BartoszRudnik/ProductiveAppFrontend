@@ -1,123 +1,18 @@
-import 'package:flutter/foundation.dart';
+import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import '../models/task.dart';
 
 class TaskProvider with ChangeNotifier {
-  List<Task> taskList = [
-    Task(
-      id: '1',
-      title: 'Example taks 1 long task title test',
-      startDate: '2021-01-11',
-      endDate: '2021-03-14',
-      tags: [
-        'tag1',
-        'tag2',
-      ],
-      done: false,
-    ),
-    Task(
-      id: '2',
-      title: 'Example taks 2 long task title test',
-      startDate: '2021-01-11',
-      endDate: '2021-03-14',
-      tags: [
-        'tag1',
-        'tag2',
-      ],
-      done: false,
-    ),
-    Task(
-      id: '3',
-      title: 'Example taks 3 long task title test',
-      startDate: '2021-01-11',
-      endDate: '2021-03-14',
-      tags: [
-        'tag1',
-        'tag2',
-      ],
-      done: false,
-    ),
-    Task(
-      id: '4',
-      title: 'Example taks 4 long task title test',
-      startDate: '2021-01-11',
-      endDate: '2021-03-14',
-      tags: [
-        'tag1',
-        'tag2',
-      ],
-      done: false,
-    ),
-    Task(
-      id: '5',
-      title: 'Example taks 5 long task title test',
-      startDate: '2021-01-11',
-      endDate: '2021-03-14',
-      tags: [
-        'tag1',
-        'tag2',
-      ],
-      done: false,
-    ),
-    Task(
-      id: '6',
-      title: 'Example taks 6 long task title test',
-      startDate: '2021-01-11',
-      endDate: '2021-03-14',
-      tags: [
-        'tag1',
-        'tag2',
-      ],
-      done: false,
-    ),
-    Task(
-      id: '7',
-      title: 'Example taks 7 long task title test',
-      startDate: '2021-01-11',
-      endDate: '2021-03-14',
-      tags: [
-        'tag1',
-        'tag2',
-      ],
-      done: false,
-    ),
-    Task(
-      id: '8',
-      title: 'Example taks 8 long task title test',
-      startDate: '2021-01-11',
-      endDate: '2021-03-14',
-      tags: [
-        'tag1',
-        'tag2',
-      ],
-      done: false,
-    ),
-    Task(
-      id: '9',
-      title: 'Example taks 9 long task title test',
-      startDate: '2021-01-11',
-      endDate: '2021-03-14',
-      tags: [
-        'tag1',
-        'tag2',
-      ],
-      done: false,
-    ),
-    Task(
-      id: '10',
-      title: 'Example taks 10 long task title test',
-      startDate: '2021-01-11',
-      endDate: '2021-03-14',
-      tags: [
-        'tag1',
-        'tag2',
-      ],
-      done: false,
-    ),
-  ];
+  List<Task> archivedList = [];
+
+  List<Task> taskList = [];
 
   final String userMail;
   final String authToken;
+
+  String _serverUrl = 'http://192.168.1.120:8080/api/v1/';
 
   TaskProvider({
     @required this.userMail,
@@ -129,11 +24,39 @@ class TaskProvider with ChangeNotifier {
     return [...this.taskList];
   }
 
-  Future<void> addTask(Task task) async {}
+  Future<void> addTask(Task task) async {
+    String url = this._serverUrl + 'task/add';
+
+    try {
+      await http.post(
+        url,
+        body: json.encode(
+          {
+            'taskName': task.title,
+            'taskDescription': task.description,
+            'userEmail': this.userMail,
+            'startDate': task.startDate.toIso8601String(),
+            'endDate': task.endDate.toIso8601String(),
+          },
+        ),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      this.taskList.add(task);
+      notifyListeners();
+    } catch (error) {
+      throw error;
+    }
+  }
 
   Future<void> updateTask(String id, Task task) async {}
 
   Future<void> fetchTasks() async {}
 
-  Future<void> deleteTask(String id) async {}
+  Future<void> deleteTask(int index) async {
+    this.taskList.removeAt(index);
+  }
 }

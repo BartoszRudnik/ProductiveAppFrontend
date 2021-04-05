@@ -74,7 +74,11 @@ class _InboxScreenState extends State<InboxScreen> {
                       IconSlideAction(
                         caption: 'Archive',
                         color: Theme.of(context).accentColor,
-                        onTap: () {},
+                        onTap: () {
+                          setState(() {
+                            Provider.of<TaskProvider>(context, listen: false).deleteTask(index);
+                          });
+                        },
                         iconWidget: Icon(
                           Icons.delete,
                           color: Theme.of(context).primaryColor,
@@ -137,10 +141,10 @@ class _InboxScreenState extends State<InboxScreen> {
                                 Icon(Icons.calendar_today),
                                 SizedBox(width: 6),
                                 Text(
-                                  DateFormat('MMM d').format(DateTime.parse(tasks[index].startDate)) + ' - ',
+                                  DateFormat('MMM d').format(tasks[index].startDate) + ' - ',
                                 ),
                                 Text(
-                                  DateFormat('MMM d').format(DateTime.parse(tasks[index].endDate)),
+                                  DateFormat('MMM d').format(tasks[index].endDate),
                                 ),
                               ],
                             ),

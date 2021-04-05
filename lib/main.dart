@@ -38,6 +38,7 @@ class MyApp extends StatelessWidget {
             scaffoldBackgroundColor: Colors.white,
             primaryColor: Colors.black,
             accentColor: Colors.white,
+            backgroundColor: Colors.black,
             fontFamily: 'Lato',
             textTheme: TextTheme(
               headline6: TextStyle(
