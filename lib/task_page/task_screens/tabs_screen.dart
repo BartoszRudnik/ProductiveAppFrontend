@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/task_page/models/task.dart';
+import 'package:productive_app/task_page/providers/task_provider.dart';
 import 'package:productive_app/task_page/widgets/new_task.dart';
 import 'package:productive_app/task_page/widgets/task_appBar.dart';
 import 'package:productive_app/task_page/widgets/main_drawer.dart';
@@ -6,6 +8,7 @@ import 'package:productive_app/task_page/task_screens/anyTime_screen.dart';
 import 'package:productive_app/task_page/task_screens/delegated_screen.dart';
 import 'package:productive_app/task_page/task_screens/inbox_screen.dart';
 import 'package:productive_app/task_page/task_screens/scheduled_screen.dart';
+import 'package:provider/provider.dart';
 
 class TabsScreen extends StatefulWidget {
   static const routeName = ('/tabs-screen');
@@ -28,6 +31,7 @@ class _TabsScreenState extends State<TabsScreen> {
   @override
   void initState() {
     super.initState();
+
     _pages = [
       {
         'page': InboxScreen(),

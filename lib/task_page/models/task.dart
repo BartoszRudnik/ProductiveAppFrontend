@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 class Task with ChangeNotifier {
-  String id;
+  int id;
   String title;
   String description;
   DateTime startDate;

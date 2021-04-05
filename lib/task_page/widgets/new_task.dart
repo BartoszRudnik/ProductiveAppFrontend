@@ -22,7 +22,7 @@ class _NewTaskState extends State<NewTask> {
     this._formKey.currentState.save();
 
     final newTask = Task(
-      id: this._startDate.toString(),
+      id: null,
       title: this._taskName,
       startDate: this._startDate,
       endDate: this._endDate,
@@ -55,204 +55,202 @@ class _NewTaskState extends State<NewTask> {
             ),
             child: Form(
               key: this._formKey,
-              child: Expanded(
-                child: Column(
-                  children: [
-                    ListTile(
-                      isThreeLine: true,
-                      horizontalTitleGap: 5,
-                      minLeadingWidth: 20,
-                      contentPadding: EdgeInsets.all(0),
-                      leading: RawMaterialButton(
-                        fillColor: this._isDone ? Colors.grey : Theme.of(context).accentColor,
-                        focusElevation: 0,
-                        child: this._isDone
-                            ? Icon(
-                                Icons.done,
-                                color: Colors.white,
-                                size: 14,
-                              )
-                            : null,
-                        onPressed: () {
-                          setState(() {
-                            this._isDone = !this._isDone;
-                          });
-                        },
-                        constraints: BoxConstraints(minWidth: 20, minHeight: 18),
-                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        shape: CircleBorder(
-                          side: BorderSide(
-                            color: Theme.of(context).primaryColor,
-                            width: 1,
-                          ),
+              child: Column(
+                children: [
+                  ListTile(
+                    isThreeLine: true,
+                    horizontalTitleGap: 5,
+                    minLeadingWidth: 20,
+                    contentPadding: EdgeInsets.all(0),
+                    leading: RawMaterialButton(
+                      fillColor: this._isDone ? Colors.grey : Theme.of(context).accentColor,
+                      focusElevation: 0,
+                      child: this._isDone
+                          ? Icon(
+                              Icons.done,
+                              color: Colors.white,
+                              size: 14,
+                            )
+                          : null,
+                      onPressed: () {
+                        setState(() {
+                          this._isDone = !this._isDone;
+                        });
+                      },
+                      constraints: BoxConstraints(minWidth: 20, minHeight: 18),
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      shape: CircleBorder(
+                        side: BorderSide(
+                          color: Theme.of(context).primaryColor,
+                          width: 1,
                         ),
-                        padding: EdgeInsets.zero,
                       ),
-                      title: TextFormField(
-                        key: ValueKey('taskName'),
-                        onSaved: (value) {
-                          this._taskName = value;
-                        },
-                        style: TextStyle(
-                          fontSize: 20,
+                      padding: EdgeInsets.zero,
+                    ),
+                    title: TextFormField(
+                      key: ValueKey('taskName'),
+                      onSaved: (value) {
+                        this._taskName = value;
+                      },
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      decoration: InputDecoration(
+                        hintStyle: TextStyle(
                           fontWeight: FontWeight.w400,
+                          fontSize: 20,
                         ),
-                        decoration: InputDecoration(
-                          hintStyle: TextStyle(
-                            fontWeight: FontWeight.w400,
+                        hintText: 'Task name',
+                        border: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                      ),
+                    ),
+                    trailing: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: Size(20, 20),
+                        onPrimary: Theme.of(context).primaryColor,
+                        primary: Theme.of(context).accentColor,
+                        elevation: 0,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          this._isFullScreen = !this._isFullScreen;
+                        });
+                      },
+                      icon: Icon(Icons.open_in_full),
+                      label: Text(''),
+                    ),
+                    subtitle: TextFormField(
+                      key: ValueKey('taskDescription'),
+                      onSaved: (value) {
+                        this._taskDescription = value;
+                      },
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'Task description',
+                        hintStyle: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          fontSize: 15,
+                        ),
+                        border: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          Icons.flag_outlined,
+                        ),
+                        onPressed: () {},
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.calendar_today_outlined,
+                        ),
+                        onPressed: () async {
+                          final picked = await showDateRangePicker(
+                            context: context,
+                            firstDate: new DateTime.now(),
+                            lastDate: new DateTime.now().add(
+                              Duration(days: 365),
+                            ),
+                            builder: (context, child) {
+                              return Theme(
+                                data: Theme.of(context).copyWith(
+                                  colorScheme: ColorScheme.light(
+                                    primary: Colors.grey,
+                                    onPrimary: Colors.white,
+                                    onSurface: Colors.black,
+                                  ),
+                                  textButtonTheme: TextButtonThemeData(
+                                    style: TextButton.styleFrom(
+                                      primary: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                                child: child,
+                              );
+                            },
+                          );
+                          if (picked != null) {
+                            this._startDate = picked.start;
+                            this._endDate = picked.end;
+                          }
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.tag,
+                        ),
+                        onPressed: () {},
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.save),
+                        onPressed: () {},
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.person_add_alt_1_outlined,
+                        ),
+                        onPressed: () {},
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.attach_file_outlined),
+                        onPressed: () {},
+                      ),
+                    ],
+                  ),
+                  Divider(
+                    thickness: 1.5,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          onPrimary: Theme.of(context).primaryColor,
+                          primary: Theme.of(context).accentColor,
+                          elevation: 0,
+                        ),
+                        onPressed: () {},
+                        icon: Icon(Icons.all_inbox),
+                        label: Text(
+                          'Inbox',
+                          style: TextStyle(
                             fontSize: 20,
+                            fontWeight: FontWeight.w400,
                           ),
-                          hintText: 'Task name',
-                          border: InputBorder.none,
-                          focusedBorder: InputBorder.none,
                         ),
                       ),
-                      trailing: ElevatedButton.icon(
+                      ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
-                          minimumSize: Size(20, 20),
                           onPrimary: Theme.of(context).primaryColor,
                           primary: Theme.of(context).accentColor,
                           elevation: 0,
                         ),
                         onPressed: () {
-                          setState(() {
-                            this._isFullScreen = !this._isFullScreen;
-                          });
+                          this._addNewTask();
                         },
-                        icon: Icon(Icons.open_in_full),
-                        label: Text(''),
-                      ),
-                      subtitle: TextFormField(
-                        key: ValueKey('taskDescription'),
-                        onSaved: (value) {
-                          this._taskDescription = value;
-                        },
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: 'Task description',
-                          hintStyle: TextStyle(
+                        icon: Icon(Icons.subdirectory_arrow_left_outlined),
+                        label: Text(
+                          'Save',
+                          style: TextStyle(
+                            fontSize: 20,
                             fontWeight: FontWeight.w400,
-                            fontSize: 15,
                           ),
-                          border: InputBorder.none,
-                          focusedBorder: InputBorder.none,
                         ),
                       ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        IconButton(
-                          icon: Icon(
-                            Icons.flag_outlined,
-                          ),
-                          onPressed: () {},
-                        ),
-                        IconButton(
-                          icon: Icon(
-                            Icons.calendar_today_outlined,
-                          ),
-                          onPressed: () async {
-                            final picked = await showDateRangePicker(
-                              context: context,
-                              firstDate: new DateTime.now(),
-                              lastDate: new DateTime.now().add(
-                                Duration(days: 365),
-                              ),
-                              builder: (context, child) {
-                                return Theme(
-                                  data: Theme.of(context).copyWith(
-                                    colorScheme: ColorScheme.light(
-                                      primary: Colors.grey,
-                                      onPrimary: Colors.white,
-                                      onSurface: Colors.black,
-                                    ),
-                                    textButtonTheme: TextButtonThemeData(
-                                      style: TextButton.styleFrom(
-                                        primary: Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                  child: child,
-                                );
-                              },
-                            );
-                            if (picked != null) {
-                              this._startDate = picked.start;
-                              this._endDate = picked.end;
-                            }
-                          },
-                        ),
-                        IconButton(
-                          icon: Icon(
-                            Icons.tag,
-                          ),
-                          onPressed: () {},
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.save),
-                          onPressed: () {},
-                        ),
-                        IconButton(
-                          icon: Icon(
-                            Icons.person_add_alt_1_outlined,
-                          ),
-                          onPressed: () {},
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.attach_file_outlined),
-                          onPressed: () {},
-                        ),
-                      ],
-                    ),
-                    Divider(
-                      thickness: 1.5,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            onPrimary: Theme.of(context).primaryColor,
-                            primary: Theme.of(context).accentColor,
-                            elevation: 0,
-                          ),
-                          onPressed: () {},
-                          icon: Icon(Icons.all_inbox),
-                          label: Text(
-                            'Inbox',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                        ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            onPrimary: Theme.of(context).primaryColor,
-                            primary: Theme.of(context).accentColor,
-                            elevation: 0,
-                          ),
-                          onPressed: () {
-                            this._addNewTask();
-                          },
-                          icon: Icon(Icons.subdirectory_arrow_left_outlined),
-                          label: Text(
-                            'Save',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
+                    ],
+                  )
+                ],
               ),
             ),
           ),

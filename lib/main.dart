@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
           update: (ctx, auth, previousTasks) => TaskProvider(
             userMail: auth.email,
             authToken: auth.token,
-            //taskList: previousTasks == null ? [] : previousTasks.taskList,
+            taskList: previousTasks == null ? [] : previousTasks.taskList,
           ),
         ),
       ],

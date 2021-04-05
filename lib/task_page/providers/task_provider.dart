@@ -6,7 +6,6 @@ import '../models/task.dart';
 
 class TaskProvider with ChangeNotifier {
   List<Task> archivedList = [];
-
   List<Task> taskList = [];
 
   final String userMail;
@@ -17,7 +16,7 @@ class TaskProvider with ChangeNotifier {
   TaskProvider({
     @required this.userMail,
     @required this.authToken,
-    //@required this.taskList,
+    @required this.taskList,
   });
 
   List<Task> get tasks {
@@ -28,7 +27,7 @@ class TaskProvider with ChangeNotifier {
     String url = this._serverUrl + 'task/add';
 
     try {
-      await http.post(
+      final response = await http.post(
         url,
         body: json.encode(
           {
@@ -45,6 +44,8 @@ class TaskProvider with ChangeNotifier {
         },
       );
 
+      task.id = int.parse(response.body);
+
       this.taskList.add(task);
       notifyListeners();
     } catch (error) {
@@ -54,9 +55,52 @@ class TaskProvider with ChangeNotifier {
 
   Future<void> updateTask(String id, Task task) async {}
 
-  Future<void> fetchTasks() async {}
+  Future<void> fetchTasks() async {
+    String url = this._serverUrl + 'task/getAll/${this.userMail}';
 
-  Future<void> deleteTask(int index) async {
-    this.taskList.removeAt(index);
+    final List<Task> loadedTasks = [];
+
+    try {
+      final response = await http.get(url);
+      final responseBody = json.decode(response.body);
+
+      for (var element in responseBody) {
+        Task task = Task(
+          id: element['id_task'],
+          title: element['task_name'],
+          description: element['description'],
+          done: element['ifDone'],
+          endDate: DateTime.parse(element['endDate']),
+          startDate: DateTime.parse(element['startDate']),
+          tags: ['tag1'],
+        );
+        loadedTasks.add(task);
+      }
+
+      this.taskList = loadedTasks;
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw error;
+    }
+  }
+
+  Future<void> deleteTask(int id) async {
+    String url = this._serverUrl + 'task/delete/$id';
+
+    var tmpProduct = this.taskList.firstWhere((element) => element.id == id);
+
+    try {
+      http.delete(url);
+      this.taskList.removeWhere((element) => element.id == id);
+
+      tmpProduct = null;
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      this.taskList.add(tmpProduct);
+      throw error;
+    }
   }
 }

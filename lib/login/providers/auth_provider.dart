@@ -151,6 +151,7 @@ class AuthProvider with ChangeNotifier {
     final preferences = await SharedPreferences.getInstance();
     final userData = json.encode(
       {
+        'email': this._email,
         'token': this._token,
         'expiryDate': this._expiryDate.toIso8601String(),
       },
@@ -199,6 +200,7 @@ class AuthProvider with ChangeNotifier {
       return false;
     }
 
+    this._email = extractedUserData['email'];
     this._token = extractedUserData['token'];
     this._expiryDate = expiryDate;
 
