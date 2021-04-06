@@ -27,7 +27,7 @@ class _NewTaskState extends State<NewTask> {
       startDate: this._startDate,
       endDate: this._endDate,
       done: this._isDone,
-      tags: ['tag1'],
+      tags: ['tag1', 'tag2', 'tag3adsdasdaasd', 'asdasdas', 'sdasd22', 'asdasdasda', 'sdaa3f'],
       description: this._taskDescription,
     );
 

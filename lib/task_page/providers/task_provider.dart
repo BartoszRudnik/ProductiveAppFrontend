@@ -73,7 +73,7 @@ class TaskProvider with ChangeNotifier {
           done: element['ifDone'],
           endDate: DateTime.parse(element['endDate']),
           startDate: DateTime.parse(element['startDate']),
-          tags: ['tag1'],
+          tags: ['tag1', 'tag2', 'tag3adsdasdaasd', 'asdasdas', 'sdasd22', 'asdasdasda', 'sdaa3f'],
         );
         loadedTasks.add(task);
       }
