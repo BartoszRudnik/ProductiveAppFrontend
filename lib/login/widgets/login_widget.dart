@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -127,7 +129,19 @@ class _LoginWidgetState extends State<LoginWidget> {
         this._authenticationFailedMessage = message;
         this._isValid = false;
       });
-    } catch (error) {
+    } on SocketException catch (error) {
+        var message = "Connection failed. PLease check your network connection.";
+        if(error.osError.errorCode == 110){
+          message = "Server connection timed out";
+        }else if(error.osError.errorCode == 101){
+          message = "No network connection";
+        }
+        setState(() {
+        this._authenticationFailedMessage = message;
+        this._isValid = false;
+      });
+    } 
+    catch (error) {
       setState(() {
         this._isValid = false;
       });

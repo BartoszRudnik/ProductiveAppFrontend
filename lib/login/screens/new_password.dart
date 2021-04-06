@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -104,6 +106,9 @@ class _NewPasswordState extends State<NewPassword> {
       var errorMessage = 'Authentication failed.';
 
       print(errorMessage);
+    } on SocketException catch (error) {
+      var message = 'Connection failed';
+      print(message);
     }
   }
 

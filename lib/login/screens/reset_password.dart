@@ -90,6 +90,9 @@ class _ResetPasswordState extends State<ResetPassword> {
       var errorMessage = 'Authentication failed.';
 
       print(errorMessage);
+    } on SocketException catch (error) {
+      var message = 'Connection failed';
+      print(message);
     }
   }
 
