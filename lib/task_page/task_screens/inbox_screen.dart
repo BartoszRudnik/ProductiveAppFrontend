@@ -197,7 +197,11 @@ class _InboxScreenState extends State<InboxScreen> {
                           children: <Widget>[
                             Row(
                               children: <Widget>[
-                                Icon(Icons.arrow_upward_sharp),
+                                if (tasks[index].priority == 'SMALL') Icon(Icons.arrow_downward_outlined),
+                                if (tasks[index].priority == 'HIGH') Icon(Icons.arrow_upward_outlined),
+                                if (tasks[index].priority == 'HIGHER') Icon(Icons.arrow_upward_outlined),
+                                if (tasks[index].priority == 'HIGHER') Icon(Icons.arrow_upward_outlined),
+                                if (tasks[index].priority == 'CRITICAL') Icon(Icons.warning_amber_sharp),
                                 SizedBox(width: 6),
                                 Icon(Icons.calendar_today),
                                 SizedBox(width: 6),

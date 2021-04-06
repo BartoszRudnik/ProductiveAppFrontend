@@ -14,6 +14,7 @@ class _NewTaskState extends State<NewTask> {
 
   final _formKey = GlobalKey<FormState>();
 
+  String _priority = '';
   String _taskName = '';
   String _taskDescription = '';
   DateTime _startDate;
@@ -39,6 +40,7 @@ class _NewTaskState extends State<NewTask> {
       startDate: this._startDate,
       endDate: this._endDate,
       done: this._isDone,
+      priority: this._priority,
       tags: ['tag1', 'tag2', 'tag3adsdasdaasd', 'asdasdas', 'sdasd22', 'asdasdasda', 'sdaa3f'],
       description: this._taskDescription,
     );
@@ -57,6 +59,8 @@ class _NewTaskState extends State<NewTask> {
 
   @override
   Widget build(BuildContext context) {
+    List<String> priorities = Provider.of<TaskProvider>(context).priorities;
+
     return LayoutBuilder(
       builder: (context, constraint) {
         return SingleChildScrollView(
@@ -163,11 +167,22 @@ class _NewTaskState extends State<NewTask> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      IconButton(
-                        icon: Icon(
-                          Icons.flag_outlined,
-                        ),
-                        onPressed: () {},
+                      PopupMenuButton(
+                        initialValue: this._priority,
+                        onSelected: (value) {
+                          setState(() {
+                            this._priority = value;
+                          });
+                        },
+                        icon: Icon(Icons.flag_outlined),
+                        itemBuilder: (context) {
+                          return priorities.map((e) {
+                            return PopupMenuItem(
+                              child: Text(e),
+                              value: e,
+                            );
+                          }).toList();
+                        },
                       ),
                       IconButton(
                         icon: Icon(

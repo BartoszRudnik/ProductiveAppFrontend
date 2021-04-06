@@ -7,6 +7,7 @@ import '../models/task.dart';
 class TaskProvider with ChangeNotifier {
   List<Task> archivedList = [];
   List<Task> taskList = [];
+  List<String> _priorities = [];
 
   final String userMail;
   final String authToken;
@@ -23,6 +24,10 @@ class TaskProvider with ChangeNotifier {
     return [...this.taskList];
   }
 
+  List<String> get priorities {
+    return [...this._priorities];
+  }
+
   Future<void> addTask(Task task) async {
     String url = this._serverUrl + 'task/add';
 
@@ -37,6 +42,7 @@ class TaskProvider with ChangeNotifier {
             'startDate': task.startDate.toIso8601String(),
             'endDate': task.endDate.toIso8601String(),
             'ifDone': task.done,
+            'priority': task.priority,
           },
         ),
         headers: {
@@ -71,6 +77,7 @@ class TaskProvider with ChangeNotifier {
           title: element['task_name'],
           description: element['description'],
           done: element['ifDone'],
+          priority: element['priority'],
           endDate: DateTime.parse(element['endDate']),
           startDate: DateTime.parse(element['startDate']),
           tags: ['tag1', 'tag2', 'tag3adsdasdaasd', 'asdasdas', 'sdasd22', 'asdasdasda', 'sdaa3f'],
@@ -120,6 +127,23 @@ class TaskProvider with ChangeNotifier {
       print(error);
 
       this.taskList[id] = tmpProduct;
+      throw error;
+    }
+  }
+
+  Future<void> getPriorities() async {
+    String url = this._serverUrl + 'task/priorities';
+
+    try {
+      final response = await http.get(url);
+
+      final responseBody = json.decode(response.body);
+
+      for (var element in responseBody) {
+        this._priorities.add(element.toString());
+      }
+    } catch (error) {
+      print(error);
       throw error;
     }
   }
