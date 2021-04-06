@@ -10,6 +10,8 @@ class NewTask extends StatefulWidget {
 
 class _NewTaskState extends State<NewTask> {
   var _isFullScreen = false;
+  var _isValid = true;
+
   final _formKey = GlobalKey<FormState>();
 
   String _taskName = '';
@@ -19,6 +21,16 @@ class _NewTaskState extends State<NewTask> {
   bool _isDone = false;
 
   Future<void> _addNewTask() async {
+    var isValid = this._formKey.currentState.validate();
+
+    setState(() {
+      this._isValid = isValid;
+    });
+
+    if (!this._isValid) {
+      return;
+    }
+
     this._formKey.currentState.save();
 
     final newTask = Task(
@@ -89,6 +101,13 @@ class _NewTaskState extends State<NewTask> {
                     ),
                     title: TextFormField(
                       key: ValueKey('taskName'),
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Task title cannot be empty';
+                        }
+
+                        return null;
+                      },
                       onSaved: (value) {
                         this._taskName = value;
                       },
