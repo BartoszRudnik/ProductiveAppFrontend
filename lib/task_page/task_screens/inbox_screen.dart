@@ -32,6 +32,7 @@ class _InboxScreenState extends State<InboxScreen> {
           child: ListView.builder(
             shrinkWrap: true,
             itemBuilder: (ctx, index) => ChangeNotifierProvider.value(
+              key: ValueKey(tasks[index].id),
               value: tasks[index],
               child: Container(
                 height: 94,
