@@ -36,6 +36,7 @@ class TaskProvider with ChangeNotifier {
             'userEmail': this.userMail,
             'startDate': task.startDate.toIso8601String(),
             'endDate': task.endDate.toIso8601String(),
+            'ifDone': task.done,
           },
         ),
         headers: {
@@ -100,6 +101,25 @@ class TaskProvider with ChangeNotifier {
     } catch (error) {
       print(error);
       this.taskList.add(tmpProduct);
+      throw error;
+    }
+  }
+
+  Future<void> toggleTaskStatus(int id) async {
+    String url = this._serverUrl + 'task/done/$id';
+
+    var tmpProduct = this.taskList.firstWhere((element) => element.id == id);
+
+    try {
+      http.put(url);
+
+      this.taskList[this.taskList.indexWhere((element) => element.id == id)].done = !this.taskList[this.taskList.indexWhere((element) => element.id == id)].done;
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+
+      this.taskList[id] = tmpProduct;
       throw error;
     }
   }

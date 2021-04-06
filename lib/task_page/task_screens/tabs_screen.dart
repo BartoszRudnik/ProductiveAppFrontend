@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/login/providers/auth_provider.dart';
 import 'package:productive_app/task_page/models/task.dart';
 import 'package:productive_app/task_page/providers/task_provider.dart';
 import 'package:productive_app/task_page/widgets/new_task.dart';
@@ -25,8 +26,6 @@ class _TabsScreenState extends State<TabsScreen> {
   final _selectedBgColor = Colors.black;
   final _unselectedBgColor = Colors.white;
   int _selectedPageIndex = 0;
-
-  final String username = 'Karolina Modzelewska';
 
   @override
   void initState() {
@@ -114,7 +113,9 @@ class _TabsScreenState extends State<TabsScreen> {
         appBar: TaskAppBar(
           title: _pages[_selectedPageIndex]['title'],
         ),
-        drawer: MainDrawer(username: this.username),
+        drawer: MainDrawer(
+          username: Provider.of<AuthProvider>(context, listen: false).email,
+        ),
         body: _pages[_selectedPageIndex]['page'],
         floatingActionButton: FloatingActionButton(
           child: Icon(

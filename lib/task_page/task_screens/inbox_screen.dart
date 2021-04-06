@@ -71,9 +71,7 @@ class _InboxScreenState extends State<InboxScreen> {
                           caption: 'Mark as done',
                           color: Theme.of(context).accentColor,
                           onTap: () {
-                            setState(() {
-                              tasks[index].changeTaskStatus();
-                            });
+                            Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(tasks[index].id);
                           },
                           iconWidget: Icon(
                             Icons.done,
@@ -108,9 +106,7 @@ class _InboxScreenState extends State<InboxScreen> {
                                       )
                                     : null,
                                 onPressed: () {
-                                  setState(() {
-                                    tasks[index].changeTaskStatus();
-                                  });
+                                  Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(tasks[index].id);
                                 },
                                 constraints: BoxConstraints(minWidth: 20, minHeight: 18),
                                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
