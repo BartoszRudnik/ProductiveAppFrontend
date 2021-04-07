@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 
 import 'tabs_screen.dart';
 
-
 class MainScreen extends StatefulWidget {
   static const routeName = ('/main-screen');
 
@@ -18,14 +17,8 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
-        children: [
-          MainDrawer(
-            username: Provider.of<AuthProvider>(context, listen: false).email
-          ),
-          TabsScreen()
-        ],
+        children: [MainDrawer(username: Provider.of<AuthProvider>(context, listen: false).email), TabsScreen()],
       ),
     );
   }
-
 }

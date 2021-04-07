@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/login/screens/entry_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../../login/providers/auth_provider.dart';
@@ -13,12 +14,14 @@ class MainDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SingleChildScrollView(
+      child: Container(
         margin: EdgeInsets.only(
           left: 47,
           top: 84,
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -56,10 +59,7 @@ class MainDrawer extends StatelessWidget {
               icon: Icons.save,
               title: 'Projects',
             ),
-            DrawerListTile(
-              icon: Icons.tag, 
-              title: 'Tags'
-            ),
+            DrawerListTile(icon: Icons.tag, title: 'Tags'),
             DrawerListTile(
               icon: Icons.analytics_outlined,
               title: 'Analytics',
@@ -95,7 +95,6 @@ class MainDrawer extends StatelessWidget {
                               onPressed: () {
                                 Provider.of<AuthProvider>(context, listen: false).logout();
                                 Navigator.of(context).pop(true);
-                                Navigator.of(context).pop();
                               },
                               child: Text(
                                 'Yes',
@@ -111,25 +110,26 @@ class MainDrawer extends StatelessWidget {
                                 side: BorderSide(color: Theme.of(context).primaryColor),
                               ),
                               onPressed: () {
-                              Navigator.of(context).pop(false);
-                            },
-                            child: Text(
-                              'No',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Theme.of(context).accentColor,
+                                Navigator.of(context).pop(false);
+                              },
+                              child: Text(
+                                'No',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Theme.of(context).accentColor,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      )
-                    ],
+                          ],
+                        )
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
-          ),
-        ],
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

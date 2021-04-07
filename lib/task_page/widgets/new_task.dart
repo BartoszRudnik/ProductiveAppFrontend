@@ -53,6 +53,7 @@ class _NewTaskState extends State<NewTask> {
         this._isDone = false;
       });
     } catch (error) {
+      print(error);
       throw error;
     }
   }
@@ -72,6 +73,7 @@ class _NewTaskState extends State<NewTask> {
             child: Form(
               key: this._formKey,
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   ListTile(
                     isThreeLine: true,

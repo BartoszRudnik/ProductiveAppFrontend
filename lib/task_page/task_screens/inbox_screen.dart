@@ -203,14 +203,18 @@ class _InboxScreenState extends State<InboxScreen> {
                                 if (tasks[index].priority == 'HIGHER') Icon(Icons.arrow_upward_outlined),
                                 if (tasks[index].priority == 'CRITICAL') Icon(Icons.warning_amber_sharp),
                                 SizedBox(width: 6),
-                                Icon(Icons.calendar_today),
+                                if (tasks[index].startDate != null || tasks[index].endDate != null) Icon(Icons.calendar_today),
                                 SizedBox(width: 6),
-                                Text(
-                                  DateFormat('MMM d').format(tasks[index].startDate) + ' - ',
-                                ),
-                                Text(
-                                  DateFormat('MMM d').format(tasks[index].endDate),
-                                ),
+                                tasks[index].startDate != null
+                                    ? Text(
+                                        DateFormat('MMM d').format(tasks[index].startDate) + ' - ',
+                                      )
+                                    : Text(''),
+                                tasks[index].endDate != null
+                                    ? Text(
+                                        DateFormat('MMM d').format(tasks[index].endDate),
+                                      )
+                                    : Text(''),
                               ],
                             ),
                             SizedBox(

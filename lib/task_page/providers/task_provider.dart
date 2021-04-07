@@ -31,6 +31,14 @@ class TaskProvider with ChangeNotifier {
   Future<void> addTask(Task task) async {
     String url = this._serverUrl + 'task/add';
 
+    if (task.startDate == null) {
+      task.startDate = DateTime.fromMicrosecondsSinceEpoch(0);
+    }
+
+    if (task.endDate == null) {
+      task.endDate = DateTime.fromMicrosecondsSinceEpoch(0);
+    }
+
     try {
       final response = await http.post(
         url,
@@ -53,9 +61,18 @@ class TaskProvider with ChangeNotifier {
 
       task.id = int.parse(response.body);
 
+      if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+        task.startDate = null;
+      }
+
+      if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+        task.endDate = null;
+      }
+
       this.taskList.add(task);
       notifyListeners();
     } catch (error) {
+      print(error);
       throw error;
     }
   }
@@ -82,6 +99,12 @@ class TaskProvider with ChangeNotifier {
           startDate: DateTime.parse(element['startDate']),
           tags: ['tag1', 'tag2', 'tag3adsdasdaasd', 'asdasdas', 'sdasd22', 'asdasdasda', 'sdaa3f'],
         );
+        if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays <= 1) {
+          task.startDate = null;
+        }
+        if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays <= 1) {
+          task.endDate = null;
+        }
         loadedTasks.add(task);
       }
 

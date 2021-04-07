@@ -103,8 +103,8 @@ class _TabsScreenState extends State<TabsScreen> {
           ),
         ),
       );
-  void _changeTranform(double x, double y, double s){
-    setState((){
+  void _changeTranform(double x, double y, double s) {
+    setState(() {
       offsetX = x;
       offsetY = y;
       scale = s;
@@ -119,19 +119,22 @@ class _TabsScreenState extends State<TabsScreen> {
       transform: Matrix4.translationValues(offsetX, offsetY, 0)..scale(scale),
       duration: Duration(milliseconds: 250),
       child: GestureDetector(
+        onTap: () {
+          if (isDrawerVisible) _changeTranform(0, 0, 1);
+        },
         onHorizontalDragEnd: (details) {
-          if(!isDrawerVisible){
+          if (!isDrawerVisible) {
             if (details.primaryVelocity < 0) {
               _selectPage(_selectedPageIndex + 1);
             }
             if (details.primaryVelocity > 0) {
-              if(_selectedPageIndex == 0 && !isDrawerVisible){
+              if (_selectedPageIndex == 0 && !isDrawerVisible) {
                 _changeTranform(230, 70, 0.8);
               }
               _selectPage(_selectedPageIndex - 1);
             }
-          }else{
-            if (details.primaryVelocity < 0){
+          } else {
+            if (details.primaryVelocity < 0) {
               _changeTranform(0, 0, 1);
             }
           }
@@ -140,12 +143,10 @@ class _TabsScreenState extends State<TabsScreen> {
           appBar: TaskAppBar(
             title: _pages[_selectedPageIndex]['title'],
             leadingButton: IconButton(
-              icon: Icon(Icons.menu),
-              onPressed: (){
-                isDrawerVisible? _changeTranform(0,0,1)
-                : _changeTranform(230, 70, 0.8);
-              }
-            ),
+                icon: Icon(Icons.menu),
+                onPressed: () {
+                  isDrawerVisible ? _changeTranform(0, 0, 1) : _changeTranform(230, 70, 0.8);
+                }),
           ),
           /*drawer: DrawerScreen(
             username: Provider.of<AuthProvider>(context, listen: false).email,
