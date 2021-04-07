@@ -3,9 +3,10 @@ import 'package:flutter/services.dart';
 
 class TaskAppBar extends StatelessWidget with PreferredSizeWidget {
   final String title;
-
+  final IconButton leadingButton;
   TaskAppBar({
     @required this.title,
+    this.leadingButton
   });
 
   @override
@@ -24,6 +25,7 @@ class TaskAppBar extends StatelessWidget with PreferredSizeWidget {
       backgroundColor: Theme.of(context).accentColor,
       iconTheme: Theme.of(context).iconTheme,
       brightness: Brightness.dark,
+      leading: (leadingButton != null)? leadingButton:null,
       actions: <Widget>[
         PopupMenuButton(
           icon: Icon(Icons.more_vert),

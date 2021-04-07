@@ -13,8 +13,7 @@ class MainDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(
-      child: Container(
+    return Container(
         margin: EdgeInsets.only(
           left: 47,
           top: 84,
@@ -47,32 +46,23 @@ class MainDrawer extends StatelessWidget {
               ),
             ),
             SizedBox(
-              height: 30,
+              height: 15,
             ),
             DrawerListTile(
               icon: Icons.settings,
               title: 'Settings',
             ),
-            SizedBox(
-              height: 15,
-            ),
             DrawerListTile(
               icon: Icons.save,
               title: 'Projects',
             ),
-            SizedBox(
-              height: 15,
-            ),
-            DrawerListTile(icon: Icons.tag, title: 'Tags'),
-            SizedBox(
-              height: 15,
+            DrawerListTile(
+              icon: Icons.tag, 
+              title: 'Tags'
             ),
             DrawerListTile(
               icon: Icons.analytics_outlined,
               title: 'Analytics',
-            ),
-            SizedBox(
-              height: 15,
             ),
             ListTile(
               minLeadingWidth: 16,
@@ -121,26 +111,25 @@ class MainDrawer extends StatelessWidget {
                                 side: BorderSide(color: Theme.of(context).primaryColor),
                               ),
                               onPressed: () {
-                                Navigator.of(context).pop(false);
-                              },
-                              child: Text(
-                                'No',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Theme.of(context).accentColor,
-                                ),
+                              Navigator.of(context).pop(false);
+                            },
+                            child: Text(
+                              'No',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Theme.of(context).accentColor,
                               ),
                             ),
-                          ],
-                        )
-                      ],
-                    ),
+                          ),
+                        ],
+                      )
+                    ],
                   ),
-                );
-              },
-            ),
-          ],
-        ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }

@@ -4,7 +4,6 @@ import 'package:productive_app/task_page/models/task.dart';
 import 'package:productive_app/task_page/providers/task_provider.dart';
 import 'package:productive_app/task_page/widgets/new_task.dart';
 import 'package:productive_app/task_page/widgets/task_appBar.dart';
-import 'package:productive_app/task_page/widgets/main_drawer.dart';
 import 'package:productive_app/task_page/task_screens/anyTime_screen.dart';
 import 'package:productive_app/task_page/task_screens/delegated_screen.dart';
 import 'package:productive_app/task_page/task_screens/inbox_screen.dart';
@@ -26,6 +25,11 @@ class _TabsScreenState extends State<TabsScreen> {
   final _selectedBgColor = Colors.black;
   final _unselectedBgColor = Colors.white;
   int _selectedPageIndex = 0;
+
+  double offsetX = 0;
+  double offsetY = 0;
+  double scale = 1;
+  bool isDrawerVisible = false;
 
   @override
   void initState() {
@@ -99,68 +103,97 @@ class _TabsScreenState extends State<TabsScreen> {
           ),
         ),
       );
+  void _changeTranform(double x, double y, double s){
+    setState((){
+      offsetX = x;
+      offsetY = y;
+      scale = s;
+    });
+    isDrawerVisible = !isDrawerVisible;
+    print("Transform change");
+  }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onHorizontalDragEnd: (details) {
-        if (details.primaryVelocity < 0) {
-          _selectPage(_selectedPageIndex + 1);
-        }
-        if (details.primaryVelocity > 0) {
-          _selectPage(_selectedPageIndex - 1);
-        }
-      },
-      child: Scaffold(
-        appBar: TaskAppBar(
-          title: _pages[_selectedPageIndex]['title'],
-        ),
-        drawer: MainDrawer(
-          username: Provider.of<AuthProvider>(context, listen: false).email,
-        ),
-        body: _pages[_selectedPageIndex]['page'],
-        floatingActionButton: FloatingActionButton(
-          child: Icon(
-            Icons.add,
-            color: Theme.of(context).accentColor,
-            size: 50,
-          ),
-          onPressed: () {
-            this._addNewTaskForm(context);
-          },
-          backgroundColor: Theme.of(context).primaryColor,
-        ),
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor,
-            border: Border(
-              top: BorderSide(color: Theme.of(context).primaryColor, width: 1.0),
+    return AnimatedContainer(
+      transform: Matrix4.translationValues(offsetX, offsetY, 0)..scale(scale),
+      duration: Duration(milliseconds: 250),
+      child: GestureDetector(
+        onHorizontalDragEnd: (details) {
+          if(!isDrawerVisible){
+            if (details.primaryVelocity < 0) {
+              _selectPage(_selectedPageIndex + 1);
+            }
+            if (details.primaryVelocity > 0) {
+              if(_selectedPageIndex == 0 && !isDrawerVisible){
+                _changeTranform(230, 70, 0.8);
+              }
+              _selectPage(_selectedPageIndex - 1);
+            }
+          }else{
+            if (details.primaryVelocity < 0){
+              _changeTranform(0, 0, 1);
+            }
+          }
+        },
+        child: Scaffold(
+          appBar: TaskAppBar(
+            title: _pages[_selectedPageIndex]['title'],
+            leadingButton: IconButton(
+              icon: Icon(Icons.menu),
+              onPressed: (){
+                isDrawerVisible? _changeTranform(0,0,1)
+                : _changeTranform(230, 70, 0.8);
+              }
             ),
           ),
-          child: BottomNavigationBar(
-            selectedFontSize: 0,
-            currentIndex: _selectedPageIndex,
-            selectedItemColor: this._selectedItemColor,
-            unselectedItemColor: this._unselectedItemColor,
-            type: BottomNavigationBarType.fixed,
-            items: [
-              BottomNavigationBarItem(
-                icon: _buildIcon(Icons.inbox_outlined, 'Inbox', 0),
-                title: SizedBox.shrink(),
+          /*drawer: DrawerScreen(
+            username: Provider.of<AuthProvider>(context, listen: false).email,
+          ), */
+          body: _pages[_selectedPageIndex]['page'],
+          floatingActionButton: FloatingActionButton(
+            child: Icon(
+              Icons.add,
+              color: Theme.of(context).accentColor,
+              size: 50,
+            ),
+            onPressed: () {
+              this._addNewTaskForm(context);
+            },
+            backgroundColor: Theme.of(context).primaryColor,
+          ),
+          bottomNavigationBar: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).primaryColor,
+              border: Border(
+                top: BorderSide(color: Theme.of(context).primaryColor, width: 1.0),
               ),
-              BottomNavigationBarItem(
-                icon: _buildIcon(Icons.access_time, 'Anytime', 1),
-                title: SizedBox.shrink(),
-              ),
-              BottomNavigationBarItem(
-                icon: _buildIcon(Icons.calendar_today, 'Scheduled', 2),
-                title: SizedBox.shrink(),
-              ),
-              BottomNavigationBarItem(
-                icon: _buildIcon(Icons.person_outline_outlined, 'Delegated', 3),
-                title: SizedBox.shrink(),
-              ),
-            ],
+            ),
+            child: BottomNavigationBar(
+              selectedFontSize: 0,
+              currentIndex: _selectedPageIndex,
+              selectedItemColor: this._selectedItemColor,
+              unselectedItemColor: this._unselectedItemColor,
+              type: BottomNavigationBarType.fixed,
+              items: [
+                BottomNavigationBarItem(
+                  icon: _buildIcon(Icons.inbox_outlined, 'Inbox', 0),
+                  title: SizedBox.shrink(),
+                ),
+                BottomNavigationBarItem(
+                  icon: _buildIcon(Icons.access_time, 'Anytime', 1),
+                  title: SizedBox.shrink(),
+                ),
+                BottomNavigationBarItem(
+                  icon: _buildIcon(Icons.calendar_today, 'Scheduled', 2),
+                  title: SizedBox.shrink(),
+                ),
+                BottomNavigationBarItem(
+                  icon: _buildIcon(Icons.person_outline_outlined, 'Delegated', 3),
+                  title: SizedBox.shrink(),
+                ),
+              ],
+            ),
           ),
         ),
       ),

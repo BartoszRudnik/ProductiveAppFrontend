@@ -9,6 +9,7 @@ import 'login/screens/new_password.dart';
 import 'login/screens/reset_password.dart';
 import 'login/screens/splash_screen.dart';
 import 'task_page/task_screens/inbox_screen.dart';
+import 'task_page/task_screens/main_screen.dart';
 import 'task_page/task_screens/tabs_screen.dart';
 import 'task_page/task_screens/task_details_screen.dart';
 
@@ -69,12 +70,13 @@ class MyApp extends StatelessWidget {
             ),
           ),
           home: authData.isAuth
-              ? TabsScreen()
+              ? MainScreen()
               : FutureBuilder(
                   future: authData.tryAutoLogin(),
                   builder: (ctx, authResult) => authResult.connectionState == ConnectionState.waiting ? SplashScreen() : EntryScreen(),
                 ),
           routes: {
+            MainScreen.routeName: (ctx) => MainScreen(),
             TabsScreen.routeName: (ctx) => TabsScreen(),
             LoginScreen.routeName: (ctx) => LoginScreen(),
             InboxScreen.routeName: (ctx) => InboxScreen(),
