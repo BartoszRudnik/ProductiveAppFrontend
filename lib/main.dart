@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/task_page/providers/tag_provider.dart';
 import 'package:productive_app/task_page/providers/task_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -29,6 +30,13 @@ class MyApp extends StatelessWidget {
             userMail: auth.email,
             authToken: auth.token,
             taskList: previousTasks == null ? [] : previousTasks.taskList,
+          ),
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, TagProvider>(
+          create: null,
+          update: (ctx, auth, previousTags) => TagProvider(
+            authToken: auth.token,
+            userMail: auth.email,
           ),
         ),
       ],

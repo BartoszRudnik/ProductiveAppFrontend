@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/task_page/widgets/task_tags.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/task_provider.dart';
@@ -243,33 +244,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                     SizedBox(
                       height: 4,
                     ),
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    height: 20,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      shrinkWrap: true,
-                      physics: ClampingScrollPhysics(),
-                      itemCount: this.widget.task.tags.length,
-                      itemBuilder: (ctx, secondIndex) => Container(
-                        alignment: Alignment.center,
-                        padding: EdgeInsets.symmetric(horizontal: 4),
-                        margin: EdgeInsets.symmetric(horizontal: 8),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Theme.of(context).primaryColor,
-                            width: 0.2,
-                          ),
-                        ),
-                        child: Center(
-                          child: Text(
-                            this.widget.task.tags[secondIndex],
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  TaskTags(tags: this.widget.task.tags),
                 ],
               ),
             ],
