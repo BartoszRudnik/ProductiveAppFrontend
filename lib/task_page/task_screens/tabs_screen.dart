@@ -35,8 +35,6 @@ class _TabsScreenState extends State<TabsScreen> {
   void initState() {
     super.initState();
 
-    Provider.of<TaskProvider>(context, listen: false).getPriorities();
-
     _pages = [
       {
         'page': InboxScreen(),

@@ -14,12 +14,15 @@ class _NewTaskState extends State<NewTask> {
 
   final _formKey = GlobalKey<FormState>();
 
-  String _priority = '';
+  String _priority = 'NORMAL';
   String _taskName = '';
   String _taskDescription = '';
   DateTime _startDate;
   DateTime _endDate;
   bool _isDone = false;
+
+  DateTime _startInitialValue = DateTime.now();
+  DateTime _endInitialValue = DateTime.now();
 
   Future<void> _addNewTask() async {
     var isValid = this._formKey.currentState.validate();
@@ -194,9 +197,11 @@ class _NewTaskState extends State<NewTask> {
                         onPressed: () async {
                           final picked = await showDateRangePicker(
                             context: context,
-                            firstDate: new DateTime.now(),
-                            lastDate: new DateTime.now().add(
-                              Duration(days: 365),
+                            firstDate: new DateTime.now().subtract(Duration(days: 730)),
+                            lastDate: new DateTime.now().add(Duration(days: 730)),
+                            initialDateRange: DateTimeRange(
+                              start: this._startInitialValue,
+                              end: this._endInitialValue,
                             ),
                             builder: (context, child) {
                               return Theme(
@@ -218,7 +223,10 @@ class _NewTaskState extends State<NewTask> {
                           );
                           if (picked != null) {
                             this._startDate = picked.start;
+                            this._startInitialValue = picked.start;
+
                             this._endDate = picked.end;
+                            this._endInitialValue = picked.end;
                           }
                         },
                       ),
@@ -286,7 +294,7 @@ class _NewTaskState extends State<NewTask> {
                         ),
                       ),
                     ],
-                  )
+                  ),
                 ],
               ),
             ),

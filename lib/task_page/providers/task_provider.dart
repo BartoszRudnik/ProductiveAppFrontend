@@ -61,7 +61,7 @@ class TaskProvider with ChangeNotifier {
 
       task.id = int.parse(response.body);
 
-      if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+      if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1 || task.endDate.difference(task.startDate).inDays <= 0) {
         task.startDate = null;
       }
 
@@ -99,7 +99,7 @@ class TaskProvider with ChangeNotifier {
           startDate: DateTime.parse(element['startDate']),
           tags: ['tag1', 'tag2', 'tag3adsdasdaasd', 'asdasdas', 'sdasd22', 'asdasdasda', 'sdaa3f'],
         );
-        if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays <= 1) {
+        if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays <= 1 || task.endDate.difference(task.startDate).inDays <= 0) {
           task.startDate = null;
         }
         if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays <= 1) {

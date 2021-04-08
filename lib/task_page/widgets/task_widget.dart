@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
-import 'package:productive_app/task_page/models/task.dart';
-import 'package:productive_app/task_page/providers/task_provider.dart';
-import 'package:productive_app/task_page/task_screens/task_details_screen.dart';
 import 'package:provider/provider.dart';
+
+import '../providers/task_provider.dart';
+import '../task_screens/task_details_screen.dart';
 
 class TaskWidget extends StatefulWidget {
   final task;
@@ -23,7 +23,7 @@ class _TaskWidgetState extends State<TaskWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 94,
+      //height: 94,
       width: 319,
       padding: EdgeInsets.symmetric(
         horizontal: 20,
@@ -36,43 +36,53 @@ class _TaskWidgetState extends State<TaskWidget> {
         child: Slidable(
           key: this.widget.taskKey,
           actionPane: SlidableStrechActionPane(),
-          actionExtentRatio: 0.5,
+          actionExtentRatio: 0.3,
+          closeOnScroll: true,
           actions: [
             IconSlideAction(
               caption: 'Move to Anytime',
-              color: Theme.of(context).accentColor,
+              color: Theme.of(context).primaryColor,
               onTap: () {},
               iconWidget: Icon(
                 Icons.access_time_sharp,
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).accentColor,
               ),
             ),
             IconSlideAction(
               caption: 'Move to Scheduled',
-              color: Theme.of(context).accentColor,
+              color: Theme.of(context).primaryColor,
               onTap: () {},
               iconWidget: Icon(
                 Icons.calendar_today,
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).accentColor,
               ),
             )
           ],
           secondaryActions: [
             IconSlideAction(
+              caption: 'Edit',
+              color: Theme.of(context).primaryColor,
+              onTap: () {},
+              iconWidget: Icon(
+                Icons.edit_outlined,
+                color: Theme.of(context).accentColor,
+              ),
+            ),
+            IconSlideAction(
               caption: this.widget.task.done ? 'Mark as undone' : 'Mark as done',
-              color: Theme.of(context).accentColor,
+              color: Theme.of(context).primaryColor,
               onTap: () {
                 Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(this.widget.task.id);
               },
               iconWidget: Icon(
                 this.widget.task.done ? Icons.not_interested_outlined : Icons.done,
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).accentColor,
               ),
             ),
             IconSlideAction(
               closeOnTap: false,
               caption: 'Archive',
-              color: Theme.of(context).accentColor,
+              color: Theme.of(context).primaryColor,
               onTap: () {
                 return showDialog(
                   context: context,
@@ -155,7 +165,7 @@ class _TaskWidgetState extends State<TaskWidget> {
               },
               iconWidget: Icon(
                 Icons.delete,
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).accentColor,
               ),
             ),
           ],
@@ -206,31 +216,33 @@ class _TaskWidgetState extends State<TaskWidget> {
               ),
               Column(
                 children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      if (this.widget.task.priority == 'SMALL') Icon(Icons.arrow_downward_outlined),
-                      if (this.widget.task.priority == 'HIGH') Icon(Icons.arrow_upward_outlined),
-                      if (this.widget.task.priority == 'HIGHER') Icon(Icons.arrow_upward_outlined),
-                      if (this.widget.task.priority == 'HIGHER') Icon(Icons.arrow_upward_outlined),
-                      if (this.widget.task.priority == 'CRITICAL') Icon(Icons.warning_amber_sharp),
-                      SizedBox(width: 6),
-                      if (this.widget.task.startDate != null || this.widget.task.endDate != null) Icon(Icons.calendar_today),
-                      SizedBox(width: 6),
-                      this.widget.task.startDate != null
-                          ? Text(
-                              DateFormat('MMM d').format(this.widget.task.startDate) + ' - ',
-                            )
-                          : Text(''),
-                      this.widget.task.endDate != null
-                          ? Text(
-                              DateFormat('MMM d').format(this.widget.task.endDate),
-                            )
-                          : Text(''),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 4,
-                  ),
+                  if (this.widget.task.priority != 'NORMAL' || this.widget.task.startDate != null || this.widget.task.endDate != null)
+                    Row(
+                      children: <Widget>[
+                        if (this.widget.task.priority == 'SMALL') Icon(Icons.arrow_downward_outlined),
+                        if (this.widget.task.priority == 'HIGH') Icon(Icons.arrow_upward_outlined),
+                        if (this.widget.task.priority == 'HIGHER') Icon(Icons.arrow_upward_outlined),
+                        if (this.widget.task.priority == 'HIGHER') Icon(Icons.arrow_upward_outlined),
+                        if (this.widget.task.priority == 'CRITICAL') Icon(Icons.warning_amber_sharp),
+                        SizedBox(width: 6),
+                        if (this.widget.task.startDate != null || this.widget.task.endDate != null) Icon(Icons.calendar_today),
+                        SizedBox(width: 6),
+                        this.widget.task.startDate != null
+                            ? Text(
+                                DateFormat('MMM d').format(this.widget.task.startDate) + ' - ',
+                              )
+                            : Text(''),
+                        this.widget.task.endDate != null
+                            ? Text(
+                                DateFormat('MMM d').format(this.widget.task.endDate),
+                              )
+                            : Text(''),
+                      ],
+                    ),
+                  if (this.widget.task.priority != 'NORMAL' || this.widget.task.startDate != null || this.widget.task.endDate != null)
+                    SizedBox(
+                      height: 4,
+                    ),
                   Container(
                     alignment: Alignment.centerLeft,
                     height: 20,

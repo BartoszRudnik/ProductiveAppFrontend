@@ -12,9 +12,15 @@ class InboxScreen extends StatefulWidget {
 }
 
 class _InboxScreenState extends State<InboxScreen> {
+  Future<void> loadData() async {
+    await Provider.of<TaskProvider>(context, listen: false).fetchTasks();
+    await Provider.of<TaskProvider>(context, listen: false).getPriorities();
+  }
+
   @override
   void initState() {
-    Provider.of<TaskProvider>(context, listen: false).fetchTasks();
+    this.loadData();
+
     super.initState();
   }
 
