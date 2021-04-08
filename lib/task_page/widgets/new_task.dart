@@ -178,6 +178,7 @@ class _NewTaskState extends State<NewTask> {
                         },
                         icon: Icon(Icons.flag_outlined),
                         itemBuilder: (context) {
+                          print('flag');
                           return priorities.map((e) {
                             return PopupMenuItem(
                               child: Text(e),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/task_page/models/task.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/task_provider.dart';
@@ -70,13 +71,13 @@ class _InboxScreenState extends State<InboxScreen> {
                     ],
                     secondaryActions: [
                       IconSlideAction(
-                        caption: 'Mark as done',
+                        caption: tasks[index].done ? 'Mark as undone' : 'Mark as done',
                         color: Theme.of(context).accentColor,
                         onTap: () {
                           Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(tasks[index].id);
                         },
                         iconWidget: Icon(
-                          Icons.done,
+                          tasks[index].done ? Icons.not_interested_outlined : Icons.done,
                           color: Theme.of(context).primaryColor,
                         ),
                       ),
@@ -85,59 +86,81 @@ class _InboxScreenState extends State<InboxScreen> {
                         caption: 'Archive',
                         color: Theme.of(context).accentColor,
                         onTap: () {
-                          return showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: Center(
-                                child: Text(
-                                  'Archive',
-                                  style: Theme.of(context).textTheme.headline3,
+                          // return showDialog(
+                          //   context: context,
+                          //   builder: (context) => AlertDialog(
+                          //     title: Center(
+                          //       child: Text(
+                          //         'Archive',
+                          //         style: Theme.of(context).textTheme.headline3,
+                          //       ),
+                          //     ),
+                          //     content: Column(
+                          //       mainAxisSize: MainAxisSize.min,
+                          //       children: [
+                          //         Text('Are you sure you want to archive this task?'),
+                          //         SizedBox(height: 10),
+                          //         Row(
+                          //           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          //           children: [
+                          //             ElevatedButton(
+                          //               style: ElevatedButton.styleFrom(
+                          //                 primary: Theme.of(context).primaryColor,
+                          //                 side: BorderSide(color: Theme.of(context).primaryColor),
+                          //               ),
+                          //               onPressed: () {
+                          //                 Provider.of<TaskProvider>(context, listen: false).deleteTask(tasks[index].id);
+                          //                 Navigator.of(context).pop(true);
+                          //               },
+                          //               child: Text(
+                          //                 'Yes',
+                          //                 style: TextStyle(
+                          //                   fontSize: 14,
+                          //                   color: Theme.of(context).accentColor,
+                          //                 ),
+                          //               ),
+                          //             ),
+                          //             ElevatedButton(
+                          //               style: ElevatedButton.styleFrom(
+                          //                 primary: Theme.of(context).primaryColor,
+                          //                 side: BorderSide(color: Theme.of(context).primaryColor),
+                          //               ),
+                          //               onPressed: () {
+                          //                 Navigator.of(context).pop(false);
+                          //               },
+                          //               child: Text(
+                          //                 'No',
+                          //                 style: TextStyle(
+                          //                   fontSize: 14,
+                          //                   color: Theme.of(context).accentColor,
+                          //                 ),
+                          //               ),
+                          //             ),
+                          //           ],
+                          //         )
+                          //       ],
+                          //     ),
+                          //   ),
+                          // );
+                          Task tmpTask = tasks[index];
+                          Provider.of<TaskProvider>(context, listen: false).deleteTask(tasks[index].id);
+                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              duration: Duration(
+                                seconds: 3,
+                              ),
+                              content: Text(
+                                'Task archived',
+                                style: TextStyle(
+                                  fontSize: 16,
                                 ),
                               ),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text('Are you sure you want to archive this task?'),
-                                  SizedBox(height: 10),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          primary: Theme.of(context).primaryColor,
-                                          side: BorderSide(color: Theme.of(context).primaryColor),
-                                        ),
-                                        onPressed: () {
-                                          Provider.of<TaskProvider>(context, listen: false).deleteTask(tasks[index].id);
-                                          Navigator.of(context).pop(true);
-                                        },
-                                        child: Text(
-                                          'Yes',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Theme.of(context).accentColor,
-                                          ),
-                                        ),
-                                      ),
-                                      ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          primary: Theme.of(context).primaryColor,
-                                          side: BorderSide(color: Theme.of(context).primaryColor),
-                                        ),
-                                        onPressed: () {
-                                          Navigator.of(context).pop(false);
-                                        },
-                                        child: Text(
-                                          'No',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Theme.of(context).accentColor,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                ],
+                              action: SnackBarAction(
+                                label: 'UNDO',
+                                onPressed: () {
+                                  Provider.of<TaskProvider>(context, listen: false).addTask(tmpTask);
+                                },
                               ),
                             ),
                           );
