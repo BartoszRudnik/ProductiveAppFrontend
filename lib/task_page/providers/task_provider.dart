@@ -165,6 +165,8 @@ class TaskProvider with ChangeNotifier {
       for (var element in responseBody) {
         this._priorities.add(element.toString());
       }
+
+      notifyListeners();
     } catch (error) {
       print(error);
       throw error;
