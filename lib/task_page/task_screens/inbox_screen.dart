@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/task_page/providers/tag_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/task_provider.dart';
@@ -15,6 +16,7 @@ class _InboxScreenState extends State<InboxScreen> {
   Future<void> loadData() async {
     await Provider.of<TaskProvider>(context, listen: false).fetchTasks();
     await Provider.of<TaskProvider>(context, listen: false).getPriorities();
+    await Provider.of<TagProvider>(context, listen: false).getTags();
   }
 
   @override
@@ -26,8 +28,7 @@ class _InboxScreenState extends State<InboxScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final loadedTasks = Provider.of<TaskProvider>(context);
-    final tasks = loadedTasks.tasks;
+    final tasks = Provider.of<TaskProvider>(context).tasks;
 
     return Column(
       mainAxisSize: MainAxisSize.min,

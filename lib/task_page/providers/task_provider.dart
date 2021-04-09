@@ -32,21 +32,6 @@ class TaskProvider with ChangeNotifier {
   Future<void> addTask(Task task) async {
     String url = this._serverUrl + 'task/add';
 
-    print(
-      json.encode(
-        {
-          'taskName': task.title,
-          'taskDescription': task.description,
-          'userEmail': this.userMail,
-          //'startDate': task.startDate.toIso8601String(),
-          //'endDate': task.endDate.toIso8601String(),
-          'ifDone': task.done,
-          'priority': task.priority,
-          'tags': task.tags.map((tag) => tag.toJson()).toList(),
-        },
-      ),
-    );
-
     if (task.startDate == null) {
       task.startDate = DateTime.fromMicrosecondsSinceEpoch(0);
     }
@@ -104,8 +89,6 @@ class TaskProvider with ChangeNotifier {
     try {
       final response = await http.get(url);
       final responseBody = json.decode(response.body);
-
-      print(responseBody);
 
       for (var element in responseBody) {
         List<Tag> taskTags = [];

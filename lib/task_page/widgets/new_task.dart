@@ -68,6 +68,7 @@ class _NewTaskState extends State<NewTask> {
   @override
   Widget build(BuildContext context) {
     List<String> priorities = Provider.of<TaskProvider>(context).priorities;
+
     List<Tag> tags = Provider.of<TagProvider>(context).tags;
     List<Tag> filteredTags = Provider.of<TagProvider>(context).tags;
     List<bool> selectedTags = List<bool>.filled(tags.length, false, growable: true);
