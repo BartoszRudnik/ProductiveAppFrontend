@@ -23,7 +23,7 @@ class _NewTaskState extends State<NewTask> {
   DateTime _startDate;
   DateTime _endDate;
   bool _isDone = false;
-  List<Tag> finalTags = [];
+  List<Tag> _finalTags = [];
 
   DateTime _startInitialValue = DateTime.now();
   DateTime _endInitialValue = DateTime.now();
@@ -48,7 +48,7 @@ class _NewTaskState extends State<NewTask> {
       endDate: this._endDate,
       done: this._isDone,
       priority: this._priority,
-      tags: ['tag1', 'tag2', 'tag3adsdasdaasd', 'asdasdas', 'sdasd22', 'asdasdasda', 'sdaa3f'],
+      tags: this._finalTags,
       description: this._taskDescription,
     );
 
@@ -265,7 +265,9 @@ class _NewTaskState extends State<NewTask> {
                                                 },
                                                 onSaved: (value) {
                                                   setState(() {
-                                                    tags.add(Tag(id: (tags.length + 1), name: value));
+                                                    final newTag = Tag(id: (tags.length + 1), name: value);
+                                                    Provider.of<TagProvider>(context, listen: false).addTag(newTag);
+                                                    tags.add(newTag);
                                                   });
                                                 },
                                                 maxLines: null,
@@ -300,9 +302,9 @@ class _NewTaskState extends State<NewTask> {
                                                   onTap: () => setState(() {
                                                     selectedTags[filteredTags[tagIndex].id - 1] = !selectedTags[filteredTags[tagIndex].id - 1];
                                                     if (selectedTags[filteredTags[tagIndex].id - 1]) {
-                                                      this.finalTags.add(tags[filteredTags[tagIndex].id - 1]);
+                                                      this._finalTags.add(tags[filteredTags[tagIndex].id - 1]);
                                                     } else {
-                                                      this.finalTags.removeWhere((element) => element.id == filteredTags[tagIndex].id);
+                                                      this._finalTags.removeWhere((element) => element.id == filteredTags[tagIndex].id);
                                                     }
                                                   }),
                                                   child: Card(
@@ -330,7 +332,7 @@ class _NewTaskState extends State<NewTask> {
                                                   side: BorderSide(color: Theme.of(context).primaryColor),
                                                 ),
                                                 onPressed: () {
-                                                  Navigator.of(context).pop(true);
+                                                  Navigator.of(context).pop(false);
                                                 },
                                                 child: Text(
                                                   'Cancel',
@@ -346,10 +348,7 @@ class _NewTaskState extends State<NewTask> {
                                                   side: BorderSide(color: Theme.of(context).primaryColor),
                                                 ),
                                                 onPressed: () {
-                                                  this.finalTags.forEach((element) {
-                                                    print(element.id.toString() + ' ' + element.name);
-                                                  });
-                                                  Navigator.of(context).pop(false);
+                                                  Navigator.of(context).pop(true);
                                                 },
                                                 child: Text(
                                                   'Add tag/tags',

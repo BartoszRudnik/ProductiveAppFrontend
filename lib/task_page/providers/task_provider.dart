@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:productive_app/task_page/models/tag.dart';
 import '../models/task.dart';
 
 class TaskProvider with ChangeNotifier {
@@ -31,6 +32,21 @@ class TaskProvider with ChangeNotifier {
   Future<void> addTask(Task task) async {
     String url = this._serverUrl + 'task/add';
 
+    print(
+      json.encode(
+        {
+          'taskName': task.title,
+          'taskDescription': task.description,
+          'userEmail': this.userMail,
+          //'startDate': task.startDate.toIso8601String(),
+          //'endDate': task.endDate.toIso8601String(),
+          'ifDone': task.done,
+          'priority': task.priority,
+          'tags': task.tags.map((tag) => tag.toJson()).toList(),
+        },
+      ),
+    );
+
     if (task.startDate == null) {
       task.startDate = DateTime.fromMicrosecondsSinceEpoch(0);
     }
@@ -51,6 +67,7 @@ class TaskProvider with ChangeNotifier {
             'endDate': task.endDate.toIso8601String(),
             'ifDone': task.done,
             'priority': task.priority,
+            'tags': task.tags.map((tag) => tag.toJson()).toList(),
           },
         ),
         headers: {
@@ -88,16 +105,27 @@ class TaskProvider with ChangeNotifier {
       final response = await http.get(url);
       final responseBody = json.decode(response.body);
 
+      print(responseBody);
+
       for (var element in responseBody) {
+        List<Tag> taskTags = [];
+
+        for (var tagElement in element['tags']) {
+          taskTags.add(Tag(
+            id: tagElement['id'],
+            name: tagElement['name'],
+          ));
+        }
+
         Task task = Task(
-          id: element['id_task'],
-          title: element['task_name'],
-          description: element['description'],
-          done: element['ifDone'],
-          priority: element['priority'],
-          endDate: DateTime.parse(element['endDate']),
-          startDate: DateTime.parse(element['startDate']),
-          tags: ['tag1', 'tag2', 'tag3adsdasdaasd', 'asdasdas', 'sdasd22', 'asdasdasda', 'sdaa3f'],
+          id: element['tasks']['id_task'],
+          title: element['tasks']['task_name'],
+          description: element['tasks']['description'],
+          done: element['tasks']['ifDone'],
+          priority: element['tasks']['priority'],
+          endDate: DateTime.parse(element['tasks']['endDate']),
+          startDate: DateTime.parse(element['tasks']['startDate']),
+          tags: taskTags,
         );
         if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays <= 1 || task.endDate.difference(task.startDate).inDays <= 0) {
           task.startDate = null;

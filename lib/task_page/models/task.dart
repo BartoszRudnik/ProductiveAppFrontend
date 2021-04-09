@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:productive_app/task_page/models/tag.dart';
 
 class Task with ChangeNotifier {
   int id;
@@ -7,7 +8,7 @@ class Task with ChangeNotifier {
   String priority;
   DateTime startDate;
   DateTime endDate;
-  List<String> tags = [];
+  List<Tag> tags = [];
   bool done;
 
   Task({
