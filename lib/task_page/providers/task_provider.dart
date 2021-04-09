@@ -166,6 +166,7 @@ class TaskProvider with ChangeNotifier {
   }
 
   Future<void> getPriorities() async {
+    this._priorities = [];
     String url = this._serverUrl + 'task/priorities';
 
     try {

@@ -49,6 +49,32 @@ class TagProvider with ChangeNotifier {
   }
 
   void addTag(Tag newTag) {
+    final url = this._serverUrl + "tag/add";
+
+    try {
+      http.post(
+        url,
+        body: json.encode(
+          {
+            'id': newTag.id,
+            'name': newTag.name,
+            'taskId': null,
+            'ownerEmail': this.userMail,
+          },
+        ),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      this.tagList.add(newTag);
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw error;
+    }
+
     this.tagList.add(newTag);
 
     notifyListeners();

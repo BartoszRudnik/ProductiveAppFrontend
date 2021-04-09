@@ -58,6 +58,10 @@ class _NewTaskState extends State<NewTask> {
       this._formKey.currentState.reset();
       setState(() {
         this._isDone = false;
+        this._finalTags.forEach((element) {
+          element.isSelected = false;
+        });
+        this._finalTags = [];
       });
     } catch (error) {
       print(error);
@@ -67,11 +71,10 @@ class _NewTaskState extends State<NewTask> {
 
   @override
   Widget build(BuildContext context) {
-    List<String> priorities = Provider.of<TaskProvider>(context).priorities;
+    List<String> priorities = Provider.of<TaskProvider>(context, listen: false).priorities;
 
     List<Tag> tags = Provider.of<TagProvider>(context).tags;
     List<Tag> filteredTags = Provider.of<TagProvider>(context).tags;
-    List<bool> selectedTags = List<bool>.filled(tags.length, false, growable: true);
 
     return LayoutBuilder(
       builder: (context, constraint) {
@@ -289,7 +292,6 @@ class _NewTaskState extends State<NewTask> {
                                                 this._tagKey.currentState.save();
                                                 this._tagKey.currentState.reset();
                                                 filteredTags = tags.reversed.toList();
-                                                selectedTags.add(false);
                                               },
                                               backgroundColor: Theme.of(context).primaryColor,
                                             ),
@@ -301,21 +303,21 @@ class _NewTaskState extends State<NewTask> {
                                               itemBuilder: (ctx, tagIndex) {
                                                 return GestureDetector(
                                                   onTap: () => setState(() {
-                                                    selectedTags[filteredTags[tagIndex].id - 1] = !selectedTags[filteredTags[tagIndex].id - 1];
-                                                    if (selectedTags[filteredTags[tagIndex].id - 1]) {
-                                                      this._finalTags.add(tags[filteredTags[tagIndex].id - 1]);
+                                                    filteredTags[tagIndex].isSelected = !filteredTags[tagIndex].isSelected;
+                                                    if (filteredTags[tagIndex].isSelected) {
+                                                      this._finalTags.add(filteredTags[tagIndex]);
                                                     } else {
-                                                      this._finalTags.removeWhere((element) => element.id == filteredTags[tagIndex].id);
+                                                      this._finalTags.remove(filteredTags[tagIndex]);
                                                     }
                                                   }),
                                                   child: Card(
-                                                    color: selectedTags[filteredTags[tagIndex].id - 1] ? Theme.of(context).primaryColor : Theme.of(context).accentColor,
+                                                    color: filteredTags[tagIndex].isSelected ? Theme.of(context).primaryColor : Theme.of(context).accentColor,
                                                     child: Padding(
                                                       padding: EdgeInsets.all(10),
                                                       child: Text(
                                                         filteredTags[tagIndex].name,
                                                         style: TextStyle(
-                                                          color: selectedTags[filteredTags[tagIndex].id - 1] ? Theme.of(context).accentColor : Theme.of(context).primaryColor,
+                                                          color: filteredTags[tagIndex].isSelected ? Theme.of(context).accentColor : Theme.of(context).primaryColor,
                                                         ),
                                                       ),
                                                     ),
