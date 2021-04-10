@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/task_page/models/tag.dart';
-import 'package:productive_app/task_page/models/task.dart';
-import 'package:productive_app/task_page/providers/tag_provider.dart';
-import 'package:productive_app/task_page/providers/task_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../models/tag.dart';
+import '../models/task.dart';
+import '../providers/tag_provider.dart';
+import '../providers/task_provider.dart';
+
 class NewTask extends StatefulWidget {
+  String localization;
+
+  NewTask({
+    @required this.localization,
+  });
+
   @override
   _NewTaskState createState() => _NewTaskState();
 }
@@ -17,6 +24,7 @@ class _NewTaskState extends State<NewTask> {
   final _formKey = GlobalKey<FormState>();
   final _tagKey = GlobalKey<FormState>();
 
+  String _localization;
   String _priority = 'NORMAL';
   String _taskName = '';
   String _taskDescription = '';
@@ -27,6 +35,12 @@ class _NewTaskState extends State<NewTask> {
 
   DateTime _startInitialValue = DateTime.now();
   DateTime _endInitialValue = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    this._localization = this.widget.localization;
+  }
 
   Future<void> _addNewTask() async {
     var isValid = this._formKey.currentState.validate();
@@ -50,6 +64,7 @@ class _NewTaskState extends State<NewTask> {
       priority: this._priority,
       tags: this._finalTags,
       description: this._taskDescription,
+      localization: this._localization,
     );
 
     try {
@@ -57,6 +72,9 @@ class _NewTaskState extends State<NewTask> {
 
       this._formKey.currentState.reset();
       setState(() {
+        this._startInitialValue = DateTime.now();
+        this._endInitialValue = DateTime.now();
+        this._localization = this.widget.localization;
         this._isDone = false;
         this._finalTags.forEach((element) {
           element.isSelected = false;
@@ -71,9 +89,10 @@ class _NewTaskState extends State<NewTask> {
 
   @override
   Widget build(BuildContext context) {
-    List<String> priorities = Provider.of<TaskProvider>(context, listen: false).priorities;
+    final priorities = Provider.of<TaskProvider>(context, listen: false).priorities;
+    final localizations = Provider.of<TaskProvider>(context, listen: false).localizations;
 
-    List<Tag> tags = Provider.of<TagProvider>(context).tags;
+    final tags = Provider.of<TagProvider>(context).tags;
     List<Tag> filteredTags = Provider.of<TagProvider>(context).tags;
 
     return LayoutBuilder(
@@ -394,24 +413,26 @@ class _NewTaskState extends State<NewTask> {
                     color: Theme.of(context).primaryColor,
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //mainAxisAlignment: MainAxisAlignment.values(),
                     children: [
-                      ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          onPrimary: Theme.of(context).primaryColor,
-                          primary: Theme.of(context).accentColor,
-                          elevation: 0,
-                        ),
-                        onPressed: () {},
+                      PopupMenuButton(
                         icon: Icon(Icons.all_inbox),
-                        label: Text(
-                          'Inbox',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
+                        initialValue: this._localization,
+                        onSelected: (value) {
+                          setState(() {
+                            this._localization = value;
+                          });
+                        },
+                        itemBuilder: (context) {
+                          return localizations.map((e) {
+                            return PopupMenuItem(
+                              child: Text(e),
+                              value: e,
+                            );
+                          }).toList();
+                        },
                       ),
+                      Expanded(child: Text(this._localization)),
                       ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
                           onPrimary: Theme.of(context).primaryColor,

@@ -27,7 +27,6 @@ class _TaskWidgetState extends State<TaskWidget> {
       //height: 94,
       width: 319,
       padding: EdgeInsets.symmetric(
-        horizontal: 20,
         vertical: 7,
       ),
       child: GestureDetector(
@@ -73,7 +72,7 @@ class _TaskWidgetState extends State<TaskWidget> {
               caption: this.widget.task.done ? 'Mark as undone' : 'Mark as done',
               color: Theme.of(context).primaryColor,
               onTap: () {
-                Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(this.widget.task.id);
+                Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(this.widget.task);
               },
               iconWidget: Icon(
                 this.widget.task.done ? Icons.not_interested_outlined : Icons.done,
@@ -184,7 +183,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                           )
                         : null,
                     onPressed: () {
-                      Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(this.widget.task.id);
+                      Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(this.widget.task);
                     },
                     constraints: BoxConstraints(minWidth: 20, minHeight: 18),
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,

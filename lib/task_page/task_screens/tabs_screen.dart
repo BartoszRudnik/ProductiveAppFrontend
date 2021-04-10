@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/login/providers/auth_provider.dart';
-import 'package:productive_app/task_page/models/task.dart';
-import 'package:productive_app/task_page/providers/task_provider.dart';
-import 'package:productive_app/task_page/widgets/new_task.dart';
-import 'package:productive_app/task_page/widgets/task_appBar.dart';
-import 'package:productive_app/task_page/task_screens/anyTime_screen.dart';
-import 'package:productive_app/task_page/task_screens/delegated_screen.dart';
-import 'package:productive_app/task_page/task_screens/inbox_screen.dart';
-import 'package:productive_app/task_page/task_screens/scheduled_screen.dart';
-import 'package:provider/provider.dart';
+
+import '../widgets/new_task.dart';
+import '../widgets/task_appBar.dart';
+import 'anyTime_screen.dart';
+import 'delegated_screen.dart';
+import 'inbox_screen.dart';
+import 'scheduled_screen.dart';
 
 class TabsScreen extends StatefulWidget {
   static const routeName = ('/tabs-screen');
@@ -30,6 +27,16 @@ class _TabsScreenState extends State<TabsScreen> {
   double offsetY = 0;
   double scale = 1;
   bool isDrawerVisible = false;
+
+  String _getCurrentLocalizationName() {
+    if (this._selectedPageIndex == 0) {
+      return 'INBOX';
+    } else if (this._selectedPageIndex == 1) {
+      return 'ANYTIME';
+    } else if (this._selectedPageIndex == 2) {
+      return 'SCHEDULED';
+    }
+  }
 
   @override
   void initState() {
@@ -64,7 +71,9 @@ class _TabsScreenState extends State<TabsScreen> {
       builder: (_) {
         return GestureDetector(
           onTap: () {},
-          child: NewTask(),
+          child: NewTask(
+            localization: this._getCurrentLocalizationName(),
+          ),
           behavior: HitTestBehavior.opaque,
         );
       },

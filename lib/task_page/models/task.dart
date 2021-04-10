@@ -6,6 +6,7 @@ class Task with ChangeNotifier {
   String title;
   String description;
   String priority;
+  String localization;
   DateTime startDate;
   DateTime endDate;
   List<Tag> tags = [];
@@ -20,5 +21,6 @@ class Task with ChangeNotifier {
     this.endDate,
     this.tags,
     this.done,
+    this.localization,
   });
 }
