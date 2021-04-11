@@ -33,143 +33,117 @@ class _TaskWidgetState extends State<TaskWidget> {
         onTap: () {
           Navigator.of(context).pushNamed(TaskDetailScreen.routeName);
         },
-        child: Slidable(
+        child: Dismissible(
           key: this.widget.taskKey,
-          actionPane: SlidableStrechActionPane(),
-          actionExtentRatio: 0.3,
-          closeOnScroll: true,
-          actions: [
-            IconSlideAction(
-              caption: 'Move further',
-              color: Theme.of(context).primaryColor,
-              onTap: () {
-                String newLocation = 'INBOX';
-
-                if (this.widget.task.endDate != null) {
-                  newLocation = 'SCHEDULED';
-                } else {
-                  newLocation = 'ANYTIME';
-                }
-
-                Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
-              },
-              iconWidget: Icon(
-                Icons.navigate_next_outlined,
-                color: Theme.of(context).accentColor,
-              ),
+          background: Container(
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            alignment: Alignment.centerLeft,
+            color: Theme.of(context).primaryColor,
+            child: Row(
+              //mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.navigate_next_outlined,
+                  color: Theme.of(context).accentColor,
+                  size: 50,
+                ),
+                Text(
+                  'Move task',
+                  style: TextStyle(color: Theme.of(context).accentColor, fontSize: 20, fontWeight: FontWeight.w400),
+                ),
+              ],
             ),
-          ],
-          secondaryActions: [
-            IconSlideAction(
-              caption: 'Edit',
-              color: Theme.of(context).primaryColor,
-              onTap: () {},
-              iconWidget: Icon(
-                Icons.edit_outlined,
-                color: Theme.of(context).accentColor,
-              ),
+          ),
+          secondaryBackground: Container(
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            alignment: Alignment.centerRight,
+            color: Theme.of(context).primaryColor,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  'Archive task',
+                  style: TextStyle(color: Theme.of(context).accentColor, fontSize: 20, fontWeight: FontWeight.w400),
+                ),
+                Icon(
+                  Icons.delete_outline,
+                  color: Theme.of(context).accentColor,
+                  size: 40,
+                ),
+              ],
             ),
-            IconSlideAction(
-              caption: this.widget.task.done ? 'Mark as undone' : 'Mark as done',
-              color: Theme.of(context).primaryColor,
-              onTap: () {
-                Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(this.widget.task);
-              },
-              iconWidget: Icon(
-                this.widget.task.done ? Icons.not_interested_outlined : Icons.done,
-                color: Theme.of(context).accentColor,
-              ),
-            ),
-            IconSlideAction(
-              closeOnTap: false,
-              caption: 'Archive',
-              color: Theme.of(context).primaryColor,
-              onTap: () {
-                return showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Center(
-                      child: Text(
-                        'Archive',
-                        style: Theme.of(context).textTheme.headline3,
-                      ),
-                    ),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text('Are you sure you want to archive this task?'),
-                        SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                primary: Theme.of(context).primaryColor,
-                                side: BorderSide(color: Theme.of(context).primaryColor),
-                              ),
-                              onPressed: () {
-                                Provider.of<TaskProvider>(context, listen: false).deleteTask(this.widget.task.id);
-                                Navigator.of(context).pop(true);
-                              },
-                              child: Text(
-                                'Yes',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Theme.of(context).accentColor,
-                                ),
-                              ),
-                            ),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                primary: Theme.of(context).primaryColor,
-                                side: BorderSide(color: Theme.of(context).primaryColor),
-                              ),
-                              onPressed: () {
-                                Navigator.of(context).pop(false);
-                              },
-                              child: Text(
-                                'No',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Theme.of(context).accentColor,
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
+          ),
+          confirmDismiss: (direction) {
+            if (direction == DismissDirection.endToStart) {
+              return showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Center(
+                    child: Text(
+                      'Archive',
+                      style: Theme.of(context).textTheme.headline3,
                     ),
                   ),
-                );
-                // Task tmpTask = this.widget.task;
-                // ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                // ScaffoldMessenger.of(context).showSnackBar(
-                //   SnackBar(
-                //     duration: Duration(
-                //       seconds: 3,
-                //     ),
-                //     content: Text(
-                //       'Task archived',
-                //       style: TextStyle(
-                //         fontSize: 16,
-                //       ),
-                //     ),
-                //     action: SnackBarAction(
-                //       label: 'UNDO',
-                //       onPressed: () {
-                //         Provider.of<TaskProvider>(context, listen: false).addTask(tmpTask);
-                //       },
-                //     ),
-                //   ),
-                // );
-                // Provider.of<TaskProvider>(context, listen: false).deleteTask(this.widget.task.id);
-              },
-              iconWidget: Icon(
-                Icons.delete,
-                color: Theme.of(context).accentColor,
-              ),
-            ),
-          ],
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('Are you sure you want to archive this task?'),
+                      SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              primary: Theme.of(context).primaryColor,
+                              side: BorderSide(color: Theme.of(context).primaryColor),
+                            ),
+                            onPressed: () {
+                              Provider.of<TaskProvider>(context, listen: false).deleteTask(this.widget.task.id);
+                              Navigator.of(context).pop(true);
+                            },
+                            child: Text(
+                              'Yes',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Theme.of(context).accentColor,
+                              ),
+                            ),
+                          ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              primary: Theme.of(context).primaryColor,
+                              side: BorderSide(color: Theme.of(context).primaryColor),
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).pop(false);
+                            },
+                            child: Text(
+                              'No',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Theme.of(context).accentColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              );
+            }
+            if (direction == DismissDirection.startToEnd) {
+              String newLocation = 'INBOX';
+
+              if (this.widget.task.endDate != null) {
+                newLocation = 'SCHEDULED';
+              } else {
+                newLocation = 'ANYTIME';
+              }
+
+              Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
+            }
+          },
           child: Column(
             children: <Widget>[
               Row(
