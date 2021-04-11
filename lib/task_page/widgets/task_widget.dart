@@ -40,23 +40,24 @@ class _TaskWidgetState extends State<TaskWidget> {
           closeOnScroll: true,
           actions: [
             IconSlideAction(
-              caption: 'Move to Anytime',
+              caption: 'Move further',
               color: Theme.of(context).primaryColor,
-              onTap: () {},
+              onTap: () {
+                String newLocation = 'INBOX';
+
+                if (this.widget.task.endDate != null) {
+                  newLocation = 'SCHEDULED';
+                } else {
+                  newLocation = 'ANYTIME';
+                }
+
+                Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
+              },
               iconWidget: Icon(
-                Icons.access_time_sharp,
+                Icons.navigate_next_outlined,
                 color: Theme.of(context).accentColor,
               ),
             ),
-            IconSlideAction(
-              caption: 'Move to Scheduled',
-              color: Theme.of(context).primaryColor,
-              onTap: () {},
-              iconWidget: Icon(
-                Icons.calendar_today,
-                color: Theme.of(context).accentColor,
-              ),
-            )
           ],
           secondaryActions: [
             IconSlideAction(

@@ -100,7 +100,58 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
-  Future<void> updateTask(String id, Task task) async {}
+  Future<void> updateTask(Task task, String newLocation) async {
+    String url = this._serverUrl + 'task/update/${task.id}';
+
+    if (task.startDate == null) {
+      task.startDate = DateTime.fromMicrosecondsSinceEpoch(0);
+    }
+
+    if (task.endDate == null) {
+      task.endDate = DateTime.fromMicrosecondsSinceEpoch(0);
+    }
+
+    try {
+      await http.put(
+        url,
+        body: json.encode(
+          {
+            'taskName': task.title,
+            'taskDescription': task.description,
+            'userEmail': this.userMail,
+            'startDate': task.startDate.toIso8601String(),
+            'endDate': task.endDate.toIso8601String(),
+            'ifDone': task.done,
+            'priority': task.priority,
+            'tags': task.tags.map((tag) => tag.toJson()).toList(),
+            'localization': newLocation,
+          },
+        ),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1 || task.endDate.difference(task.startDate).inDays <= 0) {
+        task.startDate = null;
+      }
+
+      if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+        task.endDate = null;
+      }
+
+      this.deleteFromLocalization(task);
+
+      task.localization = newLocation;
+      this.addToLocalication(task);
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
 
   Future<void> fetchTasks() async {
     String url = this._serverUrl + 'task/getAll/${this.userMail}';
