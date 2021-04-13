@@ -31,7 +31,7 @@ class _TaskWidgetState extends State<TaskWidget> {
       ),
       child: GestureDetector(
         onTap: () {
-          Navigator.of(context).pushNamed(TaskDetailScreen.routeName);
+          Navigator.of(context).pushNamed(TaskDetailScreen.routeName,arguments: this.widget.task);
         },
         child: Dismissible(
           key: this.widget.taskKey,

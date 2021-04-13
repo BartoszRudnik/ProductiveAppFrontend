@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:productive_app/task_page/models/task.dart';
 import 'package:productive_app/task_page/providers/task_provider.dart';
 import 'package:productive_app/task_page/widgets/task_appBar.dart';
 import 'package:provider/provider.dart';
@@ -12,15 +14,19 @@ class TaskDetailScreen extends StatefulWidget {
 
 class _TaskDetailScreenState extends State<TaskDetailScreen> {
   FocusNode _descriptionFocus = new FocusNode();
+  final _formKey = GlobalKey<FormState>();
+  Task taskToEdit; 
+  Task originalTask;
+
+  bool _isValid = true;
   bool _isFocused = false;
   bool _isDescriptionInitial = true;
-  bool _isStartDateInitial = true;
-  bool _isEndDateInitial = true;
   String _description = "";
+  DateFormat formatter = DateFormat("yyyy-MM-dd");
   @override
   void initState() {
-    Provider.of<TaskProvider>(context, listen: false).fetchTasks();
     _descriptionFocus.addListener(onDescriptionFocusChange);
+    taskToEdit = null;
     super.initState();
   }
 
@@ -51,8 +57,144 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     });
   }
 
+  Future<DateTime> pickDate(DateTime initDate) async{
+    final DateTime pick = await showDatePicker(
+      context: context, 
+      initialDate: initDate, 
+      firstDate: DateTime(2000), 
+      lastDate: DateTime(3000),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Colors.grey,
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
+            ),
+            textButtonTheme: TextButtonThemeData(
+                style: TextButton.styleFrom(
+                primary: Colors.black,
+              ),
+            ),
+          ),
+          child: child,
+        );
+      },
+    );
+    return pick;
+  }
+
+  Future<void> selectStartDate() async{
+    DateTime initDate = taskToEdit.startDate;
+    if(taskToEdit.startDate == null){
+      initDate = DateTime.now();
+    }
+    final DateTime pick = await pickDate(initDate);
+    setState(() {
+      taskToEdit.startDate = pick;
+    });
+  }
+
+  Future<void> selectEndDate() async{
+    DateTime initDate = taskToEdit.endDate;
+    if(taskToEdit.endDate == null){
+      initDate = DateTime.now();
+    }
+    final DateTime pick = await pickDate(initDate);
+    setState(() {
+      taskToEdit.endDate = pick;
+    });
+  }
+
+  Future<void> saveTask() async{
+    var isValid = this._formKey.currentState.validate();
+
+    setState(() {
+      this._isValid = isValid;
+    });
+
+    if(taskToEdit.startDate != null && taskToEdit.endDate == null){
+      setState((){
+        this._isValid = false;
+      });showDialog(
+        context: context, 
+        builder: (context) => AlertDialog(
+          title: Text(
+            'Warning',
+            style: Theme.of(context).textTheme.headline2,
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Task end date must be specified if you specify task start date'),
+              SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Theme.of(context).primaryColor,
+                      side: BorderSide(color: Theme.of(context).primaryColor),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                    },
+                    child: Text(
+                      'OK',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(context).accentColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        )
+      );
+    }
+
+    if (!this._isValid) {
+      return;
+    }
+
+    this._formKey.currentState.save();
+    try{
+      await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, taskToEdit.localization);
+      Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);  
+    }catch (error){
+      print(error);
+    }
+    Navigator.pop(context);
+  }
+
+  void setTaskToEdit(Task argTask){
+      taskToEdit = new Task(
+        id: argTask.id,
+        title: argTask.title,
+        description: argTask.description,
+        done: argTask.done,
+        startDate: argTask.startDate,
+        endDate: argTask.endDate,
+        localization: argTask.localization,
+        priority: argTask.priority,
+        tags: argTask.tags,
+      );
+
+  }
+
   @override
   Widget build(BuildContext context) {
+    if(taskToEdit == null){
+      originalTask = ModalRoute.of(context).settings.arguments as Task;  
+      setTaskToEdit(originalTask);
+      _description = taskToEdit.description;
+      if(_description.isNotEmpty && _description.trim() != ''){
+        onDescriptionChanged(taskToEdit.description);
+      }
+    }
+    
     return Scaffold(
       appBar: TaskAppBar(
         title: 'Details',
@@ -60,172 +202,206 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       body: SingleChildScrollView (
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30.0), 
-          child: Column(
-            children: [
-              TextFormField(
-                style: TextStyle(fontSize: 25),
-                maxLines: null,
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              ListTile(
-                minLeadingWidth: 16,
-                contentPadding: EdgeInsets.symmetric(horizontal: 0),
-                leading: Icon(Icons.edit),
-                title: Align(
-                  alignment: Alignment(-1.1,0),
-                  child: Text(
-                    "Description",
-                    style: TextStyle(fontSize: 21),
-                  ),
+          child: Form(
+            key: this._formKey,
+            child: Column(
+              children: [
+                TextFormField(
+                  initialValue: taskToEdit.title,
+                  style: TextStyle(fontSize: 25),
+                  maxLines: null,
+                  onSaved: (value){
+                    taskToEdit.title = value;
+                  },
+                  validator: (value){
+                    if(value.isEmpty){
+                      return 'Task title cannot be empty';
+                    }
+                    return null;
+                  },
                 ),
-              ),
-              TextFormField(
-                //key: Key(_description),
-                maxLines: null,
-                focusNode: _descriptionFocus,
-                onChanged: (text) {
-                  onDescriptionChanged(text);
-                },
-                style: TextStyle(fontSize: 16),
-                textAlign: _isDescriptionInitial? TextAlign.center : TextAlign.left,
-                decoration: InputDecoration(
-                  hintText: _isFocused? "" : "Tap to add description",
-                  hintStyle: TextStyle(
-                    color: Color.fromRGBO(119, 119, 120, 1)
-                  ),
-                  filled: true,
-                  fillColor: _isDescriptionInitial? Color.fromRGBO(237, 237, 240, 1) : Colors.white,
-                  enabledBorder: _description.isEmpty? OutlineInputBorder(
-                    borderSide: BorderSide(color: Color.fromRGBO(221, 221, 226, 1))
-                  ) : InputBorder.none,
+                SizedBox(
+                  height: 10,
                 ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                children: [
-                  ConstrainedBox(
-                    constraints: BoxConstraints.tightFor(width: 90, height: 100),
-                    child: ElevatedButton(
-                      onPressed: (){},
-                      style: ElevatedButton.styleFrom(
-                        primary: Color.fromRGBO(221, 221, 226, 1),
-                        onPrimary: Colors.black,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.flag),
-                          Text("Priority")
-                        ],
-                      )
+                ListTile(
+                  minLeadingWidth: 16,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 0),
+                  leading: Icon(Icons.edit),
+                  title: Align(
+                    alignment: Alignment(-1.1,0),
+                    child: Text(
+                      "Description",
+                      style: TextStyle(fontSize: 21),
                     ),
                   ),
-                  SizedBox(
-                    width: 15,
+                ),
+                TextFormField(
+                  initialValue: taskToEdit.description,
+                  maxLines: null,
+                  focusNode: _descriptionFocus,
+                  onChanged: (text) {
+                    //taskToEdit.description = text;
+                    onDescriptionChanged(text);
+                  },
+                  onSaved: (value){
+                    taskToEdit.description = value;
+                  },
+                  style: TextStyle(fontSize: 16),
+                  textAlign: _isDescriptionInitial? TextAlign.center : TextAlign.left,
+                  decoration: InputDecoration(
+                    hintText: _isFocused? "" : "Tap to add description",
+                    hintStyle: TextStyle(
+                      color: Color.fromRGBO(119, 119, 120, 1)
+                    ),
+                    filled: true,
+                    fillColor: _isDescriptionInitial? Color.fromRGBO(237, 237, 240, 1) : Colors.white,
+                    enabledBorder: _description.isEmpty? OutlineInputBorder(
+                      borderSide: BorderSide(color: Color.fromRGBO(221, 221, 226, 1))
+                    ) : InputBorder.none,
                   ),
-                  ConstrainedBox(
-                    constraints: BoxConstraints.tightFor(width: 90, height: 100),
-                    child: ElevatedButton(
-                      onPressed: (){},
-                      style: ElevatedButton.styleFrom(
-                        primary: Color.fromRGBO(221, 221, 226, 1),
-                        onPrimary: Colors.black,
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 5,
+                      child: SizedBox(
+                        height: 100,
+                        child: ElevatedButton(
+                          onPressed: (){},
+                          style: ElevatedButton.styleFrom(
+                            primary: Color.fromRGBO(221, 221, 226, 1),
+                            onPrimary: Colors.black,
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.flag),
+                              Text("Priority")
+                            ],
+                          )
+                        ),
                       ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.person_add),
-                          Text("Assigned")
-                        ],
-                      )
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: SizedBox()
+                    ),
+                    Expanded(
+                      flex: 5,
+                      child: SizedBox(
+                        height: 100,
+                        child: ElevatedButton(
+                          onPressed: (){},
+                          style: ElevatedButton.styleFrom(
+                            primary: Color.fromRGBO(221, 221, 226, 1),
+                            onPrimary: Colors.black,
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.person_add),
+                              Text("Assigned")
+                            ],
+                          )
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: SizedBox()
+                    ),
+                    Expanded(
+                      flex: 5,
+                      child: SizedBox(
+                        height: 100,
+                        child: ElevatedButton(
+                          onPressed: (){},
+                          style: ElevatedButton.styleFrom(
+                            primary: Color.fromRGBO(221, 221, 226, 1),
+                            onPrimary: Colors.black,
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.inbox),
+                              Text("Inbox")
+                            ],
+                          )
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                ListTile(
+                  minLeadingWidth: 16,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 0),
+                  leading: Icon(Icons.calendar_today),
+                  title: Align(
+                    alignment: Alignment(-1.1,0),
+                    child: Text(
+                      "Start and due date",
+                      style: TextStyle(fontSize: 21),
                     ),
                   ),
-                  SizedBox(
-                    width: 15,
+                ),
+                ConstrainedBox(
+                  constraints: BoxConstraints.tightFor(width: double.infinity, height: 50),
+                  child: ElevatedButton(
+                    onPressed: () => selectStartDate(),
+                    style: ElevatedButton.styleFrom(
+                      primary: Color.fromRGBO(237, 237, 240, 1),
+                      onPrimary: Color.fromRGBO(119, 119, 120, 1),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                            (taskToEdit.startDate.toString() == "null")? "Start date" :
+                              "Start date: " + formatter.format(taskToEdit.startDate)
+                        )
+                      ],
+                    )
                   ),
-                  ConstrainedBox(
-                    constraints: BoxConstraints.tightFor(width: 90, height: 100),
-                    child: ElevatedButton(
-                      onPressed: (){},
-                      style: ElevatedButton.styleFrom(
-                        primary: Color.fromRGBO(221, 221, 226, 1),
-                        onPrimary: Colors.black,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.inbox),
-                          Text("Inbox")
-                        ],
-                      )
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                ConstrainedBox(
+                  constraints: BoxConstraints.tightFor(width: double.infinity, height: 50),
+                  child: ElevatedButton(
+                    onPressed: () => selectEndDate(),
+                    style: ElevatedButton.styleFrom(
+                      primary: Color.fromRGBO(237, 237, 240, 1),
+                      onPrimary: Color.fromRGBO(119, 119, 120, 1),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                            (taskToEdit.endDate.toString() == "null")? "End date" :
+                              "End date: " + formatter.format(taskToEdit.endDate)
+                        )
+                      ],
+                    )
+                  ),
+                ),
+                ListTile(
+                  minLeadingWidth: 16,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 0),
+                  leading: Icon(Icons.tag),
+                  title: Align(
+                    alignment: Alignment(-1.1,0),
+                    child: Text(
+                      "Tags",
+                      style: TextStyle(fontSize: 21),
                     ),
                   ),
-                ],
-              ),
-              ListTile(
-                minLeadingWidth: 16,
-                contentPadding: EdgeInsets.symmetric(horizontal: 0),
-                leading: Icon(Icons.calendar_today),
-                title: Align(
-                  alignment: Alignment(-1.1,0),
-                  child: Text(
-                    "Start and due date",
-                    style: TextStyle(fontSize: 21),
-                  ),
                 ),
-              ),
-              TextFormField(
-                maxLines: null,
-                style: TextStyle(fontSize: 16),
-                textAlign: _isStartDateInitial? TextAlign.center : TextAlign.left,
-                decoration: InputDecoration(
-                  hintText: "Start date",
-                  hintStyle: TextStyle(
-                    color: Color.fromRGBO(119, 119, 120, 1)
-                  ),
-                  filled: true,
-                  fillColor: _isStartDateInitial? Color.fromRGBO(237, 237, 240, 1) : Colors.white,
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color.fromRGBO(221, 221, 226, 1))
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              TextFormField(
-                maxLines: null,
-                style: TextStyle(fontSize: 16),
-                textAlign: _isEndDateInitial? TextAlign.center : TextAlign.left,
-                decoration: InputDecoration(
-                  hintText: "End date",
-                  hintStyle: TextStyle(
-                    color: Color.fromRGBO(119, 119, 120, 1)
-                  ),
-                  filled: true,
-                  fillColor: _isEndDateInitial? Color.fromRGBO(237, 237, 240, 1) : Colors.white,
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color.fromRGBO(221, 221, 226, 1))
-                  ),
-                ),
-              ),
-              ListTile(
-                minLeadingWidth: 16,
-                contentPadding: EdgeInsets.symmetric(horizontal: 0),
-                leading: Icon(Icons.tag),
-                title: Align(
-                  alignment: Alignment(-1.1,0),
-                  child: Text(
-                    "Tags",
-                    style: TextStyle(fontSize: 21),
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -242,9 +418,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                 icon: Icon(Icons.delete),
                 label: Text("Trash"),
               ),
-              SizedBox(
-                width: 105,
-              ),
               TextButton.icon(
                 onPressed: (){},
                 style: ElevatedButton.styleFrom(
@@ -252,6 +425,14 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                 ),
                 icon: Icon(Icons.done),
                 label: Text("Mark as done"),
+              ),
+              TextButton.icon(
+                onPressed: () => saveTask(),
+                style: ElevatedButton.styleFrom(
+                  onPrimary: Colors.black,
+                ),
+                icon: Icon(Icons.save),
+                label: Text("Save task"),
               )
             ],
           ),
