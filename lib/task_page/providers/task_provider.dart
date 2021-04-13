@@ -322,6 +322,34 @@ class TaskProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void editTag(String oldName, String newName) {
+    this._inboxTasks.forEach((task) {
+      task.tags.forEach((tag) {
+        if (tag.name == oldName) {
+          tag.name = newName;
+        }
+      });
+    });
+
+    this._anytimeTasks.forEach((task) {
+      task.tags.forEach((tag) {
+        if (tag.name == oldName) {
+          tag.name = newName;
+        }
+      });
+    });
+
+    this._scheduledTasks.forEach((task) {
+      task.tags.forEach((tag) {
+        if (tag.name == oldName) {
+          tag.name = newName;
+        }
+      });
+    });
+
+    notifyListeners();
+  }
+
   List<Task> tasksBeforeToday() {
     return this._scheduledTasks.where((element) => (element.endDate != null && element.endDate.difference(DateTime.now()).inDays < 0)).toList();
   }

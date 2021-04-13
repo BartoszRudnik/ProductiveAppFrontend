@@ -51,7 +51,7 @@ class TagProvider with ChangeNotifier {
   }
 
   Future<void> deleteTagPermanently(String tagName) async {
-    final url = this._serverUrl + "tag/delete/$tagName";
+    final url = this._serverUrl + "tag/delete/$tagName&${this.userMail}";
 
     try {
       await http.delete(url);
@@ -61,6 +61,35 @@ class TagProvider with ChangeNotifier {
     } catch (error) {
       print(error);
       throw error;
+    }
+  }
+
+  Future<void> updateTag(String newName, String oldName) async {
+    final url = this._serverUrl + "tag/update/${this.userMail}";
+
+    try {
+      await http.put(
+        url,
+        body: json.encode({
+          'oldName': oldName,
+          'newName': newName,
+        }),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      this.tagList.forEach((tag) {
+        if (tag.name == oldName) {
+          tag.name = newName;
+        }
+      });
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw (error);
     }
   }
 

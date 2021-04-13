@@ -24,6 +24,25 @@ class _TagsScreenState extends State<TagsScreen> {
           onTap: () {},
           child: NewTag(
             tagsLength: tagsLength,
+            editMode: false,
+          ),
+          behavior: HitTestBehavior.opaque,
+        );
+      },
+    );
+  }
+
+  void _editTagForm(BuildContext buildContext, int tagsLength, String initialValue) {
+    showModalBottomSheet(
+      backgroundColor: Theme.of(context).accentColor,
+      context: buildContext,
+      builder: (_) {
+        return GestureDetector(
+          onTap: () {},
+          child: NewTag(
+            tagsLength: tagsLength,
+            editMode: true,
+            initialValue: initialValue,
           ),
           behavior: HitTestBehavior.opaque,
         );
@@ -67,7 +86,7 @@ class _TagsScreenState extends State<TagsScreen> {
                   size: 50,
                 ),
                 Text(
-                  'Edit tag name',
+                  'Edit tag',
                   style: TextStyle(color: Theme.of(context).accentColor, fontSize: 20, fontWeight: FontWeight.w400),
                 ),
               ],
@@ -81,7 +100,7 @@ class _TagsScreenState extends State<TagsScreen> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  'Delete',
+                  'Delete tag',
                   style: TextStyle(color: Theme.of(context).accentColor, fontSize: 20, fontWeight: FontWeight.w400),
                 ),
                 Icon(
@@ -152,7 +171,9 @@ class _TagsScreenState extends State<TagsScreen> {
                 ),
               );
             }
-            if (direction == DismissDirection.startToEnd) {}
+            if (direction == DismissDirection.startToEnd) {
+              this._editTagForm(context, tags.length, tags[tagIndex].name);
+            }
           },
           child: Card(
             child: ListTile(
