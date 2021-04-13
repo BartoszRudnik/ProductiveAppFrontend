@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/task_page/task_screens/tags_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'login/providers/auth_provider.dart';
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
           update: (ctx, auth, previousTags) => TagProvider(
             authToken: auth.token,
             userMail: auth.email,
+            tagList: previousTags == null ? [] : previousTags.tagList,
           ),
         ),
       ],
@@ -90,6 +92,7 @@ class MyApp extends StatelessWidget {
             ResetPassword.routeName: (ctx) => ResetPassword(),
             TaskDetailScreen.routeName: (ctx) => TaskDetailScreen(),
             NewPassword.routeName: (ctx) => NewPassword(),
+            TagsScreen.routeName: (ctx) => TagsScreen(),
           },
         ),
       ),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/login/screens/entry_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../../login/providers/auth_provider.dart';
+import '../task_screens/tags_screen.dart';
 import 'drawerListTile.dart';
 
 class MainDrawer extends StatelessWidget {
@@ -59,10 +59,22 @@ class MainDrawer extends StatelessWidget {
               icon: Icons.save,
               title: 'Projects',
             ),
-            DrawerListTile(icon: Icons.tag, title: 'Tags'),
+            DrawerListTile(
+              icon: Icons.tag,
+              title: 'Tags',
+              routeName: TagsScreen.routeName,
+            ),
             DrawerListTile(
               icon: Icons.analytics_outlined,
               title: 'Analytics',
+            ),
+            DrawerListTile(
+              icon: Icons.done_all_outlined,
+              title: 'Completed',
+            ),
+            DrawerListTile(
+              icon: Icons.delete_outline_outlined,
+              title: 'Trash',
             ),
             ListTile(
               minLeadingWidth: 16,

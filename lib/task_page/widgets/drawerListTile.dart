@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 class DrawerListTile extends StatelessWidget {
   final IconData icon;
   final String title;
+  final String routeName;
 
   DrawerListTile({
     @required this.icon,
     @required this.title,
+    this.routeName,
   });
 
   @override
@@ -16,7 +18,9 @@ class DrawerListTile extends StatelessWidget {
       contentPadding: EdgeInsets.symmetric(horizontal: 0),
       leading: Icon(this.icon),
       title: Text(this.title),
-      onTap: () {},
+      onTap: () {
+        Navigator.of(context).pushNamed(this.routeName);
+      },
     );
   }
 }

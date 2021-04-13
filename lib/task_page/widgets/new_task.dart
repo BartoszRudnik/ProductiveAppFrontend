@@ -182,6 +182,7 @@ class _NewTaskState extends State<NewTask> {
                       label: Text(''),
                     ),
                     subtitle: TextFormField(
+                      maxLines: null,
                       key: ValueKey('taskDescription'),
                       onSaved: (value) {
                         this._taskDescription = value;
