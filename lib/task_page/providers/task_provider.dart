@@ -308,6 +308,20 @@ class TaskProvider with ChangeNotifier {
     });
   }
 
+  void clearTagFromTasks(String tagName) {
+    this._inboxTasks.forEach((task) {
+      task.tags.removeWhere((tag) => tag.name == tagName);
+    });
+    this._anytimeTasks.forEach((task) {
+      task.tags.removeWhere((tag) => tag.name == tagName);
+    });
+    this._scheduledTasks.forEach((task) {
+      task.tags.removeWhere((tag) => tag.name == tagName);
+    });
+
+    notifyListeners();
+  }
+
   List<Task> tasksBeforeToday() {
     return this._scheduledTasks.where((element) => (element.endDate != null && element.endDate.difference(DateTime.now()).inDays < 0)).toList();
   }

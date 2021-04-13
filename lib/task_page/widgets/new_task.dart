@@ -72,6 +72,8 @@ class _NewTaskState extends State<NewTask> {
 
       this._formKey.currentState.reset();
       setState(() {
+        this._startDate = null;
+        this._endDate = null;
         this._startInitialValue = DateTime.now();
         this._endInitialValue = DateTime.now();
         this._localization = this.widget.localization;
@@ -180,6 +182,7 @@ class _NewTaskState extends State<NewTask> {
                       label: Text(''),
                     ),
                     subtitle: TextFormField(
+                      maxLines: null,
                       key: ValueKey('taskDescription'),
                       onSaved: (value) {
                         this._taskDescription = value;
@@ -272,7 +275,7 @@ class _NewTaskState extends State<NewTask> {
                                 builder: (context, setState) {
                                   return AlertDialog(
                                     content: Container(
-                                      height: 300,
+                                      height: 350,
                                       width: 300,
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
@@ -286,11 +289,20 @@ class _NewTaskState extends State<NewTask> {
                                                     filteredTags = tags.where((element) => element.name.toLowerCase().contains(value.toLowerCase())).toList();
                                                   });
                                                 },
+                                                validator: (value) {
+                                                  if (value.isEmpty) {
+                                                    return 'tag name cannot be empty';
+                                                  }
+                                                  return null;
+                                                },
                                                 onSaved: (value) {
                                                   setState(() {
                                                     final newTag = Tag(id: (tags.length + 1), name: value);
-                                                    Provider.of<TagProvider>(context, listen: false).addTag(newTag);
-                                                    tags.add(newTag);
+                                                    final alreadyExists = tags.where((element) => element.name == newTag.name);
+                                                    if (alreadyExists.isEmpty) {
+                                                      Provider.of<TagProvider>(context, listen: false).addTag(newTag);
+                                                      tags.insert(0, newTag);
+                                                    }
                                                   });
                                                 },
                                                 maxLines: null,
@@ -308,9 +320,12 @@ class _NewTaskState extends State<NewTask> {
                                                 size: 30,
                                               ),
                                               onPressed: () {
-                                                this._tagKey.currentState.save();
-                                                this._tagKey.currentState.reset();
-                                                filteredTags = tags.reversed.toList();
+                                                final isValid = this._tagKey.currentState.validate();
+                                                if (isValid) {
+                                                  this._tagKey.currentState.save();
+                                                  this._tagKey.currentState.reset();
+                                                  filteredTags = tags;
+                                                }
                                               },
                                               backgroundColor: Theme.of(context).primaryColor,
                                             ),

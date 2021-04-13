@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import '../models/tag.dart';
 
 class TagProvider with ChangeNotifier {
-  List<Tag> tagList = [];
+  List<Tag> tagList;
 
   final String userMail;
   final String authToken;
@@ -16,6 +16,7 @@ class TagProvider with ChangeNotifier {
   TagProvider({
     @required this.userMail,
     @required this.authToken,
+    @required this.tagList,
   });
 
   List<Tag> get tags {
@@ -37,6 +38,7 @@ class TagProvider with ChangeNotifier {
           id: element['id'],
           name: element['name'],
         );
+
         loadedTags.add(newTag);
       }
 
@@ -48,11 +50,25 @@ class TagProvider with ChangeNotifier {
     }
   }
 
-  void addTag(Tag newTag) {
+  Future<void> deleteTagPermanently(String tagName) async {
+    final url = this._serverUrl + "tag/delete/$tagName";
+
+    try {
+      await http.delete(url);
+
+      this.tagList.removeWhere((element) => element.name == tagName);
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw error;
+    }
+  }
+
+  Future<void> addTag(Tag newTag) async {
     final url = this._serverUrl + "tag/add";
 
     try {
-      http.post(
+      await http.post(
         url,
         body: json.encode(
           {
@@ -68,15 +84,11 @@ class TagProvider with ChangeNotifier {
         },
       );
 
-      this.tagList.add(newTag);
+      this.tagList.insert(0, newTag);
       notifyListeners();
     } catch (error) {
       print(error);
       throw error;
     }
-
-    this.tagList.add(newTag);
-
-    notifyListeners();
   }
 }

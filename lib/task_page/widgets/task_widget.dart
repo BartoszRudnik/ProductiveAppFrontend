@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_app/task_page/widgets/task_tags.dart';
 import 'package:provider/provider.dart';
@@ -40,7 +39,6 @@ class _TaskWidgetState extends State<TaskWidget> {
             alignment: Alignment.centerLeft,
             color: Theme.of(context).primaryColor,
             child: Row(
-              //mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Icon(
                   Icons.navigate_next_outlined,
@@ -62,7 +60,7 @@ class _TaskWidgetState extends State<TaskWidget> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  'Archive task',
+                  'Move to trash',
                   style: TextStyle(color: Theme.of(context).accentColor, fontSize: 20, fontWeight: FontWeight.w400),
                 ),
                 Icon(
@@ -80,14 +78,14 @@ class _TaskWidgetState extends State<TaskWidget> {
                 builder: (context) => AlertDialog(
                   title: Center(
                     child: Text(
-                      'Archive',
+                      'Move to trash',
                       style: Theme.of(context).textTheme.headline3,
                     ),
                   ),
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('Are you sure you want to archive this task?'),
+                      Text('Are you sure you want to delete this task?'),
                       SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
