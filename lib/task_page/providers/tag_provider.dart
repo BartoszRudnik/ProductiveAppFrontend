@@ -37,6 +37,7 @@ class TagProvider with ChangeNotifier {
           id: element['id'],
           name: element['name'],
         );
+
         loadedTags.add(newTag);
       }
 
@@ -68,15 +69,11 @@ class TagProvider with ChangeNotifier {
         },
       );
 
-      this.tagList.add(newTag);
+      this.tagList.insert(0, newTag);
       notifyListeners();
     } catch (error) {
       print(error);
       throw error;
     }
-
-    this.tagList.add(newTag);
-
-    notifyListeners();
   }
 }
