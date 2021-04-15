@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/task_page/task_screens/tags_screen.dart';
+import 'package:productive_app/task_page/task_screens/trash_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'login/providers/auth_provider.dart';
@@ -10,8 +10,10 @@ import 'login/screens/reset_password.dart';
 import 'login/screens/splash_screen.dart';
 import 'task_page/providers/tag_provider.dart';
 import 'task_page/providers/task_provider.dart';
+import 'task_page/task_screens/completed_screen.dart';
 import 'task_page/task_screens/main_screen.dart';
 import 'task_page/task_screens/tabs_screen.dart';
+import 'task_page/task_screens/tags_screen.dart';
 import 'task_page/task_screens/task_details_screen.dart';
 
 void main() => runApp(MyApp());
@@ -93,6 +95,8 @@ class MyApp extends StatelessWidget {
             TaskDetailScreen.routeName: (ctx) => TaskDetailScreen(),
             NewPassword.routeName: (ctx) => NewPassword(),
             TagsScreen.routeName: (ctx) => TagsScreen(),
+            CompletedScreen.routeName: (ctx) => CompletedScreen(),
+            TrashScreen.routeName: (ctx) => TrashScreen(),
           },
         ),
       ),

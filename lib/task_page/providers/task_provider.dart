@@ -6,14 +6,16 @@ import 'package:productive_app/task_page/models/tag.dart';
 import '../models/task.dart';
 
 class TaskProvider with ChangeNotifier {
-  List<Task> archivedTasks = [];
+  List<Task> _trashTasks = [];
+  List<Task> _completedTasks = [];
   List<Task> _inboxTasks = [];
   List<Task> _anytimeTasks = [];
   List<Task> _scheduledTasks = [];
   List<Task> taskList = [];
+
   List<String> _priorities = [];
 
-  final _localizations = ['INBOX', 'SCHEDULED', 'ANYTIME'];
+  final _localizations = ['INBOX', 'SCHEDULED', 'ANYTIME', 'COMPLETED', 'TRASH'];
 
   final String userMail;
   final String authToken;
@@ -38,6 +40,14 @@ class TaskProvider with ChangeNotifier {
 
   List<Task> get scheduledTasks {
     return [...this._scheduledTasks];
+  }
+
+  List<Task> get completedTasks {
+    return [...this._completedTasks];
+  }
+
+  List<Task> get trashTasks {
+    return [...this._trashTasks];
   }
 
   List<String> get priorities {
@@ -207,7 +217,7 @@ class TaskProvider with ChangeNotifier {
     var tmpProduct = this.taskList.firstWhere((element) => element.id == id);
 
     try {
-      http.delete(url);
+      await http.delete(url);
 
       this.deleteFromLocalization(tmpProduct);
       this.taskList.removeWhere((element) => element.id == id);
@@ -226,7 +236,7 @@ class TaskProvider with ChangeNotifier {
     String url = this._serverUrl + 'task/done/${task.id}';
 
     try {
-      http.put(url);
+      await http.put(url);
 
       this.localizationTaskStatus(task);
 
@@ -279,6 +289,10 @@ class TaskProvider with ChangeNotifier {
       this._anytimeTasks.add(task);
     } else if (task.localization == 'SCHEDULED') {
       this._scheduledTasks.add(task);
+    } else if (task.localization == 'COMPLETED') {
+      this._completedTasks.add(task);
+    } else if (task.localization == 'TRASH') {
+      this._trashTasks.add(task);
     }
   }
 
@@ -289,6 +303,10 @@ class TaskProvider with ChangeNotifier {
       this._anytimeTasks.remove(task);
     } else if (task.localization == 'SCHEDULED') {
       this._scheduledTasks.remove(task);
+    } else if (task.localization == 'COMPLETED') {
+      this._completedTasks.remove(task);
+    } else if (task.localization == 'TRASH') {
+      this._trashTasks.remove(task);
     }
   }
 
@@ -296,6 +314,8 @@ class TaskProvider with ChangeNotifier {
     this._inboxTasks = [];
     this._anytimeTasks = [];
     this._scheduledTasks = [];
+    this._completedTasks = [];
+    this._trashTasks = [];
 
     this.taskList.forEach((element) {
       if (element.localization == 'INBOX') {
@@ -304,6 +324,10 @@ class TaskProvider with ChangeNotifier {
         this._anytimeTasks.add(element);
       } else if (element.localization == 'SCHEDULED') {
         this._scheduledTasks.add(element);
+      } else if (element.localization == 'COMPLETED') {
+        this._completedTasks.add(element);
+      } else if (element.localization == 'TRASH') {
+        this._trashTasks.add(element);
       }
     });
   }

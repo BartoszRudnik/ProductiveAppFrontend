@@ -22,6 +22,8 @@ class TaskWidget extends StatefulWidget {
 class _TaskWidgetState extends State<TaskWidget> {
   @override
   Widget build(BuildContext context) {
+    bool isArchived = (this.widget.task.localization == 'COMPLETED' || this.widget.task.localization == 'TRASH');
+
     return Container(
       //height: 94,
       width: 319,
@@ -30,7 +32,7 @@ class _TaskWidgetState extends State<TaskWidget> {
       ),
       child: GestureDetector(
         onTap: () {
-          Navigator.of(context).pushNamed(TaskDetailScreen.routeName,arguments: this.widget.task);
+          Navigator.of(context).pushNamed(TaskDetailScreen.routeName, arguments: this.widget.task);
         },
         child: Dismissible(
           key: this.widget.taskKey,
@@ -41,12 +43,12 @@ class _TaskWidgetState extends State<TaskWidget> {
             child: Row(
               children: [
                 Icon(
-                  Icons.navigate_next_outlined,
+                  Icons.restore_from_trash_outlined,
                   color: Theme.of(context).accentColor,
                   size: 50,
                 ),
                 Text(
-                  'Move task',
+                  isArchived ? 'Restore task' : 'Move task',
                   style: TextStyle(color: Theme.of(context).accentColor, fontSize: 20, fontWeight: FontWeight.w400),
                 ),
               ],
@@ -60,11 +62,11 @@ class _TaskWidgetState extends State<TaskWidget> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  'Move to trash',
+                  isArchived ? 'Delete' : 'Archive',
                   style: TextStyle(color: Theme.of(context).accentColor, fontSize: 20, fontWeight: FontWeight.w400),
                 ),
                 Icon(
-                  Icons.delete_outline,
+                  Icons.archive_outlined,
                   color: Theme.of(context).accentColor,
                   size: 40,
                 ),
@@ -78,14 +80,16 @@ class _TaskWidgetState extends State<TaskWidget> {
                 builder: (context) => AlertDialog(
                   title: Center(
                     child: Text(
-                      'Move to trash',
+                      isArchived ? 'Delete' : 'Archive',
                       style: Theme.of(context).textTheme.headline3,
                     ),
                   ),
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('Are you sure you want to delete this task?'),
+                      Text(
+                        isArchived ? 'Are you sure you want to delete this task?' : 'Are you sure you want to archive this task?',
+                      ),
                       SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -96,7 +100,19 @@ class _TaskWidgetState extends State<TaskWidget> {
                               side: BorderSide(color: Theme.of(context).primaryColor),
                             ),
                             onPressed: () {
-                              Provider.of<TaskProvider>(context, listen: false).deleteTask(this.widget.task.id);
+                              if (!isArchived) {
+                                String newLocation = 'INBOX';
+
+                                if (this.widget.task.done) {
+                                  newLocation = 'COMPLETED';
+                                } else {
+                                  newLocation = 'TRASH';
+                                }
+                                Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
+                              } else {
+                                Provider.of<TaskProvider>(context, listen: false).deleteTask(this.widget.task.id);
+                              }
+
                               Navigator.of(context).pop(true);
                             },
                             child: Text(
@@ -146,29 +162,30 @@ class _TaskWidgetState extends State<TaskWidget> {
             children: <Widget>[
               Row(
                 children: <Widget>[
-                  RawMaterialButton(
-                    focusElevation: 0,
-                    child: this.widget.task.done
-                        ? Icon(
-                            Icons.done,
-                            color: Colors.white,
-                            size: 14,
-                          )
-                        : null,
-                    onPressed: () {
-                      Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(this.widget.task);
-                    },
-                    constraints: BoxConstraints(minWidth: 20, minHeight: 18),
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    fillColor: this.widget.task.done ? Colors.grey : Theme.of(context).accentColor,
-                    shape: CircleBorder(
-                      side: BorderSide(
-                        color: Theme.of(context).primaryColor,
-                        width: 1,
+                  if (!isArchived)
+                    RawMaterialButton(
+                      focusElevation: 0,
+                      child: this.widget.task.done
+                          ? Icon(
+                              Icons.done,
+                              color: Colors.white,
+                              size: 14,
+                            )
+                          : null,
+                      onPressed: () {
+                        Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(this.widget.task);
+                      },
+                      constraints: BoxConstraints(minWidth: 20, minHeight: 18),
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      fillColor: this.widget.task.done ? Colors.grey : Theme.of(context).accentColor,
+                      shape: CircleBorder(
+                        side: BorderSide(
+                          color: Theme.of(context).primaryColor,
+                          width: 1,
+                        ),
                       ),
+                      padding: EdgeInsets.zero,
                     ),
-                    padding: EdgeInsets.zero,
-                  ),
                   SizedBox(
                     width: 7,
                   ),

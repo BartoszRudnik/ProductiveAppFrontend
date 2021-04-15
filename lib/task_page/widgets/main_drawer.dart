@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/task_page/task_screens/completed_screen.dart';
+import 'package:productive_app/task_page/task_screens/trash_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../../login/providers/auth_provider.dart';
@@ -71,10 +73,12 @@ class MainDrawer extends StatelessWidget {
             DrawerListTile(
               icon: Icons.done_all_outlined,
               title: 'Completed',
+              routeName: CompletedScreen.routeName,
             ),
             DrawerListTile(
               icon: Icons.delete_outline_outlined,
               title: 'Trash',
+              routeName: TrashScreen.routeName,
             ),
             ListTile(
               minLeadingWidth: 16,
