@@ -239,8 +239,13 @@ class _NewTaskState extends State<NewTask> {
                             builder: (context, child) {
                               return Theme(
                                 data: Theme.of(context).copyWith(
+                                  appBarTheme: Theme.of(context).appBarTheme.copyWith(
+                                        backgroundColor: Colors.grey,
+                                      ),
                                   colorScheme: ColorScheme.light(
+                                    background: Colors.grey,
                                     primary: Colors.grey,
+                                    secondary: Colors.grey,
                                     onPrimary: Colors.white,
                                     onSurface: Colors.black,
                                   ),
