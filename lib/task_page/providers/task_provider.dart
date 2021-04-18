@@ -13,7 +13,7 @@ class TaskProvider with ChangeNotifier {
   List<Task> _scheduledTasks = [];
   List<Task> taskList = [];
 
-  List<String> _priorities = [];
+  List<String> taskPriorities = [];
 
   final _localizations = ['INBOX', 'SCHEDULED', 'ANYTIME', 'COMPLETED', 'TRASH'];
 
@@ -22,7 +22,7 @@ class TaskProvider with ChangeNotifier {
 
   String _serverUrl = 'http://192.168.1.120:8080/api/v1/';
 
-  TaskProvider({@required this.userMail, @required this.authToken, @required this.taskList}) {
+  TaskProvider({@required this.userMail, @required this.authToken, @required this.taskList, @required this.taskPriorities}) {
     this.divideTasks();
   }
 
@@ -51,7 +51,7 @@ class TaskProvider with ChangeNotifier {
   }
 
   List<String> get priorities {
-    return [...this._priorities];
+    return [...this.taskPriorities];
   }
 
   List<String> get localizations {
@@ -93,12 +93,12 @@ class TaskProvider with ChangeNotifier {
 
       task.id = int.parse(response.body);
 
-      if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1 || task.endDate.difference(task.startDate).inDays <= 0) {
-        task.startDate = null;
-      }
-
       if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
         task.endDate = null;
+      }
+
+      if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+        task.startDate = null;
       }
 
       this.addToLocalication(task);
@@ -143,12 +143,12 @@ class TaskProvider with ChangeNotifier {
         },
       );
 
-      if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1 || task.endDate.difference(task.startDate).inDays <= 0) {
-        task.startDate = null;
-      }
-
       if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
         task.endDate = null;
+      }
+
+      if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+        task.startDate = null;
       }
 
       this.deleteFromLocalization(task);
@@ -193,12 +193,15 @@ class TaskProvider with ChangeNotifier {
           tags: taskTags,
           localization: element['tasks']['localization'],
         );
-        if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays <= 1 || task.endDate.difference(task.startDate).inDays <= 0) {
-          task.startDate = null;
-        }
-        if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays <= 1) {
+
+        if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
           task.endDate = null;
         }
+
+        if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+          task.startDate = null;
+        }
+
         loadedTasks.add(task);
       }
 
@@ -250,7 +253,7 @@ class TaskProvider with ChangeNotifier {
   }
 
   Future<void> getPriorities() async {
-    this._priorities = [];
+    this.taskPriorities = [];
     String url = this._serverUrl + 'task/priorities';
 
     try {
@@ -259,7 +262,7 @@ class TaskProvider with ChangeNotifier {
       final responseBody = json.decode(response.body);
 
       for (var element in responseBody) {
-        this._priorities.add(element.toString());
+        this.taskPriorities.add(element.toString());
       }
 
       notifyListeners();

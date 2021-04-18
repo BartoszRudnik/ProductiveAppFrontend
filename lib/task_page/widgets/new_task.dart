@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/tag.dart';
@@ -33,6 +34,7 @@ class _NewTaskState extends State<NewTask> {
   bool _isDone = false;
   List<Tag> _finalTags = [];
 
+  DateFormat formatter = DateFormat("yyyy-MM-dd");
   DateTime _startInitialValue = DateTime.now();
   DateTime _endInitialValue = DateTime.now();
 
@@ -87,6 +89,33 @@ class _NewTaskState extends State<NewTask> {
       print(error);
       throw error;
     }
+  }
+
+  Future<DateTime> pickDate(DateTime initDate) async {
+    final DateTime pick = await showDatePicker(
+      context: context,
+      initialDate: initDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(3000),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Colors.grey,
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                primary: Colors.black,
+              ),
+            ),
+          ),
+          child: child,
+        );
+      },
+    );
+    return pick;
   }
 
   @override
@@ -228,44 +257,121 @@ class _NewTaskState extends State<NewTask> {
                           Icons.calendar_today_outlined,
                         ),
                         onPressed: () async {
-                          final picked = await showDateRangePicker(
+                          showDialog(
                             context: context,
-                            firstDate: new DateTime.now().subtract(Duration(days: 730)),
-                            lastDate: new DateTime.now().add(Duration(days: 730)),
-                            initialDateRange: DateTimeRange(
-                              start: this._startInitialValue,
-                              end: this._endInitialValue,
-                            ),
-                            builder: (context, child) {
-                              return Theme(
-                                data: Theme.of(context).copyWith(
-                                  appBarTheme: Theme.of(context).appBarTheme.copyWith(
-                                        backgroundColor: Colors.grey,
+                            builder: (context) {
+                              return StatefulBuilder(
+                                builder: (context, setState) {
+                                  return AlertDialog(
+                                    content: Container(
+                                      height: 230,
+                                      width: 300,
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          ConstrainedBox(
+                                            constraints: BoxConstraints.tightFor(width: double.infinity, height: 70),
+                                            child: ElevatedButton(
+                                                onPressed: () async {
+                                                  DateTime initDate = this._startDate;
+                                                  if (this._startDate == null) {
+                                                    initDate = DateTime.now();
+                                                  }
+                                                  final DateTime pick = await pickDate(initDate);
+                                                  setState(() {
+                                                    this._startDate = pick;
+                                                  });
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  primary: Color.fromRGBO(237, 237, 240, 1),
+                                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
+                                                ),
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Text(
+                                                      (this._startDate.toString() == "null") ? "Start date" : "Start date: " + formatter.format(this._startDate),
+                                                    ),
+                                                  ],
+                                                )),
+                                          ),
+                                          SizedBox(
+                                            height: 20,
+                                          ),
+                                          ConstrainedBox(
+                                            constraints: BoxConstraints.tightFor(width: double.infinity, height: 70),
+                                            child: ElevatedButton(
+                                                onPressed: () async {
+                                                  DateTime initDate = this._endDate;
+                                                  if (this._endDate == null) {
+                                                    initDate = DateTime.now();
+                                                  }
+                                                  final DateTime pick = await pickDate(initDate);
+                                                  setState(() {
+                                                    this._endDate = pick;
+                                                  });
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  primary: Color.fromRGBO(237, 237, 240, 1),
+                                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
+                                                ),
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Text(
+                                                      (this._endDate.toString() == "null") ? "End date" : "End date: " + formatter.format(this._endDate),
+                                                    ),
+                                                  ],
+                                                )),
+                                          ),
+                                          SizedBox(
+                                            height: 20,
+                                          ),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  primary: Theme.of(context).primaryColor,
+                                                  side: BorderSide(color: Theme.of(context).primaryColor),
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop(false);
+                                                },
+                                                child: Text(
+                                                  'Cancel',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Theme.of(context).accentColor,
+                                                  ),
+                                                ),
+                                              ),
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  primary: Theme.of(context).primaryColor,
+                                                  side: BorderSide(color: Theme.of(context).primaryColor),
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop(true);
+                                                },
+                                                child: Text(
+                                                  'Add date/dates',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Theme.of(context).accentColor,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
                                       ),
-                                  colorScheme: ColorScheme.light(
-                                    background: Colors.grey,
-                                    primary: Colors.grey,
-                                    secondary: Colors.grey,
-                                    onPrimary: Colors.white,
-                                    onSurface: Colors.black,
-                                  ),
-                                  textButtonTheme: TextButtonThemeData(
-                                    style: TextButton.styleFrom(
-                                      primary: Colors.black,
                                     ),
-                                  ),
-                                ),
-                                child: child,
+                                  );
+                                },
                               );
                             },
                           );
-                          if (picked != null) {
-                            this._startDate = picked.start;
-                            this._startInitialValue = picked.start;
-
-                            this._endDate = picked.end;
-                            this._endInitialValue = picked.end;
-                          }
                         },
                       ),
                       IconButton(
@@ -286,6 +392,7 @@ class _NewTaskState extends State<NewTask> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: <Widget>[
                                           ListTile(
+                                            horizontalTitleGap: 6,
                                             title: Form(
                                               key: this._tagKey,
                                               child: TextFormField(

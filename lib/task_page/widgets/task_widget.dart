@@ -25,7 +25,6 @@ class _TaskWidgetState extends State<TaskWidget> {
     bool isArchived = (this.widget.task.localization == 'COMPLETED' || this.widget.task.localization == 'TRASH');
 
     return Container(
-      //height: 94,
       width: 319,
       padding: EdgeInsets.symmetric(
         vertical: 7,

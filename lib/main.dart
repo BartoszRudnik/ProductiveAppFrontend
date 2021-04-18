@@ -32,6 +32,7 @@ class MyApp extends StatelessWidget {
             userMail: auth.email,
             authToken: auth.token,
             taskList: previousTasks == null ? [] : previousTasks.taskList,
+            taskPriorities: previousTasks == null ? [] : previousTasks.priorities,
           ),
         ),
         ChangeNotifierProxyProvider<AuthProvider, TagProvider>(
