@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/tag.dart';
@@ -11,7 +12,7 @@ class TagProvider with ChangeNotifier {
   final String userMail;
   final String authToken;
 
-  String _serverUrl = 'http://192.168.1.120:8080/api/v1/';
+  String _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
   TagProvider({
     @required this.userMail,

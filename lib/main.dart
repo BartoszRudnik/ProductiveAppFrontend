@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/task_page/task_screens/trash_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:global_configuration/global_configuration.dart';
 
 import 'login/providers/auth_provider.dart';
 import 'login/screens/entry_screen.dart';
@@ -16,7 +17,11 @@ import 'task_page/task_screens/tabs_screen.dart';
 import 'task_page/task_screens/tags_screen.dart';
 import 'task_page/task_screens/task_details_screen.dart';
 
-void main() => runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await GlobalConfiguration().loadFromAsset("properties");
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override

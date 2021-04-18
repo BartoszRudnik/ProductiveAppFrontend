@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,7 +16,7 @@ class AuthProvider with ChangeNotifier {
   Timer _authTimer;
   String _email;
 
-  String _serverUrl = 'http://192.168.1.120:8080/api/v1/'; //computer IP address
+  String _serverUrl = GlobalConfiguration().getValue("serverUrl"); //computer IP address
 
   bool get isAuth {
     return token != null;

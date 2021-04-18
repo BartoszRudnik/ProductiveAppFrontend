@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:global_configuration/global_configuration.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:productive_app/task_page/models/tag.dart';
@@ -20,7 +21,7 @@ class TaskProvider with ChangeNotifier {
   final String userMail;
   final String authToken;
 
-  String _serverUrl = 'http://192.168.1.120:8080/api/v1/';
+  String _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
   TaskProvider({@required this.userMail, @required this.authToken, @required this.taskList, @required this.taskPriorities}) {
     this.divideTasks();
