@@ -35,8 +35,8 @@ class _NewTaskState extends State<NewTask> {
   List<Tag> _finalTags = [];
 
   DateFormat formatter = DateFormat("yyyy-MM-dd");
-  DateTime _startInitialValue = DateTime.now();
-  DateTime _endInitialValue = DateTime.now();
+  DateTime _startInitialValue;
+  DateTime _endInitialValue;
 
   @override
   void initState() {
@@ -76,8 +76,8 @@ class _NewTaskState extends State<NewTask> {
       setState(() {
         this._startDate = null;
         this._endDate = null;
-        this._startInitialValue = DateTime.now();
-        this._endInitialValue = DateTime.now();
+        this._startInitialValue = null;
+        this._endInitialValue = null;
         this._localization = this.widget.localization;
         this._isDone = false;
         this._finalTags.forEach((element) {
@@ -244,9 +244,22 @@ class _NewTaskState extends State<NewTask> {
                         icon: Icon(Icons.flag_outlined),
                         itemBuilder: (context) {
                           print('flag');
-                          return priorities.map((e) {
+                          return priorities.reversed.map((e) {
                             return PopupMenuItem(
-                              child: Text(e),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: <Widget>[
+                                  Text(e),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  if (e == 'LOW') Icon(Icons.arrow_downward_outlined),
+                                  if (e == 'HIGH') Icon(Icons.arrow_upward_outlined),
+                                  if (e == 'HIGHER') Icon(Icons.arrow_upward_outlined),
+                                  if (e == 'HIGHER') Icon(Icons.arrow_upward_outlined),
+                                  if (e == 'CRITICAL') Icon(Icons.warning_amber_sharp),
+                                ],
+                              ),
                               value: e,
                             );
                           }).toList();
@@ -273,13 +286,13 @@ class _NewTaskState extends State<NewTask> {
                                             constraints: BoxConstraints.tightFor(width: double.infinity, height: 70),
                                             child: ElevatedButton(
                                                 onPressed: () async {
-                                                  DateTime initDate = this._startDate;
-                                                  if (this._startDate == null) {
+                                                  DateTime initDate = this._startInitialValue;
+                                                  if (this._startInitialValue == null) {
                                                     initDate = DateTime.now();
                                                   }
                                                   final DateTime pick = await pickDate(initDate);
                                                   setState(() {
-                                                    this._startDate = pick;
+                                                    this._startInitialValue = pick;
                                                   });
                                                 },
                                                 style: ElevatedButton.styleFrom(
@@ -290,7 +303,7 @@ class _NewTaskState extends State<NewTask> {
                                                   mainAxisAlignment: MainAxisAlignment.center,
                                                   children: [
                                                     Text(
-                                                      (this._startDate.toString() == "null") ? "Start date" : "Start date: " + formatter.format(this._startDate),
+                                                      (this._startInitialValue.toString() == "null") ? "Start date" : "Start date: " + formatter.format(this._startInitialValue),
                                                     ),
                                                   ],
                                                 )),
@@ -302,13 +315,13 @@ class _NewTaskState extends State<NewTask> {
                                             constraints: BoxConstraints.tightFor(width: double.infinity, height: 70),
                                             child: ElevatedButton(
                                                 onPressed: () async {
-                                                  DateTime initDate = this._endDate;
-                                                  if (this._endDate == null) {
+                                                  DateTime initDate = this._endInitialValue;
+                                                  if (this._endInitialValue == null) {
                                                     initDate = DateTime.now();
                                                   }
                                                   final DateTime pick = await pickDate(initDate);
                                                   setState(() {
-                                                    this._endDate = pick;
+                                                    this._endInitialValue = pick;
                                                   });
                                                 },
                                                 style: ElevatedButton.styleFrom(
@@ -319,7 +332,7 @@ class _NewTaskState extends State<NewTask> {
                                                   mainAxisAlignment: MainAxisAlignment.center,
                                                   children: [
                                                     Text(
-                                                      (this._endDate.toString() == "null") ? "End date" : "End date: " + formatter.format(this._endDate),
+                                                      (this._endInitialValue.toString() == "null") ? "End date" : "End date: " + formatter.format(this._endInitialValue),
                                                     ),
                                                   ],
                                                 )),
@@ -336,6 +349,8 @@ class _NewTaskState extends State<NewTask> {
                                                   side: BorderSide(color: Theme.of(context).primaryColor),
                                                 ),
                                                 onPressed: () {
+                                                  this._startInitialValue = null;
+                                                  this._endInitialValue = null;
                                                   Navigator.of(context).pop(false);
                                                 },
                                                 child: Text(
@@ -352,10 +367,14 @@ class _NewTaskState extends State<NewTask> {
                                                   side: BorderSide(color: Theme.of(context).primaryColor),
                                                 ),
                                                 onPressed: () {
+                                                  setState(() {
+                                                    this._startDate = this._startInitialValue;
+                                                    this._endDate = this._endInitialValue;
+                                                  });
                                                   Navigator.of(context).pop(true);
                                                 },
                                                 child: Text(
-                                                  'Add date/dates',
+                                                  'Save',
                                                   style: TextStyle(
                                                     fontSize: 14,
                                                     color: Theme.of(context).accentColor,

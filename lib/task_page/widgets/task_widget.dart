@@ -152,6 +152,8 @@ class _TaskWidgetState extends State<TaskWidget> {
                 newLocation = 'ANYTIME';
               } else if (this.widget.task.endDate != null) {
                 newLocation = 'SCHEDULED';
+              } else {
+                newLocation = 'ANYTIME';
               }
 
               Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
@@ -208,7 +210,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                   if (this.widget.task.priority != 'NORMAL' || this.widget.task.startDate != null || this.widget.task.endDate != null)
                     Row(
                       children: <Widget>[
-                        if (this.widget.task.priority == 'SMALL') Icon(Icons.arrow_downward_outlined),
+                        if (this.widget.task.priority == 'LOW') Icon(Icons.arrow_downward_outlined),
                         if (this.widget.task.priority == 'HIGH') Icon(Icons.arrow_upward_outlined),
                         if (this.widget.task.priority == 'HIGHER') Icon(Icons.arrow_upward_outlined),
                         if (this.widget.task.priority == 'HIGHER') Icon(Icons.arrow_upward_outlined),
