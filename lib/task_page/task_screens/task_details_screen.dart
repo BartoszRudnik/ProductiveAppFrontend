@@ -186,6 +186,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final priorities = Provider.of<TaskProvider>(context, listen: false).priorities;
+
     if(taskToEdit == null){
       originalTask = ModalRoute.of(context).settings.arguments as Task;  
       setTaskToEdit(originalTask);
@@ -269,19 +271,59 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                       flex: 5,
                       child: SizedBox(
                         height: 100,
-                        child: ElevatedButton(
-                          onPressed: (){},
-                          style: ElevatedButton.styleFrom(
-                            primary: Color.fromRGBO(221, 221, 226, 1),
-                            onPrimary: Colors.black,
+                        child: Theme(
+                          data: Theme.of(context).copyWith(
+                            canvasColor: Color.fromRGBO(221, 221, 226, 1)
                           ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.flag),
-                              Text("Priority")
-                            ],
-                          )
+                          child: PopupMenuButton(
+                            initialValue: taskToEdit.priority,
+                            onSelected: (value){
+                              setState(() {
+                                taskToEdit.priority = value;
+                              });
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Color.fromRGBO(221, 221, 226, 1),
+                                borderRadius: BorderRadius.circular(3),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.8),
+                                    offset: Offset(0.0, 1.0),
+                                    blurRadius: 1.0,
+                                  )
+                                ]
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.flag),
+                                  Text("Priority")
+                                ],
+                              ),
+                            ),
+                            itemBuilder: (context){
+                              return priorities.reversed.map((e) {
+                              return PopupMenuItem(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  children: <Widget>[
+                                    Text(e),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    if (e == 'LOW') Icon(Icons.arrow_downward_outlined),
+                                    if (e == 'HIGH') Icon(Icons.arrow_upward_outlined),
+                                    if (e == 'HIGHER') Icon(Icons.arrow_upward_outlined),
+                                    if (e == 'HIGHER') Icon(Icons.arrow_upward_outlined),
+                                    if (e == 'CRITICAL') Icon(Icons.warning_amber_sharp),
+                                  ],
+                                ),
+                                value: e,
+                              );
+                            }).toList();
+                            },
+                          ),
                         ),
                       ),
                     ),
