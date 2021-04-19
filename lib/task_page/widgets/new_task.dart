@@ -37,6 +37,10 @@ class _NewTaskState extends State<NewTask> {
   DateFormat formatter = DateFormat("yyyy-MM-dd");
   DateTime _startInitialValue;
   DateTime _endInitialValue;
+  TimeOfDay _startTime;
+  TimeOfDay _endTime;
+  TimeOfDay _startInitialTime;
+  TimeOfDay _endInitialTime;
 
   @override
   void initState() {
@@ -94,6 +98,11 @@ class _NewTaskState extends State<NewTask> {
       return;
     }
 
+    if (this._endDate.isBefore(this._startDate)) {
+      this._showAlertDialog(context, 'End date must be later than start date');
+      return;
+    }
+
     setState(() {
       this._isValid = isValid;
     });
@@ -103,6 +112,12 @@ class _NewTaskState extends State<NewTask> {
     }
 
     this._formKey.currentState.save();
+
+    this._startDate = DateTime(this._startDate.year, this._startDate.month, this._startDate.day, this._startTime.hour - 2, this._startTime.minute);
+    this._endDate = DateTime(this._endDate.year, this._endDate.month, this._endDate.day, this._endTime.hour - 2, this._endTime.minute);
+
+    print(this._startDate);
+    print(this._endDate);
 
     final newTask = Task(
       id: null,
@@ -138,7 +153,7 @@ class _NewTaskState extends State<NewTask> {
     }
   }
 
-  Future<DateTime> pickDate(DateTime initDate) async {
+  Future<DateTime> _pickDate(DateTime initDate) async {
     final DateTime pick = await showDatePicker(
       context: context,
       initialDate: initDate,
@@ -163,6 +178,33 @@ class _NewTaskState extends State<NewTask> {
       },
     );
     return pick;
+  }
+
+  Future<TimeOfDay> _pickTime() async {
+    final TimeOfDay selectedTime = await showTimePicker(
+      initialTime: TimeOfDay.now(),
+      context: context,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Colors.grey,
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                primary: Colors.black,
+              ),
+            ),
+          ),
+          child: child,
+        );
+      },
+    );
+
+    print(selectedTime);
+    return selectedTime;
   }
 
   @override
@@ -337,9 +379,11 @@ class _NewTaskState extends State<NewTask> {
                                                   if (this._startInitialValue == null) {
                                                     initDate = DateTime.now();
                                                   }
-                                                  final DateTime pick = await pickDate(initDate);
+                                                  final DateTime pick = await this._pickDate(initDate);
+                                                  final TimeOfDay pickTime = await this._pickTime();
                                                   setState(() {
                                                     this._startInitialValue = pick;
+                                                    this._startInitialTime = pickTime;
                                                   });
                                                 },
                                                 style: ElevatedButton.styleFrom(
@@ -366,9 +410,11 @@ class _NewTaskState extends State<NewTask> {
                                                   if (this._endInitialValue == null) {
                                                     initDate = DateTime.now();
                                                   }
-                                                  final DateTime pick = await pickDate(initDate);
+                                                  final DateTime pick = await this._pickDate(initDate);
+                                                  final TimeOfDay pickTime = await this._pickTime();
                                                   setState(() {
                                                     this._endInitialValue = pick;
+                                                    this._endInitialTime = pickTime;
                                                   });
                                                 },
                                                 style: ElevatedButton.styleFrom(
@@ -398,6 +444,8 @@ class _NewTaskState extends State<NewTask> {
                                                 onPressed: () {
                                                   this._startInitialValue = null;
                                                   this._endInitialValue = null;
+                                                  this._startInitialTime = null;
+                                                  this._endInitialTime = null;
                                                   Navigator.of(context).pop(false);
                                                 },
                                                 child: Text(
@@ -416,7 +464,9 @@ class _NewTaskState extends State<NewTask> {
                                                 onPressed: () {
                                                   setState(() {
                                                     this._startDate = this._startInitialValue;
+                                                    this._startTime = this._startInitialTime;
                                                     this._endDate = this._endInitialValue;
+                                                    this._endTime = this._endInitialTime;
                                                   });
                                                   Navigator.of(context).pop(true);
                                                 },

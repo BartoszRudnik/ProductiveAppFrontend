@@ -226,6 +226,16 @@ class _TaskWidgetState extends State<TaskWidget> {
                                 DateFormat('MMM d').format(this.widget.task.endDate),
                               )
                             : Text(''),
+                        SizedBox(width: 6),
+                        if (this.widget.task.endDate.difference(DateTime.now()).inDays == 0) Icon(Icons.access_time_outlined),
+                        if (this.widget.task.endDate.difference(DateTime.now()).inDays == 0)
+                          Text(
+                            DateFormat('Hm').format(this.widget.task.endDate),
+                          ),
+                        if (this.widget.task.endDate.difference(DateTime.now()).inDays < 0) Icon(Icons.fireplace_outlined),
+                        if (this.widget.task.endDate.difference(DateTime.now()).inDays < 0) Text(DateTime.now().difference(this.widget.task.endDate).inDays.toString() + 'd overude'),
+                        if (this.widget.task.endDate.difference(DateTime.now()).inDays > 0) Icon(Icons.hourglass_bottom_outlined),
+                        if (this.widget.task.endDate.difference(DateTime.now()).inDays > 0) Text(this.widget.task.endDate.difference(DateTime.now()).inDays.toString() + 'd left'),
                       ],
                     ),
                   if (this.widget.task.priority != 'NORMAL' || this.widget.task.startDate != null || this.widget.task.endDate != null)
