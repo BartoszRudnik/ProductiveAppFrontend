@@ -44,8 +44,55 @@ class _NewTaskState extends State<NewTask> {
     this._localization = this.widget.localization;
   }
 
+  _showAlertDialog(BuildContext context, final errorMessage) {
+    Widget acceptButton = ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        primary: Theme.of(context).primaryColor,
+        side: BorderSide(color: Theme.of(context).primaryColor),
+      ),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+      child: Text(
+        'OK',
+        style: TextStyle(fontSize: 14, color: Theme.of(context).accentColor),
+      ),
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: Text(
+        'Incorrect task attributes',
+        style: TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      content: Text(errorMessage),
+      actions: [
+        acceptButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   Future<void> _addNewTask() async {
     var isValid = this._formKey.currentState.validate();
+
+    if (this._endDate == null) {
+      this._showAlertDialog(context, 'Task need to have end date');
+      return;
+    }
+
+    if (this._localization == 'SCHEDULED' && this._startDate == null) {
+      this._showAlertDialog(context, 'SCHEDULED Task needs start date');
+      return;
+    }
 
     setState(() {
       this._isValid = isValid;
@@ -559,7 +606,6 @@ class _NewTaskState extends State<NewTask> {
                     color: Theme.of(context).primaryColor,
                   ),
                   Row(
-                    //mainAxisAlignment: MainAxisAlignment.values(),
                     children: [
                       PopupMenuButton(
                         icon: Icon(Icons.all_inbox),

@@ -148,9 +148,7 @@ class _TaskWidgetState extends State<TaskWidget> {
             if (direction == DismissDirection.startToEnd) {
               String newLocation = 'INBOX';
 
-              if (this.widget.task.startDate != null && this.widget.task.endDate == null) {
-                newLocation = 'ANYTIME';
-              } else if (this.widget.task.endDate != null) {
+              if ((this.widget.task.startDate != null && this.widget.task.endDate != null) || this.widget.task.startDate) {
                 newLocation = 'SCHEDULED';
               } else {
                 newLocation = 'ANYTIME';
