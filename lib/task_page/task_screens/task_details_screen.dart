@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/shared/dialogs.dart';
 import 'package:productive_app/task_page/models/task.dart';
 import 'package:productive_app/task_page/providers/task_provider.dart';
 import 'package:productive_app/task_page/widgets/task_appBar.dart';
@@ -111,27 +112,27 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
     if(taskToEdit.endDate == null){
       isValid = false;
-      showWarningDialog("Task end date must be specified");
+      Dialogs.showWarningDialog(context, "Task end date must be specified");
     }
 
     if(taskToEdit.startDate == null && taskToEdit.localization == "SCHEDULED"){
       isValid = false;
-      showWarningDialog("Scheduled tasks have to specify start date");
+      Dialogs.showWarningDialog(context, "Scheduled tasks have to specify start date");
     }
 
     if(taskToEdit.startDate != null && taskToEdit.localization == "ANYTIME"){
       isValid = false;
-      showWarningDialog("Tasks with start date should be scheduled");
+      Dialogs.showWarningDialog(context, "Tasks with start date should be scheduled");
     }
 
     if(taskToEdit.localization == "COMPLETED" && !taskToEdit.done){
       isValid = false;
-      showWarningDialog("Completed tasks have to be marked as done");
+      Dialogs.showWarningDialog(context, "Completed tasks have to be marked as done");
     }
 
     if(originalTask.localization != "INBOX" && taskToEdit.localization == "INBOX"){
       isValid = false;
-      showWarningDialog("Task cannot return to inbox");
+      Dialogs.showWarningDialog(context, "Task cannot return to inbox");
     }
 
     setState((){
@@ -147,49 +148,24 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, taskToEdit.localization);
       Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);  
     }catch (error){
-      print(error);
+      Dialogs.showWarningDialog(context, "An error has occured");
     }
     Navigator.pop(context);
   }
 
-  void showWarningDialog(String warningText){
-    showDialog(
-        context: context, 
-        builder: (context) => AlertDialog(
-          title: Text(
-            'Warning',
-            style: Theme.of(context).textTheme.headline2,
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(warningText),
-              SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Theme.of(context).primaryColor,
-                      side: BorderSide(color: Theme.of(context).primaryColor),
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).pop(true);
-                    },
-                    child: Text(
-                      'OK',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).accentColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        )
-      );
+  Future<void> deleteTask() async{
+    bool accepted = await Dialogs.showChoiceDialog(context, "Are you sure you want to delete this task?");
+    if (accepted){
+      setTaskToEdit(originalTask);
+      taskToEdit.localization = "TRASH";
+      try{
+        await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, taskToEdit.localization);
+        Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);  
+      }catch (error){
+        Dialogs.showWarningDialog(context, "An error has occured");
+      }
+      Navigator.pop(context);
+    }
   }
 
   void setTaskToEdit(Task argTask){
@@ -489,38 +465,52 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
         ),
       ),
       bottomNavigationBar: Container(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Row(
+        child: Row(
             children: [
-              TextButton.icon(
-                onPressed: (){},
-                style: ElevatedButton.styleFrom(
-                  onPrimary: Colors.black,
+              Expanded(
+                  flex: 3,
+                  child:TextButton.icon(
+                  onPressed: () => deleteTask(),
+                  style: ElevatedButton.styleFrom(
+                    onPrimary: Colors.black,
+                  ),
+                  icon: Icon(Icons.delete),
+                  label: Text("Trash"),
                 ),
-                icon: Icon(Icons.delete),
-                label: Text("Trash"),
               ),
-              TextButton.icon(
-                onPressed: (){},
-                style: ElevatedButton.styleFrom(
-                  onPrimary: Colors.black,
+              Expanded(
+                flex: 6,
+                child: TextButton.icon(
+                  onPressed: (){
+                    setState(() {
+                      taskToEdit.done = !taskToEdit.done;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    onPrimary: Colors.black,
+                  ),
+                  icon: Icon(
+                    taskToEdit.done? Icons.cancel : Icons.done
+                  ),
+                  label: Text(
+                    taskToEdit.done? "Unmark as done" : "Mark as done"
+                  ),
                 ),
-                icon: Icon(Icons.done),
-                label: Text("Mark as done"),
               ),
-              TextButton.icon(
-                onPressed: () => saveTask(),
-                style: ElevatedButton.styleFrom(
-                  onPrimary: Colors.black,
-                ),
-                icon: Icon(Icons.save),
-                label: Text("Save task"),
-              )
+              Expanded(
+                flex:4,
+                child: TextButton.icon(
+                  onPressed: () => saveTask(),
+                  style: ElevatedButton.styleFrom(
+                    onPrimary: Colors.black,
+                  ),
+                  icon: Icon(Icons.save),
+                  label: Text("Save task"),
+                )
+              ),
             ],
           ),
         )
-      ), 
     );
   }
 }
