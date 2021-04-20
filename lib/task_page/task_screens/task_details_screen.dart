@@ -109,14 +109,51 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
   Future<void> saveTask() async{
     var isValid = this._formKey.currentState.validate();
 
-    setState(() {
+    if(taskToEdit.endDate == null){
+      isValid = false;
+      showWarningDialog("Task end date must be specified");
+    }
+
+    if(taskToEdit.startDate == null && taskToEdit.localization == "SCHEDULED"){
+      isValid = false;
+      showWarningDialog("Scheduled tasks have to specify start date");
+    }
+
+    if(taskToEdit.startDate != null && taskToEdit.localization == "ANYTIME"){
+      isValid = false;
+      showWarningDialog("Tasks with start date should be scheduled");
+    }
+
+    if(taskToEdit.localization == "COMPLETED" && !taskToEdit.done){
+      isValid = false;
+      showWarningDialog("Completed tasks have to be marked as done");
+    }
+
+    if(originalTask.localization != "INBOX" && taskToEdit.localization == "INBOX"){
+      isValid = false;
+      showWarningDialog("Task cannot return to inbox");
+    }
+
+    setState((){
       this._isValid = isValid;
     });
 
-    if(taskToEdit.startDate != null && taskToEdit.endDate == null){
-      setState((){
-        this._isValid = false;
-      });showDialog(
+    if (!this._isValid) {
+      return;
+    }
+
+    this._formKey.currentState.save();
+    try{
+      await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, taskToEdit.localization);
+      Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);  
+    }catch (error){
+      print(error);
+    }
+    Navigator.pop(context);
+  }
+
+  void showWarningDialog(String warningText){
+    showDialog(
         context: context, 
         builder: (context) => AlertDialog(
           title: Text(
@@ -126,7 +163,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Task end date must be specified if you specify task start date'),
+              Text(warningText),
               SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -153,20 +190,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
           ),
         )
       );
-    }
-
-    if (!this._isValid) {
-      return;
-    }
-
-    this._formKey.currentState.save();
-    try{
-      await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, taskToEdit.localization);
-      Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);  
-    }catch (error){
-      print(error);
-    }
-    Navigator.pop(context);
   }
 
   void setTaskToEdit(Task argTask){
@@ -187,6 +210,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final priorities = Provider.of<TaskProvider>(context, listen: false).priorities;
+    final localizations = Provider.of<TaskProvider>(context, listen: false).localizations;
 
     if(taskToEdit == null){
       originalTask = ModalRoute.of(context).settings.arguments as Task;  
@@ -271,39 +295,35 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                       flex: 5,
                       child: SizedBox(
                         height: 100,
-                        child: Theme(
-                          data: Theme.of(context).copyWith(
-                            canvasColor: Color.fromRGBO(221, 221, 226, 1)
-                          ),
-                          child: PopupMenuButton(
-                            initialValue: taskToEdit.priority,
-                            onSelected: (value){
-                              setState(() {
-                                taskToEdit.priority = value;
-                              });
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Color.fromRGBO(221, 221, 226, 1),
-                                borderRadius: BorderRadius.circular(3),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.8),
-                                    offset: Offset(0.0, 1.0),
-                                    blurRadius: 1.0,
-                                  )
-                                ]
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.flag),
-                                  Text("Priority")
-                                ],
-                              ),
+                        child: PopupMenuButton(
+                          initialValue: taskToEdit.priority,
+                          onSelected: (value){
+                            setState(() {
+                              taskToEdit.priority = value;
+                            });
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Color.fromRGBO(221, 221, 226, 1),
+                              borderRadius: BorderRadius.circular(3),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.8),
+                                  offset: Offset(0.0, 1.0),
+                                  blurRadius: 1.0,
+                                )
+                              ]
                             ),
-                            itemBuilder: (context){
-                              return priorities.reversed.map((e) {
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.flag),
+                                Text("Priority")
+                              ],
+                            ),
+                          ),
+                          itemBuilder: (context){
+                            return priorities.reversed.map((e) {
                               return PopupMenuItem(
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -322,8 +342,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                                 value: e,
                               );
                             }).toList();
-                            },
-                          ),
+                          },
                         ),
                       ),
                     ),
@@ -359,19 +378,41 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                       flex: 5,
                       child: SizedBox(
                         height: 100,
-                        child: ElevatedButton(
-                          onPressed: (){},
-                          style: ElevatedButton.styleFrom(
-                            primary: Color.fromRGBO(221, 221, 226, 1),
-                            onPrimary: Colors.black,
+                        child: PopupMenuButton(
+                          initialValue: taskToEdit.localization,
+                          onSelected: (value){
+                            setState(() {
+                              taskToEdit.localization = value;
+                            });
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Color.fromRGBO(221, 221, 226, 1),
+                              borderRadius: BorderRadius.circular(3),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.8),
+                                  offset: Offset(0.0, 1.0),
+                                  blurRadius: 1.0,
+                                )
+                              ]
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.inbox),
+                                Text(taskToEdit.localization)
+                              ],
+                            ),
                           ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.inbox),
-                              Text("Inbox")
-                            ],
-                          )
+                          itemBuilder: (context){
+                            return localizations.map((e) {
+                              return PopupMenuItem(
+                                child: Text(e),
+                                value: e,
+                              );
+                            }).toList();
+                          },
                         ),
                       ),
                     ),
