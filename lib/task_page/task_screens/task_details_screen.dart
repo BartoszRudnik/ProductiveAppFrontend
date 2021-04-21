@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/shared/dialogs.dart';
 import 'package:productive_app/task_page/models/task.dart';
 import 'package:productive_app/task_page/providers/task_provider.dart';
 import 'package:productive_app/task_page/widgets/task_appBar.dart';
@@ -109,51 +110,34 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
   Future<void> saveTask() async{
     var isValid = this._formKey.currentState.validate();
 
-    setState(() {
+    if(taskToEdit.endDate == null){
+      isValid = false;
+      Dialogs.showWarningDialog(context, "Task end date must be specified");
+    }
+
+    if(taskToEdit.startDate == null && taskToEdit.localization == "SCHEDULED"){
+      isValid = false;
+      Dialogs.showWarningDialog(context, "Scheduled tasks have to specify start date");
+    }
+
+    if(taskToEdit.startDate != null && taskToEdit.localization == "ANYTIME"){
+      isValid = false;
+      Dialogs.showWarningDialog(context, "Tasks with start date should be scheduled");
+    }
+
+    if(taskToEdit.localization == "COMPLETED" && !taskToEdit.done){
+      isValid = false;
+      Dialogs.showWarningDialog(context, "Completed tasks have to be marked as done");
+    }
+
+    if(originalTask.localization != "INBOX" && taskToEdit.localization == "INBOX"){
+      isValid = false;
+      Dialogs.showWarningDialog(context, "Task cannot return to inbox");
+    }
+
+    setState((){
       this._isValid = isValid;
     });
-
-    if(taskToEdit.startDate != null && taskToEdit.endDate == null){
-      setState((){
-        this._isValid = false;
-      });showDialog(
-        context: context, 
-        builder: (context) => AlertDialog(
-          title: Text(
-            'Warning',
-            style: Theme.of(context).textTheme.headline2,
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Task end date must be specified if you specify task start date'),
-              SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Theme.of(context).primaryColor,
-                      side: BorderSide(color: Theme.of(context).primaryColor),
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).pop(true);
-                    },
-                    child: Text(
-                      'OK',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).accentColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        )
-      );
-    }
 
     if (!this._isValid) {
       return;
@@ -164,9 +148,24 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, taskToEdit.localization);
       Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);  
     }catch (error){
-      print(error);
+      Dialogs.showWarningDialog(context, "An error has occured");
     }
     Navigator.pop(context);
+  }
+
+  Future<void> deleteTask() async{
+    bool accepted = await Dialogs.showChoiceDialog(context, "Are you sure you want to delete this task?");
+    if (accepted){
+      setTaskToEdit(originalTask);
+      taskToEdit.localization = "TRASH";
+      try{
+        await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, taskToEdit.localization);
+        Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);  
+      }catch (error){
+        Dialogs.showWarningDialog(context, "An error has occured");
+      }
+      Navigator.pop(context);
+    }
   }
 
   void setTaskToEdit(Task argTask){
@@ -187,6 +186,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final priorities = Provider.of<TaskProvider>(context, listen: false).priorities;
+    final localizations = Provider.of<TaskProvider>(context, listen: false).localizations;
 
     if(taskToEdit == null){
       originalTask = ModalRoute.of(context).settings.arguments as Task;  
@@ -271,39 +271,35 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                       flex: 5,
                       child: SizedBox(
                         height: 100,
-                        child: Theme(
-                          data: Theme.of(context).copyWith(
-                            canvasColor: Color.fromRGBO(221, 221, 226, 1)
-                          ),
-                          child: PopupMenuButton(
-                            initialValue: taskToEdit.priority,
-                            onSelected: (value){
-                              setState(() {
-                                taskToEdit.priority = value;
-                              });
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Color.fromRGBO(221, 221, 226, 1),
-                                borderRadius: BorderRadius.circular(3),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.8),
-                                    offset: Offset(0.0, 1.0),
-                                    blurRadius: 1.0,
-                                  )
-                                ]
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.flag),
-                                  Text("Priority")
-                                ],
-                              ),
+                        child: PopupMenuButton(
+                          initialValue: taskToEdit.priority,
+                          onSelected: (value){
+                            setState(() {
+                              taskToEdit.priority = value;
+                            });
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Color.fromRGBO(221, 221, 226, 1),
+                              borderRadius: BorderRadius.circular(3),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.8),
+                                  offset: Offset(0.0, 1.0),
+                                  blurRadius: 1.0,
+                                )
+                              ]
                             ),
-                            itemBuilder: (context){
-                              return priorities.reversed.map((e) {
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.flag),
+                                Text("Priority")
+                              ],
+                            ),
+                          ),
+                          itemBuilder: (context){
+                            return priorities.reversed.map((e) {
                               return PopupMenuItem(
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -322,8 +318,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                                 value: e,
                               );
                             }).toList();
-                            },
-                          ),
+                          },
                         ),
                       ),
                     ),
@@ -359,19 +354,41 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                       flex: 5,
                       child: SizedBox(
                         height: 100,
-                        child: ElevatedButton(
-                          onPressed: (){},
-                          style: ElevatedButton.styleFrom(
-                            primary: Color.fromRGBO(221, 221, 226, 1),
-                            onPrimary: Colors.black,
+                        child: PopupMenuButton(
+                          initialValue: taskToEdit.localization,
+                          onSelected: (value){
+                            setState(() {
+                              taskToEdit.localization = value;
+                            });
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Color.fromRGBO(221, 221, 226, 1),
+                              borderRadius: BorderRadius.circular(3),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.8),
+                                  offset: Offset(0.0, 1.0),
+                                  blurRadius: 1.0,
+                                )
+                              ]
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.inbox),
+                                Text(taskToEdit.localization)
+                              ],
+                            ),
                           ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.inbox),
-                              Text("Inbox")
-                            ],
-                          )
+                          itemBuilder: (context){
+                            return localizations.map((e) {
+                              return PopupMenuItem(
+                                child: Text(e),
+                                value: e,
+                              );
+                            }).toList();
+                          },
                         ),
                       ),
                     ),
@@ -448,38 +465,52 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
         ),
       ),
       bottomNavigationBar: Container(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Row(
+        child: Row(
             children: [
-              TextButton.icon(
-                onPressed: (){},
-                style: ElevatedButton.styleFrom(
-                  onPrimary: Colors.black,
+              Expanded(
+                  flex: 3,
+                  child:TextButton.icon(
+                  onPressed: () => deleteTask(),
+                  style: ElevatedButton.styleFrom(
+                    onPrimary: Colors.black,
+                  ),
+                  icon: Icon(Icons.delete),
+                  label: Text("Trash"),
                 ),
-                icon: Icon(Icons.delete),
-                label: Text("Trash"),
               ),
-              TextButton.icon(
-                onPressed: (){},
-                style: ElevatedButton.styleFrom(
-                  onPrimary: Colors.black,
+              Expanded(
+                flex: 6,
+                child: TextButton.icon(
+                  onPressed: (){
+                    setState(() {
+                      taskToEdit.done = !taskToEdit.done;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    onPrimary: Colors.black,
+                  ),
+                  icon: Icon(
+                    taskToEdit.done? Icons.cancel : Icons.done
+                  ),
+                  label: Text(
+                    taskToEdit.done? "Unmark as done" : "Mark as done"
+                  ),
                 ),
-                icon: Icon(Icons.done),
-                label: Text("Mark as done"),
               ),
-              TextButton.icon(
-                onPressed: () => saveTask(),
-                style: ElevatedButton.styleFrom(
-                  onPrimary: Colors.black,
-                ),
-                icon: Icon(Icons.save),
-                label: Text("Save task"),
-              )
+              Expanded(
+                flex:4,
+                child: TextButton.icon(
+                  onPressed: () => saveTask(),
+                  style: ElevatedButton.styleFrom(
+                    onPrimary: Colors.black,
+                  ),
+                  icon: Icon(Icons.save),
+                  label: Text("Save task"),
+                )
+              ),
             ],
           ),
         )
-      ), 
     );
   }
 }
