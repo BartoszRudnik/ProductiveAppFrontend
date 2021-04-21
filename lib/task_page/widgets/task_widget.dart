@@ -153,7 +153,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                 newLocation = 'SCHEDULED';
               } else if (this.widget.task.endDate != null) {
                 newLocation = 'ANYTIME';
-              } else if (this.widget.task.endDate == null && this.widget.task.startDate == null) {
+              } else if (this.widget.task.endDate == null && this.widget.task.startDate == null && !isArchived) {
                 Dialogs.showWarningDialog(context, 'To organize task needs at least end date');
               }
 
