@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:productive_app/task_page/widgets/show_alert_dialog.dart';
+import 'package:productive_app/shared/dialogs.dart';
 import 'package:provider/provider.dart';
 
 import '../models/tag.dart';
@@ -50,22 +50,20 @@ class _NewTaskState extends State<NewTask> {
   }
 
   Future<void> _addNewTask() async {
-    final alertDialog = ShowAlertDialog();
-
     var isValid = this._formKey.currentState.validate();
 
     if (this._endDate == null && this._localization != 'INBOX') {
-      alertDialog.showAlertDialog(context, 'Planned task need to have end date');
+      Dialogs.showWarningDialog(context, 'Planned task need to have end date');
       return;
     }
 
     if (this._localization == 'SCHEDULED' && this._startDate == null) {
-      alertDialog.showAlertDialog(context, 'SCHEDULED Task needs start date');
+      Dialogs.showWarningDialog(context, 'Planned task need to have end date');
       return;
     }
 
     if (this._startDate != null && this._endDate.isBefore(this._startDate)) {
-      alertDialog.showAlertDialog(context, 'End date must be later than start date');
+      Dialogs.showWarningDialog(context, 'Planned task need to have end date');
       return;
     }
 

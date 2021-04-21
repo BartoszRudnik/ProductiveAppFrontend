@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:productive_app/task_page/widgets/show_alert_dialog.dart';
+import 'package:productive_app/shared/dialogs.dart';
 import 'package:productive_app/task_page/widgets/task_tags.dart';
 import 'package:provider/provider.dart';
 
@@ -154,9 +154,7 @@ class _TaskWidgetState extends State<TaskWidget> {
               } else if (this.widget.task.endDate != null) {
                 newLocation = 'ANYTIME';
               } else if (this.widget.task.endDate == null && this.widget.task.startDate == null) {
-                final alertDialog = ShowAlertDialog();
-
-                alertDialog.showAlertDialog(context, 'To organize task needs at least end date');
+                Dialogs.showWarningDialog(context, 'To organize task needs at least end date');
               }
 
               Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
