@@ -622,9 +622,15 @@ class _NewTaskState extends State<NewTask> {
                     color: Theme.of(context).primaryColor,
                   ),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       PopupMenuButton(
-                        icon: Icon(Icons.all_inbox),
+                        child: Row(
+                          children: [
+                            Icon(Icons.all_inbox),
+                            Text(this._localization),
+                          ],
+                        ),
                         initialValue: this._localization,
                         onSelected: (value) {
                           setState(() {
@@ -640,7 +646,6 @@ class _NewTaskState extends State<NewTask> {
                           }).toList();
                         },
                       ),
-                      Expanded(child: Text(this._localization)),
                       ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
                           onPrimary: Theme.of(context).primaryColor,

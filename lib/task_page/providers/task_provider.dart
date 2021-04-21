@@ -171,7 +171,7 @@ class TaskProvider with ChangeNotifier {
 
     try {
       final response = await http.get(url);
-      final responseBody = json.decode(response.body);
+      final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
       for (var element in responseBody) {
         List<Tag> taskTags = [];
