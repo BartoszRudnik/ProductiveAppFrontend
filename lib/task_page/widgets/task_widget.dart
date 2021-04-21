@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/task_page/widgets/show_alert_dialog.dart';
 import 'package:productive_app/task_page/widgets/task_tags.dart';
 import 'package:provider/provider.dart';
 
@@ -148,10 +149,14 @@ class _TaskWidgetState extends State<TaskWidget> {
             if (direction == DismissDirection.startToEnd) {
               String newLocation = 'INBOX';
 
-              if ((this.widget.task.startDate != null && this.widget.task.endDate != null) || this.widget.task.startDate) {
+              if (this.widget.task.startDate != null && this.widget.task.endDate != null) {
                 newLocation = 'SCHEDULED';
-              } else {
+              } else if (this.widget.task.endDate != null) {
                 newLocation = 'ANYTIME';
+              } else if (this.widget.task.endDate == null && this.widget.task.startDate == null) {
+                final alertDialog = ShowAlertDialog();
+
+                alertDialog.showAlertDialog(context, 'To organize task needs at least end date');
               }
 
               Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
@@ -227,15 +232,22 @@ class _TaskWidgetState extends State<TaskWidget> {
                               )
                             : Text(''),
                         SizedBox(width: 6),
-                        if (this.widget.task.endDate.difference(DateTime.now()).inDays == 0) Icon(Icons.access_time_outlined),
-                        if (this.widget.task.endDate.difference(DateTime.now()).inDays == 0)
-                          Text(
-                            DateFormat('Hm').format(this.widget.task.endDate),
-                          ),
-                        if (this.widget.task.endDate.difference(DateTime.now()).inDays < 0) Icon(Icons.fireplace_outlined),
-                        if (this.widget.task.endDate.difference(DateTime.now()).inDays < 0) Text(DateTime.now().difference(this.widget.task.endDate).inDays.toString() + 'd overude'),
-                        if (this.widget.task.endDate.difference(DateTime.now()).inDays > 0) Icon(Icons.hourglass_bottom_outlined),
-                        if (this.widget.task.endDate.difference(DateTime.now()).inDays > 0) Text(this.widget.task.endDate.difference(DateTime.now()).inDays.toString() + 'd left'),
+                        if (this.widget.task.endDate != null)
+                          Container(
+                            child: Row(
+                              children: [
+                                if (this.widget.task.endDate.difference(DateTime.now()).inDays == 0) Icon(Icons.access_time_outlined),
+                                if (this.widget.task.endDate.difference(DateTime.now()).inDays == 0)
+                                  Text(
+                                    DateFormat('Hm').format(this.widget.task.endDate),
+                                  ),
+                                if (this.widget.task.endDate.difference(DateTime.now()).inDays < 0) Icon(Icons.fireplace_outlined),
+                                if (this.widget.task.endDate.difference(DateTime.now()).inDays < 0) Text(DateTime.now().difference(this.widget.task.endDate).inDays.toString() + 'd overude'),
+                                if (this.widget.task.endDate.difference(DateTime.now()).inDays > 0) Icon(Icons.hourglass_bottom_outlined),
+                                if (this.widget.task.endDate.difference(DateTime.now()).inDays > 0) Text(this.widget.task.endDate.difference(DateTime.now()).inDays.toString() + 'd left'),
+                              ],
+                            ),
+                          )
                       ],
                     ),
                   if (this.widget.task.priority != 'NORMAL' || this.widget.task.startDate != null || this.widget.task.endDate != null)

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/task_page/widgets/show_alert_dialog.dart';
 import 'package:provider/provider.dart';
 
 import '../models/tag.dart';
@@ -48,58 +49,23 @@ class _NewTaskState extends State<NewTask> {
     this._localization = this.widget.localization;
   }
 
-  _showAlertDialog(BuildContext context, final errorMessage) {
-    Widget acceptButton = ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        primary: Theme.of(context).primaryColor,
-        side: BorderSide(color: Theme.of(context).primaryColor),
-      ),
-      onPressed: () {
-        Navigator.of(context).pop();
-      },
-      child: Text(
-        'OK',
-        style: TextStyle(fontSize: 14, color: Theme.of(context).accentColor),
-      ),
-    );
-
-    AlertDialog alert = AlertDialog(
-      title: Text(
-        'Incorrect task attributes',
-        style: TextStyle(
-          fontSize: 28,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      content: Text(errorMessage),
-      actions: [
-        acceptButton,
-      ],
-    );
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
-
   Future<void> _addNewTask() async {
+    final alertDialog = ShowAlertDialog();
+
     var isValid = this._formKey.currentState.validate();
 
-    if (this._endDate == null) {
-      this._showAlertDialog(context, 'Task need to have end date');
+    if (this._endDate == null && this._localization != 'INBOX') {
+      alertDialog.showAlertDialog(context, 'Planned task need to have end date');
       return;
     }
 
     if (this._localization == 'SCHEDULED' && this._startDate == null) {
-      this._showAlertDialog(context, 'SCHEDULED Task needs start date');
+      alertDialog.showAlertDialog(context, 'SCHEDULED Task needs start date');
       return;
     }
 
-    if (this._endDate.isBefore(this._startDate)) {
-      this._showAlertDialog(context, 'End date must be later than start date');
+    if (this._startDate != null && this._endDate.isBefore(this._startDate)) {
+      alertDialog.showAlertDialog(context, 'End date must be later than start date');
       return;
     }
 
@@ -113,11 +79,13 @@ class _NewTaskState extends State<NewTask> {
 
     this._formKey.currentState.save();
 
-    this._startDate = DateTime(this._startDate.year, this._startDate.month, this._startDate.day, this._startTime.hour - 2, this._startTime.minute);
-    this._endDate = DateTime(this._endDate.year, this._endDate.month, this._endDate.day, this._endTime.hour - 2, this._endTime.minute);
+    if (this._startDate != null) {
+      this._startDate = DateTime(this._startDate.year, this._startDate.month, this._startDate.day, this._startTime.hour, this._startTime.minute);
+    }
 
-    print(this._startDate);
-    print(this._endDate);
+    if (this._endDate != null) {
+      this._endDate = DateTime(this._endDate.year, this._endDate.month, this._endDate.day, this._endTime.hour, this._endTime.minute);
+    }
 
     final newTask = Task(
       id: null,
