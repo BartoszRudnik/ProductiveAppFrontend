@@ -101,6 +101,16 @@ class AuthProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
+
+      if (response != null) {
+        try {
+          final responseData = json.decode(response.body);
+
+          if (responseData['error']?.isNotEmpty == true) {
+            throw HttpException(responseData['message']);
+          }
+        } catch (error) {}
+      }
     } catch (error) {
       throw error;
     }

@@ -29,6 +29,7 @@ class _NewPasswordState extends State<NewPassword> {
   var _repeatPassword = '';
 
   var _validationMessage = 'Authentication failed';
+  var _isLoading = false;
 
   @override
   void initState() {
@@ -46,6 +47,9 @@ class _NewPasswordState extends State<NewPassword> {
   }
 
   Future<void> _setNewPassword() async {
+    setState(() {
+      this._isLoading = true;
+    });
     final isValid = this._newPasswordKey.currentState.validate();
 
     setState(() {
@@ -55,6 +59,9 @@ class _NewPasswordState extends State<NewPassword> {
     FocusScope.of(context).unfocus();
 
     if (!isValid) {
+      setState(() {
+        this._isLoading = false;
+      });
       return;
     }
 
@@ -103,13 +110,19 @@ class _NewPasswordState extends State<NewPassword> {
         ),
       );
     } on HttpException catch (error) {
-      var errorMessage = 'Authentication failed.';
-
-      print(errorMessage);
+      this._validationMessage = 'Authentication failed.';
+      this._isValid = false;
     } on SocketException catch (error) {
-      var message = 'Connection failed';
-      print(message);
+      this._validationMessage = 'Connection failed';
+      this._isValid = false;
+    } catch (error) {
+      this._validationMessage = 'Wrong token';
+      this._isValid = false;
     }
+
+    setState(() {
+      this._isLoading = false;
+    });
   }
 
   @override
@@ -236,24 +249,27 @@ class _NewPasswordState extends State<NewPassword> {
                   ),
                 ),
                 SizedBox(height: 20),
-                Container(
-                  width: 304,
-                  height: 47,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Theme.of(context).primaryColor,
-                      side: BorderSide(color: Theme.of(context).primaryColor),
-                    ),
-                    onPressed: this._setNewPassword,
-                    child: Text(
-                      'Submit',
-                      style: TextStyle(
-                        fontSize: 25,
-                        color: Theme.of(context).accentColor,
+                if (this._isLoading)
+                  CircularProgressIndicator(backgroundColor: Theme.of(context).primaryColor)
+                else
+                  Container(
+                    width: 304,
+                    height: 47,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: Theme.of(context).primaryColor,
+                        side: BorderSide(color: Theme.of(context).primaryColor),
+                      ),
+                      onPressed: this._setNewPassword,
+                      child: Text(
+                        'Submit',
+                        style: TextStyle(
+                          fontSize: 25,
+                          color: Theme.of(context).accentColor,
+                        ),
                       ),
                     ),
                   ),
-                ),
                 SizedBox(
                   height: 10,
                 ),

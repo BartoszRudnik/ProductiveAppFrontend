@@ -23,8 +23,14 @@ class _ResetPasswordState extends State<ResetPassword> {
   var _email = '';
 
   var _isValid = true;
+  var _isLoading = false;
+
+  var _operationFailedMessage = 'Operation failed';
 
   Future<void> _tryReset() async {
+    setState(() {
+      this._isLoading = true;
+    });
     final isValid = this._resetKey.currentState.validate();
 
     setState(() {
@@ -87,13 +93,23 @@ class _ResetPasswordState extends State<ResetPassword> {
         ),
       );
     } on HttpException catch (error) {
-      var errorMessage = 'Authentication failed.';
-
-      print(errorMessage);
+      setState(() {
+        this._operationFailedMessage = 'Authentication failed.';
+        this._isValid = false;
+      });
     } on SocketException catch (error) {
-      var message = 'Connection failed';
-      print(message);
+      setState(() {
+        this._operationFailedMessage = 'Connection failed';
+        this._isValid = false;
+      });
+    } catch (error) {
+      print(error);
+      this._operationFailedMessage = 'Email address not found';
+      this._isValid = false;
     }
+    setState(() {
+      this._isLoading = false;
+    });
   }
 
   @override
@@ -109,7 +125,7 @@ class _ResetPasswordState extends State<ResetPassword> {
             child: Column(
               children: <Widget>[
                 LoginGreet(greetText: 'Reset password'),
-                if (!this._isValid) ValidationFailWidget(message: 'Please enter a valid email address.'),
+                if (!this._isValid) ValidationFailWidget(message: this._operationFailedMessage),
                 SizedBox(
                   height: this._isValid ? 0 : 10,
                 ),
@@ -141,24 +157,27 @@ class _ResetPasswordState extends State<ResetPassword> {
                   ),
                 ),
                 SizedBox(height: 50),
-                Container(
-                  width: 304,
-                  height: 47,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Theme.of(context).primaryColor,
-                      side: BorderSide(color: Theme.of(context).primaryColor),
-                    ),
-                    onPressed: this._tryReset,
-                    child: Text(
-                      'Reset',
-                      style: TextStyle(
-                        fontSize: 25,
-                        color: Theme.of(context).accentColor,
+                if (this._isLoading)
+                  CircularProgressIndicator(backgroundColor: Theme.of(context).primaryColor)
+                else
+                  Container(
+                    width: 304,
+                    height: 47,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: Theme.of(context).primaryColor,
+                        side: BorderSide(color: Theme.of(context).primaryColor),
+                      ),
+                      onPressed: this._tryReset,
+                      child: Text(
+                        'Reset',
+                        style: TextStyle(
+                          fontSize: 25,
+                          color: Theme.of(context).accentColor,
+                        ),
                       ),
                     ),
                   ),
-                ),
                 SizedBox(
                   height: 10,
                 ),
