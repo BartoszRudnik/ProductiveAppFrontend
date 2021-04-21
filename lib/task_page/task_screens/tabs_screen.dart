@@ -123,6 +123,16 @@ class _TabsScreenState extends State<TabsScreen> {
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.6),
+            spreadRadius: 5,
+            blurRadius: 7,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
       transform: Matrix4.translationValues(offsetX, offsetY, 0)..scale(scale),
       duration: Duration(milliseconds: 250),
       child: GestureDetector(
