@@ -110,11 +110,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
   Future<void> saveTask() async {
     var isValid = this._formKey.currentState.validate();
 
-    if (taskToEdit.endDate == null && taskToEdit.localization != "INBOX") {
-      isValid = false;
-      Dialogs.showWarningDialog(context, "Task end date must be specified");
-    }
-
     if (taskToEdit.startDate == null && taskToEdit.localization == "SCHEDULED") {
       isValid = false;
       Dialogs.showWarningDialog(context, "Scheduled tasks have to specify start date");

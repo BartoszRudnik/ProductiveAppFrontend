@@ -149,15 +149,12 @@ class _TaskWidgetState extends State<TaskWidget> {
             if (direction == DismissDirection.startToEnd) {
               String newLocation = 'INBOX';
 
-              if (this.widget.task.startDate != null && this.widget.task.endDate != null) {
+              if (this.widget.task.startDate != null) {
                 newLocation = 'SCHEDULED';
-                Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
-              } else if (this.widget.task.endDate != null) {
+              } else {
                 newLocation = 'ANYTIME';
-                Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
-              } else if (this.widget.task.endDate == null && this.widget.task.startDate == null && !isArchived) {
-                Dialogs.showWarningDialog(context, 'To organize task needs at least end date');
               }
+              Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
             }
           },
           child: Column(

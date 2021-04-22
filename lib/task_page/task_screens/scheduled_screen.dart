@@ -92,9 +92,11 @@ class _ScheduledScreenState extends State<ScheduledScreen> {
                         }
                       }
 
-                      // final task = before.removeAt(oldIndex);
-                      // before.insert(newIndex, task);
-                      // Provider.of<TaskProvider>(context, listen: false).setScheduledTasks(before);
+                      final task = before.removeAt(oldIndex);
+                      before.insert(newIndex, task);
+                      before.addAll(after);
+                      before.addAll(today);
+                      Provider.of<TaskProvider>(context, listen: false).setScheduledTasks(before);
 
                       Provider.of<TaskProvider>(context, listen: false).updateTaskPosition(item, newPosition);
                     });
@@ -159,9 +161,11 @@ class _ScheduledScreenState extends State<ScheduledScreen> {
                         }
                       }
 
-                      // final task = before.removeAt(oldIndex);
-                      // before.insert(newIndex, task);
-                      // Provider.of<TaskProvider>(context, listen: false).setScheduledTasks(before);
+                      final task = today.removeAt(oldIndex);
+                      today.insert(newIndex, task);
+                      today.addAll(before);
+                      today.addAll(after);
+                      Provider.of<TaskProvider>(context, listen: false).setScheduledTasks(today);
 
                       Provider.of<TaskProvider>(context, listen: false).updateTaskPosition(item, newPosition);
                     });
@@ -226,9 +230,11 @@ class _ScheduledScreenState extends State<ScheduledScreen> {
                         }
                       }
 
-                      // final task = before.removeAt(oldIndex);
-                      // before.insert(newIndex, task);
-                      // Provider.of<TaskProvider>(context, listen: false).setScheduledTasks(before);
+                      final task = after.removeAt(oldIndex);
+                      after.insert(newIndex, task);
+                      after.addAll(before);
+                      after.addAll(today);
+                      Provider.of<TaskProvider>(context, listen: false).setScheduledTasks(after);
 
                       Provider.of<TaskProvider>(context, listen: false).updateTaskPosition(item, newPosition);
                     });

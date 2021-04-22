@@ -457,14 +457,14 @@ class TaskProvider with ChangeNotifier {
   }
 
   List<Task> tasksBeforeToday() {
-    return this._scheduledTasks.where((element) => (element.endDate != null && element.endDate.difference(DateTime.now()).inDays < 0)).toList();
+    return this._scheduledTasks.where((element) => (element.startDate != null && element.startDate.difference(DateTime.now()).inDays < 0)).toList();
   }
 
   List<Task> tasksToday() {
-    return this._scheduledTasks.where((element) => (element.endDate != null && element.endDate.difference(DateTime.now()).inDays == 0)).toList();
+    return this._scheduledTasks.where((element) => (element.startDate != null && element.startDate.difference(DateTime.now()).inDays == 0)).toList();
   }
 
   List<Task> taskAfterToday() {
-    return this._scheduledTasks.where((element) => (element.endDate != null && element.endDate.difference(DateTime.now()).inDays > 0)).toList();
+    return this._scheduledTasks.where((element) => (element.startDate != null && element.startDate.difference(DateTime.now()).inDays > 0)).toList();
   }
 }

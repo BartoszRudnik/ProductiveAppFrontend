@@ -52,18 +52,13 @@ class _NewTaskState extends State<NewTask> {
   Future<void> _addNewTask() async {
     var isValid = this._formKey.currentState.validate();
 
-    if (this._endDate == null && this._localization != 'INBOX') {
-      Dialogs.showWarningDialog(context, 'Planned task need to have end date');
-      return;
-    }
-
     if (this._localization == 'SCHEDULED' && this._startDate == null) {
-      Dialogs.showWarningDialog(context, 'Planned task need to have end date');
+      Dialogs.showWarningDialog(context, 'Planned task need to have start date');
       return;
     }
 
-    if (this._startDate != null && this._endDate.isBefore(this._startDate)) {
-      Dialogs.showWarningDialog(context, 'Planned task need to have end date');
+    if (this._startDate != null && this._endDate != null && this._endDate.isBefore(this._startDate)) {
+      Dialogs.showWarningDialog(context, 'End date must be before start date');
       return;
     }
 
@@ -77,11 +72,11 @@ class _NewTaskState extends State<NewTask> {
 
     this._formKey.currentState.save();
 
-    if (this._startDate != null) {
+    if (this._startDate != null && this._startTime != null) {
       this._startDate = DateTime(this._startDate.year, this._startDate.month, this._startDate.day, this._startTime.hour, this._startTime.minute);
     }
 
-    if (this._endDate != null) {
+    if (this._endDate != null && this._endTime != null) {
       this._endDate = DateTime(this._endDate.year, this._endDate.month, this._endDate.day, this._endTime.hour, this._endTime.minute);
     }
 
