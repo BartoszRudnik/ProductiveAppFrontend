@@ -35,6 +35,18 @@ class TaskProvider with ChangeNotifier {
     return [...this._inboxTasks];
   }
 
+  void setInboxTasks(List<Task> newList) {
+    this._inboxTasks = newList;
+  }
+
+  void setAnytimeTasks(List<Task> newList) {
+    this._anytimeTasks = newList;
+  }
+
+  void setScheduledTasks(List<Task> newList) {
+    this._scheduledTasks = newList;
+  }
+
   List<Task> get anytimeTasks {
     return [...this._anytimeTasks];
   }
@@ -93,6 +105,7 @@ class TaskProvider with ChangeNotifier {
       );
 
       task.id = int.parse(response.body);
+      task.position = int.parse(response.body) + 1000.0;
 
       if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
         task.endDate = null;
@@ -111,8 +124,51 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
+  Future<void> updateTaskPosition(Task task, double newPosition) async {
+    print(newPosition);
+    String url = this._serverUrl + 'task/updatePosition/${task.id}';
+
+    try {
+      await http.put(
+        url,
+        body: json.encode(
+          {
+            'position': newPosition,
+          },
+        ),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      task.position = newPosition;
+
+      if (task.localization == 'INBOX') {
+        this.sortByPosition(this._inboxTasks);
+      } else if (task.localization == 'ANYTIME') {
+        this.sortByPosition(this._anytimeTasks);
+      } else if (task.localization == 'SCHEDULED') {
+        this.sortByPosition(this._scheduledTasks);
+      }
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
   Future<void> updateTask(Task task, String newLocation) async {
     String url = this._serverUrl + 'task/update/${task.id}';
+
+    if (task.localization != newLocation) {
+      if (newLocation == 'ANYTIME' && this._anytimeTasks.length > 0) {
+        task.position = this._anytimeTasks[this._anytimeTasks.length - 1].position + 1000.0;
+      } else if (newLocation == 'SCHEDULED' && this._scheduledTasks.length > 0) {
+        task.position = this._scheduledTasks[this._scheduledTasks.length - 1].position + 1000.0;
+      }
+    }
 
     if (task.startDate == null) {
       task.startDate = DateTime.fromMicrosecondsSinceEpoch(0);
@@ -136,6 +192,7 @@ class TaskProvider with ChangeNotifier {
             'priority': task.priority,
             'tags': task.tags.map((tag) => tag.toJson()).toList(),
             'localization': newLocation,
+            'position': task.position,
           },
         ),
         headers: {
@@ -155,7 +212,16 @@ class TaskProvider with ChangeNotifier {
       this.deleteFromLocalization(task);
 
       task.localization = newLocation;
+
       this.addToLocalication(task);
+
+      if (task.localization == 'INBOX') {
+        this.sortByPosition(this._inboxTasks);
+      } else if (task.localization == 'ANYTIME') {
+        this.sortByPosition(this._anytimeTasks);
+      } else if (task.localization == 'SCHEDULED') {
+        this.sortByPosition(this._scheduledTasks);
+      }
 
       notifyListeners();
     } catch (error) {
@@ -193,6 +259,7 @@ class TaskProvider with ChangeNotifier {
           startDate: DateTime.parse(element['tasks']['startDate']),
           tags: taskTags,
           localization: element['tasks']['localization'],
+          position: element['tasks']['position'],
         );
 
         if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
@@ -208,6 +275,11 @@ class TaskProvider with ChangeNotifier {
 
       this.taskList = loadedTasks;
       this.divideTasks();
+
+      this.sortByPosition(this._anytimeTasks);
+      this.sortByPosition(this._scheduledTasks);
+      this.sortByPosition(this._inboxTasks);
+
       notifyListeners();
     } catch (error) {
       print(error);
@@ -376,6 +448,12 @@ class TaskProvider with ChangeNotifier {
     });
 
     notifyListeners();
+  }
+
+  void sortByPosition(List<Task> listToSort) {
+    listToSort.sort((a, b) {
+      return a.position.compareTo(b.position);
+    });
   }
 
   List<Task> tasksBeforeToday() {

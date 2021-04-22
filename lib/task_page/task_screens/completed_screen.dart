@@ -27,7 +27,7 @@ class CompletedScreen extends StatelessWidget {
                   value: completedTasks[index],
                   child: TaskWidget(
                     task: completedTasks[index],
-                    taskKey: ValueKey(completedTasks[index].id),
+                    key: UniqueKey(),
                   ),
                 ),
               ),

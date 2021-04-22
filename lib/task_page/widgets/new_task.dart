@@ -95,6 +95,7 @@ class _NewTaskState extends State<NewTask> {
       tags: this._finalTags,
       description: this._taskDescription,
       localization: this._localization,
+      position: null,
     );
 
     try {

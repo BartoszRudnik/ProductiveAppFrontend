@@ -145,7 +145,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
     this._formKey.currentState.save();
     try {
-      await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, taskToEdit.localization);
+      final newLocalization = taskToEdit.localization;
+      taskToEdit.localization = originalTask.localization;
+      await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, newLocalization);
       Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);
     } catch (error) {
       Dialogs.showWarningDialog(context, "An error has occured");
@@ -184,6 +186,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       localization: argTask.localization,
       priority: argTask.priority,
       tags: argTask.tags,
+      position: argTask.position,
     );
   }
 

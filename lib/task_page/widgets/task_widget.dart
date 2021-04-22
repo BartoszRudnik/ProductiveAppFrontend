@@ -9,12 +9,12 @@ import '../task_screens/task_details_screen.dart';
 
 class TaskWidget extends StatefulWidget {
   final task;
-  final taskKey;
+  final key;
 
   TaskWidget({
     @required this.task,
-    @required this.taskKey,
-  });
+    @required this.key,
+  }) : super(key: key);
 
   @override
   _TaskWidgetState createState() => _TaskWidgetState();
@@ -35,7 +35,7 @@ class _TaskWidgetState extends State<TaskWidget> {
           Navigator.of(context).pushNamed(TaskDetailScreen.routeName, arguments: this.widget.task);
         },
         child: Dismissible(
-          key: this.widget.taskKey,
+          key: this.widget.key,
           background: Container(
             padding: EdgeInsets.symmetric(horizontal: 10),
             alignment: Alignment.centerLeft,
@@ -43,7 +43,7 @@ class _TaskWidgetState extends State<TaskWidget> {
             child: Row(
               children: [
                 Icon(
-                  Icons.restore_from_trash_outlined,
+                  isArchived ? Icons.restore_from_trash_outlined : Icons.navigate_next_outlined,
                   color: Theme.of(context).accentColor,
                   size: 50,
                 ),
@@ -151,13 +151,13 @@ class _TaskWidgetState extends State<TaskWidget> {
 
               if (this.widget.task.startDate != null && this.widget.task.endDate != null) {
                 newLocation = 'SCHEDULED';
+                Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
               } else if (this.widget.task.endDate != null) {
                 newLocation = 'ANYTIME';
+                Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
               } else if (this.widget.task.endDate == null && this.widget.task.startDate == null && !isArchived) {
                 Dialogs.showWarningDialog(context, 'To organize task needs at least end date');
               }
-
-              Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
             }
           },
           child: Column(

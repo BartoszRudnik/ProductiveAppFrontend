@@ -33,17 +33,52 @@ class _AnytimeScreenState extends State<AnytimeScreen> {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Expanded(
-            child: ListView.builder(
+            child: ReorderableListView.builder(
               shrinkWrap: true,
               itemCount: tasks.length,
               itemBuilder: (ctx, index) => ChangeNotifierProvider.value(
-                key: ValueKey(tasks[index].id),
+                key: ValueKey(tasks[index]),
                 value: tasks[index],
                 child: TaskWidget(
                   task: tasks[index],
-                  taskKey: ValueKey(tasks[index].id),
+                  key: ValueKey(tasks[index]),
                 ),
               ),
+              onReorder: (int oldIndex, int newIndex) {
+                if (newIndex > tasks.length) newIndex = tasks.length;
+                if (oldIndex < newIndex) newIndex -= 1;
+
+                setState(() {
+                  final item = tasks.elementAt(oldIndex);
+                  double newPosition = item.position;
+
+                  if (newIndex < oldIndex) {
+                    if (newIndex != 0) {
+                      print(tasks.elementAt(newIndex).position.toString() + ' ' + tasks.elementAt(newIndex).title);
+                      print(tasks.elementAt(newIndex - 1).position.toString() + ' ' + tasks.elementAt(newIndex - 1).title);
+                      newPosition = (tasks.elementAt(newIndex).position + tasks.elementAt(newIndex - 1).position) / 2;
+                    } else {
+                      print(tasks.elementAt(newIndex).position.toString() + ' ' + tasks.elementAt(newIndex).title);
+                      newPosition = tasks.elementAt(newIndex).position / 2;
+                    }
+                  } else {
+                    if (newIndex != tasks.length - 1) {
+                      print(tasks.elementAt(newIndex).position.toString() + ' ' + tasks.elementAt(newIndex).title);
+                      print(tasks.elementAt(newIndex + 1).position.toString() + ' ' + tasks.elementAt(newIndex + 1).title);
+                      newPosition = (tasks.elementAt(newIndex).position + tasks.elementAt(newIndex + 1).position) / 2;
+                    } else {
+                      print(tasks.elementAt(newIndex).position.toString() + ' ' + tasks.elementAt(newIndex).title);
+                      newPosition = tasks.elementAt(newIndex).position * 2;
+                    }
+                  }
+
+                  final task = tasks.removeAt(oldIndex);
+                  tasks.insert(newIndex, task);
+                  Provider.of<TaskProvider>(context, listen: false).setAnytimeTasks(tasks);
+
+                  Provider.of<TaskProvider>(context, listen: false).updateTaskPosition(item, newPosition);
+                });
+              },
             ),
           ),
         ],
