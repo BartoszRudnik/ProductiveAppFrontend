@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/task_page/widgets/is_done_button.dart';
 import 'package:productive_app/task_page/widgets/task_tags.dart';
 import 'package:provider/provider.dart';
 
@@ -20,6 +21,10 @@ class TaskWidget extends StatefulWidget {
 }
 
 class _TaskWidgetState extends State<TaskWidget> {
+  void changeTaskStatus() {
+    Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(this.widget.task);
+  }
+
   @override
   Widget build(BuildContext context) {
     bool isArchived = (this.widget.task.localization == 'COMPLETED' || this.widget.task.localization == 'TRASH');
@@ -161,28 +166,9 @@ class _TaskWidgetState extends State<TaskWidget> {
               Row(
                 children: <Widget>[
                   if (!isArchived)
-                    RawMaterialButton(
-                      focusElevation: 0,
-                      child: this.widget.task.done
-                          ? Icon(
-                              Icons.done,
-                              color: Colors.white,
-                              size: 14,
-                            )
-                          : null,
-                      onPressed: () {
-                        Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(this.widget.task);
-                      },
-                      constraints: BoxConstraints(minWidth: 20, minHeight: 18),
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      fillColor: this.widget.task.done ? Colors.grey : Theme.of(context).accentColor,
-                      shape: CircleBorder(
-                        side: BorderSide(
-                          color: Theme.of(context).primaryColor,
-                          width: 1,
-                        ),
-                      ),
-                      padding: EdgeInsets.zero,
+                    IsDoneButton(
+                      isDone: this.widget.task.done,
+                      changeIsDoneStatus: this.changeTaskStatus,
                     ),
                   SizedBox(
                     width: 7,

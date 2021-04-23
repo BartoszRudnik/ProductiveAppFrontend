@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:productive_app/shared/dialogs.dart';
 import 'package:productive_app/task_page/models/task.dart';
 import 'package:productive_app/task_page/providers/task_provider.dart';
+import 'package:productive_app/task_page/utils/date_time_pickers.dart';
 import 'package:productive_app/task_page/widgets/task_appBar.dart';
 import 'package:provider/provider.dart';
 
@@ -58,39 +59,12 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     });
   }
 
-  Future<DateTime> pickDate(DateTime initDate) async {
-    final DateTime pick = await showDatePicker(
-      context: context,
-      initialDate: initDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(3000),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: Colors.grey,
-              onPrimary: Colors.white,
-              onSurface: Colors.black,
-            ),
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                primary: Colors.black,
-              ),
-            ),
-          ),
-          child: child,
-        );
-      },
-    );
-    return pick;
-  }
-
   Future<void> selectStartDate() async {
     DateTime initDate = taskToEdit.startDate;
     if (taskToEdit.startDate == null) {
       initDate = DateTime.now();
     }
-    final DateTime pick = await pickDate(initDate);
+    final DateTime pick = await DateTimePickers.pickDate(initDate, context);
     setState(() {
       taskToEdit.startDate = pick;
     });
@@ -101,7 +75,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     if (taskToEdit.endDate == null) {
       initDate = DateTime.now();
     }
-    final DateTime pick = await pickDate(initDate);
+    final DateTime pick = await DateTimePickers.pickDate(initDate, context);
     setState(() {
       taskToEdit.endDate = pick;
     });
