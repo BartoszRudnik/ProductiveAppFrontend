@@ -189,6 +189,7 @@ class _NewTaskState extends State<NewTask> {
               key: this._formKey,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   ListTile(
                     isThreeLine: true,
@@ -282,383 +283,387 @@ class _NewTaskState extends State<NewTask> {
                       ),
                     ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  Column(
                     children: [
-                      PopupMenuButton(
-                        initialValue: this._priority,
-                        onSelected: (value) {
-                          setState(() {
-                            this._priority = value;
-                          });
-                        },
-                        icon: Icon(Icons.flag_outlined),
-                        itemBuilder: (context) {
-                          print('flag');
-                          return priorities.reversed.map((e) {
-                            return PopupMenuItem(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                children: <Widget>[
-                                  Text(e),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  if (e == 'LOW') Icon(Icons.arrow_downward_outlined),
-                                  if (e == 'HIGH') Icon(Icons.arrow_upward_outlined),
-                                  if (e == 'HIGHER') Icon(Icons.arrow_upward_outlined),
-                                  if (e == 'HIGHER') Icon(Icons.arrow_upward_outlined),
-                                  if (e == 'CRITICAL') Icon(Icons.warning_amber_sharp),
-                                ],
-                              ),
-                              value: e,
-                            );
-                          }).toList();
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.calendar_today_outlined,
-                        ),
-                        onPressed: () async {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return StatefulBuilder(
-                                builder: (context, setState) {
-                                  return AlertDialog(
-                                    content: Container(
-                                      height: 230,
-                                      width: 300,
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: <Widget>[
-                                          ConstrainedBox(
-                                            constraints: BoxConstraints.tightFor(width: double.infinity, height: 70),
-                                            child: ElevatedButton(
-                                                onPressed: () async {
-                                                  DateTime initDate = this._startInitialValue;
-                                                  if (this._startInitialValue == null) {
-                                                    initDate = DateTime.now();
-                                                  }
-                                                  final DateTime pick = await this._pickDate(initDate);
-                                                  final TimeOfDay pickTime = await this._pickTime();
-                                                  setState(() {
-                                                    this._startInitialValue = pick;
-                                                    this._startInitialTime = pickTime;
-                                                  });
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  primary: Color.fromRGBO(237, 237, 240, 1),
-                                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
-                                                ),
-                                                child: Column(
-                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                  children: [
-                                                    Text(
-                                                      (this._startInitialValue.toString() == "null") ? "Start date" : "Start date: " + formatter.format(this._startInitialValue),
-                                                    ),
-                                                  ],
-                                                )),
-                                          ),
-                                          SizedBox(
-                                            height: 20,
-                                          ),
-                                          ConstrainedBox(
-                                            constraints: BoxConstraints.tightFor(width: double.infinity, height: 70),
-                                            child: ElevatedButton(
-                                                onPressed: () async {
-                                                  DateTime initDate = this._endInitialValue;
-                                                  if (this._endInitialValue == null) {
-                                                    initDate = DateTime.now();
-                                                  }
-                                                  final DateTime pick = await this._pickDate(initDate);
-                                                  final TimeOfDay pickTime = await this._pickTime();
-                                                  setState(() {
-                                                    this._endInitialValue = pick;
-                                                    this._endInitialTime = pickTime;
-                                                  });
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  primary: Color.fromRGBO(237, 237, 240, 1),
-                                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
-                                                ),
-                                                child: Column(
-                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                  children: [
-                                                    Text(
-                                                      (this._endInitialValue.toString() == "null") ? "End date" : "End date: " + formatter.format(this._endInitialValue),
-                                                    ),
-                                                  ],
-                                                )),
-                                          ),
-                                          SizedBox(
-                                            height: 20,
-                                          ),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                  primary: Theme.of(context).primaryColor,
-                                                  side: BorderSide(color: Theme.of(context).primaryColor),
-                                                ),
-                                                onPressed: () {
-                                                  this._startInitialValue = null;
-                                                  this._endInitialValue = null;
-                                                  this._startInitialTime = null;
-                                                  this._endInitialTime = null;
-                                                  Navigator.of(context).pop(false);
-                                                },
-                                                child: Text(
-                                                  'Cancel',
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Theme.of(context).accentColor,
-                                                  ),
-                                                ),
-                                              ),
-                                              ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                  primary: Theme.of(context).primaryColor,
-                                                  side: BorderSide(color: Theme.of(context).primaryColor),
-                                                ),
-                                                onPressed: () {
-                                                  setState(() {
-                                                    this._startDate = this._startInitialValue;
-                                                    this._startTime = this._startInitialTime;
-                                                    this._endDate = this._endInitialValue;
-                                                    this._endTime = this._endInitialTime;
-                                                  });
-                                                  Navigator.of(context).pop(true);
-                                                },
-                                                child: Text(
-                                                  'Save',
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Theme.of(context).accentColor,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              );
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          PopupMenuButton(
+                            initialValue: this._priority,
+                            onSelected: (value) {
+                              setState(() {
+                                this._priority = value;
+                              });
                             },
-                          );
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.tag,
-                        ),
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return StatefulBuilder(
-                                builder: (context, setState) {
-                                  return AlertDialog(
-                                    content: Container(
-                                      height: 350,
-                                      width: 300,
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: <Widget>[
-                                          ListTile(
-                                            horizontalTitleGap: 6,
-                                            title: Form(
-                                              key: this._tagKey,
-                                              child: TextFormField(
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    filteredTags = tags.where((element) => element.name.toLowerCase().contains(value.toLowerCase())).toList();
-                                                  });
-                                                },
-                                                validator: (value) {
-                                                  if (value.isEmpty) {
-                                                    return 'tag name cannot be empty';
-                                                  }
-                                                  return null;
-                                                },
-                                                onSaved: (value) {
-                                                  setState(() {
-                                                    final newTag = Tag(id: (tags.length + 1), name: value);
-                                                    final alreadyExists = tags.where((element) => element.name == newTag.name);
-                                                    if (alreadyExists.isEmpty) {
-                                                      Provider.of<TagProvider>(context, listen: false).addTag(newTag);
-                                                      tags.insert(0, newTag);
-                                                    }
-                                                  });
-                                                },
-                                                maxLines: null,
-                                                decoration: InputDecoration(
-                                                  contentPadding: EdgeInsets.all(10),
-                                                  hintText: 'Find or create new tag',
-                                                ),
-                                              ),
-                                            ),
-                                            trailing: FloatingActionButton(
-                                              mini: true,
-                                              child: Icon(
-                                                Icons.add,
-                                                color: Theme.of(context).accentColor,
-                                                size: 30,
-                                              ),
-                                              onPressed: () {
-                                                final isValid = this._tagKey.currentState.validate();
-                                                if (isValid) {
-                                                  this._tagKey.currentState.save();
-                                                  this._tagKey.currentState.reset();
-                                                  filteredTags = tags;
-                                                }
-                                              },
-                                              backgroundColor: Theme.of(context).primaryColor,
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: ListView.builder(
-                                              padding: EdgeInsets.all(10),
-                                              itemCount: filteredTags.length,
-                                              itemBuilder: (ctx, tagIndex) {
-                                                return GestureDetector(
-                                                  onTap: () => setState(() {
-                                                    filteredTags[tagIndex].isSelected = !filteredTags[tagIndex].isSelected;
-                                                    if (filteredTags[tagIndex].isSelected) {
-                                                      this._finalTags.add(filteredTags[tagIndex]);
-                                                    } else {
-                                                      this._finalTags.remove(filteredTags[tagIndex]);
-                                                    }
-                                                  }),
-                                                  child: Card(
-                                                    color: filteredTags[tagIndex].isSelected ? Theme.of(context).primaryColor : Theme.of(context).accentColor,
-                                                    child: Padding(
-                                                      padding: EdgeInsets.all(10),
-                                                      child: Text(
-                                                        filteredTags[tagIndex].name,
-                                                        style: TextStyle(
-                                                          color: filteredTags[tagIndex].isSelected ? Theme.of(context).accentColor : Theme.of(context).primaryColor,
+                            icon: Icon(Icons.flag_outlined),
+                            itemBuilder: (context) {
+                              print('flag');
+                              return priorities.reversed.map((e) {
+                                return PopupMenuItem(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: <Widget>[
+                                      Text(e),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      if (e == 'LOW') Icon(Icons.arrow_downward_outlined),
+                                      if (e == 'HIGH') Icon(Icons.arrow_upward_outlined),
+                                      if (e == 'HIGHER') Icon(Icons.arrow_upward_outlined),
+                                      if (e == 'HIGHER') Icon(Icons.arrow_upward_outlined),
+                                      if (e == 'CRITICAL') Icon(Icons.warning_amber_sharp),
+                                    ],
+                                  ),
+                                  value: e,
+                                );
+                              }).toList();
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.calendar_today_outlined,
+                            ),
+                            onPressed: () async {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return StatefulBuilder(
+                                    builder: (context, setState) {
+                                      return AlertDialog(
+                                        content: Container(
+                                          height: 230,
+                                          width: 300,
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: <Widget>[
+                                              ConstrainedBox(
+                                                constraints: BoxConstraints.tightFor(width: double.infinity, height: 70),
+                                                child: ElevatedButton(
+                                                    onPressed: () async {
+                                                      DateTime initDate = this._startInitialValue;
+                                                      if (this._startInitialValue == null) {
+                                                        initDate = DateTime.now();
+                                                      }
+                                                      final DateTime pick = await this._pickDate(initDate);
+                                                      final TimeOfDay pickTime = await this._pickTime();
+                                                      setState(() {
+                                                        this._startInitialValue = pick;
+                                                        this._startInitialTime = pickTime;
+                                                      });
+                                                    },
+                                                    style: ElevatedButton.styleFrom(
+                                                      primary: Color.fromRGBO(237, 237, 240, 1),
+                                                      onPrimary: Color.fromRGBO(119, 119, 120, 1),
+                                                    ),
+                                                    child: Column(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                        Text(
+                                                          (this._startInitialValue.toString() == "null") ? "Start date" : "Start date: " + formatter.format(this._startInitialValue),
                                                         ),
+                                                      ],
+                                                    )),
+                                              ),
+                                              SizedBox(
+                                                height: 20,
+                                              ),
+                                              ConstrainedBox(
+                                                constraints: BoxConstraints.tightFor(width: double.infinity, height: 70),
+                                                child: ElevatedButton(
+                                                    onPressed: () async {
+                                                      DateTime initDate = this._endInitialValue;
+                                                      if (this._endInitialValue == null) {
+                                                        initDate = DateTime.now();
+                                                      }
+                                                      final DateTime pick = await this._pickDate(initDate);
+                                                      final TimeOfDay pickTime = await this._pickTime();
+                                                      setState(() {
+                                                        this._endInitialValue = pick;
+                                                        this._endInitialTime = pickTime;
+                                                      });
+                                                    },
+                                                    style: ElevatedButton.styleFrom(
+                                                      primary: Color.fromRGBO(237, 237, 240, 1),
+                                                      onPrimary: Color.fromRGBO(119, 119, 120, 1),
+                                                    ),
+                                                    child: Column(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                        Text(
+                                                          (this._endInitialValue.toString() == "null") ? "End date" : "End date: " + formatter.format(this._endInitialValue),
+                                                        ),
+                                                      ],
+                                                    )),
+                                              ),
+                                              SizedBox(
+                                                height: 20,
+                                              ),
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  ElevatedButton(
+                                                    style: ElevatedButton.styleFrom(
+                                                      primary: Theme.of(context).primaryColor,
+                                                      side: BorderSide(color: Theme.of(context).primaryColor),
+                                                    ),
+                                                    onPressed: () {
+                                                      this._startInitialValue = null;
+                                                      this._endInitialValue = null;
+                                                      this._startInitialTime = null;
+                                                      this._endInitialTime = null;
+                                                      Navigator.of(context).pop(false);
+                                                    },
+                                                    child: Text(
+                                                      'Cancel',
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Theme.of(context).accentColor,
                                                       ),
                                                     ),
                                                   ),
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                  primary: Theme.of(context).primaryColor,
-                                                  side: BorderSide(color: Theme.of(context).primaryColor),
-                                                ),
-                                                onPressed: () {
-                                                  Navigator.of(context).pop(false);
-                                                },
-                                                child: Text(
-                                                  'Cancel',
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Theme.of(context).accentColor,
+                                                  ElevatedButton(
+                                                    style: ElevatedButton.styleFrom(
+                                                      primary: Theme.of(context).primaryColor,
+                                                      side: BorderSide(color: Theme.of(context).primaryColor),
+                                                    ),
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        this._startDate = this._startInitialValue;
+                                                        this._startTime = this._startInitialTime;
+                                                        this._endDate = this._endInitialValue;
+                                                        this._endTime = this._endInitialTime;
+                                                      });
+                                                      Navigator.of(context).pop(true);
+                                                    },
+                                                    child: Text(
+                                                      'Save',
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Theme.of(context).accentColor,
+                                                      ),
+                                                    ),
                                                   ),
-                                                ),
-                                              ),
-                                              ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                  primary: Theme.of(context).primaryColor,
-                                                  side: BorderSide(color: Theme.of(context).primaryColor),
-                                                ),
-                                                onPressed: () {
-                                                  Navigator.of(context).pop(true);
-                                                },
-                                                child: Text(
-                                                  'Add tag/tags',
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Theme.of(context).accentColor,
-                                                  ),
-                                                ),
+                                                ],
                                               ),
                                             ],
                                           ),
-                                        ],
-                                      ),
-                                    ),
+                                        ),
+                                      );
+                                    },
                                   );
                                 },
                               );
                             },
-                          );
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.save),
-                        onPressed: () {},
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.person_add_alt_1_outlined,
-                        ),
-                        onPressed: () {},
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.attach_file_outlined),
-                        onPressed: () {},
-                      ),
-                    ],
-                  ),
-                  Divider(
-                    thickness: 1.5,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      PopupMenuButton(
-                        child: Row(
-                          children: [
-                            Icon(Icons.all_inbox),
-                            Text(this._localization),
-                          ],
-                        ),
-                        initialValue: this._localization,
-                        onSelected: (value) {
-                          setState(() {
-                            this._localization = value;
-                          });
-                        },
-                        itemBuilder: (context) {
-                          return localizations.map((e) {
-                            return PopupMenuItem(
-                              child: Text(e),
-                              value: e,
-                            );
-                          }).toList();
-                        },
-                      ),
-                      ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          onPrimary: Theme.of(context).primaryColor,
-                          primary: Theme.of(context).accentColor,
-                          elevation: 0,
-                        ),
-                        onPressed: () {
-                          this._addNewTask();
-                        },
-                        icon: Icon(Icons.subdirectory_arrow_left_outlined),
-                        label: Text(
-                          'Save',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w400,
                           ),
-                        ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.tag,
+                            ),
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return StatefulBuilder(
+                                    builder: (context, setState) {
+                                      return AlertDialog(
+                                        content: Container(
+                                          height: 350,
+                                          width: 300,
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: <Widget>[
+                                              ListTile(
+                                                horizontalTitleGap: 6,
+                                                title: Form(
+                                                  key: this._tagKey,
+                                                  child: TextFormField(
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        filteredTags = tags.where((element) => element.name.toLowerCase().contains(value.toLowerCase())).toList();
+                                                      });
+                                                    },
+                                                    validator: (value) {
+                                                      if (value.isEmpty) {
+                                                        return 'tag name cannot be empty';
+                                                      }
+                                                      return null;
+                                                    },
+                                                    onSaved: (value) {
+                                                      setState(() {
+                                                        final newTag = Tag(id: (tags.length + 1), name: value);
+                                                        final alreadyExists = tags.where((element) => element.name == newTag.name);
+                                                        if (alreadyExists.isEmpty) {
+                                                          Provider.of<TagProvider>(context, listen: false).addTag(newTag);
+                                                          tags.insert(0, newTag);
+                                                        }
+                                                      });
+                                                    },
+                                                    maxLines: null,
+                                                    decoration: InputDecoration(
+                                                      contentPadding: EdgeInsets.all(10),
+                                                      hintText: 'Find or create new tag',
+                                                    ),
+                                                  ),
+                                                ),
+                                                trailing: FloatingActionButton(
+                                                  mini: true,
+                                                  child: Icon(
+                                                    Icons.add,
+                                                    color: Theme.of(context).accentColor,
+                                                    size: 30,
+                                                  ),
+                                                  onPressed: () {
+                                                    final isValid = this._tagKey.currentState.validate();
+                                                    if (isValid) {
+                                                      this._tagKey.currentState.save();
+                                                      this._tagKey.currentState.reset();
+                                                      filteredTags = tags;
+                                                    }
+                                                  },
+                                                  backgroundColor: Theme.of(context).primaryColor,
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: ListView.builder(
+                                                  padding: EdgeInsets.all(10),
+                                                  itemCount: filteredTags.length,
+                                                  itemBuilder: (ctx, tagIndex) {
+                                                    return GestureDetector(
+                                                      onTap: () => setState(() {
+                                                        filteredTags[tagIndex].isSelected = !filteredTags[tagIndex].isSelected;
+                                                        if (filteredTags[tagIndex].isSelected) {
+                                                          this._finalTags.add(filteredTags[tagIndex]);
+                                                        } else {
+                                                          this._finalTags.remove(filteredTags[tagIndex]);
+                                                        }
+                                                      }),
+                                                      child: Card(
+                                                        color: filteredTags[tagIndex].isSelected ? Theme.of(context).primaryColor : Theme.of(context).accentColor,
+                                                        child: Padding(
+                                                          padding: EdgeInsets.all(10),
+                                                          child: Text(
+                                                            filteredTags[tagIndex].name,
+                                                            style: TextStyle(
+                                                              color: filteredTags[tagIndex].isSelected ? Theme.of(context).accentColor : Theme.of(context).primaryColor,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                children: [
+                                                  ElevatedButton(
+                                                    style: ElevatedButton.styleFrom(
+                                                      primary: Theme.of(context).primaryColor,
+                                                      side: BorderSide(color: Theme.of(context).primaryColor),
+                                                    ),
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop(false);
+                                                    },
+                                                    child: Text(
+                                                      'Cancel',
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Theme.of(context).accentColor,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  ElevatedButton(
+                                                    style: ElevatedButton.styleFrom(
+                                                      primary: Theme.of(context).primaryColor,
+                                                      side: BorderSide(color: Theme.of(context).primaryColor),
+                                                    ),
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop(true);
+                                                    },
+                                                    child: Text(
+                                                      'Add tag/tags',
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Theme.of(context).accentColor,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.save),
+                            onPressed: () {},
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.person_add_alt_1_outlined,
+                            ),
+                            onPressed: () {},
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.attach_file_outlined),
+                            onPressed: () {},
+                          ),
+                        ],
+                      ),
+                      Divider(
+                        thickness: 1.5,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          PopupMenuButton(
+                            child: Row(
+                              children: [
+                                Icon(Icons.all_inbox),
+                                Text(this._localization),
+                              ],
+                            ),
+                            initialValue: this._localization,
+                            onSelected: (value) {
+                              setState(() {
+                                this._localization = value;
+                              });
+                            },
+                            itemBuilder: (context) {
+                              return localizations.map((e) {
+                                return PopupMenuItem(
+                                  child: Text(e),
+                                  value: e,
+                                );
+                              }).toList();
+                            },
+                          ),
+                          ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              onPrimary: Theme.of(context).primaryColor,
+                              primary: Theme.of(context).accentColor,
+                              elevation: 0,
+                            ),
+                            onPressed: () {
+                              this._addNewTask();
+                            },
+                            icon: Icon(Icons.subdirectory_arrow_left_outlined),
+                            label: Text(
+                              'Save',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
