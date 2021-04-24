@@ -28,7 +28,7 @@ class TrashScreen extends StatelessWidget {
                   value: trashTasks[index],
                   child: TaskWidget(
                     task: trashTasks[index],
-                    taskKey: ValueKey(trashTasks[index].id),
+                    key: UniqueKey(),
                   ),
                 ),
               ),

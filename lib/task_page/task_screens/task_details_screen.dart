@@ -3,7 +3,10 @@ import 'package:intl/intl.dart';
 import 'package:productive_app/shared/dialogs.dart';
 import 'package:productive_app/task_page/models/task.dart';
 import 'package:productive_app/task_page/providers/task_provider.dart';
+import 'package:productive_app/task_page/widgets/tags_dialog.dart';
+import 'package:productive_app/task_page/utils/date_time_pickers.dart';
 import 'package:productive_app/task_page/widgets/task_appBar.dart';
+import 'package:productive_app/task_page/widgets/task_tags_edit.dart';
 import 'package:provider/provider.dart';
 
 class TaskDetailScreen extends StatefulWidget {
@@ -58,39 +61,12 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     });
   }
 
-  Future<DateTime> pickDate(DateTime initDate) async {
-    final DateTime pick = await showDatePicker(
-      context: context,
-      initialDate: initDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(3000),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: Colors.grey,
-              onPrimary: Colors.white,
-              onSurface: Colors.black,
-            ),
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                primary: Colors.black,
-              ),
-            ),
-          ),
-          child: child,
-        );
-      },
-    );
-    return pick;
-  }
-
   Future<void> selectStartDate() async {
     DateTime initDate = taskToEdit.startDate;
     if (taskToEdit.startDate == null) {
       initDate = DateTime.now();
     }
-    final DateTime pick = await pickDate(initDate);
+    final DateTime pick = await DateTimePickers.pickDate(initDate, context);
     setState(() {
       taskToEdit.startDate = pick;
     });
@@ -101,7 +77,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     if (taskToEdit.endDate == null) {
       initDate = DateTime.now();
     }
-    final DateTime pick = await pickDate(initDate);
+    final DateTime pick = await DateTimePickers.pickDate(initDate, context);
     setState(() {
       taskToEdit.endDate = pick;
     });
@@ -109,11 +85,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
   Future<void> saveTask() async {
     var isValid = this._formKey.currentState.validate();
-
-    if (taskToEdit.endDate == null && taskToEdit.localization != "INBOX") {
-      isValid = false;
-      Dialogs.showWarningDialog(context, "Task end date must be specified");
-    }
 
     if (taskToEdit.startDate == null && taskToEdit.localization == "SCHEDULED") {
       isValid = false;
@@ -145,7 +116,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
     this._formKey.currentState.save();
     try {
-      await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, taskToEdit.localization);
+      final newLocalization = taskToEdit.localization;
+      taskToEdit.localization = originalTask.localization;
+      await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, newLocalization);
       Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);
     } catch (error) {
       Dialogs.showWarningDialog(context, "An error has occured");
@@ -173,6 +146,20 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     }
   }
 
+  Future<void> editTags(BuildContext context) async{
+    final newTags = await showDialog(
+      context: context, 
+      builder: (context){
+        return TagsDialog(UniqueKey(), taskToEdit.tags); 
+      }  
+    );
+    if(newTags != null){
+      setState(() {
+        taskToEdit.tags = newTags;
+      });
+    }
+  }
+
   void setTaskToEdit(Task argTask) {
     taskToEdit = new Task(
       id: argTask.id,
@@ -184,6 +171,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       localization: argTask.localization,
       priority: argTask.priority,
       tags: argTask.tags,
+      position: argTask.position,
     );
   }
 
@@ -423,6 +411,12 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                       ),
                     ),
                   ),
+                  TextButton(
+                    onPressed: () => editTags(context), 
+                    child: TaskTagsEdit(
+                          tags: taskToEdit.tags,
+                        ),
+                    )
                 ],
               ),
             ),
@@ -465,7 +459,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                       onPrimary: Colors.black,
                     ),
                     icon: Icon(Icons.save),
-                    label: Text("Save task"),
+                    label: Text("Save"),
                   )),
             ],
           ),

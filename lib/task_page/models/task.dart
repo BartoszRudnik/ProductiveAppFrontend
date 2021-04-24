@@ -3,6 +3,7 @@ import 'package:productive_app/task_page/models/tag.dart';
 
 class Task with ChangeNotifier {
   int id;
+  double position;
   String title;
   String description;
   String priority;
@@ -22,5 +23,6 @@ class Task with ChangeNotifier {
     this.tags,
     this.done,
     this.localization,
+    this.position,
   });
 }
