@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:productive_app/shared/dialogs.dart';
+import 'package:productive_app/task_page/widgets/is_done_button.dart';
 import 'package:productive_app/task_page/widgets/task_tags.dart';
 import 'package:provider/provider.dart';
 
@@ -9,18 +9,22 @@ import '../task_screens/task_details_screen.dart';
 
 class TaskWidget extends StatefulWidget {
   final task;
-  final taskKey;
+  final key;
 
   TaskWidget({
     @required this.task,
-    @required this.taskKey,
-  });
+    @required this.key,
+  }) : super(key: key);
 
   @override
   _TaskWidgetState createState() => _TaskWidgetState();
 }
 
 class _TaskWidgetState extends State<TaskWidget> {
+  void changeTaskStatus() {
+    Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(this.widget.task);
+  }
+
   @override
   Widget build(BuildContext context) {
     bool isArchived = (this.widget.task.localization == 'COMPLETED' || this.widget.task.localization == 'TRASH');
@@ -35,7 +39,7 @@ class _TaskWidgetState extends State<TaskWidget> {
           Navigator.of(context).pushNamed(TaskDetailScreen.routeName, arguments: this.widget.task);
         },
         child: Dismissible(
-          key: this.widget.taskKey,
+          key: this.widget.key,
           background: Container(
             padding: EdgeInsets.symmetric(horizontal: 10),
             alignment: Alignment.centerLeft,
@@ -43,7 +47,7 @@ class _TaskWidgetState extends State<TaskWidget> {
             child: Row(
               children: [
                 Icon(
-                  Icons.restore_from_trash_outlined,
+                  isArchived ? Icons.restore_from_trash_outlined : Icons.navigate_next_outlined,
                   color: Theme.of(context).accentColor,
                   size: 50,
                 ),
@@ -149,14 +153,11 @@ class _TaskWidgetState extends State<TaskWidget> {
             if (direction == DismissDirection.startToEnd) {
               String newLocation = 'INBOX';
 
-              if (this.widget.task.startDate != null && this.widget.task.endDate != null) {
+              if (this.widget.task.startDate != null) {
                 newLocation = 'SCHEDULED';
-              } else if (this.widget.task.endDate != null) {
+              } else {
                 newLocation = 'ANYTIME';
-              } else if (this.widget.task.endDate == null && this.widget.task.startDate == null && !isArchived) {
-                Dialogs.showWarningDialog(context, 'To organize task needs at least end date');
               }
-
               Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
             }
           },
@@ -165,28 +166,9 @@ class _TaskWidgetState extends State<TaskWidget> {
               Row(
                 children: <Widget>[
                   if (!isArchived)
-                    RawMaterialButton(
-                      focusElevation: 0,
-                      child: this.widget.task.done
-                          ? Icon(
-                              Icons.done,
-                              color: Colors.white,
-                              size: 14,
-                            )
-                          : null,
-                      onPressed: () {
-                        Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(this.widget.task);
-                      },
-                      constraints: BoxConstraints(minWidth: 20, minHeight: 18),
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      fillColor: this.widget.task.done ? Colors.grey : Theme.of(context).accentColor,
-                      shape: CircleBorder(
-                        side: BorderSide(
-                          color: Theme.of(context).primaryColor,
-                          width: 1,
-                        ),
-                      ),
-                      padding: EdgeInsets.zero,
+                    IsDoneButton(
+                      isDone: this.widget.task.done,
+                      changeIsDoneStatus: this.changeTaskStatus,
                     ),
                   SizedBox(
                     width: 7,

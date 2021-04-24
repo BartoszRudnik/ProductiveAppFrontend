@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/task_page/models/tag.dart';
-import 'package:productive_app/task_page/models/task.dart';
 import 'package:productive_app/task_page/providers/tag_provider.dart';
 import 'package:productive_app/task_page/providers/task_provider.dart';
 import 'package:productive_app/task_page/widgets/new_tag.dart';
