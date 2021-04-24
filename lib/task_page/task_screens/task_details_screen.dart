@@ -3,7 +3,10 @@ import 'package:intl/intl.dart';
 import 'package:productive_app/shared/dialogs.dart';
 import 'package:productive_app/task_page/models/task.dart';
 import 'package:productive_app/task_page/providers/task_provider.dart';
+import 'package:productive_app/task_page/widgets/tags_dialog.dart';
 import 'package:productive_app/task_page/widgets/task_appBar.dart';
+import 'package:productive_app/task_page/widgets/task_tags.dart';
+import 'package:productive_app/task_page/widgets/task_tags_edit.dart';
 import 'package:provider/provider.dart';
 
 class TaskDetailScreen extends StatefulWidget {
@@ -170,6 +173,20 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
         Dialogs.showWarningDialog(context, "An error has occured");
       }
       Navigator.pop(context);
+    }
+  }
+
+  Future<void> editTags(BuildContext context) async{
+    final newTags = await showDialog(
+      context: context, 
+      builder: (context){
+        return TagsDialog(UniqueKey(), taskToEdit.tags); 
+      }  
+    );
+    if(newTags != null){
+      setState(() {
+        taskToEdit.tags = newTags;
+      });
     }
   }
 
@@ -423,6 +440,12 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                       ),
                     ),
                   ),
+                  TextButton(
+                    onPressed: () => editTags(context), 
+                    child: TaskTagsEdit(
+                          tags: taskToEdit.tags,
+                        ),
+                    )
                 ],
               ),
             ),
@@ -465,7 +488,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                       onPrimary: Colors.black,
                     ),
                     icon: Icon(Icons.save),
-                    label: Text("Save task"),
+                    label: Text("Save"),
                   )),
             ],
           ),
