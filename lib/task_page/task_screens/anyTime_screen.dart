@@ -54,20 +54,14 @@ class _AnytimeScreenState extends State<AnytimeScreen> {
 
                   if (newIndex < oldIndex) {
                     if (newIndex != 0) {
-                      print(tasks.elementAt(newIndex).position.toString() + ' ' + tasks.elementAt(newIndex).title);
-                      print(tasks.elementAt(newIndex - 1).position.toString() + ' ' + tasks.elementAt(newIndex - 1).title);
                       newPosition = (tasks.elementAt(newIndex).position + tasks.elementAt(newIndex - 1).position) / 2;
                     } else {
-                      print(tasks.elementAt(newIndex).position.toString() + ' ' + tasks.elementAt(newIndex).title);
                       newPosition = tasks.elementAt(newIndex).position / 2;
                     }
                   } else {
                     if (newIndex != tasks.length - 1) {
-                      print(tasks.elementAt(newIndex).position.toString() + ' ' + tasks.elementAt(newIndex).title);
-                      print(tasks.elementAt(newIndex + 1).position.toString() + ' ' + tasks.elementAt(newIndex + 1).title);
                       newPosition = (tasks.elementAt(newIndex).position + tasks.elementAt(newIndex + 1).position) / 2;
                     } else {
-                      print(tasks.elementAt(newIndex).position.toString() + ' ' + tasks.elementAt(newIndex).title);
                       newPosition = tasks.elementAt(newIndex).position * 2;
                     }
                   }

@@ -151,13 +151,18 @@ class _TaskWidgetState extends State<TaskWidget> {
               );
             }
             if (direction == DismissDirection.startToEnd) {
-              String newLocation = 'INBOX';
+              String newLocation;
 
-              if (this.widget.task.startDate != null) {
-                newLocation = 'SCHEDULED';
+              if (this.widget.task.delegatedEmail == null) {
+                if (this.widget.task.startDate != null) {
+                  newLocation = 'SCHEDULED';
+                } else {
+                  newLocation = 'ANYTIME';
+                }
               } else {
-                newLocation = 'ANYTIME';
+                newLocation = 'DELEGATED';
               }
+
               Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
             }
           },

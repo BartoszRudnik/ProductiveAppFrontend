@@ -12,6 +12,7 @@ class TaskProvider with ChangeNotifier {
   List<Task> _inboxTasks = [];
   List<Task> _anytimeTasks = [];
   List<Task> _scheduledTasks = [];
+  List<Task> _delegatedTasks = [];
   List<Task> taskList = [];
 
   List<String> taskPriorities = [];
@@ -27,14 +28,6 @@ class TaskProvider with ChangeNotifier {
     this.divideTasks();
   }
 
-  List<Task> get tasks {
-    return [...this.taskList];
-  }
-
-  List<Task> get inboxTasks {
-    return [...this._inboxTasks];
-  }
-
   void setInboxTasks(List<Task> newList) {
     this._inboxTasks = newList;
   }
@@ -45,6 +38,18 @@ class TaskProvider with ChangeNotifier {
 
   void setScheduledTasks(List<Task> newList) {
     this._scheduledTasks = newList;
+  }
+
+  void setDelegatedTasks(List<Task> newList) {
+    this._delegatedTasks = newList;
+  }
+
+  List<Task> get tasks {
+    return [...this.taskList];
+  }
+
+  List<Task> get inboxTasks {
+    return [...this._inboxTasks];
   }
 
   List<Task> get anytimeTasks {
@@ -61,6 +66,10 @@ class TaskProvider with ChangeNotifier {
 
   List<Task> get trashTasks {
     return [...this._trashTasks];
+  }
+
+  List<Task> get delegatedTasks {
+    return [...this._delegatedTasks];
   }
 
   List<String> get priorities {
@@ -221,6 +230,8 @@ class TaskProvider with ChangeNotifier {
         this.sortByPosition(this._anytimeTasks);
       } else if (task.localization == 'SCHEDULED') {
         this.sortByPosition(this._scheduledTasks);
+      } else if (task.localization == 'DELEGATED') {
+        this.sortByPosition(this._delegatedTasks);
       }
 
       notifyListeners();
@@ -279,6 +290,7 @@ class TaskProvider with ChangeNotifier {
       this.sortByPosition(this._anytimeTasks);
       this.sortByPosition(this._scheduledTasks);
       this.sortByPosition(this._inboxTasks);
+      this.sortByPosition(this._delegatedTasks);
 
       notifyListeners();
     } catch (error) {
@@ -355,6 +367,9 @@ class TaskProvider with ChangeNotifier {
     } else if (task.localization == 'SCHEDULED') {
       Task tmp = this._scheduledTasks.firstWhere((element) => element.id == task.id);
       tmp.done = !tmp.done;
+    } else if (task.localization == 'DELEGATED') {
+      Task tmp = this._delegatedTasks.firstWhere((element) => element.id == task.id);
+      tmp.done = !tmp.done;
     }
   }
 
@@ -369,6 +384,8 @@ class TaskProvider with ChangeNotifier {
       this._completedTasks.add(task);
     } else if (task.localization == 'TRASH') {
       this._trashTasks.add(task);
+    } else if (task.localization == 'DELEGATED') {
+      this._delegatedTasks.add(task);
     }
   }
 
@@ -383,6 +400,8 @@ class TaskProvider with ChangeNotifier {
       this._completedTasks.remove(task);
     } else if (task.localization == 'TRASH') {
       this._trashTasks.remove(task);
+    } else if (task.localization == 'DELEGATED') {
+      this._delegatedTasks.remove(task);
     }
   }
 
@@ -392,18 +411,21 @@ class TaskProvider with ChangeNotifier {
     this._scheduledTasks = [];
     this._completedTasks = [];
     this._trashTasks = [];
+    this._delegatedTasks = [];
 
-    this.taskList.forEach((element) {
-      if (element.localization == 'INBOX') {
-        this._inboxTasks.add(element);
-      } else if (element.localization == 'ANYTIME') {
-        this._anytimeTasks.add(element);
-      } else if (element.localization == 'SCHEDULED') {
-        this._scheduledTasks.add(element);
-      } else if (element.localization == 'COMPLETED') {
-        this._completedTasks.add(element);
-      } else if (element.localization == 'TRASH') {
-        this._trashTasks.add(element);
+    this.taskList.forEach((task) {
+      if (task.localization == 'INBOX') {
+        this._inboxTasks.add(task);
+      } else if (task.localization == 'ANYTIME') {
+        this._anytimeTasks.add(task);
+      } else if (task.localization == 'SCHEDULED') {
+        this._scheduledTasks.add(task);
+      } else if (task.localization == 'COMPLETED') {
+        this._completedTasks.add(task);
+      } else if (task.localization == 'TRASH') {
+        this._trashTasks.add(task);
+      } else if (task.localization == 'DELEGATED') {
+        this._delegatedTasks.add(task);
       }
     });
   }
@@ -416,6 +438,15 @@ class TaskProvider with ChangeNotifier {
       task.tags.removeWhere((tag) => tag.name == tagName);
     });
     this._scheduledTasks.forEach((task) {
+      task.tags.removeWhere((tag) => tag.name == tagName);
+    });
+    this._completedTasks.forEach((task) {
+      task.tags.removeWhere((tag) => tag.name == tagName);
+    });
+    this._trashTasks.forEach((task) {
+      task.tags.removeWhere((tag) => tag.name == tagName);
+    });
+    this._delegatedTasks.forEach((task) {
       task.tags.removeWhere((tag) => tag.name == tagName);
     });
 

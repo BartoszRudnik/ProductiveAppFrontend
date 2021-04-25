@@ -35,7 +35,7 @@ class _NewTaskState extends State<NewTask> {
 
   List<Tag> _finalTags = [];
 
-  String _delegatedEmail = '';
+  String _delegatedEmail;
   String _localization;
   String _priority = 'NORMAL';
   String _taskName = '';
@@ -136,9 +136,8 @@ class _NewTaskState extends State<NewTask> {
       description: this._taskDescription,
       localization: this._localization,
       position: null,
+      delegatedEmail: this._delegatedEmail,
     );
-
-    print(this._delegatedEmail);
 
     try {
       await Provider.of<TaskProvider>(context, listen: false).addTask(newTask);

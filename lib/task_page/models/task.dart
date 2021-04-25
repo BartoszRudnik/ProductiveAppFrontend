@@ -8,6 +8,7 @@ class Task with ChangeNotifier {
   String description;
   String priority;
   String localization;
+  String delegatedEmail;
   DateTime startDate;
   DateTime endDate;
   List<Tag> tags = [];
@@ -24,5 +25,6 @@ class Task with ChangeNotifier {
     this.done,
     this.localization,
     this.position,
+    this.delegatedEmail,
   });
 }

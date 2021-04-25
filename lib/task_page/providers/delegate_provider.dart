@@ -32,7 +32,7 @@ class DelegateProvider with ChangeNotifier {
   }
 
   Future<void> getCollaborators() async {
-    final requestUrl = this._serverUrl + 'delegate/getCollaborators';
+    final requestUrl = this._serverUrl + 'delegate/getCollaborators/${this.userEmail}';
 
     List<Collaborator> loadedCollaborators;
 
@@ -42,7 +42,8 @@ class DelegateProvider with ChangeNotifier {
       final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
       for (var element in responseBody) {
-        loadedCollaborators.add(element);
+        Collaborator newCollaborator = Collaborator(email: element, isSelected: false);
+        loadedCollaborators.add(newCollaborator);
       }
 
       this.collaborators = loadedCollaborators;
@@ -53,7 +54,30 @@ class DelegateProvider with ChangeNotifier {
     }
   }
 
-  Future<void> addCollaborator(String collaboratorEmail) async {
-    final requestUrl = this._serverUrl + '/delegate/addCollaborator';
+  Future<void> addCollaborator(String newCollaborator) async {
+    final requestUrl = this._serverUrl + '/delegate/addCollaborator/${this.userEmail}';
+
+    try {
+      await http.post(
+        requestUrl,
+        body: json.encode(
+          {
+            'collaboratorEmail': newCollaborator,
+          },
+        ),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      this.collaborators.insert(
+            0,
+            Collaborator(email: newCollaborator, isSelected: false),
+          );
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
   }
 }

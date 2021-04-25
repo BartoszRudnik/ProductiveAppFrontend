@@ -74,20 +74,14 @@ class _ScheduledScreenState extends State<ScheduledScreen> {
 
                       if (newIndex < oldIndex) {
                         if (newIndex != 0) {
-                          print(before.elementAt(newIndex).position.toString() + ' ' + before.elementAt(newIndex).title);
-                          print(before.elementAt(newIndex - 1).position.toString() + ' ' + before.elementAt(newIndex - 1).title);
                           newPosition = (before.elementAt(newIndex).position + before.elementAt(newIndex - 1).position) / 2;
                         } else {
-                          print(before.elementAt(newIndex).position.toString() + ' ' + before.elementAt(newIndex).title);
                           newPosition = before.elementAt(newIndex).position / 2;
                         }
                       } else {
                         if (newIndex != before.length - 1) {
-                          print(before.elementAt(newIndex).position.toString() + ' ' + before.elementAt(newIndex).title);
-                          print(before.elementAt(newIndex + 1).position.toString() + ' ' + before.elementAt(newIndex + 1).title);
                           newPosition = (before.elementAt(newIndex).position + before.elementAt(newIndex + 1).position) / 2;
                         } else {
-                          print(before.elementAt(newIndex).position.toString() + ' ' + before.elementAt(newIndex).title);
                           newPosition = before.elementAt(newIndex).position * 2;
                         }
                       }
@@ -143,20 +137,14 @@ class _ScheduledScreenState extends State<ScheduledScreen> {
 
                       if (newIndex < oldIndex) {
                         if (newIndex != 0) {
-                          print(today.elementAt(newIndex).position.toString() + ' ' + today.elementAt(newIndex).title);
-                          print(today.elementAt(newIndex - 1).position.toString() + ' ' + today.elementAt(newIndex - 1).title);
                           newPosition = (today.elementAt(newIndex).position + today.elementAt(newIndex - 1).position) / 2;
                         } else {
-                          print(today.elementAt(newIndex).position.toString() + ' ' + today.elementAt(newIndex).title);
                           newPosition = today.elementAt(newIndex).position / 2;
                         }
                       } else {
                         if (newIndex != today.length - 1) {
-                          print(today.elementAt(newIndex).position.toString() + ' ' + today.elementAt(newIndex).title);
-                          print(today.elementAt(newIndex + 1).position.toString() + ' ' + today.elementAt(newIndex + 1).title);
                           newPosition = (today.elementAt(newIndex).position + today.elementAt(newIndex + 1).position) / 2;
                         } else {
-                          print(today.elementAt(newIndex).position.toString() + ' ' + today.elementAt(newIndex).title);
                           newPosition = today.elementAt(newIndex).position * 2;
                         }
                       }
@@ -212,20 +200,14 @@ class _ScheduledScreenState extends State<ScheduledScreen> {
 
                       if (newIndex < oldIndex) {
                         if (newIndex != 0) {
-                          print(after.elementAt(newIndex).position.toString() + ' ' + after.elementAt(newIndex).title);
-                          print(after.elementAt(newIndex - 1).position.toString() + ' ' + after.elementAt(newIndex - 1).title);
                           newPosition = (after.elementAt(newIndex).position + after.elementAt(newIndex - 1).position) / 2;
                         } else {
-                          print(after.elementAt(newIndex).position.toString() + ' ' + after.elementAt(newIndex).title);
                           newPosition = after.elementAt(newIndex).position / 2;
                         }
                       } else {
                         if (newIndex != after.length - 1) {
-                          print(after.elementAt(newIndex).position.toString() + ' ' + after.elementAt(newIndex).title);
-                          print(after.elementAt(newIndex + 1).position.toString() + ' ' + after.elementAt(newIndex + 1).title);
                           newPosition = (after.elementAt(newIndex).position + after.elementAt(newIndex + 1).position) / 2;
                         } else {
-                          print(after.elementAt(newIndex).position.toString() + ' ' + after.elementAt(newIndex).title);
                           newPosition = after.elementAt(newIndex).position * 2;
                         }
                       }
