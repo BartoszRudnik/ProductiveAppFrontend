@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/task_page/widgets/tags_dialog.dart';
-import 'package:provider/provider.dart';
 
 import '../models/tag.dart';
-import '../providers/tag_provider.dart';
+import 'tags_dialog.dart';
 
 class NewTaskTags extends StatefulWidget {
   Function setTags;
@@ -29,13 +27,12 @@ class _NewTaskTagsState extends State<NewTaskTags> {
       icon: Icon(
         Icons.tag,
       ),
-      onPressed: () async{
+      onPressed: () async {
         finalTags = await showDialog(
-          context: context,
-          builder: (context){
-            return TagsDialog(UniqueKey(), []); 
-          } 
-        );
+            context: context,
+            builder: (context) {
+              return TagsDialog(UniqueKey(), []);
+            });
         this.widget.setTags(finalTags);
       },
     );

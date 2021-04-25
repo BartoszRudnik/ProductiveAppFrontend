@@ -3,9 +3,11 @@ import 'package:intl/intl.dart';
 import 'package:productive_app/shared/dialogs.dart';
 import 'package:productive_app/task_page/models/task.dart';
 import 'package:productive_app/task_page/providers/task_provider.dart';
+import 'package:productive_app/task_page/widgets/delegate_dialog.dart';
 import 'package:productive_app/task_page/widgets/tags_dialog.dart';
 import 'package:productive_app/task_page/utils/date_time_pickers.dart';
 import 'package:productive_app/task_page/widgets/task_appBar.dart';
+import 'package:productive_app/task_page/widgets/task_delegate.dart';
 import 'package:productive_app/task_page/widgets/task_tags_edit.dart';
 import 'package:provider/provider.dart';
 
@@ -146,18 +148,28 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     }
   }
 
-  Future<void> editTags(BuildContext context) async{
+  Future<void> editTags(BuildContext context) async {
     final newTags = await showDialog(
-      context: context, 
-      builder: (context){
-        return TagsDialog(UniqueKey(), taskToEdit.tags); 
-      }  
-    );
-    if(newTags != null){
+        context: context,
+        builder: (context) {
+          return TagsDialog(UniqueKey(), taskToEdit.tags);
+        });
+    if (newTags != null) {
       setState(() {
         taskToEdit.tags = newTags;
       });
     }
+  }
+
+  void setDelegatedEmail() async {
+    String value = await showDialog(
+      context: context,
+      builder: (context) {
+        return DelegateDialog();
+      },
+    );
+    print(value);
+    //taskToEdit.delegated = value;
   }
 
   void setTaskToEdit(Task argTask) {
@@ -309,15 +321,18 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                         child: SizedBox(
                           height: 100,
                           child: ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                primary: Color.fromRGBO(221, 221, 226, 1),
-                                onPrimary: Colors.black,
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [Icon(Icons.person_add), Text("Assigned")],
-                              )),
+                            onPressed: () {
+                              this.setDelegatedEmail();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              primary: Color.fromRGBO(221, 221, 226, 1),
+                              onPrimary: Colors.black,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [Icon(Icons.person_add), Text("Assigned")],
+                            ),
+                          ),
                         ),
                       ),
                       Expanded(flex: 1, child: SizedBox()),
@@ -412,11 +427,11 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () => editTags(context), 
+                    onPressed: () => editTags(context),
                     child: TaskTagsEdit(
-                          tags: taskToEdit.tags,
-                        ),
-                    )
+                      tags: taskToEdit.tags,
+                    ),
+                  )
                 ],
               ),
             ),

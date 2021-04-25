@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 class TagsDialog extends StatefulWidget {
   static const routeName = "/tags-dialog";
   final List<Tag> taskTags;
-  TagsDialog(Key key,[this.taskTags]) : super(key: key);
+  TagsDialog(Key key, [this.taskTags]) : super(key: key);
   @override
   _TagsDialogState createState() => _TagsDialogState();
 }
@@ -27,28 +27,26 @@ class _TagsDialogState extends State<TagsDialog> {
   void organizeFinalList(int index) {
     setState(() {
       filteredTags[index].isSelected = !filteredTags[index].isSelected;
-      Tag tagInList = _finalTags.firstWhere(
-        (element) => element.name == filteredTags[index].name,orElse: () => null);
+      Tag tagInList = _finalTags.firstWhere((element) => element.name == filteredTags[index].name, orElse: () => null);
       if (filteredTags[index].isSelected && tagInList == null) {
         _finalTags.add(filteredTags[index]);
       } else {
-          _finalTags.remove(tagInList);
+        _finalTags.remove(tagInList);
       }
     });
   }
 
-  void initValues(){
-    tags =  List<Tag>.from(Provider.of<TagProvider>(context, listen: false).tags);
-    filteredTags =
-        List<Tag>.from(tags);
-    filteredTags.forEach((element) { element.isSelected = false;});
+  void initValues() {
+    tags = List<Tag>.from(Provider.of<TagProvider>(context, listen: false).tags);
+    filteredTags = List<Tag>.from(tags);
+    filteredTags.forEach((element) {
+      element.isSelected = false;
+    });
     taskTags = widget.taskTags;
     if (taskTags != null) {
       _finalTags = List<Tag>.from(taskTags);
       for (int i = 0; i < taskTags.length; i++) {
-        Tag t = filteredTags.firstWhere(
-            (element) => element.name == taskTags[i].name,
-            orElse: () => null);
+        Tag t = filteredTags.firstWhere((element) => element.name == taskTags[i].name, orElse: () => null);
         if (t != null) {
           int index = filteredTags.indexOf(t);
           print(filteredTags.indexOf(t));
@@ -76,11 +74,7 @@ class _TagsDialogState extends State<TagsDialog> {
                 child: TextFormField(
                   onChanged: (value) {
                     setState(() {
-                      filteredTags = tags
-                          .where((element) => element.name
-                              .toLowerCase()
-                              .contains(value.toLowerCase()))
-                          .toList();
+                      filteredTags = tags.where((element) => element.name.toLowerCase().contains(value.toLowerCase())).toList();
                     });
                   },
                   validator: (value) {
@@ -92,11 +86,9 @@ class _TagsDialogState extends State<TagsDialog> {
                   onSaved: (value) {
                     setState(() {
                       final newTag = Tag(id: (tags.length + 1), name: value);
-                      final alreadyExists =
-                          tags.where((element) => element.name == newTag.name);
+                      final alreadyExists = tags.where((element) => element.name == newTag.name);
                       if (alreadyExists.isEmpty) {
-                        Provider.of<TagProvider>(context, listen: false)
-                            .addTag(newTag);
+                        Provider.of<TagProvider>(context, listen: false).addTag(newTag);
                         tags.insert(0, newTag);
                       }
                     });
@@ -134,17 +126,13 @@ class _TagsDialogState extends State<TagsDialog> {
                   return GestureDetector(
                     onTap: () => organizeFinalList(tagIndex),
                     child: Card(
-                      color: filteredTags[tagIndex].isSelected
-                          ? Theme.of(context).primaryColor
-                          : Theme.of(context).accentColor,
+                      color: filteredTags[tagIndex].isSelected ? Theme.of(context).primaryColor : Theme.of(context).accentColor,
                       child: Padding(
                         padding: EdgeInsets.all(10),
                         child: Text(
                           filteredTags[tagIndex].name,
                           style: TextStyle(
-                            color: filteredTags[tagIndex].isSelected
-                                ? Theme.of(context).accentColor
-                                : Theme.of(context).primaryColor,
+                            color: filteredTags[tagIndex].isSelected ? Theme.of(context).accentColor : Theme.of(context).primaryColor,
                           ),
                         ),
                       ),

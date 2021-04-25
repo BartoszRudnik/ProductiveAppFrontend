@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/shared/dialogs.dart';
 import 'package:provider/provider.dart';
+
 import '../../shared/dialogs.dart';
 import '../models/tag.dart';
 import '../models/task.dart';
@@ -10,6 +10,7 @@ import 'full_screen_button.dart';
 import 'is_done_button.dart';
 import 'new_task_tags.dart';
 import 'task_date.dart';
+import 'task_delegate.dart';
 import 'task_description.dart';
 import 'task_localization.dart';
 import 'task_priority.dart';
@@ -34,6 +35,7 @@ class _NewTaskState extends State<NewTask> {
 
   List<Tag> _finalTags = [];
 
+  String _delegatedEmail = '';
   String _localization;
   String _priority = 'NORMAL';
   String _taskName = '';
@@ -56,6 +58,10 @@ class _NewTaskState extends State<NewTask> {
     this._endDate = endDate;
     this._startTime = startTime;
     this._endTime = endTime;
+  }
+
+  void setDelegatedEmail(String value) {
+    this._delegatedEmail = value;
   }
 
   void changeIsDone() {
@@ -131,6 +137,8 @@ class _NewTaskState extends State<NewTask> {
       localization: this._localization,
       position: null,
     );
+
+    print(this._delegatedEmail);
 
     try {
       await Provider.of<TaskProvider>(context, listen: false).addTask(newTask);
@@ -209,11 +217,8 @@ class _NewTaskState extends State<NewTask> {
                             icon: Icon(Icons.save),
                             onPressed: () {},
                           ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.person_add_alt_1_outlined,
-                            ),
-                            onPressed: () {},
+                          TaskDelegate(
+                            setDelegatedEmail: this.setDelegatedEmail,
                           ),
                           IconButton(
                             icon: Icon(Icons.attach_file_outlined),

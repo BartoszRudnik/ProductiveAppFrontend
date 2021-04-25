@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/task_page/task_screens/trash_screen.dart';
+import 'task_page/providers/delegate_provider.dart';
+import 'task_page/task_screens/trash_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:global_configuration/global_configuration.dart';
 
@@ -46,6 +47,14 @@ class MyApp extends StatelessWidget {
             authToken: auth.token,
             userMail: auth.email,
             tagList: previousTags == null ? [] : previousTags.tagList,
+          ),
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, DelegateProvider>(
+          create: null,
+          update: (ctx, auth, previousDelegate) => DelegateProvider(
+            //collaborators: previousDelegate == null ? [] : previousDelegate.collaborators,
+            userEmail: auth.email,
+            userToken: auth.token,
           ),
         ),
       ],
