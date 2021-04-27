@@ -10,7 +10,7 @@ class DelegateDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<Collaborator> collaborators = Provider.of<DelegateProvider>(context, listen: false).collaboratorsList;
+    List<Collaborator> collaborators = Provider.of<DelegateProvider>(context).collaboratorsList;
     List<Collaborator> filteredCollaborators = List<Collaborator>.from(collaborators);
 
     return StatefulBuilder(
@@ -42,14 +42,7 @@ class DelegateDialog extends StatelessWidget {
                         setState(() {
                           final alreadyExists = collaborators.where((element) => element.email == value);
                           if (alreadyExists.isEmpty) {
-                            //Provider.of<DelegateProvider>(context, listen: false).addCollaborator(value);
-                            collaborators.insert(
-                              0,
-                              Collaborator(
-                                email: value,
-                                isSelected: false,
-                              ),
-                            );
+                            Provider.of<DelegateProvider>(context, listen: false).addCollaborator(value);
                           }
                         });
                       },

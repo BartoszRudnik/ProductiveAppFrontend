@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 class Collaborator {
   String email;
-  bool isSelected;
+  String relationState;
+  bool isSelected = false;
 
   Collaborator({
     @required this.email,
+    @required this.relationState,
     this.isSelected,
   });
 }

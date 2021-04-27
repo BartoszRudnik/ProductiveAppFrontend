@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProxyProvider<AuthProvider, DelegateProvider>(
           create: null,
           update: (ctx, auth, previousDelegate) => DelegateProvider(
-            //collaborators: previousDelegate == null ? [] : previousDelegate.collaborators,
+            collaborators: previousDelegate == null ? [] : previousDelegate.collaborators,
             userEmail: auth.email,
             userToken: auth.token,
           ),

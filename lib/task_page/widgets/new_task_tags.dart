@@ -17,8 +17,6 @@ class NewTaskTags extends StatefulWidget {
 }
 
 class _NewTaskTagsState extends State<NewTaskTags> {
-  final _tagKey = GlobalKey<FormState>();
-
   @override
   Widget build(BuildContext context) {
     List<Tag> finalTags;

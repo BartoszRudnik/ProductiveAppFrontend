@@ -6,23 +6,14 @@ import 'package:http/http.dart' as http;
 import 'package:productive_app/task_page/models/collaborator.dart';
 
 class DelegateProvider with ChangeNotifier {
-  List<Collaborator> collaborators = [
-    Collaborator(
-      email: 'jan@kowalski.com',
-      isSelected: false,
-    ),
-    Collaborator(
-      email: 'stefan@batory.com',
-      isSelected: false,
-    ),
-  ];
+  List<Collaborator> collaborators = [];
   final userToken;
   final userEmail;
 
   String _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
   DelegateProvider({
-    //@required this.collaborators,
+    @required this.collaborators,
     @required this.userEmail,
     @required this.userToken,
   });
@@ -32,9 +23,9 @@ class DelegateProvider with ChangeNotifier {
   }
 
   Future<void> getCollaborators() async {
-    final requestUrl = this._serverUrl + 'delegate/getCollaborators/${this.userEmail}';
+    final requestUrl = this._serverUrl + 'delegate/getAllCollaborators/${this.userEmail}';
 
-    List<Collaborator> loadedCollaborators;
+    List<Collaborator> loadedCollaborators = [];
 
     try {
       final response = await http.get(requestUrl);
@@ -42,7 +33,12 @@ class DelegateProvider with ChangeNotifier {
       final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
       for (var element in responseBody) {
-        Collaborator newCollaborator = Collaborator(email: element, isSelected: false);
+        Collaborator newCollaborator = Collaborator(
+          email: element['collaboratorEmail'],
+          relationState: element['relationState'],
+          isSelected: false,
+        );
+
         loadedCollaborators.add(newCollaborator);
       }
 
@@ -54,14 +50,42 @@ class DelegateProvider with ChangeNotifier {
     }
   }
 
-  Future<void> addCollaborator(String newCollaborator) async {
-    final requestUrl = this._serverUrl + '/delegate/addCollaborator/${this.userEmail}';
+  Future<void> deleteCollaborator(String collaborator) async {
+    final requestUrl = this._serverUrl + 'delegate/deleteCollaborator';
 
     try {
-      await http.post(
+      final response = await http.post(
         requestUrl,
         body: json.encode(
           {
+            'userEmail': this.userEmail,
+            'collaboratorEmail': collaborator,
+          },
+        ),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      this.collaborators.removeWhere((element) => element.email == collaborator);
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<void> addCollaborator(String newCollaborator) async {
+    final requestUrl = this._serverUrl + 'delegate/addCollaborator';
+
+    try {
+      final response = await http.post(
+        requestUrl,
+        body: json.encode(
+          {
+            'userEmail': this.userEmail,
             'collaboratorEmail': newCollaborator,
           },
         ),
@@ -71,10 +95,14 @@ class DelegateProvider with ChangeNotifier {
         },
       );
 
-      this.collaborators.insert(
-            0,
-            Collaborator(email: newCollaborator, isSelected: false),
-          );
+      if (response.body == null) {
+        this.collaborators.insert(
+              0,
+              Collaborator(email: newCollaborator, relationState: 'WAITING', isSelected: false),
+            );
+      }
+
+      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);

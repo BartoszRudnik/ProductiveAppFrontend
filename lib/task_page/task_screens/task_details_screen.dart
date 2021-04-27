@@ -7,7 +7,6 @@ import 'package:productive_app/task_page/widgets/delegate_dialog.dart';
 import 'package:productive_app/task_page/widgets/tags_dialog.dart';
 import 'package:productive_app/task_page/utils/date_time_pickers.dart';
 import 'package:productive_app/task_page/widgets/task_appBar.dart';
-import 'package:productive_app/task_page/widgets/task_delegate.dart';
 import 'package:productive_app/task_page/widgets/task_tags_edit.dart';
 import 'package:provider/provider.dart';
 

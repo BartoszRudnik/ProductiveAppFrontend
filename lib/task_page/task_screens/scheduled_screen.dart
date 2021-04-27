@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/task_page/providers/delegate_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/tag_provider.dart';
@@ -15,6 +16,7 @@ class _ScheduledScreenState extends State<ScheduledScreen> {
     await Provider.of<TaskProvider>(context, listen: false).fetchTasks();
     await Provider.of<TaskProvider>(context, listen: false).getPriorities();
     await Provider.of<TagProvider>(context, listen: false).getTags();
+    await Provider.of<DelegateProvider>(context, listen: false).getCollaborators();
   }
 
   @override
