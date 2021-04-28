@@ -32,46 +32,60 @@ class _DelegatedScreenState extends State<DelegatedScreen> {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Expanded(
-            child: ReorderableListView.builder(
-              shrinkWrap: true,
-              itemCount: tasks.length,
-              itemBuilder: (ctx, index) => ChangeNotifierProvider.value(
-                key: ValueKey(tasks[index]),
-                value: tasks[index],
-                child: TaskWidget(
-                  task: tasks[index],
-                  key: ValueKey(tasks[index]),
-                ),
-              ),
-              onReorder: (int oldIndex, int newIndex) {
-                if (newIndex > tasks.length) newIndex = tasks.length;
-                if (oldIndex < newIndex) newIndex -= 1;
+            child: RefreshIndicator(
+              backgroundColor: Theme.of(context).primaryColor,
+              onRefresh: () => Provider.of<TaskProvider>(context, listen: false).fetchTasks(),
+              child: tasks.length == 0
+                  ? SingleChildScrollView(
+                      physics: AlwaysScrollableScrollPhysics(),
+                      child: Container(
+                        height: MediaQuery.of(context).size.height,
+                        child: Center(
+                          child: Text('Your delegated is clear'),
+                        ),
+                      ),
+                    )
+                  : ReorderableListView.builder(
+                      shrinkWrap: true,
+                      itemCount: tasks.length,
+                      itemBuilder: (ctx, index) => ChangeNotifierProvider.value(
+                        key: ValueKey(tasks[index]),
+                        value: tasks[index],
+                        child: TaskWidget(
+                          task: tasks[index],
+                          key: ValueKey(tasks[index]),
+                        ),
+                      ),
+                      onReorder: (int oldIndex, int newIndex) {
+                        if (newIndex > tasks.length) newIndex = tasks.length;
+                        if (oldIndex < newIndex) newIndex -= 1;
 
-                setState(() {
-                  final item = tasks.elementAt(oldIndex);
-                  double newPosition = item.position;
+                        setState(() {
+                          final item = tasks.elementAt(oldIndex);
+                          double newPosition = item.position;
 
-                  if (newIndex < oldIndex) {
-                    if (newIndex != 0) {
-                      newPosition = (tasks.elementAt(newIndex).position + tasks.elementAt(newIndex - 1).position) / 2;
-                    } else {
-                      newPosition = tasks.elementAt(newIndex).position / 2;
-                    }
-                  } else {
-                    if (newIndex != tasks.length - 1) {
-                      newPosition = (tasks.elementAt(newIndex).position + tasks.elementAt(newIndex + 1).position) / 2;
-                    } else {
-                      newPosition = tasks.elementAt(newIndex).position * 2;
-                    }
-                  }
+                          if (newIndex < oldIndex) {
+                            if (newIndex != 0) {
+                              newPosition = (tasks.elementAt(newIndex).position + tasks.elementAt(newIndex - 1).position) / 2;
+                            } else {
+                              newPosition = tasks.elementAt(newIndex).position / 2;
+                            }
+                          } else {
+                            if (newIndex != tasks.length - 1) {
+                              newPosition = (tasks.elementAt(newIndex).position + tasks.elementAt(newIndex + 1).position) / 2;
+                            } else {
+                              newPosition = tasks.elementAt(newIndex).position * 2;
+                            }
+                          }
 
-                  final task = tasks.removeAt(oldIndex);
-                  tasks.insert(newIndex, task);
-                  Provider.of<TaskProvider>(context, listen: false).setAnytimeTasks(tasks);
+                          final task = tasks.removeAt(oldIndex);
+                          tasks.insert(newIndex, task);
+                          Provider.of<TaskProvider>(context, listen: false).setAnytimeTasks(tasks);
 
-                  Provider.of<TaskProvider>(context, listen: false).updateTaskPosition(item, newPosition);
-                });
-              },
+                          Provider.of<TaskProvider>(context, listen: false).updateTaskPosition(item, newPosition);
+                        });
+                      },
+                    ),
             ),
           ),
         ],
