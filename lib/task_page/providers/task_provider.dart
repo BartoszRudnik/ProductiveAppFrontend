@@ -105,6 +105,7 @@ class TaskProvider with ChangeNotifier {
             'priority': task.priority,
             'tags': task.tags.map((tag) => tag.toJson()).toList(),
             'localization': task.localization,
+            'delegatedEmail': task.delegatedEmail,
           },
         ),
         headers: {
@@ -112,6 +113,8 @@ class TaskProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
+
+      print(response.body);
 
       task.id = int.parse(response.body);
       task.position = int.parse(response.body) + 1000.0;
@@ -202,6 +205,7 @@ class TaskProvider with ChangeNotifier {
             'tags': task.tags.map((tag) => tag.toJson()).toList(),
             'localization': newLocation,
             'position': task.position,
+            'delegatedEmail': task.delegatedEmail,
           },
         ),
         headers: {
@@ -271,6 +275,7 @@ class TaskProvider with ChangeNotifier {
           tags: taskTags,
           localization: element['tasks']['localization'],
           position: element['tasks']['position'],
+          delegatedEmail: element['tasks']['delegatedEmail'],
         );
 
         if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {

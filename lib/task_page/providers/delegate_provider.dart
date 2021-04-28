@@ -95,7 +95,9 @@ class DelegateProvider with ChangeNotifier {
         },
       );
 
-      if (response.body == null) {
+      print(response.body);
+
+      if (response.body == null || response.body == '') {
         this.collaborators.insert(
               0,
               Collaborator(email: newCollaborator, relationState: 'WAITING', isSelected: false),
