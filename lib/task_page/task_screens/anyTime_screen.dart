@@ -44,7 +44,7 @@ class _AnytimeScreenState extends State<AnytimeScreen> {
                       child: Container(
                         height: MediaQuery.of(context).size.height,
                         child: Center(
-                          child: Text('Your anytime is clear'),
+                          child: Text('Your anytime list is empty'),
                         ),
                       ),
                     )

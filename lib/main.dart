@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'task_page/providers/delegate_provider.dart';
-import 'task_page/task_screens/trash_screen.dart';
-import 'package:provider/provider.dart';
 import 'package:global_configuration/global_configuration.dart';
+import 'package:provider/provider.dart';
 
 import 'login/providers/auth_provider.dart';
 import 'login/screens/entry_screen.dart';
@@ -10,13 +8,16 @@ import 'login/screens/login_screen.dart';
 import 'login/screens/new_password.dart';
 import 'login/screens/reset_password.dart';
 import 'login/screens/splash_screen.dart';
+import 'task_page/providers/delegate_provider.dart';
 import 'task_page/providers/tag_provider.dart';
 import 'task_page/providers/task_provider.dart';
+import 'task_page/task_screens/collaborators_screen.dart';
 import 'task_page/task_screens/completed_screen.dart';
 import 'task_page/task_screens/main_screen.dart';
 import 'task_page/task_screens/tabs_screen.dart';
 import 'task_page/task_screens/tags_screen.dart';
 import 'task_page/task_screens/task_details_screen.dart';
+import 'task_page/task_screens/trash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -112,6 +113,7 @@ class MyApp extends StatelessWidget {
             TagsScreen.routeName: (ctx) => TagsScreen(),
             CompletedScreen.routeName: (ctx) => CompletedScreen(),
             TrashScreen.routeName: (ctx) => TrashScreen(),
+            CollaboratorsScreen.routeName: (ctx) => CollaboratorsScreen(),
           },
         ),
       ),

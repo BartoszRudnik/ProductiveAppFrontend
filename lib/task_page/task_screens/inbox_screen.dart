@@ -44,7 +44,7 @@ class _InboxScreenState extends State<InboxScreen> {
                       child: Container(
                         height: MediaQuery.of(context).size.height,
                         child: Center(
-                          child: Text('Your inbox is clear'),
+                          child: Text('Your inbox is empty'),
                         ),
                       ),
                     )

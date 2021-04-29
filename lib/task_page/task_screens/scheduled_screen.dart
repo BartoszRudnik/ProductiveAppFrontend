@@ -40,7 +40,7 @@ class _ScheduledScreenState extends State<ScheduledScreen> {
               child: Container(
                 height: MediaQuery.of(context).size.height,
                 child: Center(
-                  child: Text('Your scheduled is clear'),
+                  child: Text('Your scheduled list is empty'),
                 ),
               ),
             )

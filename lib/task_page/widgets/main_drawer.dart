@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/task_page/task_screens/collaborators_screen.dart';
 import 'package:productive_app/task_page/task_screens/completed_screen.dart';
 import 'package:productive_app/task_page/task_screens/trash_screen.dart';
 import 'package:provider/provider.dart';
@@ -79,6 +80,11 @@ class MainDrawer extends StatelessWidget {
               icon: Icons.delete_outline_outlined,
               title: 'Trash',
               routeName: TrashScreen.routeName,
+            ),
+            DrawerListTile(
+              icon: Icons.people_outline,
+              title: 'Collaborators',
+              routeName: CollaboratorsScreen.routeName,
             ),
             ListTile(
               minLeadingWidth: 16,

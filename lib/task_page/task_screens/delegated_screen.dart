@@ -41,7 +41,7 @@ class _DelegatedScreenState extends State<DelegatedScreen> {
                       child: Container(
                         height: MediaQuery.of(context).size.height,
                         child: Center(
-                          child: Text('Your delegated is clear'),
+                          child: Text('Your delegated list is empty'),
                         ),
                       ),
                     )
