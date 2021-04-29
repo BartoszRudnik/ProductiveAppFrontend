@@ -100,7 +100,9 @@ class DelegateProvider with ChangeNotifier {
 
       if (collaborator.relationState == 'WAITING') {
         this._send.remove(collaborator);
+        print('usuwanie wyslanych');
       } else {
+        print('usuwanie accepted');
         this._accepted.remove(collaborator);
       }
 
@@ -126,6 +128,7 @@ class DelegateProvider with ChangeNotifier {
       );
 
       Collaborator collaborator = this._received.firstWhere((collaborator) => collaborator.id == id);
+      collaborator.relationState = "ACCEPTED";
 
       this._received.remove(collaborator);
       this._accepted.add(collaborator);

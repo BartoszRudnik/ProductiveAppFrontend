@@ -1,4 +1,6 @@
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
+import 'package:productive_app/task_page/providers/delegate_provider.dart';
 import 'package:productive_app/task_page/task_screens/collaborators_screen.dart';
 import 'package:productive_app/task_page/task_screens/completed_screen.dart';
 import 'package:productive_app/task_page/task_screens/trash_screen.dart';
@@ -81,10 +83,19 @@ class MainDrawer extends StatelessWidget {
               title: 'Trash',
               routeName: TrashScreen.routeName,
             ),
-            DrawerListTile(
-              icon: Icons.people_outline,
-              title: 'Collaborators',
-              routeName: CollaboratorsScreen.routeName,
+            Badge(
+              position: BadgePosition.topStart(),
+              showBadge: Provider.of<DelegateProvider>(context).received.length > 0,
+              badgeColor: Theme.of(context).primaryColor,
+              badgeContent: Text(
+                Provider.of<DelegateProvider>(context).received.length.toString(),
+                style: TextStyle(color: Theme.of(context).accentColor),
+              ),
+              child: DrawerListTile(
+                icon: Icons.people_outline,
+                title: 'Collaborators',
+                routeName: CollaboratorsScreen.routeName,
+              ),
             ),
             ListTile(
               minLeadingWidth: 16,

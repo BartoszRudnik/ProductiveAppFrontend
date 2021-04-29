@@ -58,8 +58,8 @@ class AcceptedCollaborator extends StatelessWidget {
                           primary: Theme.of(context).primaryColor,
                           side: BorderSide(color: Theme.of(context).primaryColor),
                         ),
-                        onPressed: () {
-                          Provider.of<DelegateProvider>(context, listen: false).deleteCollaborator(this.collaborator.id);
+                        onPressed: () async {
+                          await Provider.of<DelegateProvider>(context, listen: false).deleteCollaborator(this.collaborator.id);
                           Navigator.of(context).pop(true);
                         },
                         child: Text(
