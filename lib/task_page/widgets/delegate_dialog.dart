@@ -36,15 +36,74 @@ class DelegateDialog extends StatelessWidget {
                         if (value.isEmpty) {
                           return 'collaborator email cannot be empty';
                         }
+                        if (value == Provider.of<DelegateProvider>(context, listen: false).userEmail) {
+                          return 'Cannot invite yourself';
+                        }
                         return null;
                       },
-                      onSaved: (value) {
-                        setState(() {
-                          final alreadyExists = collaborators.where((element) => element.email == value);
-                          if (alreadyExists.isEmpty) {
-                            Provider.of<DelegateProvider>(context, listen: false).addCollaborator(value);
+                      onSaved: (value) async {
+                        final alreadyExists = collaborators.where((element) => element.email == value);
+                        if (alreadyExists.isEmpty) {
+                          try {
+                            await Provider.of<DelegateProvider>(context, listen: false).addCollaborator(value);
+                          } catch (error) {
+                            return showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: Center(
+                                  child: Text(
+                                    'User not found',
+                                    style: Theme.of(context).textTheme.headline2,
+                                  ),
+                                ),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text('User with given email doesn\'t exists, do you want to send invitation?'),
+                                    SizedBox(height: 10),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                      children: [
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            primary: Theme.of(context).primaryColor,
+                                            side: BorderSide(color: Theme.of(context).primaryColor),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.of(context).pop(false);
+                                          },
+                                          child: Text(
+                                            'Cancel',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: Theme.of(context).accentColor,
+                                            ),
+                                          ),
+                                        ),
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            primary: Theme.of(context).primaryColor,
+                                            side: BorderSide(color: Theme.of(context).primaryColor),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.of(context).pop(true);
+                                          },
+                                          child: Text(
+                                            'Send invitation',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: Theme.of(context).accentColor,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
                           }
-                        });
+                        }
                       },
                       maxLines: null,
                       decoration: InputDecoration(

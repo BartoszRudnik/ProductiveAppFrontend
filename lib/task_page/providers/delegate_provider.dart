@@ -165,6 +165,10 @@ class DelegateProvider with ChangeNotifier {
     final requestUrl = this._serverUrl + 'delegate/addCollaborator';
 
     try {
+      if (this.userEmail == newCollaborator) {
+        throw Exception("You cannot invite yourself");
+      }
+
       final response = await http.post(
         requestUrl,
         body: json.encode(
