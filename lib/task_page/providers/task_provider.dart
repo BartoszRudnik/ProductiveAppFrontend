@@ -264,6 +264,12 @@ class TaskProvider with ChangeNotifier {
           ));
         }
 
+        String taskStatus;
+
+        if (element['tasks']['taskStatus'] != null) {
+          taskStatus = element['tasks']['taskStatus'];
+        }
+
         Task task = Task(
           id: element['tasks']['id_task'],
           title: element['tasks']['task_name'],
@@ -276,6 +282,8 @@ class TaskProvider with ChangeNotifier {
           localization: element['tasks']['localization'],
           position: element['tasks']['position'],
           delegatedEmail: element['tasks']['delegatedEmail'],
+          isDelegated: element['tasks']['isDelegated'],
+          taskStatus: taskStatus,
         );
 
         if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {

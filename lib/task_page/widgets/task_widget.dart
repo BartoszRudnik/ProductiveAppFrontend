@@ -188,6 +188,26 @@ class _TaskWidgetState extends State<TaskWidget> {
                       color: this.widget.task.done ? Colors.grey : Theme.of(context).primaryColor,
                     ),
                   ),
+                  SizedBox(width: 7),
+                  if (this.widget.task.isDelegated != null && this.widget.task.isDelegated) Icon(Icons.supervisor_account_outlined),
+                  if (this.widget.task.delegatedEmail != null && this.widget.task.localization == 'DELEGATED' && this.widget.task.taskStatus != null)
+                    Container(
+                      alignment: Alignment.center,
+                      padding: EdgeInsets.symmetric(horizontal: 4),
+                      margin: EdgeInsets.symmetric(horizontal: 8),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Theme.of(context).primaryColor,
+                          width: 0.2,
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          this.widget.task.taskStatus,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
                 ],
               ),
               SizedBox(
@@ -235,7 +255,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                           )
                       ],
                     ),
-                  if (this.widget.task.priority != 'NORMAL' || this.widget.task.startDate != null || this.widget.task.endDate != null)
+                  if (this.widget.task.priority != 'NORMAL' || this.widget.task.startDate != null || this.widget.task.endDate != null || this.widget.task.isDelegated != null)
                     SizedBox(
                       height: 4,
                     ),

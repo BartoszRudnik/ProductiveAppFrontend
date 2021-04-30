@@ -9,10 +9,12 @@ class Task with ChangeNotifier {
   String priority;
   String localization;
   String delegatedEmail;
+  String taskStatus;
   DateTime startDate;
   DateTime endDate;
   List<Tag> tags = [];
   bool done;
+  bool isDelegated;
 
   Task({
     @required this.id,
@@ -26,5 +28,7 @@ class Task with ChangeNotifier {
     this.localization,
     this.position,
     this.delegatedEmail,
+    this.isDelegated,
+    this.taskStatus,
   });
 }

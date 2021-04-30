@@ -137,6 +137,8 @@ class _NewTaskState extends State<NewTask> {
       localization: this._localization,
       position: null,
       delegatedEmail: this._delegatedEmail,
+      isDelegated: false,
+      taskStatus: null,
     );
 
     try {
