@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
+import 'package:productive_app/login/models/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../exceptions/HttpException.dart';
@@ -15,6 +16,7 @@ class AuthProvider with ChangeNotifier {
   DateTime _expiryDate;
   Timer _authTimer;
   String _email;
+  User _user;
 
   String _serverUrl = GlobalConfiguration().getValue("serverUrl"); //computer IP address
 
@@ -22,18 +24,25 @@ class AuthProvider with ChangeNotifier {
     return token != null;
   }
 
+  User get user {
+    return this._user;
+  }
+
   String get email {
     return this._email;
   }
 
   String get token {
-    if (this._expiryDate != null && this._expiryDate.isAfter(DateTime.now()) && this._token != null) {
+    if (this._expiryDate != null &&
+        this._expiryDate.isAfter(DateTime.now()) &&
+        this._token != null) {
       return this._token;
     }
     return null;
   }
 
-  Future<void> _authenticate(String email, String password, String urlSegment) async {
+  Future<void> _authenticate(
+      String email, String password, String urlSegment) async {
     String url = this._serverUrl + '$urlSegment';
 
     try {
@@ -60,6 +69,7 @@ class AuthProvider with ChangeNotifier {
         throw HttpException(responseData['message']);
       }
 
+      this._user = new User(email: email);
       this._email = email;
       this._token = responseData['token'];
       this._expiryDate = DateTime.now().add(
@@ -116,7 +126,8 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<void> newPassword(String email, String token, String newPassword) async {
+  Future<void> newPassword(
+      String email, String token, String newPassword) async {
     String url = this._serverUrl + 'newPassword';
 
     try {
@@ -205,7 +216,8 @@ class AuthProvider with ChangeNotifier {
       return false;
     }
 
-    final extractedUserData = json.decode(getPreferences.getString('userData')) as Map<String, Object>;
+    final extractedUserData = json.decode(getPreferences.getString('userData'))
+        as Map<String, Object>;
     final expiryDate = DateTime.parse(extractedUserData['expiryDate']);
 
     if (expiryDate.isBefore(DateTime.now())) {
