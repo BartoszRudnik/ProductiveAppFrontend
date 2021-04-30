@@ -16,7 +16,7 @@ class CollaboratorsScreen extends StatefulWidget {
 }
 
 class _CollaboratorsScreenState extends State<CollaboratorsScreen> {
-  void _addNewTagForm(BuildContext buildContext) {
+  void _addNewCollaboratorForm(BuildContext buildContext) {
     showModalBottomSheet(
       backgroundColor: Theme.of(context).accentColor,
       context: buildContext,
@@ -49,7 +49,7 @@ class _CollaboratorsScreenState extends State<CollaboratorsScreen> {
           size: 50,
         ),
         onPressed: () {
-          this._addNewTagForm(context);
+          this._addNewCollaboratorForm(context);
         },
         backgroundColor: Theme.of(context).primaryColor,
       ),
