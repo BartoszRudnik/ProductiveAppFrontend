@@ -1,8 +1,8 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:productive_app/task_page/providers/delegate_provider.dart';
-import 'package:productive_app/task_page/task_screens/collaborators_screen.dart';
 import 'package:productive_app/task_page/task_screens/completed_screen.dart';
+import 'package:productive_app/task_page/task_screens/settings_tabs_screen.dart';
 import 'package:productive_app/task_page/task_screens/trash_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -56,9 +56,23 @@ class MainDrawer extends StatelessWidget {
             SizedBox(
               height: 15,
             ),
-            DrawerListTile(
-              icon: Icons.settings,
-              title: 'Settings',
+            Badge(
+              position: BadgePosition.topStart(),
+              showBadge:
+                  Provider.of<DelegateProvider>(context).received.length > 0,
+              badgeColor: Theme.of(context).primaryColor,
+              badgeContent: Text(
+                Provider.of<DelegateProvider>(context)
+                    .received
+                    .length
+                    .toString(),
+                style: TextStyle(color: Theme.of(context).accentColor),
+              ),
+              child: DrawerListTile(
+                icon: Icons.settings,
+                title: 'Settings',
+                routeName: SettingsTabsScreen.routeName,
+              ),
             ),
             DrawerListTile(
               icon: Icons.save,
@@ -82,20 +96,6 @@ class MainDrawer extends StatelessWidget {
               icon: Icons.delete_outline_outlined,
               title: 'Trash',
               routeName: TrashScreen.routeName,
-            ),
-            Badge(
-              position: BadgePosition.topStart(),
-              showBadge: Provider.of<DelegateProvider>(context).received.length > 0,
-              badgeColor: Theme.of(context).primaryColor,
-              badgeContent: Text(
-                Provider.of<DelegateProvider>(context).received.length.toString(),
-                style: TextStyle(color: Theme.of(context).accentColor),
-              ),
-              child: DrawerListTile(
-                icon: Icons.people_outline,
-                title: 'Collaborators',
-                routeName: CollaboratorsScreen.routeName,
-              ),
             ),
             ListTile(
               minLeadingWidth: 16,
@@ -123,10 +123,13 @@ class MainDrawer extends StatelessWidget {
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 primary: Theme.of(context).primaryColor,
-                                side: BorderSide(color: Theme.of(context).primaryColor),
+                                side: BorderSide(
+                                    color: Theme.of(context).primaryColor),
                               ),
                               onPressed: () {
-                                Provider.of<AuthProvider>(context, listen: false).logout();
+                                Provider.of<AuthProvider>(context,
+                                        listen: false)
+                                    .logout();
                                 Navigator.of(context).pop(true);
                               },
                               child: Text(
@@ -140,7 +143,8 @@ class MainDrawer extends StatelessWidget {
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 primary: Theme.of(context).primaryColor,
-                                side: BorderSide(color: Theme.of(context).primaryColor),
+                                side: BorderSide(
+                                    color: Theme.of(context).primaryColor),
                               ),
                               onPressed: () {
                                 Navigator.of(context).pop(false);

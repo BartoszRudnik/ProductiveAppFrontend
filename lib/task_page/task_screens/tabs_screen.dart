@@ -1,4 +1,7 @@
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
+import 'package:productive_app/task_page/providers/delegate_provider.dart';
+import 'package:provider/provider.dart';
 
 import '../widgets/new_task.dart';
 import '../widgets/task_appBar.dart';
@@ -88,9 +91,11 @@ class _TabsScreenState extends State<TabsScreen> {
     }
   }
 
-  Color _getBgColor(int index) => _selectedPageIndex == index ? _selectedBgColor : _unselectedBgColor;
+  Color _getBgColor(int index) =>
+      _selectedPageIndex == index ? _selectedBgColor : _unselectedBgColor;
 
-  Color _getItemColor(int index) => _selectedPageIndex == index ? _selectedItemColor : _unselectedItemColor;
+  Color _getItemColor(int index) =>
+      _selectedPageIndex == index ? _selectedItemColor : _unselectedItemColor;
 
   Widget _buildIcon(IconData iconData, String text, int index) => Container(
         width: double.infinity,
@@ -103,7 +108,9 @@ class _TabsScreenState extends State<TabsScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Icon(iconData),
-                Text(text, style: TextStyle(fontSize: 12, color: this._getItemColor(index))),
+                Text(text,
+                    style: TextStyle(
+                        fontSize: 12, color: this._getItemColor(index))),
               ],
             ),
             onTap: () => this._selectPage(index),
@@ -160,9 +167,18 @@ class _TabsScreenState extends State<TabsScreen> {
           appBar: TaskAppBar(
             title: _pages[_selectedPageIndex]['title'],
             leadingButton: IconButton(
-                icon: Icon(Icons.menu),
+                icon: Badge(
+                  position: BadgePosition.topStart(),
+                  showBadge:
+                      Provider.of<DelegateProvider>(context).received.length >
+                          0,
+                  badgeColor: Theme.of(context).primaryColor,
+                  child: Icon(Icons.menu),
+                ),
                 onPressed: () {
-                  isDrawerVisible ? _changeTranform(0, 0, 1) : _changeTranform(230, 70, 0.8);
+                  isDrawerVisible
+                      ? _changeTranform(0, 0, 1)
+                      : _changeTranform(230, 70, 0.8);
                 }),
           ),
           /*drawer: DrawerScreen(
@@ -184,7 +200,8 @@ class _TabsScreenState extends State<TabsScreen> {
             decoration: BoxDecoration(
               color: Theme.of(context).primaryColor,
               border: Border(
-                top: BorderSide(color: Theme.of(context).primaryColor, width: 1.0),
+                top: BorderSide(
+                    color: Theme.of(context).primaryColor, width: 1.0),
               ),
             ),
             child: BottomNavigationBar(
@@ -207,7 +224,8 @@ class _TabsScreenState extends State<TabsScreen> {
                   title: SizedBox.shrink(),
                 ),
                 BottomNavigationBarItem(
-                  icon: _buildIcon(Icons.person_outline_outlined, 'Delegated', 3),
+                  icon:
+                      _buildIcon(Icons.person_outline_outlined, 'Delegated', 3),
                   title: SizedBox.shrink(),
                 ),
               ],

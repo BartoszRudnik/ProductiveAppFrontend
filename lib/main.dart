@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
+import 'package:productive_app/task_page/task_screens/settings_tabs_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'login/providers/auth_provider.dart';
@@ -39,7 +40,8 @@ class MyApp extends StatelessWidget {
             userMail: auth.email,
             authToken: auth.token,
             taskList: previousTasks == null ? [] : previousTasks.taskList,
-            taskPriorities: previousTasks == null ? [] : previousTasks.priorities,
+            taskPriorities:
+                previousTasks == null ? [] : previousTasks.priorities,
           ),
         ),
         ChangeNotifierProxyProvider<AuthProvider, TagProvider>(
@@ -53,7 +55,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProxyProvider<AuthProvider, DelegateProvider>(
           create: null,
           update: (ctx, auth, previousDelegate) => DelegateProvider(
-            collaborators: previousDelegate == null ? [] : previousDelegate.collaborators,
+            collaborators:
+                previousDelegate == null ? [] : previousDelegate.collaborators,
             userEmail: auth.email,
             userToken: auth.token,
           ),
@@ -100,7 +103,10 @@ class MyApp extends StatelessWidget {
               ? MainScreen()
               : FutureBuilder(
                   future: authData.tryAutoLogin(),
-                  builder: (ctx, authResult) => authResult.connectionState == ConnectionState.waiting ? SplashScreen() : EntryScreen(),
+                  builder: (ctx, authResult) =>
+                      authResult.connectionState == ConnectionState.waiting
+                          ? SplashScreen()
+                          : EntryScreen(),
                 ),
           routes: {
             MainScreen.routeName: (ctx) => MainScreen(),
@@ -114,6 +120,7 @@ class MyApp extends StatelessWidget {
             CompletedScreen.routeName: (ctx) => CompletedScreen(),
             TrashScreen.routeName: (ctx) => TrashScreen(),
             CollaboratorsScreen.routeName: (ctx) => CollaboratorsScreen(),
+            SettingsTabsScreen.routeName: (ctx) => SettingsTabsScreen(),
           },
         ),
       ),
