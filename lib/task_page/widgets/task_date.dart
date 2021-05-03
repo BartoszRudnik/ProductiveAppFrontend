@@ -95,15 +95,12 @@ class _TaskDateState extends State<TaskDate> {
                                   primary: Color.fromRGBO(237, 237, 240, 1),
                                   onPrimary: Color.fromRGBO(119, 119, 120, 1),
                                 ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    this._startInitialTime.toString() == "null"
-                                        ? Icon(Icons.access_time_outlined)
-                                        : Text(
-                                            this._startInitialTime.format(context),
-                                          ),
-                                  ],
+                                child: Center(
+                                  child: this._startInitialTime.toString() == "null"
+                                      ? Icon(Icons.access_time_outlined)
+                                      : Text(
+                                          this._startInitialTime.format(context),
+                                        ),
                                 ),
                               ),
                             ],
