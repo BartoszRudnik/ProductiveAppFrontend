@@ -524,4 +524,8 @@ class TaskProvider with ChangeNotifier {
             (element.startDate.difference(DateTime.now()).inDays > 0 || (element.startDate.difference(DateTime.now()).inDays == 0 && (element.startDate.day > DateTime.now().day || element.startDate.month > DateTime.now().month)))))
         .toList();
   }
+
+  int countInboxDelegated() {
+    return this._inboxTasks.where((task) => task.isDelegated).toList().length;
+  }
 }
