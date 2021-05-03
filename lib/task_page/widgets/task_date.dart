@@ -28,6 +28,7 @@ class _TaskDateState extends State<TaskDate> {
   TimeOfDay _endInitialTime;
 
   DateFormat formatter = DateFormat("yyyy-MM-dd");
+  TimeOfDayFormat timeFormatter = TimeOfDayFormat.HH_colon_mm;
 
   @override
   Widget build(BuildContext context) {
@@ -43,69 +44,130 @@ class _TaskDateState extends State<TaskDate> {
               builder: (context, setState) {
                 return AlertDialog(
                   content: Container(
-                    height: 230,
-                    width: 300,
+                    height: 280,
+                    width: 200,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
+                        Center(
+                          child: Text('Start date'),
+                        ),
+                        SizedBox(height: 5),
                         ConstrainedBox(
                           constraints: BoxConstraints.tightFor(width: double.infinity, height: 70),
-                          child: ElevatedButton(
-                              onPressed: () async {
-                                DateTime initDate = this.widget.startValue;
-                                if (this.widget.startValue == null) {
-                                  initDate = DateTime.now();
-                                }
-                                final DateTime pick = await DateTimePickers.pickDate(initDate, context);
-                                final TimeOfDay pickTime = await DateTimePickers.pickTime(context);
-                                setState(() {
-                                  this._startInitialValue = pick;
-                                  this._startInitialTime = pickTime;
-                                });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                primary: Color.fromRGBO(237, 237, 240, 1),
-                                onPrimary: Color.fromRGBO(119, 119, 120, 1),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () async {
+                                  DateTime initDate = this.widget.startValue;
+                                  if (this.widget.startValue == null) {
+                                    initDate = DateTime.now();
+                                  }
+                                  final DateTime pick = await DateTimePickers.pickDate(initDate, context);
+
+                                  setState(() {
+                                    this._startInitialValue = pick;
+                                  });
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  primary: Color.fromRGBO(237, 237, 240, 1),
+                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
+                                ),
+                                child: Center(
+                                  child: this._startInitialValue.toString() == "null"
+                                      ? Icon(Icons.calendar_today_outlined)
+                                      : Text(
+                                          formatter.format(this._startInitialValue),
+                                        ),
+                                ),
                               ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    (this._startInitialValue.toString() == "null") ? "Start date" : "Start date: " + formatter.format(this._startInitialValue),
-                                  ),
-                                ],
-                              )),
+                              SizedBox(width: 30),
+                              ElevatedButton(
+                                onPressed: () async {
+                                  final TimeOfDay pickTime = await DateTimePickers.pickTime(context);
+
+                                  setState(() {
+                                    this._startInitialTime = pickTime;
+                                  });
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  primary: Color.fromRGBO(237, 237, 240, 1),
+                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    this._startInitialTime.toString() == "null"
+                                        ? Icon(Icons.access_time_outlined)
+                                        : Text(
+                                            this._startInitialTime.format(context),
+                                          ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                         SizedBox(
                           height: 20,
                         ),
+                        Center(
+                          child: Text('End date'),
+                        ),
+                        SizedBox(height: 5),
                         ConstrainedBox(
                           constraints: BoxConstraints.tightFor(width: double.infinity, height: 70),
-                          child: ElevatedButton(
-                              onPressed: () async {
-                                DateTime initDate = this.widget.endValue;
-                                if (this.widget.endValue == null) {
-                                  initDate = DateTime.now();
-                                }
-                                final DateTime pick = await DateTimePickers.pickDate(initDate, context);
-                                final TimeOfDay pickTime = await DateTimePickers.pickTime(context);
-                                setState(() {
-                                  this._endInitialValue = pick;
-                                  this._endInitialTime = pickTime;
-                                });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                primary: Color.fromRGBO(237, 237, 240, 1),
-                                onPrimary: Color.fromRGBO(119, 119, 120, 1),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () async {
+                                  DateTime initDate = this.widget.endValue;
+                                  if (this.widget.endValue == null) {
+                                    initDate = DateTime.now();
+                                  }
+                                  final DateTime pick = await DateTimePickers.pickDate(initDate, context);
+
+                                  setState(() {
+                                    this._endInitialValue = pick;
+                                  });
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  primary: Color.fromRGBO(237, 237, 240, 1),
+                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
+                                ),
+                                child: Center(
+                                  child: this._endInitialValue.toString() == "null"
+                                      ? Icon(Icons.calendar_today_outlined)
+                                      : Text(
+                                          formatter.format(this._endInitialValue),
+                                        ),
+                                ),
                               ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    (this._endInitialValue.toString() == "null") ? "End date" : "End date: " + formatter.format(this._endInitialValue),
-                                  ),
-                                ],
-                              )),
+                              SizedBox(width: 30),
+                              ElevatedButton(
+                                onPressed: () async {
+                                  final TimeOfDay pickTime = await DateTimePickers.pickTime(context);
+
+                                  setState(() {
+                                    this._endInitialTime = pickTime;
+                                  });
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  primary: Color.fromRGBO(237, 237, 240, 1),
+                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
+                                ),
+                                child: Center(
+                                  child: this._endInitialTime.toString() == "null"
+                                      ? Icon(Icons.access_time_outlined)
+                                      : Text(
+                                          this._endInitialTime.format(context),
+                                        ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                         SizedBox(
                           height: 20,
@@ -139,6 +201,48 @@ class _TaskDateState extends State<TaskDate> {
                                 side: BorderSide(color: Theme.of(context).primaryColor),
                               ),
                               onPressed: () {
+                                if ((this._startInitialTime != null && this._startInitialValue == null) || (this._endInitialTime != null && this._endInitialValue == null)) {
+                                  return showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: Center(
+                                        child: Text(
+                                          'Cannot select only time',
+                                          style: Theme.of(context).textTheme.headline2,
+                                        ),
+                                      ),
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text('...'),
+                                          SizedBox(height: 10),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  primary: Theme.of(context).primaryColor,
+                                                  side: BorderSide(color: Theme.of(context).primaryColor),
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop(false);
+                                                },
+                                                child: Text(
+                                                  'OK',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Theme.of(context).accentColor,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                }
+
                                 setState(() {
                                   this.widget.startValue = this._startInitialValue;
                                   this.widget.endValue = this._endInitialValue;

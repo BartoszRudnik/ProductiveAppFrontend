@@ -217,26 +217,32 @@ class _TaskWidgetState extends State<TaskWidget> {
                 children: <Widget>[
                   if (this.widget.task.priority != 'NORMAL' || this.widget.task.startDate != null || this.widget.task.endDate != null)
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        if (this.widget.task.priority == 'LOW') Icon(Icons.arrow_downward_outlined),
-                        if (this.widget.task.priority == 'HIGH') Icon(Icons.arrow_upward_outlined),
-                        if (this.widget.task.priority == 'HIGHER') Icon(Icons.arrow_upward_outlined),
-                        if (this.widget.task.priority == 'HIGHER') Icon(Icons.arrow_upward_outlined),
-                        if (this.widget.task.priority == 'CRITICAL') Icon(Icons.warning_amber_sharp),
-                        SizedBox(width: 6),
-                        if (this.widget.task.startDate != null || this.widget.task.endDate != null) Icon(Icons.calendar_today),
-                        SizedBox(width: 6),
-                        this.widget.task.startDate != null
-                            ? Text(
-                                DateFormat('MMM d').format(this.widget.task.startDate) + ' - ',
-                              )
-                            : Text(''),
-                        this.widget.task.endDate != null
-                            ? Text(
-                                DateFormat('MMM d').format(this.widget.task.endDate),
-                              )
-                            : Text(''),
-                        SizedBox(width: 6),
+                        Container(
+                          child: Row(
+                            children: [
+                              if (this.widget.task.priority == 'LOW') Icon(Icons.arrow_downward_outlined),
+                              if (this.widget.task.priority == 'HIGH') Icon(Icons.arrow_upward_outlined),
+                              if (this.widget.task.priority == 'HIGHER') Icon(Icons.arrow_upward_outlined),
+                              if (this.widget.task.priority == 'HIGHER') Icon(Icons.arrow_upward_outlined),
+                              if (this.widget.task.priority == 'CRITICAL') Icon(Icons.warning_amber_sharp),
+                              SizedBox(width: 6),
+                              if (this.widget.task.startDate != null || this.widget.task.endDate != null) Icon(Icons.calendar_today),
+                              SizedBox(width: 6),
+                              this.widget.task.startDate != null
+                                  ? Text(
+                                      DateFormat('MMM d').format(this.widget.task.startDate) + ' - ',
+                                    )
+                                  : Text(''),
+                              this.widget.task.endDate != null
+                                  ? Text(
+                                      DateFormat('MMM d').format(this.widget.task.endDate),
+                                    )
+                                  : Text(''),
+                            ],
+                          ),
+                        ),
                         if (this.widget.task.endDate != null)
                           Container(
                             child: Row(
