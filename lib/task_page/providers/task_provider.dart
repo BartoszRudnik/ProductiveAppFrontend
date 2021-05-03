@@ -501,14 +501,22 @@ class TaskProvider with ChangeNotifier {
   }
 
   List<Task> tasksBeforeToday() {
-    return this._scheduledTasks.where((element) => (element.startDate != null && element.startDate.difference(DateTime.now()).inDays < 0)).toList();
+    return this
+        ._scheduledTasks
+        .where((element) => (element.startDate != null &&
+            (element.startDate.difference(DateTime.now()).inDays < 0 || (element.startDate.difference(DateTime.now()).inDays == 0 && (element.startDate.day < DateTime.now().day || element.startDate.month < DateTime.now().month)))))
+        .toList();
   }
 
   List<Task> tasksToday() {
-    return this._scheduledTasks.where((element) => (element.startDate != null && element.startDate.difference(DateTime.now()).inDays == 0)).toList();
+    return this._scheduledTasks.where((element) => (element.startDate != null && element.startDate.difference(DateTime.now()).inDays == 0 && element.startDate.day == DateTime.now().day)).toList();
   }
 
   List<Task> taskAfterToday() {
-    return this._scheduledTasks.where((element) => (element.startDate != null && element.startDate.difference(DateTime.now()).inDays > 0)).toList();
+    return this
+        ._scheduledTasks
+        .where((element) => (element.startDate != null &&
+            (element.startDate.difference(DateTime.now()).inDays > 0 || (element.startDate.difference(DateTime.now()).inDays == 0 && (element.startDate.day > DateTime.now().day || element.startDate.month > DateTime.now().month)))))
+        .toList();
   }
 }

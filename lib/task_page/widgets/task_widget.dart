@@ -29,6 +29,13 @@ class _TaskWidgetState extends State<TaskWidget> {
   Widget build(BuildContext context) {
     bool isArchived = (this.widget.task.localization == 'COMPLETED' || this.widget.task.localization == 'TRASH');
 
+    DateTime taskEndDate;
+    DateTime today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+
+    if (this.widget.task.endDate != null) {
+      taskEndDate = DateTime(this.widget.task.endDate.year, this.widget.task.endDate.month, this.widget.task.endDate.day);
+    }
+
     return Container(
       width: 319,
       padding: EdgeInsets.symmetric(
@@ -247,15 +254,15 @@ class _TaskWidgetState extends State<TaskWidget> {
                           Container(
                             child: Row(
                               children: [
-                                if (this.widget.task.endDate.difference(DateTime.now()).inDays == 0) Icon(Icons.access_time_outlined),
-                                if (this.widget.task.endDate.difference(DateTime.now()).inDays == 0)
+                                if (taskEndDate.difference(today).inDays == 0) Icon(Icons.access_time_outlined),
+                                if (taskEndDate.difference(today).inDays == 0)
                                   Text(
                                     DateFormat('Hm').format(this.widget.task.endDate),
                                   ),
-                                if (this.widget.task.endDate.difference(DateTime.now()).inDays < 0) Icon(Icons.fireplace_outlined),
-                                if (this.widget.task.endDate.difference(DateTime.now()).inDays < 0) Text(DateTime.now().difference(this.widget.task.endDate).inDays.toString() + 'd overude'),
-                                if (this.widget.task.endDate.difference(DateTime.now()).inDays > 0) Icon(Icons.hourglass_bottom_outlined),
-                                if (this.widget.task.endDate.difference(DateTime.now()).inDays > 0) Text(this.widget.task.endDate.difference(DateTime.now()).inDays.toString() + 'd left'),
+                                if (taskEndDate.difference(today).inDays < 0) Icon(Icons.fireplace_outlined),
+                                if (taskEndDate.difference(today).inDays < 0) Text(today.difference(taskEndDate).inDays.toString() + 'd overude'),
+                                if (taskEndDate.difference(today).inDays > 0) Icon(Icons.hourglass_bottom_outlined),
+                                if (taskEndDate.difference(today).inDays > 0) Text(taskEndDate.difference(today).inDays.toString() + 'd left'),
                               ],
                             ),
                           )
