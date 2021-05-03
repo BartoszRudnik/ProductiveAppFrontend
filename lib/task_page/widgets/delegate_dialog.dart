@@ -6,12 +6,21 @@ import 'package:provider/provider.dart';
 class DelegateDialog extends StatelessWidget {
   final _collaboratorKey = GlobalKey<FormState>();
 
-  String _choosenCollaborator;
+  String choosenCollaborator;
+
+  DelegateDialog({
+    this.choosenCollaborator,
+  });
 
   @override
   Widget build(BuildContext context) {
     List<Collaborator> collaborators = Provider.of<DelegateProvider>(context).collaboratorsList;
     List<Collaborator> filteredCollaborators = List<Collaborator>.from(collaborators);
+
+    final index = filteredCollaborators.indexWhere((element) => element.email == this.choosenCollaborator);
+    if (index != -1) {
+      filteredCollaborators.elementAt(index).isSelected = true;
+    }
 
     return StatefulBuilder(
       builder: (context, setState) {
@@ -144,7 +153,7 @@ class DelegateDialog extends StatelessWidget {
                               }
                             });
                             filteredCollaborators[collaboratorIndex].isSelected = true;
-                            this._choosenCollaborator = filteredCollaborators[collaboratorIndex].email;
+                            this.choosenCollaborator = filteredCollaborators[collaboratorIndex].email;
                           });
                         },
                         child: Card(
@@ -188,7 +197,7 @@ class DelegateDialog extends StatelessWidget {
                         side: BorderSide(color: Theme.of(context).primaryColor),
                       ),
                       onPressed: () {
-                        Navigator.of(context).pop(this._choosenCollaborator);
+                        Navigator.of(context).pop(this.choosenCollaborator);
                       },
                       child: Text(
                         'Add collaborator',

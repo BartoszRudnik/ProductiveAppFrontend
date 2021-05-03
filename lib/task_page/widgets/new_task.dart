@@ -139,6 +139,7 @@ class _NewTaskState extends State<NewTask> {
       delegatedEmail: this._delegatedEmail,
       isDelegated: false,
       taskStatus: null,
+      isCanceled: false,
     );
 
     try {

@@ -15,6 +15,7 @@ class Task with ChangeNotifier {
   List<Tag> tags = [];
   bool done;
   bool isDelegated;
+  bool isCanceled;
 
   Task({
     @required this.id,
@@ -30,5 +31,6 @@ class Task with ChangeNotifier {
     this.delegatedEmail,
     this.isDelegated,
     this.taskStatus,
+    this.isCanceled,
   });
 }

@@ -17,7 +17,7 @@ class TaskProvider with ChangeNotifier {
 
   List<String> taskPriorities = [];
 
-  final _localizations = ['INBOX', 'SCHEDULED', 'ANYTIME', 'COMPLETED', 'TRASH'];
+  final _localizations = ['INBOX', 'SCHEDULED', 'ANYTIME', 'COMPLETED', 'TRASH', 'DELEGATED'];
 
   final String userMail;
   final String authToken;
@@ -106,6 +106,7 @@ class TaskProvider with ChangeNotifier {
             'tags': task.tags.map((tag) => tag.toJson()).toList(),
             'localization': task.localization,
             'delegatedEmail': task.delegatedEmail,
+            'isCanceled': task.isCanceled,
           },
         ),
         headers: {
@@ -191,7 +192,7 @@ class TaskProvider with ChangeNotifier {
     }
 
     try {
-      await http.put(
+      final response = await http.put(
         url,
         body: json.encode(
           {
@@ -206,6 +207,7 @@ class TaskProvider with ChangeNotifier {
             'localization': newLocation,
             'position': task.position,
             'delegatedEmail': task.delegatedEmail,
+            'isCanceled': task.isCanceled,
           },
         ),
         headers: {
@@ -213,6 +215,8 @@ class TaskProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
+
+      print(response.body);
 
       if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
         task.endDate = null;
@@ -284,6 +288,7 @@ class TaskProvider with ChangeNotifier {
           delegatedEmail: element['tasks']['delegatedEmail'],
           isDelegated: element['tasks']['isDelegated'],
           taskStatus: taskStatus,
+          isCanceled: element['tasks']['isCanceled'],
         );
 
         if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {

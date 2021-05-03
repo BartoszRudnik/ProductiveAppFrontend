@@ -119,15 +119,17 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     }
 
     this._formKey.currentState.save();
+
     try {
-      if (this.startTime != null) {
+      if (this.startTime != null && taskToEdit.startDate != null) {
         taskToEdit.startDate = new DateTime(taskToEdit.startDate.year, taskToEdit.startDate.month, taskToEdit.startDate.day, this.startTime.hour, this.startTime.minute);
-      } else {
+      } else if (taskToEdit.startDate != null) {
         taskToEdit.startDate = new DateTime(taskToEdit.startDate.year, taskToEdit.startDate.month, taskToEdit.startDate.day, 0, 0);
       }
-      if (this.endTime != null) {
+
+      if (this.endTime != null && taskToEdit.endDate != null) {
         taskToEdit.endDate = new DateTime(taskToEdit.endDate.year, taskToEdit.endDate.month, taskToEdit.endDate.day, this.endTime.hour, this.endTime.minute);
-      } else {
+      } else if (taskToEdit.endDate != null) {
         taskToEdit.endDate = new DateTime(taskToEdit.endDate.year, taskToEdit.endDate.month, taskToEdit.endDate.day, 0, 0);
       }
 
@@ -137,6 +139,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, newLocalization);
       Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);
     } catch (error) {
+      print(error);
       Dialogs.showWarningDialog(context, "An error has occured");
     }
     Navigator.pop(context);
@@ -179,11 +182,15 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     String value = await showDialog(
       context: context,
       builder: (context) {
-        return DelegateDialog();
+        return DelegateDialog(choosenCollaborator: this.taskToEdit.delegatedEmail);
       },
     );
+
     print(value);
-    //taskToEdit.delegated = value;
+
+    if (value != null) {
+      this.taskToEdit.delegatedEmail = value;
+    }
   }
 
   void setTaskToEdit(Task argTask) {
@@ -209,6 +216,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       priority: argTask.priority,
       tags: argTask.tags,
       position: argTask.position,
+      delegatedEmail: argTask.delegatedEmail,
+      isCanceled: argTask.isCanceled,
     );
   }
 
