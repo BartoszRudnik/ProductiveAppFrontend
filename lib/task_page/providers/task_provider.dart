@@ -533,6 +533,10 @@ class TaskProvider with ChangeNotifier {
     return [...listToFilter.where((element) => (element.isDelegated != null && element.isDelegated))];
   }
 
+  List<Task> filterCollaboratorEmail(List<Task> listToFilter, String filterEmail) {
+    return [...listToFilter.where((element) => (element.delegatedEmail != null && element.delegatedEmail == filterEmail))];
+  }
+
   int countInboxDelegated() {
     List<Task> tmpList = [];
 

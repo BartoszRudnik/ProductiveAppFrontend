@@ -43,6 +43,9 @@ class FiltersAppBar extends StatelessWidget with PreferredSizeWidget {
               if (userSettings.showOnlyUnfinished != null && userSettings.showOnlyUnfinished) {
                 Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyUnfinished();
               }
+              if (userSettings.collaboratorEmail != null) {
+                Provider.of<SettingsProvider>(context, listen: false).filterCollaboratorEmail(null);
+              }
             },
             child: Text(
               'Clear filters',

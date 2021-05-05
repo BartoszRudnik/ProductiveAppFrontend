@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/task_page/widgets/delegate_dialog.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/settings_provider.dart';
@@ -16,6 +17,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
   Widget build(BuildContext context) {
     final userSettings = Provider.of<SettingsProvider>(context).userSettings;
 
+    String collaboratorEmail = userSettings.collaboratorEmail;
     bool showOnlyUnfinished = userSettings.showOnlyUnfinished;
     bool showOnlyDelegated = userSettings.showOnlyDelegated;
 
@@ -320,7 +322,22 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                   primary: Theme.of(context).accentColor,
                                   side: BorderSide(color: Theme.of(context).primaryColor),
                                 ),
-                                onPressed: () {},
+                                onPressed: () async {
+                                  collaboratorEmail = await showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      if (collaboratorEmail != null) {
+                                        return DelegateDialog(choosenCollaborator: collaboratorEmail);
+                                      } else {
+                                        return DelegateDialog();
+                                      }
+                                    },
+                                  );
+
+                                  if (collaboratorEmail != null && collaboratorEmail.length > 1) {
+                                    Provider.of<SettingsProvider>(context, listen: false).filterCollaboratorEmail(collaboratorEmail);
+                                  }
+                                },
                                 child: Text(
                                   'Choose collaborator',
                                   style: TextStyle(
@@ -332,6 +349,45 @@ class _FiltersScreenState extends State<FiltersScreen> {
                             ),
                           ],
                         ),
+                        if (collaboratorEmail != null && collaboratorEmail.length > 1)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.symmetric(horizontal: 4),
+                              margin: EdgeInsets.symmetric(horizontal: 8),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).primaryColor,
+                                border: Border.all(
+                                  color: Theme.of(context).primaryColor,
+                                  width: 0.2,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 16.0),
+                                    child: Text(
+                                      collaboratorEmail,
+                                      style: TextStyle(color: Theme.of(context).accentColor, fontSize: 18),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.cancel_outlined, color: Theme.of(context).accentColor),
+                                    onPressed: () {
+                                      setState(
+                                        () {
+                                          collaboratorEmail = null;
+                                          Provider.of<SettingsProvider>(context, listen: false).filterCollaboratorEmail(collaboratorEmail);
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),

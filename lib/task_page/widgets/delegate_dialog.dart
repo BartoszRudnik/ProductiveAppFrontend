@@ -181,6 +181,11 @@ class DelegateDialog extends StatelessWidget {
                         side: BorderSide(color: Theme.of(context).primaryColor),
                       ),
                       onPressed: () {
+                        final index = filteredCollaborators.indexWhere((element) => element.email == this.choosenCollaborator);
+                        if (index != -1) {
+                          filteredCollaborators.elementAt(index).isSelected = false;
+                        }
+
                         Navigator.of(context).pop('');
                       },
                       child: Text(
@@ -197,6 +202,11 @@ class DelegateDialog extends StatelessWidget {
                         side: BorderSide(color: Theme.of(context).primaryColor),
                       ),
                       onPressed: () {
+                        final index = filteredCollaborators.indexWhere((element) => element.email == this.choosenCollaborator);
+                        if (index != -1) {
+                          filteredCollaborators.elementAt(index).isSelected = false;
+                        }
+
                         Navigator.of(context).pop(this.choosenCollaborator);
                       },
                       child: Text(

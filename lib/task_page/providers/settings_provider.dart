@@ -29,8 +29,39 @@ class SettingsProvider with ChangeNotifier {
       Settings newSettings = Settings(
         showOnlyUnfinished: responseBody['showOnlyUnfinished'],
         showOnlyDelegated: responseBody['showOnlyDelegated'],
+        collaboratorEmail: responseBody['collaboratorEmail'],
       );
       this.userSettings = newSettings;
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<void> filterCollaboratorEmail(String collaboratorEmail) async {
+    final finalUrl = this._serverUrl + 'filterSettings/filterCollaboratorEmail/${this.userMail}';
+
+    try {
+      final response = await http.post(
+        finalUrl,
+        body: json.encode(
+          {
+            'collaboratorEmail': collaboratorEmail,
+          },
+        ),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      if (collaboratorEmail != null) {
+        this.userSettings.collaboratorEmail = collaboratorEmail;
+      } else {
+        this.userSettings.collaboratorEmail = null;
+      }
 
       notifyListeners();
     } catch (error) {
