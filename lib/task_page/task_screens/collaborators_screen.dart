@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/task_page/models/collaborator.dart';
-import 'package:productive_app/task_page/providers/delegate_provider.dart';
-import 'package:productive_app/task_page/widgets/accepted_collaborator.dart';
-import 'package:productive_app/task_page/widgets/new_collaborator.dart';
-import 'package:productive_app/task_page/widgets/received_collaborator.dart';
-import 'package:productive_app/task_page/widgets/send_collaborator.dart';
-import 'package:productive_app/task_page/widgets/task_appBar.dart';
 import 'package:provider/provider.dart';
+
+import '../models/collaborator.dart';
+import '../providers/delegate_provider.dart';
+import '../widgets/accepted_collaborator.dart';
+import '../widgets/new_collaborator.dart';
+import '../widgets/received_collaborator.dart';
+import '../widgets/send_collaborator.dart';
+import '../widgets/task_appBar.dart';
 
 class CollaboratorsScreen extends StatefulWidget {
   static const routeName = "/collaborators";

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/task_page/models/task.dart';
 import 'package:productive_app/task_page/providers/delegate_provider.dart';
+import 'package:productive_app/task_page/providers/settings_provider.dart';
 import 'package:productive_app/task_page/providers/tag_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -17,6 +19,7 @@ class _AnytimeScreenState extends State<AnytimeScreen> {
     await Provider.of<TaskProvider>(context, listen: false).getPriorities();
     await Provider.of<TagProvider>(context, listen: false).getTags();
     await Provider.of<DelegateProvider>(context, listen: false).getCollaborators();
+    await Provider.of<SettingsProvider>(context, listen: false).getFilterSettings();
   }
 
   @override
@@ -27,7 +30,13 @@ class _AnytimeScreenState extends State<AnytimeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final tasks = Provider.of<TaskProvider>(context).anytimeTasks;
+    List<Task> tasks = [];
+
+    if (Provider.of<SettingsProvider>(context).userSettings.showOnlyUnfinished != null && Provider.of<SettingsProvider>(context).userSettings.showOnlyUnfinished) {
+      tasks = Provider.of<TaskProvider>(context).unfinishedAnytimeTasks;
+    } else {
+      tasks = Provider.of<TaskProvider>(context).anytimeTasks;
+    }
 
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 20),

@@ -1,11 +1,11 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
-import 'package:productive_app/task_page/providers/delegate_provider.dart';
-import 'package:productive_app/task_page/providers/task_provider.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/delegate_provider.dart';
+import '../providers/task_provider.dart';
+import '../widgets/newTask_appBar.dart';
 import '../widgets/new_task.dart';
-import '../widgets/task_appBar.dart';
 import 'anyTime_screen.dart';
 import 'delegated_screen.dart';
 import 'inbox_screen.dart';
@@ -126,7 +126,7 @@ class _TabsScreenState extends State<TabsScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Badge(
-                  showBadge: Provider.of<TaskProvider>(context).countInboxDelegated() > 0,
+                  showBadge: Provider.of<TaskProvider>(context).countInboxDelegated() != null && Provider.of<TaskProvider>(context).countInboxDelegated() > 0,
                   badgeColor: index == _selectedPageIndex ? Theme.of(context).accentColor : Theme.of(context).primaryColor,
                   badgeContent: Text(
                     Provider.of<TaskProvider>(context).countInboxDelegated().toString(),
@@ -191,7 +191,7 @@ class _TabsScreenState extends State<TabsScreen> {
           }
         },
         child: Scaffold(
-          appBar: TaskAppBar(
+          appBar: NewTaskAppBar(
             title: _pages[_selectedPageIndex]['title'],
             leadingButton: IconButton(
                 icon: Badge(
@@ -204,9 +204,6 @@ class _TabsScreenState extends State<TabsScreen> {
                   isDrawerVisible ? _changeTranform(0, 0, 1) : _changeTranform(230, 70, 0.8);
                 }),
           ),
-          /*drawer: DrawerScreen(
-            username: Provider.of<AuthProvider>(context, listen: false).email,
-          ), */
           body: _pages[_selectedPageIndex]['page'],
           floatingActionButton: FloatingActionButton(
             child: Icon(

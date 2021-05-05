@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:productive_app/shared/dialogs.dart';
-import 'package:productive_app/task_page/models/task.dart';
-import 'package:productive_app/task_page/providers/task_provider.dart';
-import 'package:productive_app/task_page/widgets/delegate_dialog.dart';
-import 'package:productive_app/task_page/widgets/tags_dialog.dart';
-import 'package:productive_app/task_page/utils/date_time_pickers.dart';
-import 'package:productive_app/task_page/widgets/task_appBar.dart';
-import 'package:productive_app/task_page/widgets/task_tags_edit.dart';
 import 'package:provider/provider.dart';
+
+import '../../shared/dialogs.dart';
+import '../models/task.dart';
+import '../providers/task_provider.dart';
+import '../utils/date_time_pickers.dart';
+import '../widgets/delegate_dialog.dart';
+import '../widgets/tags_dialog.dart';
+import '../widgets/task_appBar.dart';
+import '../widgets/task_tags_edit.dart';
 
 class TaskDetailScreen extends StatefulWidget {
   static const routeName = "/task-details";

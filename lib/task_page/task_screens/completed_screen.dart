@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/task_page/providers/task_provider.dart';
-import 'package:productive_app/task_page/widgets/task_appBar.dart';
-import 'package:productive_app/task_page/widgets/task_widget.dart';
 import 'package:provider/provider.dart';
+
+import '../providers/task_provider.dart';
+import '../widgets/task_appBar.dart';
+import '../widgets/task_widget.dart';
 
 class CompletedScreen extends StatelessWidget {
   static const routeName = '/completed-screen';

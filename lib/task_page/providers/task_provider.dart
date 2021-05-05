@@ -52,12 +52,24 @@ class TaskProvider with ChangeNotifier {
     return [...this._inboxTasks];
   }
 
+  List<Task> get unfinishedInboxTasks {
+    return [...this._inboxTasks.where((task) => !task.done)];
+  }
+
   List<Task> get anytimeTasks {
     return [...this._anytimeTasks];
   }
 
+  List<Task> get unfinishedAnytimeTasks {
+    return [...this._anytimeTasks.where((task) => !task.done)];
+  }
+
   List<Task> get scheduledTasks {
     return [...this._scheduledTasks];
+  }
+
+  List<Task> get unfinishedScheduledTasks {
+    return [...this._scheduledTasks.where((task) => !task.done)];
   }
 
   List<Task> get completedTasks {
@@ -513,8 +525,21 @@ class TaskProvider with ChangeNotifier {
         .toList();
   }
 
+  List<Task> unfinishedTasksBeforeToday() {
+    return this
+        ._scheduledTasks
+        .where((element) => (!element.done &&
+            element.startDate != null &&
+            (element.startDate.difference(DateTime.now()).inDays < 0 || (element.startDate.difference(DateTime.now()).inDays == 0 && (element.startDate.day < DateTime.now().day || element.startDate.month < DateTime.now().month)))))
+        .toList();
+  }
+
   List<Task> tasksToday() {
     return this._scheduledTasks.where((element) => (element.startDate != null && element.startDate.difference(DateTime.now()).inDays == 0 && element.startDate.day == DateTime.now().day)).toList();
+  }
+
+  List<Task> unfinishedTasksToday() {
+    return this._scheduledTasks.where((element) => (!element.done && element.startDate != null && element.startDate.difference(DateTime.now()).inDays == 0 && element.startDate.day == DateTime.now().day)).toList();
   }
 
   List<Task> taskAfterToday() {
@@ -525,7 +550,28 @@ class TaskProvider with ChangeNotifier {
         .toList();
   }
 
+  List<Task> unfinishedTasksAfterToday() {
+    return this
+        ._scheduledTasks
+        .where((element) => (!element.done &&
+            element.startDate != null &&
+            (element.startDate.difference(DateTime.now()).inDays > 0 || (element.startDate.difference(DateTime.now()).inDays == 0 && (element.startDate.day > DateTime.now().day || element.startDate.month > DateTime.now().month)))))
+        .toList();
+  }
+
   int countInboxDelegated() {
-    return this._inboxTasks.where((task) => task.isDelegated).toList().length;
+    List<Task> tmpList = [];
+
+    tmpList = [...this._inboxTasks.where((task) => (task.isDelegated != null && task.isDelegated == true))];
+
+    if (tmpList != null) {
+      return tmpList.length;
+    } else {
+      return 0;
+    }
+  }
+
+  int countUnfinishedInboxDelegated() {
+    return this._inboxTasks.where((task) => (!task.done && task.isDelegated)).toList().length;
   }
 }

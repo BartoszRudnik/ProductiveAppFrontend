@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/task_page/models/tag.dart';
-import 'package:productive_app/task_page/providers/tag_provider.dart';
-import 'package:productive_app/task_page/providers/task_provider.dart';
-import 'package:productive_app/task_page/widgets/new_tag.dart';
-import 'package:productive_app/task_page/widgets/task_appBar.dart';
 import 'package:provider/provider.dart';
+
+import '../models/tag.dart';
+import '../providers/tag_provider.dart';
+import '../providers/task_provider.dart';
+import '../widgets/new_tag.dart';
+import '../widgets/task_appBar.dart';
 
 class TagsScreen extends StatefulWidget {
   static const routeName = '/tags-screen';

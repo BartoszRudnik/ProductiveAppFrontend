@@ -1,10 +1,11 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
-import 'package:productive_app/login/models/user.dart';
-import 'package:productive_app/login/providers/auth_provider.dart';
-import 'package:productive_app/shared/dialogs.dart';
-import 'package:productive_app/task_page/widgets/task_appBar.dart';
 import 'package:provider/provider.dart';
+
+import '../../login/models/user.dart';
+import '../../login/providers/auth_provider.dart';
+import '../../shared/dialogs.dart';
+import '../widgets/task_appBar.dart';
 
 class SettingsScreen extends StatefulWidget {
   static const routeName = "/collaborators";
@@ -18,8 +19,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   User user;
 
   Future<void> updateUserInfo() async {
-    bool hasAgreed = await Dialogs.showChoiceDialog(
-        context, "Are you sure you want to update your account information?");
+    bool hasAgreed = await Dialogs.showChoiceDialog(context, "Are you sure you want to update your account information?");
     if (hasAgreed) {
       //TO DO delete account
       print("Delet account");
@@ -27,8 +27,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> deleteUser() async {
-    bool hasAgreed = await Dialogs.showChoiceDialog(context,
-        "Are you sure you want to delete your account? This action cannot be undone!");
+    bool hasAgreed = await Dialogs.showChoiceDialog(context, "Are you sure you want to delete your account? This action cannot be undone!");
     if (hasAgreed) {
       //TO DO delete account
       print("Delet account");
@@ -36,8 +35,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> resetPassword() async {
-    bool hasAgreed = await Dialogs.showChoiceDialog(
-        context, "Are you sure you want to reset your password?");
+    bool hasAgreed = await Dialogs.showChoiceDialog(context, "Are you sure you want to reset your password?");
     if (hasAgreed) {
       //TO DO reset password
       print("Password reset");
@@ -45,8 +43,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> removeAvatar() async {
-    bool hasAgreed = await Dialogs.showChoiceDialog(
-        context, "Are you sure you want to remove your avatar?");
+    bool hasAgreed = await Dialogs.showChoiceDialog(context, "Are you sure you want to remove your avatar?");
     if (hasAgreed) {
       //TO DO reset password
       print("Remove avatar");
@@ -89,8 +86,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 width: 80,
                                 height: 80,
                                 child: CircleAvatar(
-                                  backgroundColor:
-                                      Theme.of(context).primaryColor,
+                                  backgroundColor: Theme.of(context).primaryColor,
                                 ),
                               )),
                         )),
@@ -106,9 +102,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               user.email,
                               style: TextStyle(fontSize: 20),
                             ),
-                            GestureDetector(
-                                onTap: () => removeAvatar(),
-                                child: Text("Remove avatar"))
+                            GestureDetector(onTap: () => removeAvatar(), child: Text("Remove avatar"))
                           ],
                         ),
                       ))
@@ -173,8 +167,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               initialValue: user.firstName,
                               style: TextStyle(fontSize: 18),
                               maxLines: 1,
-                              decoration:
-                                  InputDecoration(hintText: "First name"),
+                              decoration: InputDecoration(hintText: "First name"),
                               onSaved: (value) {
                                 user.firstName = value;
                               },
@@ -197,8 +190,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               initialValue: user.lastName,
                               style: TextStyle(fontSize: 18),
                               maxLines: 1,
-                              decoration:
-                                  InputDecoration(hintText: "Last name"),
+                              decoration: InputDecoration(hintText: "Last name"),
                               onSaved: (value) {
                                 user.lastName = value;
                               },
@@ -207,8 +199,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ],
                       ),
                       ConstrainedBox(
-                          constraints:
-                              const BoxConstraints(minWidth: double.infinity),
+                          constraints: const BoxConstraints(minWidth: double.infinity),
                           child: TextButton(
                             onPressed: () {
                               if (_formKey.currentState.validate()) {
@@ -216,32 +207,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 updateUserInfo();
                               }
                             },
-                            style: ButtonStyle(
-                                alignment: Alignment.centerLeft,
-                                padding: MaterialStateProperty.all<EdgeInsets>(
-                                    EdgeInsets.fromLTRB(0, 0, 0, 0)),
-                                overlayColor: MaterialStateProperty.all(
-                                    Color.fromRGBO(150, 150, 150, 0.3))),
-                            child: Text("Save account information",
-                                style: TextStyle(
-                                    color: Theme.of(context).primaryColor,
-                                    fontSize: 18)),
+                            style: ButtonStyle(alignment: Alignment.centerLeft, padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.fromLTRB(0, 0, 0, 0)), overlayColor: MaterialStateProperty.all(Color.fromRGBO(150, 150, 150, 0.3))),
+                            child: Text("Save account information", style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 18)),
                           )),
                       ConstrainedBox(
-                          constraints:
-                              const BoxConstraints(minWidth: double.infinity),
+                          constraints: const BoxConstraints(minWidth: double.infinity),
                           child: TextButton(
                             onPressed: () => resetPassword(),
-                            style: ButtonStyle(
-                                alignment: Alignment.centerLeft,
-                                padding: MaterialStateProperty.all<EdgeInsets>(
-                                    EdgeInsets.fromLTRB(0, 0, 0, 0)),
-                                overlayColor: MaterialStateProperty.all(
-                                    Color.fromRGBO(150, 150, 150, 0.3))),
-                            child: Text("Reset password",
-                                style: TextStyle(
-                                    color: Theme.of(context).primaryColor,
-                                    fontSize: 18)),
+                            style: ButtonStyle(alignment: Alignment.centerLeft, padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.fromLTRB(0, 0, 0, 0)), overlayColor: MaterialStateProperty.all(Color.fromRGBO(150, 150, 150, 0.3))),
+                            child: Text("Reset password", style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 18)),
                           )),
                     ],
                   )),
@@ -260,14 +234,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   constraints: const BoxConstraints(minWidth: double.infinity),
                   child: TextButton(
                     onPressed: () => deleteUser(),
-                    style: ButtonStyle(
-                        alignment: Alignment.centerLeft,
-                        padding: MaterialStateProperty.all<EdgeInsets>(
-                            EdgeInsets.fromLTRB(0, 0, 0, 0)),
-                        overlayColor: MaterialStateProperty.all(
-                            Color.fromRGBO(150, 150, 150, 0.3))),
-                    child: Text("Delete account",
-                        style: TextStyle(color: Colors.red, fontSize: 18)),
+                    style: ButtonStyle(alignment: Alignment.centerLeft, padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.fromLTRB(0, 0, 0, 0)), overlayColor: MaterialStateProperty.all(Color.fromRGBO(150, 150, 150, 0.3))),
+                    child: Text("Delete account", style: TextStyle(color: Colors.red, fontSize: 18)),
                   ))
             ],
           )),

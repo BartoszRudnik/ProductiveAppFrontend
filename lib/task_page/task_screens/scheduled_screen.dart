@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/task_page/models/task.dart';
 import 'package:productive_app/task_page/providers/delegate_provider.dart';
+import 'package:productive_app/task_page/providers/settings_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/tag_provider.dart';
@@ -17,6 +19,7 @@ class _ScheduledScreenState extends State<ScheduledScreen> {
     await Provider.of<TaskProvider>(context, listen: false).getPriorities();
     await Provider.of<TagProvider>(context, listen: false).getTags();
     await Provider.of<DelegateProvider>(context, listen: false).getCollaborators();
+    await Provider.of<SettingsProvider>(context, listen: false).getFilterSettings();
   }
 
   @override
@@ -27,9 +30,19 @@ class _ScheduledScreenState extends State<ScheduledScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final before = Provider.of<TaskProvider>(context).tasksBeforeToday();
-    final today = Provider.of<TaskProvider>(context).tasksToday();
-    final after = Provider.of<TaskProvider>(context).taskAfterToday();
+    List<Task> before = [];
+    List<Task> today = [];
+    List<Task> after = [];
+
+    if (Provider.of<SettingsProvider>(context).userSettings.showOnlyUnfinished != null && Provider.of<SettingsProvider>(context).userSettings.showOnlyUnfinished) {
+      before = Provider.of<TaskProvider>(context).unfinishedTasksBeforeToday();
+      today = Provider.of<TaskProvider>(context).unfinishedTasksToday();
+      after = Provider.of<TaskProvider>(context).unfinishedTasksAfterToday();
+    } else {
+      before = Provider.of<TaskProvider>(context).tasksBeforeToday();
+      today = Provider.of<TaskProvider>(context).tasksToday();
+      after = Provider.of<TaskProvider>(context).taskAfterToday();
+    }
 
     return RefreshIndicator(
       backgroundColor: Theme.of(context).primaryColor,

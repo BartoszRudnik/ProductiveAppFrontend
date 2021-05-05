@@ -177,7 +177,7 @@ class _TaskWidgetState extends State<TaskWidget> {
             children: <Widget>[
               Row(
                 children: <Widget>[
-                  if (!isArchived && !this.widget.task.isCanceled)
+                  if (!isArchived || (this.widget.task.isCanceled != null && !this.widget.task.isCanceled))
                     IsDoneButton(
                       isDone: this.widget.task.done,
                       changeIsDoneStatus: this.changeTaskStatus,
@@ -191,8 +191,8 @@ class _TaskWidgetState extends State<TaskWidget> {
                       fontSize: 20,
                       fontWeight: FontWeight.w400,
                       fontFamily: 'RobotoCondensed',
-                      decoration: this.widget.task.done || this.widget.task.isCanceled ? TextDecoration.lineThrough : null,
-                      color: this.widget.task.done || this.widget.task.isCanceled ? Colors.grey : Theme.of(context).primaryColor,
+                      decoration: this.widget.task.done || (this.widget.task.isCanceled != null && this.widget.task.isCanceled) ? TextDecoration.lineThrough : null,
+                      color: this.widget.task.done || (this.widget.task.isCanceled != null && this.widget.task.isCanceled) ? Colors.grey : Theme.of(context).primaryColor,
                     ),
                   ),
                   SizedBox(width: 7),
@@ -215,7 +215,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                         ),
                       ),
                     ),
-                  if (this.widget.task.isCanceled)
+                  if (this.widget.task.isCanceled != null && this.widget.task.isCanceled)
                     Container(
                       alignment: Alignment.center,
                       padding: EdgeInsets.symmetric(horizontal: 4),
