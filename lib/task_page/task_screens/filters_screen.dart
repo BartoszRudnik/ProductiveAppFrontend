@@ -14,8 +14,10 @@ class FiltersScreen extends StatefulWidget {
 class _FiltersScreenState extends State<FiltersScreen> {
   @override
   Widget build(BuildContext context) {
-    bool showOnlyUnfinished = Provider.of<SettingsProvider>(context).userSettings.showOnlyUnfinished;
-    bool showOnlyDelegated = false;
+    final userSettings = Provider.of<SettingsProvider>(context).userSettings;
+
+    bool showOnlyUnfinished = userSettings.showOnlyUnfinished;
+    bool showOnlyDelegated = userSettings.showOnlyDelegated;
 
     return Scaffold(
       appBar: FiltersAppBar(
@@ -55,6 +57,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Card(
+                  elevation: 8,
                   child: Column(
                     children: [
                       Padding(
@@ -189,6 +192,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Card(
+                  elevation: 8,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
@@ -238,6 +242,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Card(
+                  elevation: 8,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
@@ -286,6 +291,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Card(
+                  elevation: 8,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
@@ -334,6 +340,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Card(
+                  elevation: 8,
                   child: SwitchListTile(
                     activeColor: Theme.of(context).primaryColor,
                     title: Text('Show only unfinished tasks'),
@@ -350,6 +357,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Card(
+                  elevation: 8,
                   child: SwitchListTile(
                     activeColor: Theme.of(context).primaryColor,
                     title: Text('Show only delegated tasks'),
@@ -357,6 +365,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                     onChanged: (bool value) {
                       setState(() {
                         showOnlyDelegated = value;
+                        Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyDelegated();
                       });
                     },
                   ),

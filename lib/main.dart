@@ -65,7 +65,12 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProxyProvider<AuthProvider, SettingsProvider>(
           create: null,
           update: (ctx, auth, previousSettings) => SettingsProvider(
-            userSettings: previousSettings == null ? Settings(showOnlyUnfinished: false) : previousSettings.userSettings,
+            userSettings: previousSettings == null
+                ? Settings(
+                    showOnlyUnfinished: false,
+                    showOnlyDelegated: false,
+                  )
+                : previousSettings.userSettings,
             userMail: auth.email,
             authToken: auth.token,
           ),

@@ -30,12 +30,14 @@ class _InboxScreenState extends State<InboxScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<Task> tasks = [];
+    List<Task> tasks = Provider.of<TaskProvider>(context).inboxTasks;
+    final userSettings = Provider.of<SettingsProvider>(context).userSettings;
 
-    if (Provider.of<SettingsProvider>(context).userSettings.showOnlyUnfinished != null && Provider.of<SettingsProvider>(context).userSettings.showOnlyUnfinished) {
-      tasks = Provider.of<TaskProvider>(context).unfinishedInboxTasks;
-    } else {
-      tasks = Provider.of<TaskProvider>(context).inboxTasks;
+    if (userSettings.showOnlyUnfinished != null && userSettings.showOnlyUnfinished) {
+      tasks = Provider.of<TaskProvider>(context, listen: false).onlyUnfinishedTasks(tasks);
+    }
+    if (userSettings.showOnlyDelegated != null && userSettings.showOnlyDelegated) {
+      tasks = Provider.of<TaskProvider>(context, listen: false).onlyDelegatedTasks(tasks);
     }
 
     return Padding(

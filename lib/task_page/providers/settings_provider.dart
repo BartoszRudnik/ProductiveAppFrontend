@@ -6,7 +6,7 @@ import 'package:productive_app/task_page/models/settings.dart';
 import 'package:http/http.dart' as http;
 
 class SettingsProvider with ChangeNotifier {
-  Settings userSettings = Settings(showOnlyUnfinished: false);
+  Settings userSettings;
   final String userMail;
   final String authToken;
 
@@ -28,9 +28,30 @@ class SettingsProvider with ChangeNotifier {
 
       Settings newSettings = Settings(
         showOnlyUnfinished: responseBody['showOnlyUnfinished'],
+        showOnlyDelegated: responseBody['showOnlyDelegated'],
       );
       this.userSettings = newSettings;
 
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<void> changeShowOnlyDelegated() async {
+    final finalUrl = this._serverUrl + 'filterSettings/changeShowOnlyDelegatedStatus/${this.userMail}';
+
+    try {
+      final response = await http.post(
+        finalUrl,
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      this.userSettings.showOnlyDelegated = !this.userSettings.showOnlyDelegated;
       notifyListeners();
     } catch (error) {
       print(error);

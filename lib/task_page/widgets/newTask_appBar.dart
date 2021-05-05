@@ -42,27 +42,12 @@ class _NewTaskAppBarState extends State<NewTaskAppBar> {
       actions: <Widget>[
         PopupMenuButton(
           onSelected: (value) {
-            if (value == 'done') {
-              setState(() {
-                onlyUnfinished = !onlyUnfinished;
-                Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyUnfinished();
-              });
-            } else if (value == 'filters') {
+            if (value == 'filters') {
               Navigator.of(context).pushNamed(FiltersScreen.routeName);
             }
           },
           icon: Icon(Icons.more_vert),
           itemBuilder: (_) => [
-            PopupMenuItem(
-              child: onlyUnfinished == true
-                  ? Text(
-                      'Show all',
-                    )
-                  : Text(
-                      'Only unfinished',
-                    ),
-              value: 'done',
-            ),
             PopupMenuItem(
               child: Text('Filters'),
               value: 'filters',

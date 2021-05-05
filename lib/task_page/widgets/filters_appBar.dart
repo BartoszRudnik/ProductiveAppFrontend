@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:productive_app/task_page/providers/settings_provider.dart';
+import 'package:provider/provider.dart';
 
 class FiltersAppBar extends StatelessWidget with PreferredSizeWidget {
   final String title;
@@ -32,7 +34,16 @@ class FiltersAppBar extends StatelessWidget with PreferredSizeWidget {
               primary: Theme.of(context).primaryColor,
               side: BorderSide(color: Theme.of(context).primaryColor),
             ),
-            onPressed: () {},
+            onPressed: () {
+              final userSettings = Provider.of<SettingsProvider>(context, listen: false).userSettings;
+
+              if (userSettings.showOnlyDelegated != null && userSettings.showOnlyDelegated) {
+                Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyDelegated();
+              }
+              if (userSettings.showOnlyUnfinished != null && userSettings.showOnlyUnfinished) {
+                Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyUnfinished();
+              }
+            },
             child: Text(
               'Clear filters',
               style: TextStyle(
