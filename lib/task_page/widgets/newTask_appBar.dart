@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:productive_app/task_page/providers/settings_provider.dart';
+import 'package:productive_app/task_page/task_screens/filters_screen.dart';
 import 'package:provider/provider.dart';
 
 class NewTaskAppBar extends StatefulWidget with PreferredSizeWidget {
@@ -46,6 +47,8 @@ class _NewTaskAppBarState extends State<NewTaskAppBar> {
                 onlyUnfinished = !onlyUnfinished;
                 Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyUnfinished();
               });
+            } else if (value == 'filters') {
+              Navigator.of(context).pushNamed(FiltersScreen.routeName);
             }
           },
           icon: Icon(Icons.more_vert),
@@ -59,6 +62,10 @@ class _NewTaskAppBarState extends State<NewTaskAppBar> {
                       'Only unfinished',
                     ),
               value: 'done',
+            ),
+            PopupMenuItem(
+              child: Text('Filters'),
+              value: 'filters',
             ),
           ],
         ),

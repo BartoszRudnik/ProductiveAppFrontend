@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:productive_app/task_page/models/settings.dart';
 import 'package:productive_app/task_page/providers/settings_provider.dart';
+import 'package:productive_app/task_page/task_screens/filters_screen.dart';
 import 'package:productive_app/task_page/task_screens/settings_tabs_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -126,6 +127,7 @@ class MyApp extends StatelessWidget {
             TrashScreen.routeName: (ctx) => TrashScreen(),
             CollaboratorsScreen.routeName: (ctx) => CollaboratorsScreen(),
             SettingsTabsScreen.routeName: (ctx) => SettingsTabsScreen(),
+            FiltersScreen.routeName: (ctx) => FiltersScreen(),
           },
         ),
       ),
