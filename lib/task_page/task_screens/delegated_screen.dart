@@ -30,8 +30,8 @@ class _DelegatedScreenState extends State<DelegatedScreen> {
     List<Task> tasks = Provider.of<TaskProvider>(context).delegatedTasks;
     final userSettings = Provider.of<SettingsProvider>(context).userSettings;
 
-    if (userSettings.collaboratorEmail != null && userSettings.collaboratorEmail.length > 1) {
-      tasks = Provider.of<TaskProvider>(context, listen: false).filterCollaboratorEmail(tasks, userSettings.collaboratorEmail);
+    if (userSettings.collaborators != null && userSettings.collaborators.length >= 1) {
+      tasks = Provider.of<TaskProvider>(context, listen: false).filterCollaboratorEmail(tasks, userSettings.collaborators);
     }
 
     return Padding(

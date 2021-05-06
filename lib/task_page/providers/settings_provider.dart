@@ -14,7 +14,9 @@ class SettingsProvider with ChangeNotifier {
     this.userSettings,
     this.userMail,
     this.authToken,
-  });
+  }) {
+    this.userSettings.collaborators = [];
+  }
 
   String _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
@@ -26,10 +28,16 @@ class SettingsProvider with ChangeNotifier {
 
       final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
+      List<String> collaborators = [];
+
+      for (var element in responseBody['collaboratorEmail']) {
+        collaborators.add(element);
+      }
+
       Settings newSettings = Settings(
         showOnlyUnfinished: responseBody['showOnlyUnfinished'],
         showOnlyDelegated: responseBody['showOnlyDelegated'],
-        collaboratorEmail: responseBody['collaboratorEmail'],
+        collaborators: collaborators,
       );
       this.userSettings = newSettings;
 
@@ -40,8 +48,8 @@ class SettingsProvider with ChangeNotifier {
     }
   }
 
-  Future<void> filterCollaboratorEmail(String collaboratorEmail) async {
-    final finalUrl = this._serverUrl + 'filterSettings/filterCollaboratorEmail/${this.userMail}';
+  Future<void> addFilterCollaboratorEmail(List<String> collaboratorEmail) async {
+    final finalUrl = this._serverUrl + 'filterSettings/addFilterCollaboratorEmail/${this.userMail}';
 
     try {
       final response = await http.post(
@@ -58,10 +66,62 @@ class SettingsProvider with ChangeNotifier {
       );
 
       if (collaboratorEmail != null) {
-        this.userSettings.collaboratorEmail = collaboratorEmail;
-      } else {
-        this.userSettings.collaboratorEmail = null;
+        collaboratorEmail.forEach(
+          (element) {
+            if (!this.userSettings.collaborators.contains(element)) {
+              this.userSettings.collaborators.add(element);
+            }
+          },
+        );
       }
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<void> deleteFilterCollaboratorEmail(String collaboratorEmail) async {
+    final finalUrl = this._serverUrl + 'filterSettings/deleteFilterCollaboratorEmail/${this.userMail}';
+
+    try {
+      final response = await http.post(
+        finalUrl,
+        body: json.encode(
+          {
+            'collaboratorEmail': collaboratorEmail,
+          },
+        ),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      if (collaboratorEmail != null) {
+        this.userSettings.collaborators.remove(collaboratorEmail);
+      }
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<void> clearFilterCollaborators() async {
+    final finalUrl = this._serverUrl + 'filterSettings/clearFilterCollaborators/${this.userMail}';
+
+    try {
+      await http.post(
+        finalUrl,
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      this.userSettings.collaborators = [];
 
       notifyListeners();
     } catch (error) {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/task_page/widgets/delegate_dialog.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/settings_provider.dart';
+import '../widgets/filter_delegate_dialog.dart';
 import '../widgets/filters_appBar.dart';
 
 class FiltersScreen extends StatefulWidget {
@@ -17,7 +17,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
   Widget build(BuildContext context) {
     final userSettings = Provider.of<SettingsProvider>(context).userSettings;
 
-    String collaboratorEmail = userSettings.collaboratorEmail;
+    List<String> collaborators = userSettings.collaborators;
     bool showOnlyUnfinished = userSettings.showOnlyUnfinished;
     bool showOnlyDelegated = userSettings.showOnlyDelegated;
 
@@ -303,7 +303,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                           child: Row(
                             children: [
                               Text(
-                                'Collaborator',
+                                'Collaborators',
                                 style: TextStyle(
                                   fontSize: 26,
                                   fontWeight: FontWeight.w400,
@@ -323,23 +323,25 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                   side: BorderSide(color: Theme.of(context).primaryColor),
                                 ),
                                 onPressed: () async {
-                                  collaboratorEmail = await showDialog(
+                                  final selected = await showDialog(
                                     context: context,
                                     builder: (context) {
-                                      if (collaboratorEmail != null) {
-                                        return DelegateDialog(choosenCollaborator: collaboratorEmail);
+                                      if (collaborators != null) {
+                                        return FilterDelegateDialog(
+                                          choosenCollaborators: collaborators,
+                                        );
                                       } else {
-                                        return DelegateDialog();
+                                        return FilterDelegateDialog();
                                       }
                                     },
                                   );
 
-                                  if (collaboratorEmail != null && collaboratorEmail.length > 1) {
-                                    Provider.of<SettingsProvider>(context, listen: false).filterCollaboratorEmail(collaboratorEmail);
+                                  if (selected != null && selected.length >= 1) {
+                                    Provider.of<SettingsProvider>(context, listen: false).addFilterCollaboratorEmail(selected);
                                   }
                                 },
                                 child: Text(
-                                  'Choose collaborator',
+                                  'Choose collaborators',
                                   style: TextStyle(
                                     fontSize: 24,
                                     color: Theme.of(context).primaryColor,
@@ -349,42 +351,48 @@ class _FiltersScreenState extends State<FiltersScreen> {
                             ),
                           ],
                         ),
-                        if (collaboratorEmail != null && collaboratorEmail.length > 1)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: Container(
-                              alignment: Alignment.center,
-                              padding: EdgeInsets.symmetric(horizontal: 4),
-                              margin: EdgeInsets.symmetric(horizontal: 8),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColor,
-                                border: Border.all(
-                                  color: Theme.of(context).primaryColor,
-                                  width: 0.2,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 16.0),
-                                    child: Text(
-                                      collaboratorEmail,
-                                      style: TextStyle(color: Theme.of(context).accentColor, fontSize: 18),
+                        if (collaborators != null && collaborators.length >= 1)
+                          Container(
+                            height: 60,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: collaborators.length,
+                              itemBuilder: (context, index) => Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 8),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  padding: EdgeInsets.symmetric(horizontal: 4),
+                                  margin: EdgeInsets.symmetric(horizontal: 8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey,
+                                    border: Border.all(
+                                      color: Theme.of(context).primaryColor,
+                                      width: 0.7,
                                     ),
                                   ),
-                                  IconButton(
-                                    icon: Icon(Icons.cancel_outlined, color: Theme.of(context).accentColor),
-                                    onPressed: () {
-                                      setState(
-                                        () {
-                                          collaboratorEmail = null;
-                                          Provider.of<SettingsProvider>(context, listen: false).filterCollaboratorEmail(collaboratorEmail);
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 16.0),
+                                        child: Text(
+                                          collaborators[index],
+                                          style: TextStyle(color: Theme.of(context).accentColor, fontSize: 18),
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: Icon(Icons.cancel_outlined, color: Theme.of(context).accentColor),
+                                        onPressed: () {
+                                          setState(
+                                            () {
+                                              Provider.of<SettingsProvider>(context, listen: false).deleteFilterCollaboratorEmail(collaborators[index]);
+                                            },
+                                          );
                                         },
-                                      );
-                                    },
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
                             ),
                           ),

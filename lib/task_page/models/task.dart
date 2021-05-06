@@ -10,6 +10,7 @@ class Task with ChangeNotifier {
   String localization;
   String delegatedEmail;
   String taskStatus;
+  String supervisorEmail;
   DateTime startDate;
   DateTime endDate;
   List<Tag> tags = [];
@@ -32,5 +33,6 @@ class Task with ChangeNotifier {
     this.isDelegated,
     this.taskStatus,
     this.isCanceled,
+    this.supervisorEmail,
   });
 }

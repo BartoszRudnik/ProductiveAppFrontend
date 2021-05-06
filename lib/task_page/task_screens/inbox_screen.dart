@@ -39,8 +39,8 @@ class _InboxScreenState extends State<InboxScreen> {
     if (userSettings.showOnlyDelegated != null && userSettings.showOnlyDelegated) {
       tasks = Provider.of<TaskProvider>(context, listen: false).onlyDelegatedTasks(tasks);
     }
-    if (userSettings.collaboratorEmail != null && userSettings.collaboratorEmail.length > 1) {
-      tasks = Provider.of<TaskProvider>(context, listen: false).filterCollaboratorEmail(tasks, userSettings.collaboratorEmail);
+    if (userSettings.collaborators != null && userSettings.collaborators.length >= 1) {
+      tasks = Provider.of<TaskProvider>(context, listen: false).filterCollaboratorEmail(tasks, userSettings.collaborators);
     }
 
     return Padding(

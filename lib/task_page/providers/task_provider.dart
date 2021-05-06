@@ -260,6 +260,8 @@ class TaskProvider with ChangeNotifier {
 
       for (var element in responseBody) {
         List<Tag> taskTags = [];
+        String taskStatus;
+        String supervisorEmail;
 
         for (var tagElement in element['tags']) {
           taskTags.add(Tag(
@@ -268,7 +270,7 @@ class TaskProvider with ChangeNotifier {
           ));
         }
 
-        String taskStatus;
+        supervisorEmail = element['supervisorEmail'];
 
         if (element['tasks']['taskStatus'] != null) {
           taskStatus = element['tasks']['taskStatus'];
@@ -289,6 +291,7 @@ class TaskProvider with ChangeNotifier {
           isDelegated: element['tasks']['isDelegated'],
           taskStatus: taskStatus,
           isCanceled: element['tasks']['isCanceled'],
+          supervisorEmail: supervisorEmail,
         );
 
         if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
@@ -533,8 +536,8 @@ class TaskProvider with ChangeNotifier {
     return [...listToFilter.where((element) => (element.isDelegated != null && element.isDelegated))];
   }
 
-  List<Task> filterCollaboratorEmail(List<Task> listToFilter, String filterEmail) {
-    return [...listToFilter.where((element) => (element.delegatedEmail != null && element.delegatedEmail == filterEmail))];
+  List<Task> filterCollaboratorEmail(List<Task> listToFilter, List<String> filterEmails) {
+    return [...listToFilter.where((element) => ((element.delegatedEmail != null && filterEmails.contains(element.delegatedEmail)) || (element.supervisorEmail != null && filterEmails.contains(element.supervisorEmail))))];
   }
 
   int countInboxDelegated() {

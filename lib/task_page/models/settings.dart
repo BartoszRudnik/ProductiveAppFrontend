@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 class Settings {
   bool showOnlyUnfinished = false;
   bool showOnlyDelegated = false;
-  String collaboratorEmail;
+  List<String> collaborators;
 
   Settings({
     @required this.showOnlyUnfinished,
     @required this.showOnlyDelegated,
-    this.collaboratorEmail,
+    this.collaborators,
   });
 }
