@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/task_page/widgets/filter_priority_dialog.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/settings_provider.dart';
@@ -17,6 +18,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
   Widget build(BuildContext context) {
     final userSettings = Provider.of<SettingsProvider>(context).userSettings;
 
+    List<String> priorities = userSettings.priorities;
     List<String> collaborators = userSettings.collaborators;
     bool showOnlyUnfinished = userSettings.showOnlyUnfinished;
     bool showOnlyDelegated = userSettings.showOnlyDelegated;
@@ -254,7 +256,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                           child: Row(
                             children: [
                               Text(
-                                'Priority',
+                                'Priorities',
                                 style: TextStyle(
                                   fontSize: 26,
                                   fontWeight: FontWeight.w400,
@@ -273,9 +275,26 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                   primary: Theme.of(context).accentColor,
                                   side: BorderSide(color: Theme.of(context).primaryColor),
                                 ),
-                                onPressed: () {},
+                                onPressed: () async {
+                                  final selected = await showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      if (priorities != null) {
+                                        return FilterPriorityDialog(
+                                          choosenPriorities: priorities,
+                                        );
+                                      } else {
+                                        return FilterPriorityDialog();
+                                      }
+                                    },
+                                  );
+
+                                  if (selected != null && selected.length >= 1) {
+                                    Provider.of<SettingsProvider>(context, listen: false).addFilterPriorities(selected);
+                                  }
+                                },
                                 child: Text(
-                                  'Choose priority',
+                                  'Choose priorities',
                                   style: TextStyle(
                                     fontSize: 24,
                                     color: Theme.of(context).primaryColor,
@@ -285,6 +304,56 @@ class _FiltersScreenState extends State<FiltersScreen> {
                             ),
                           ],
                         ),
+                        if (priorities != null && priorities.length >= 1)
+                          Container(
+                            height: 60,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: priorities.length,
+                              itemBuilder: (context, index) => Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 8),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  padding: EdgeInsets.symmetric(horizontal: 4),
+                                  margin: EdgeInsets.symmetric(horizontal: 8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey,
+                                    border: Border.all(
+                                      color: Theme.of(context).primaryColor,
+                                      width: 0.7,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 16.0),
+                                        child: Text(
+                                          priorities[index],
+                                          style: TextStyle(color: Theme.of(context).accentColor, fontSize: 18),
+                                        ),
+                                      ),
+                                      if (priorities[index] == 'LOW') Icon(Icons.arrow_downward_outlined, color: Theme.of(context).accentColor),
+                                      if (priorities[index] == 'HIGH') Icon(Icons.arrow_upward_outlined, color: Theme.of(context).accentColor),
+                                      if (priorities[index] == 'HIGHER') Icon(Icons.arrow_upward_outlined, color: Theme.of(context).accentColor),
+                                      if (priorities[index] == 'HIGHER') Icon(Icons.arrow_upward_outlined, color: Theme.of(context).accentColor),
+                                      if (priorities[index] == 'CRITICAL') Icon(Icons.warning_amber_sharp, color: Theme.of(context).accentColor),
+                                      IconButton(
+                                        icon: Icon(Icons.cancel_outlined, color: Theme.of(context).accentColor),
+                                        onPressed: () {
+                                          setState(
+                                            () {
+                                              Provider.of<SettingsProvider>(context, listen: false).deleteFilterPriority(priorities[index]);
+                                            },
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),

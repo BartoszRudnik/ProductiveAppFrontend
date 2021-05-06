@@ -33,6 +33,9 @@ class _DelegatedScreenState extends State<DelegatedScreen> {
     if (userSettings.collaborators != null && userSettings.collaborators.length >= 1) {
       tasks = Provider.of<TaskProvider>(context, listen: false).filterCollaboratorEmail(tasks, userSettings.collaborators);
     }
+    if (userSettings.priorities != null && userSettings.priorities.length >= 1) {
+      tasks = Provider.of<TaskProvider>(context, listen: false).filterPriority(tasks, userSettings.priorities);
+    }
 
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 20),

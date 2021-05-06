@@ -16,6 +16,7 @@ class SettingsProvider with ChangeNotifier {
     this.authToken,
   }) {
     this.userSettings.collaborators = [];
+    this.userSettings.priorities = [];
   }
 
   String _serverUrl = GlobalConfiguration().getValue("serverUrl");
@@ -29,6 +30,11 @@ class SettingsProvider with ChangeNotifier {
       final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
       List<String> collaborators = [];
+      List<String> priorities = [];
+
+      for (var element in responseBody['priorities']) {
+        priorities.add(element);
+      }
 
       for (var element in responseBody['collaboratorEmail']) {
         collaborators.add(element);
@@ -38,9 +44,43 @@ class SettingsProvider with ChangeNotifier {
         showOnlyUnfinished: responseBody['showOnlyUnfinished'],
         showOnlyDelegated: responseBody['showOnlyDelegated'],
         collaborators: collaborators,
+        priorities: priorities,
       );
       this.userSettings = newSettings;
 
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<void> addFilterPriorities(List<String> priorities) async {
+    final finalUrl = this._serverUrl + 'filterSettings/addFilterPriority/${this.userMail}';
+
+    try {
+      final response = await http.post(
+        finalUrl,
+        body: json.encode(
+          {
+            'priorities': priorities,
+          },
+        ),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      if (priorities != null) {
+        priorities.forEach(
+          (element) {
+            if (!this.userSettings.priorities.contains(element)) {
+              this.userSettings.priorities.add(element);
+            }
+          },
+        );
+      }
       notifyListeners();
     } catch (error) {
       print(error);
@@ -81,6 +121,34 @@ class SettingsProvider with ChangeNotifier {
     }
   }
 
+  Future<void> deleteFilterPriority(String priority) async {
+    final finalUrl = this._serverUrl + 'filterSettings/deleteFilterPriority/${this.userMail}';
+
+    try {
+      final response = await http.post(
+        finalUrl,
+        body: json.encode(
+          {
+            'priority': priority,
+          },
+        ),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      if (priority != null) {
+        this.userSettings.priorities.remove(priority);
+      }
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
   Future<void> deleteFilterCollaboratorEmail(String collaboratorEmail) async {
     final finalUrl = this._serverUrl + 'filterSettings/deleteFilterCollaboratorEmail/${this.userMail}';
 
@@ -101,6 +169,27 @@ class SettingsProvider with ChangeNotifier {
       if (collaboratorEmail != null) {
         this.userSettings.collaborators.remove(collaboratorEmail);
       }
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<void> clearFilterPriorities() async {
+    final finalUrl = this._serverUrl + 'filterSettings/clearFilterPriorities/${this.userMail}';
+
+    try {
+      await http.post(
+        finalUrl,
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      this.userSettings.priorities = [];
 
       notifyListeners();
     } catch (error) {
