@@ -49,6 +49,9 @@ class FiltersAppBar extends StatelessWidget with PreferredSizeWidget {
               if (userSettings.priorities != null) {
                 Provider.of<SettingsProvider>(context, listen: false).clearFilterPriorities();
               }
+              if (userSettings.tags != null) {
+                Provider.of<SettingsProvider>(context, listen: false).clearFilterTags();
+              }
             },
             child: Text(
               'Clear filters',

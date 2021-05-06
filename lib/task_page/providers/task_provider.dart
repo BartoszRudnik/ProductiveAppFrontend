@@ -544,6 +544,31 @@ class TaskProvider with ChangeNotifier {
     return [...listToFilter.where((element) => ((element.priority != null && filterPriorities.contains(element.priority))))];
   }
 
+  List<Task> filterTags(List<Task> listToFilter, List<String> filterTags) {
+    List<Task> result = [];
+
+    listToFilter.forEach((task) {
+      if (task.tags != null) {
+        bool valid = true;
+
+        for (int i = 0; i < filterTags.length; i++) {
+          int index = task.tags.indexWhere((element) => element.name == filterTags[i]);
+
+          if (index == -1) {
+            valid = false;
+            break;
+          }
+        }
+
+        if (valid) {
+          result.add(task);
+        }
+      }
+    });
+
+    return result;
+  }
+
   int countInboxDelegated() {
     List<Task> tmpList = [];
 

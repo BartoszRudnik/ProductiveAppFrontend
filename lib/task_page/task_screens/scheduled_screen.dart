@@ -56,6 +56,11 @@ class _ScheduledScreenState extends State<ScheduledScreen> {
       today = Provider.of<TaskProvider>(context, listen: false).filterPriority(today, userSettings.priorities);
       after = Provider.of<TaskProvider>(context, listen: false).filterPriority(after, userSettings.priorities);
     }
+    if (userSettings.tags != null && userSettings.tags.length >= 1) {
+      before = Provider.of<TaskProvider>(context, listen: false).filterTags(before, userSettings.tags);
+      today = Provider.of<TaskProvider>(context, listen: false).filterTags(today, userSettings.tags);
+      after = Provider.of<TaskProvider>(context, listen: false).filterTags(after, userSettings.tags);
+    }
 
     return RefreshIndicator(
       backgroundColor: Theme.of(context).primaryColor,

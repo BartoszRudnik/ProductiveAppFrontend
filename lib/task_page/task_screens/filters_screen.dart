@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/task_page/widgets/filter_priority_dialog.dart';
+import 'package:productive_app/task_page/widgets/filter_tags_dialog.dart';
+import 'package:productive_app/task_page/widgets/tags_dialog.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/settings_provider.dart';
@@ -18,6 +20,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
   Widget build(BuildContext context) {
     final userSettings = Provider.of<SettingsProvider>(context).userSettings;
 
+    List<String> tags = userSettings.tags;
     List<String> priorities = userSettings.priorities;
     List<String> collaborators = userSettings.collaborators;
     bool showOnlyUnfinished = userSettings.showOnlyUnfinished;
@@ -226,7 +229,22 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                   primary: Theme.of(context).accentColor,
                                   side: BorderSide(color: Theme.of(context).primaryColor),
                                 ),
-                                onPressed: () {},
+                                onPressed: () async {
+                                  final selected = await showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      if (tags != null) {
+                                        return FilterTagsDialog(choosenTags: tags);
+                                      } else {
+                                        return FilterTagsDialog();
+                                      }
+                                    },
+                                  );
+
+                                  if (selected != null && selected.length >= 1) {
+                                    Provider.of<SettingsProvider>(context, listen: false).addFilterTags(selected);
+                                  }
+                                },
                                 child: Text(
                                   'Choose tags',
                                   style: TextStyle(
@@ -238,6 +256,51 @@ class _FiltersScreenState extends State<FiltersScreen> {
                             ),
                           ],
                         ),
+                        if (tags != null && tags.length >= 1)
+                          Container(
+                            height: 60,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: tags.length,
+                              itemBuilder: (context, index) => Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 8),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  padding: EdgeInsets.symmetric(horizontal: 4),
+                                  margin: EdgeInsets.symmetric(horizontal: 8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey,
+                                    border: Border.all(
+                                      color: Theme.of(context).primaryColor,
+                                      width: 0.7,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 16.0),
+                                        child: Text(
+                                          tags[index],
+                                          style: TextStyle(color: Theme.of(context).accentColor, fontSize: 18),
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: Icon(Icons.cancel_outlined, color: Theme.of(context).accentColor),
+                                        onPressed: () {
+                                          setState(
+                                            () {
+                                              Provider.of<SettingsProvider>(context, listen: false).deleteFilterTag(tags[index]);
+                                            },
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),

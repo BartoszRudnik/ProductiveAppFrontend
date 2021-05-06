@@ -45,6 +45,9 @@ class _InboxScreenState extends State<InboxScreen> {
     if (userSettings.priorities != null && userSettings.priorities.length >= 1) {
       tasks = Provider.of<TaskProvider>(context, listen: false).filterPriority(tasks, userSettings.priorities);
     }
+    if (userSettings.tags != null && userSettings.tags.length >= 1) {
+      tasks = Provider.of<TaskProvider>(context, listen: false).filterTags(tasks, userSettings.tags);
+    }
 
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 20),

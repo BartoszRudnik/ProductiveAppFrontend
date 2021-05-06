@@ -5,11 +5,13 @@ class Settings {
   bool showOnlyDelegated = false;
   List<String> collaborators;
   List<String> priorities;
+  List<String> tags;
 
   Settings({
     @required this.showOnlyUnfinished,
     @required this.showOnlyDelegated,
     this.collaborators,
     this.priorities,
+    this.tags,
   });
 }
