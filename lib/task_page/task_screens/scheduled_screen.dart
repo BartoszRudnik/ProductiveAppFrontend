@@ -30,18 +30,36 @@ class _ScheduledScreenState extends State<ScheduledScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<Task> before = [];
-    List<Task> today = [];
-    List<Task> after = [];
+    List<Task> before = Provider.of<TaskProvider>(context).tasksBeforeToday();
+    List<Task> today = Provider.of<TaskProvider>(context).tasksToday();
+    List<Task> after = Provider.of<TaskProvider>(context).taskAfterToday();
 
-    if (Provider.of<SettingsProvider>(context).userSettings.showOnlyUnfinished != null && Provider.of<SettingsProvider>(context).userSettings.showOnlyUnfinished) {
-      before = Provider.of<TaskProvider>(context).unfinishedTasksBeforeToday();
-      today = Provider.of<TaskProvider>(context).unfinishedTasksToday();
-      after = Provider.of<TaskProvider>(context).unfinishedTasksAfterToday();
-    } else {
-      before = Provider.of<TaskProvider>(context).tasksBeforeToday();
-      today = Provider.of<TaskProvider>(context).tasksToday();
-      after = Provider.of<TaskProvider>(context).taskAfterToday();
+    final userSettings = Provider.of<SettingsProvider>(context).userSettings;
+
+    if (userSettings.showOnlyUnfinished != null && userSettings.showOnlyUnfinished) {
+      before = Provider.of<TaskProvider>(context, listen: false).onlyUnfinishedTasks(before);
+      today = Provider.of<TaskProvider>(context, listen: false).onlyUnfinishedTasks(today);
+      after = Provider.of<TaskProvider>(context, listen: false).onlyUnfinishedTasks(after);
+    }
+    if (userSettings.showOnlyDelegated != null && userSettings.showOnlyDelegated) {
+      before = Provider.of<TaskProvider>(context, listen: false).onlyDelegatedTasks(before);
+      today = Provider.of<TaskProvider>(context, listen: false).onlyDelegatedTasks(today);
+      after = Provider.of<TaskProvider>(context, listen: false).onlyDelegatedTasks(after);
+    }
+    if (userSettings.collaborators != null && userSettings.collaborators.length >= 1) {
+      before = Provider.of<TaskProvider>(context, listen: false).filterCollaboratorEmail(before, userSettings.collaborators);
+      today = Provider.of<TaskProvider>(context, listen: false).filterCollaboratorEmail(today, userSettings.collaborators);
+      after = Provider.of<TaskProvider>(context, listen: false).filterCollaboratorEmail(after, userSettings.collaborators);
+    }
+    if (userSettings.priorities != null && userSettings.priorities.length >= 1) {
+      before = Provider.of<TaskProvider>(context, listen: false).filterPriority(before, userSettings.priorities);
+      today = Provider.of<TaskProvider>(context, listen: false).filterPriority(today, userSettings.priorities);
+      after = Provider.of<TaskProvider>(context, listen: false).filterPriority(after, userSettings.priorities);
+    }
+    if (userSettings.tags != null && userSettings.tags.length >= 1) {
+      before = Provider.of<TaskProvider>(context, listen: false).filterTags(before, userSettings.tags);
+      today = Provider.of<TaskProvider>(context, listen: false).filterTags(today, userSettings.tags);
+      after = Provider.of<TaskProvider>(context, listen: false).filterTags(after, userSettings.tags);
     }
 
     return RefreshIndicator(

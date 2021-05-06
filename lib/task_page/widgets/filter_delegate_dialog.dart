@@ -3,13 +3,13 @@ import 'package:productive_app/task_page/models/collaborator.dart';
 import 'package:productive_app/task_page/providers/delegate_provider.dart';
 import 'package:provider/provider.dart';
 
-class DelegateDialog extends StatelessWidget {
+class FilterDelegateDialog extends StatelessWidget {
   final _collaboratorKey = GlobalKey<FormState>();
 
-  String choosenCollaborator;
+  List<String> choosenCollaborators = [];
 
-  DelegateDialog({
-    this.choosenCollaborator,
+  FilterDelegateDialog({
+    this.choosenCollaborators,
   });
 
   @override
@@ -17,10 +17,15 @@ class DelegateDialog extends StatelessWidget {
     List<Collaborator> collaborators = Provider.of<DelegateProvider>(context).collaboratorsList;
     List<Collaborator> filteredCollaborators = List<Collaborator>.from(collaborators);
 
-    final index = filteredCollaborators.indexWhere((element) => element.email == this.choosenCollaborator);
-    if (index != -1) {
-      filteredCollaborators.elementAt(index).isSelected = true;
-    }
+    filteredCollaborators.forEach(
+      (element) {
+        if (this.choosenCollaborators != null && this.choosenCollaborators.contains(element.email)) {
+          element.isSelected = true;
+        } else {
+          element.isSelected = false;
+        }
+      },
+    );
 
     return StatefulBuilder(
       builder: (context, setState) {
@@ -147,13 +152,8 @@ class DelegateDialog extends StatelessWidget {
                       return GestureDetector(
                         onTap: () {
                           setState(() {
-                            filteredCollaborators.forEach((element) {
-                              if (element.isSelected) {
-                                element.isSelected = false;
-                              }
-                            });
-                            filteredCollaborators[collaboratorIndex].isSelected = true;
-                            this.choosenCollaborator = filteredCollaborators[collaboratorIndex].email;
+                            filteredCollaborators[collaboratorIndex].isSelected = !filteredCollaborators[collaboratorIndex].isSelected;
+                            this.choosenCollaborators.add(filteredCollaborators[collaboratorIndex].email);
                           });
                         },
                         child: Card(
@@ -181,12 +181,10 @@ class DelegateDialog extends StatelessWidget {
                         side: BorderSide(color: Theme.of(context).primaryColor),
                       ),
                       onPressed: () {
-                        final index = filteredCollaborators.indexWhere((element) => element.email == this.choosenCollaborator);
-                        if (index != -1) {
-                          filteredCollaborators.elementAt(index).isSelected = false;
-                        }
-
-                        Navigator.of(context).pop('');
+                        filteredCollaborators.forEach((element) {
+                          element.isSelected = false;
+                        });
+                        Navigator.of(context).pop();
                       },
                       child: Text(
                         'Cancel',
@@ -202,15 +200,13 @@ class DelegateDialog extends StatelessWidget {
                         side: BorderSide(color: Theme.of(context).primaryColor),
                       ),
                       onPressed: () {
-                        final index = filteredCollaborators.indexWhere((element) => element.email == this.choosenCollaborator);
-                        if (index != -1) {
-                          filteredCollaborators.elementAt(index).isSelected = false;
-                        }
-
-                        Navigator.of(context).pop(this.choosenCollaborator);
+                        filteredCollaborators.forEach((element) {
+                          element.isSelected = false;
+                        });
+                        Navigator.of(context).pop(this.choosenCollaborators);
                       },
                       child: Text(
-                        'Add collaborator',
+                        'Save',
                         style: TextStyle(
                           fontSize: 14,
                           color: Theme.of(context).accentColor,

@@ -30,12 +30,23 @@ class _AnytimeScreenState extends State<AnytimeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<Task> tasks = [];
+    List<Task> tasks = Provider.of<TaskProvider>(context).anytimeTasks;
+    final userSettings = Provider.of<SettingsProvider>(context).userSettings;
 
-    if (Provider.of<SettingsProvider>(context).userSettings.showOnlyUnfinished != null && Provider.of<SettingsProvider>(context).userSettings.showOnlyUnfinished) {
-      tasks = Provider.of<TaskProvider>(context).unfinishedAnytimeTasks;
-    } else {
-      tasks = Provider.of<TaskProvider>(context).anytimeTasks;
+    if (userSettings.showOnlyUnfinished != null && userSettings.showOnlyUnfinished) {
+      tasks = Provider.of<TaskProvider>(context, listen: false).onlyUnfinishedTasks(tasks);
+    }
+    if (userSettings.showOnlyDelegated != null && userSettings.showOnlyDelegated) {
+      tasks = Provider.of<TaskProvider>(context, listen: false).onlyDelegatedTasks(tasks);
+    }
+    if (userSettings.collaborators != null && userSettings.collaborators.length >= 1) {
+      tasks = Provider.of<TaskProvider>(context, listen: false).filterCollaboratorEmail(tasks, userSettings.collaborators);
+    }
+    if (userSettings.priorities != null && userSettings.priorities.length >= 1) {
+      tasks = Provider.of<TaskProvider>(context, listen: false).filterPriority(tasks, userSettings.priorities);
+    }
+    if (userSettings.tags != null && userSettings.tags.length >= 1) {
+      tasks = Provider.of<TaskProvider>(context, listen: false).filterTags(tasks, userSettings.tags);
     }
 
     return Padding(

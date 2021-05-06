@@ -52,24 +52,12 @@ class TaskProvider with ChangeNotifier {
     return [...this._inboxTasks];
   }
 
-  List<Task> get unfinishedInboxTasks {
-    return [...this._inboxTasks.where((task) => !task.done)];
-  }
-
   List<Task> get anytimeTasks {
     return [...this._anytimeTasks];
   }
 
-  List<Task> get unfinishedAnytimeTasks {
-    return [...this._anytimeTasks.where((task) => !task.done)];
-  }
-
   List<Task> get scheduledTasks {
     return [...this._scheduledTasks];
-  }
-
-  List<Task> get unfinishedScheduledTasks {
-    return [...this._scheduledTasks.where((task) => !task.done)];
   }
 
   List<Task> get completedTasks {
@@ -272,6 +260,8 @@ class TaskProvider with ChangeNotifier {
 
       for (var element in responseBody) {
         List<Tag> taskTags = [];
+        String taskStatus;
+        String supervisorEmail;
 
         for (var tagElement in element['tags']) {
           taskTags.add(Tag(
@@ -280,7 +270,7 @@ class TaskProvider with ChangeNotifier {
           ));
         }
 
-        String taskStatus;
+        supervisorEmail = element['supervisorEmail'];
 
         if (element['tasks']['taskStatus'] != null) {
           taskStatus = element['tasks']['taskStatus'];
@@ -301,6 +291,7 @@ class TaskProvider with ChangeNotifier {
           isDelegated: element['tasks']['isDelegated'],
           taskStatus: taskStatus,
           isCanceled: element['tasks']['isCanceled'],
+          supervisorEmail: supervisorEmail,
         );
 
         if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
@@ -525,21 +516,8 @@ class TaskProvider with ChangeNotifier {
         .toList();
   }
 
-  List<Task> unfinishedTasksBeforeToday() {
-    return this
-        ._scheduledTasks
-        .where((element) => (!element.done &&
-            element.startDate != null &&
-            (element.startDate.difference(DateTime.now()).inDays < 0 || (element.startDate.difference(DateTime.now()).inDays == 0 && (element.startDate.day < DateTime.now().day || element.startDate.month < DateTime.now().month)))))
-        .toList();
-  }
-
   List<Task> tasksToday() {
     return this._scheduledTasks.where((element) => (element.startDate != null && element.startDate.difference(DateTime.now()).inDays == 0 && element.startDate.day == DateTime.now().day)).toList();
-  }
-
-  List<Task> unfinishedTasksToday() {
-    return this._scheduledTasks.where((element) => (!element.done && element.startDate != null && element.startDate.difference(DateTime.now()).inDays == 0 && element.startDate.day == DateTime.now().day)).toList();
   }
 
   List<Task> taskAfterToday() {
@@ -550,13 +528,45 @@ class TaskProvider with ChangeNotifier {
         .toList();
   }
 
-  List<Task> unfinishedTasksAfterToday() {
-    return this
-        ._scheduledTasks
-        .where((element) => (!element.done &&
-            element.startDate != null &&
-            (element.startDate.difference(DateTime.now()).inDays > 0 || (element.startDate.difference(DateTime.now()).inDays == 0 && (element.startDate.day > DateTime.now().day || element.startDate.month > DateTime.now().month)))))
-        .toList();
+  List<Task> onlyUnfinishedTasks(List<Task> listToFilter) {
+    return [...listToFilter.where((element) => !element.done)];
+  }
+
+  List<Task> onlyDelegatedTasks(List<Task> listToFilter) {
+    return [...listToFilter.where((element) => (element.isDelegated != null && element.isDelegated))];
+  }
+
+  List<Task> filterCollaboratorEmail(List<Task> listToFilter, List<String> filterEmails) {
+    return [...listToFilter.where((element) => ((element.delegatedEmail != null && filterEmails.contains(element.delegatedEmail)) || (element.supervisorEmail != null && filterEmails.contains(element.supervisorEmail))))];
+  }
+
+  List<Task> filterPriority(List<Task> listToFilter, List<String> filterPriorities) {
+    return [...listToFilter.where((element) => ((element.priority != null && filterPriorities.contains(element.priority))))];
+  }
+
+  List<Task> filterTags(List<Task> listToFilter, List<String> filterTags) {
+    List<Task> result = [];
+
+    listToFilter.forEach((task) {
+      if (task.tags != null) {
+        bool valid = true;
+
+        for (int i = 0; i < filterTags.length; i++) {
+          int index = task.tags.indexWhere((element) => element.name == filterTags[i]);
+
+          if (index == -1) {
+            valid = false;
+            break;
+          }
+        }
+
+        if (valid) {
+          result.add(task);
+        }
+      }
+    });
+
+    return result;
   }
 
   int countInboxDelegated() {
@@ -569,9 +579,5 @@ class TaskProvider with ChangeNotifier {
     } else {
       return 0;
     }
-  }
-
-  int countUnfinishedInboxDelegated() {
-    return this._inboxTasks.where((task) => (!task.done && task.isDelegated)).toList().length;
   }
 }
