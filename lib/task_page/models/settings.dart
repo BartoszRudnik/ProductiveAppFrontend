@@ -6,6 +6,7 @@ class Settings {
   List<String> collaborators;
   List<String> priorities;
   List<String> tags;
+  int sortingMode;
 
   Settings({
     @required this.showOnlyUnfinished,
@@ -13,5 +14,6 @@ class Settings {
     this.collaborators,
     this.priorities,
     this.tags,
+    this.sortingMode,
   });
 }

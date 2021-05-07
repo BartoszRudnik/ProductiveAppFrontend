@@ -18,6 +18,7 @@ class SettingsProvider with ChangeNotifier {
     this.userSettings.collaborators = [];
     this.userSettings.priorities = [];
     this.userSettings.tags = [];
+    this.userSettings.sortingMode = 0;
   }
 
   String _serverUrl = GlobalConfiguration().getValue("serverUrl");
@@ -52,6 +53,7 @@ class SettingsProvider with ChangeNotifier {
         collaborators: collaborators,
         priorities: priorities,
         tags: tags,
+        sortingMode: responseBody['sortingMode'],
       );
       this.userSettings = newSettings;
 
@@ -337,6 +339,29 @@ class SettingsProvider with ChangeNotifier {
       );
 
       this.userSettings.showOnlyUnfinished = !this.userSettings.showOnlyUnfinished;
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<void> changeSortingMode(int newMode) async {
+    final finalUrl = this._serverUrl + 'filterSettings/changeSortingMode/${this.userMail}';
+
+    try {
+      final response = await http.post(
+        finalUrl,
+        body: json.encode({
+          'sortingMode': newMode,
+        }),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      this.userSettings.sortingMode = newMode;
       notifyListeners();
     } catch (error) {
       print(error);

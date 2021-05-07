@@ -3,6 +3,7 @@ import 'package:productive_app/task_page/models/task.dart';
 import 'package:productive_app/task_page/providers/delegate_provider.dart';
 import 'package:productive_app/task_page/providers/settings_provider.dart';
 import 'package:productive_app/task_page/providers/tag_provider.dart';
+import 'package:productive_app/task_page/utils/manage_filters.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/task_provider.dart';
@@ -33,21 +34,7 @@ class _InboxScreenState extends State<InboxScreen> {
     List<Task> tasks = Provider.of<TaskProvider>(context).inboxTasks;
     final userSettings = Provider.of<SettingsProvider>(context).userSettings;
 
-    if (userSettings.showOnlyUnfinished != null && userSettings.showOnlyUnfinished) {
-      tasks = Provider.of<TaskProvider>(context, listen: false).onlyUnfinishedTasks(tasks);
-    }
-    if (userSettings.showOnlyDelegated != null && userSettings.showOnlyDelegated) {
-      tasks = Provider.of<TaskProvider>(context, listen: false).onlyDelegatedTasks(tasks);
-    }
-    if (userSettings.collaborators != null && userSettings.collaborators.length >= 1) {
-      tasks = Provider.of<TaskProvider>(context, listen: false).filterCollaboratorEmail(tasks, userSettings.collaborators);
-    }
-    if (userSettings.priorities != null && userSettings.priorities.length >= 1) {
-      tasks = Provider.of<TaskProvider>(context, listen: false).filterPriority(tasks, userSettings.priorities);
-    }
-    if (userSettings.tags != null && userSettings.tags.length >= 1) {
-      tasks = Provider.of<TaskProvider>(context, listen: false).filterTags(tasks, userSettings.tags);
-    }
+    tasks = ManageFilters.filter(tasks, userSettings, context);
 
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 20),

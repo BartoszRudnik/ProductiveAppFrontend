@@ -3,6 +3,7 @@ import 'package:productive_app/task_page/models/task.dart';
 import 'package:productive_app/task_page/providers/settings_provider.dart';
 import 'package:productive_app/task_page/providers/tag_provider.dart';
 import 'package:productive_app/task_page/providers/task_provider.dart';
+import 'package:productive_app/task_page/utils/manage_filters.dart';
 import 'package:productive_app/task_page/widgets/task_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -30,15 +31,7 @@ class _DelegatedScreenState extends State<DelegatedScreen> {
     List<Task> tasks = Provider.of<TaskProvider>(context).delegatedTasks;
     final userSettings = Provider.of<SettingsProvider>(context).userSettings;
 
-    if (userSettings.collaborators != null && userSettings.collaborators.length >= 1) {
-      tasks = Provider.of<TaskProvider>(context, listen: false).filterCollaboratorEmail(tasks, userSettings.collaborators);
-    }
-    if (userSettings.priorities != null && userSettings.priorities.length >= 1) {
-      tasks = Provider.of<TaskProvider>(context, listen: false).filterPriority(tasks, userSettings.priorities);
-    }
-    if (userSettings.tags != null && userSettings.tags.length >= 1) {
-      tasks = Provider.of<TaskProvider>(context, listen: false).filterTags(tasks, userSettings.tags);
-    }
+    tasks = ManageFilters.filter(tasks, userSettings, context);
 
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 20),
