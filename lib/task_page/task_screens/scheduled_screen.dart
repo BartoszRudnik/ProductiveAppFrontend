@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:productive_app/task_page/models/task.dart';
 import 'package:productive_app/task_page/providers/delegate_provider.dart';
 import 'package:productive_app/task_page/providers/settings_provider.dart';
+import 'package:productive_app/task_page/utils/manage_filters.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/tag_provider.dart';
@@ -36,31 +37,9 @@ class _ScheduledScreenState extends State<ScheduledScreen> {
 
     final userSettings = Provider.of<SettingsProvider>(context).userSettings;
 
-    if (userSettings.showOnlyUnfinished != null && userSettings.showOnlyUnfinished) {
-      before = Provider.of<TaskProvider>(context, listen: false).onlyUnfinishedTasks(before);
-      today = Provider.of<TaskProvider>(context, listen: false).onlyUnfinishedTasks(today);
-      after = Provider.of<TaskProvider>(context, listen: false).onlyUnfinishedTasks(after);
-    }
-    if (userSettings.showOnlyDelegated != null && userSettings.showOnlyDelegated) {
-      before = Provider.of<TaskProvider>(context, listen: false).onlyDelegatedTasks(before);
-      today = Provider.of<TaskProvider>(context, listen: false).onlyDelegatedTasks(today);
-      after = Provider.of<TaskProvider>(context, listen: false).onlyDelegatedTasks(after);
-    }
-    if (userSettings.collaborators != null && userSettings.collaborators.length >= 1) {
-      before = Provider.of<TaskProvider>(context, listen: false).filterCollaboratorEmail(before, userSettings.collaborators);
-      today = Provider.of<TaskProvider>(context, listen: false).filterCollaboratorEmail(today, userSettings.collaborators);
-      after = Provider.of<TaskProvider>(context, listen: false).filterCollaboratorEmail(after, userSettings.collaborators);
-    }
-    if (userSettings.priorities != null && userSettings.priorities.length >= 1) {
-      before = Provider.of<TaskProvider>(context, listen: false).filterPriority(before, userSettings.priorities);
-      today = Provider.of<TaskProvider>(context, listen: false).filterPriority(today, userSettings.priorities);
-      after = Provider.of<TaskProvider>(context, listen: false).filterPriority(after, userSettings.priorities);
-    }
-    if (userSettings.tags != null && userSettings.tags.length >= 1) {
-      before = Provider.of<TaskProvider>(context, listen: false).filterTags(before, userSettings.tags);
-      today = Provider.of<TaskProvider>(context, listen: false).filterTags(today, userSettings.tags);
-      after = Provider.of<TaskProvider>(context, listen: false).filterTags(after, userSettings.tags);
-    }
+    before = ManageFilters.filter(before, userSettings, context);
+    today = ManageFilters.filter(today, userSettings, context);
+    after = ManageFilters.filter(after, userSettings, context);
 
     return RefreshIndicator(
       backgroundColor: Theme.of(context).primaryColor,

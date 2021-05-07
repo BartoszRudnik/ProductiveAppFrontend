@@ -19,6 +19,14 @@ class TaskProvider with ChangeNotifier {
 
   final _localizations = ['INBOX', 'SCHEDULED', 'ANYTIME', 'COMPLETED', 'TRASH', 'DELEGATED'];
 
+  Map<String, int> prioritiesValue = {
+    'LOW': 1,
+    'NORMAL': 2,
+    'HIGH': 3,
+    'HIGHER': 4,
+    'CRITICAL': 5,
+  };
+
   final String userMail;
   final String authToken;
 
@@ -567,6 +575,46 @@ class TaskProvider with ChangeNotifier {
     });
 
     return result;
+  }
+
+  void sortByPriorityAscending(List<Task> listToSort) {
+    listToSort.sort((a, b) => prioritiesValue[a.priority].compareTo(prioritiesValue[b.priority]));
+  }
+
+  void sortByPriorityDescending(List<Task> listToSort) {
+    listToSort.sort((a, b) => prioritiesValue[b.priority].compareTo(prioritiesValue[a.priority]));
+  }
+
+  void sortByEndDateAscending(List<Task> listToSort) {
+    listToSort.sort((a, b) => a.endDate != null && b.endDate != null
+        ? a.endDate.compareTo(b.endDate)
+        : a.endDate == null
+            ? 1
+            : -1);
+  }
+
+  void sortByEndDateDescending(List<Task> listToSort) {
+    listToSort.sort((a, b) => a.endDate != null && b.endDate != null
+        ? b.endDate.compareTo(a.endDate)
+        : a.endDate == null
+            ? -1
+            : 1);
+  }
+
+  void sortByStartDateAscending(List<Task> listToSort) {
+    listToSort.sort((a, b) => a.startDate != null && b.startDate != null
+        ? a.startDate.compareTo(b.startDate)
+        : a.startDate == null
+            ? 1
+            : -1);
+  }
+
+  void sortByStartDateDescending(List<Task> listToSort) {
+    listToSort.sort((a, b) => a.startDate != null && b.startDate != null
+        ? b.startDate.compareTo(a.startDate)
+        : a.startDate == null
+            ? -1
+            : 1);
   }
 
   int countInboxDelegated() {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/task_page/providers/task_provider.dart';
 import 'package:productive_app/task_page/widgets/filter_priority_dialog.dart';
 import 'package:productive_app/task_page/widgets/filter_tags_dialog.dart';
 import 'package:productive_app/task_page/widgets/tags_dialog.dart';
@@ -16,6 +17,16 @@ class FiltersScreen extends StatefulWidget {
 }
 
 class _FiltersScreenState extends State<FiltersScreen> {
+  final sortingModes = [
+    'end Date ascending',
+    'end Date descending',
+    'start Date ascending',
+    'start Date descending',
+    'priority descending',
+    'priority ascending',
+    'custom',
+  ];
+
   @override
   Widget build(BuildContext context) {
     final userSettings = Provider.of<SettingsProvider>(context).userSettings;
@@ -25,6 +36,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
     List<String> collaborators = userSettings.collaborators;
     bool showOnlyUnfinished = userSettings.showOnlyUnfinished;
     bool showOnlyDelegated = userSettings.showOnlyDelegated;
+    int sortingMode = userSettings.sortingMode;
 
     return Scaffold(
       appBar: FiltersAppBar(
@@ -72,7 +84,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                         child: Row(
                           children: [
                             Text(
-                              'Sorting',
+                              'Sort by',
                               style: TextStyle(
                                 fontSize: 26,
                                 fontWeight: FontWeight.w400,
@@ -84,112 +96,33 @@ class _FiltersScreenState extends State<FiltersScreen> {
                       Container(
                         padding: EdgeInsets.symmetric(vertical: 8),
                         height: 70,
-                        child: ListView(
+                        child: ListView.builder(
                           scrollDirection: Axis.horizontal,
-                          children: [
-                            Container(
+                          itemCount: sortingModes.length,
+                          itemBuilder: (context, index) => GestureDetector(
+                            onTap: () => Provider.of<SettingsProvider>(context, listen: false).changeSortingMode(index),
+                            child: Container(
                               alignment: Alignment.center,
                               padding: EdgeInsets.symmetric(horizontal: 4),
                               margin: EdgeInsets.symmetric(horizontal: 8),
                               decoration: BoxDecoration(
+                                color: sortingMode == index ? Colors.grey : Colors.white,
                                 border: Border.all(
                                   color: Theme.of(context).primaryColor,
-                                  width: 0.2,
+                                  width: sortingMode == index ? 0.9 : 0.2,
                                 ),
                               ),
                               child: Center(
                                 child: Text(
-                                  'sort option 1',
+                                  sortingModes[index],
                                   textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: sortingMode == index ? Colors.white : Colors.black,
+                                  ),
                                 ),
                               ),
                             ),
-                            Container(
-                              alignment: Alignment.center,
-                              padding: EdgeInsets.symmetric(horizontal: 4),
-                              margin: EdgeInsets.symmetric(horizontal: 8),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Theme.of(context).primaryColor,
-                                  width: 0.2,
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  'sort option 2',
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              alignment: Alignment.center,
-                              padding: EdgeInsets.symmetric(horizontal: 4),
-                              margin: EdgeInsets.symmetric(horizontal: 8),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Theme.of(context).primaryColor,
-                                  width: 0.2,
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  'sort option 3',
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              alignment: Alignment.center,
-                              padding: EdgeInsets.symmetric(horizontal: 4),
-                              margin: EdgeInsets.symmetric(horizontal: 8),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Theme.of(context).primaryColor,
-                                  width: 0.2,
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  'sort option 4',
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              alignment: Alignment.center,
-                              padding: EdgeInsets.symmetric(horizontal: 4),
-                              margin: EdgeInsets.symmetric(horizontal: 8),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Theme.of(context).primaryColor,
-                                  width: 0.2,
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  'sort option 5',
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              alignment: Alignment.center,
-                              padding: EdgeInsets.symmetric(horizontal: 4),
-                              margin: EdgeInsets.symmetric(horizontal: 8),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Theme.of(context).primaryColor,
-                                  width: 0.2,
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  'sort option 6',
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
                     ],
