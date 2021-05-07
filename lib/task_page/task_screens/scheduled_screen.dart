@@ -55,10 +55,9 @@ class _ScheduledScreenState extends State<ScheduledScreen> {
               ),
             )
           : SingleChildScrollView(
-              physics: ScrollPhysics(),
+              physics: AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.only(left: 21, right: 17, top: 10),
               child: Container(
-                height: MediaQuery.of(context).size.height,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[

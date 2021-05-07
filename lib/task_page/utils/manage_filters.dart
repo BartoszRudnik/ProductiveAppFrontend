@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/task_page/models/settings.dart';
-import 'package:productive_app/task_page/models/task.dart';
-import 'package:productive_app/task_page/providers/task_provider.dart';
 import 'package:provider/provider.dart';
+
+import '../models/settings.dart';
+import '../models/task.dart';
+import '../providers/task_provider.dart';
 
 class ManageFilters {
   static List<Task> filter(List<Task> tasks, Settings userSettings, BuildContext context) {
