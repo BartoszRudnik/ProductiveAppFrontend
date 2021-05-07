@@ -272,8 +272,8 @@ class _TaskWidgetState extends State<TaskWidget> {
                           Container(
                             child: Row(
                               children: [
-                                if (taskEndDate.difference(today).inDays == 0) Icon(Icons.access_time_outlined),
-                                if (taskEndDate.difference(today).inDays == 0)
+                                if (taskEndDate.difference(today).inDays == 0 && this.widget.task.endDate.hour != 0 && this.widget.task.endDate.minute != 0) Icon(Icons.access_time_outlined),
+                                if (taskEndDate.difference(today).inDays == 0 && this.widget.task.endDate.hour != 0 && this.widget.task.endDate.minute != 0)
                                   Text(
                                     DateFormat('Hm').format(this.widget.task.endDate),
                                   ),

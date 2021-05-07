@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/task_page/providers/task_provider.dart';
-import 'package:productive_app/task_page/widgets/filter_priority_dialog.dart';
-import 'package:productive_app/task_page/widgets/filter_tags_dialog.dart';
-import 'package:productive_app/task_page/widgets/tags_dialog.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/settings_provider.dart';
 import '../widgets/filter_delegate_dialog.dart';
+import '../widgets/filter_priority_dialog.dart';
+import '../widgets/filter_tags_dialog.dart';
 import '../widgets/filters_appBar.dart';
 
 class FiltersScreen extends StatefulWidget {
