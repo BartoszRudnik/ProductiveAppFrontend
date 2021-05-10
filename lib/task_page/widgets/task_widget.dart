@@ -43,28 +43,32 @@ class _TaskWidgetState extends State<TaskWidget> {
       ),
       child: GestureDetector(
         onTap: () {
-          Navigator.of(context).pushNamed(TaskDetailScreen.routeName, arguments: this.widget.task);
+          if (this.widget.task.isCanceled == null || !this.widget.task.isCanceled) {
+            Navigator.of(context).pushNamed(TaskDetailScreen.routeName, arguments: this.widget.task);
+          }
         },
         child: Dismissible(
           key: this.widget.key,
-          background: Container(
-            padding: EdgeInsets.symmetric(horizontal: 10),
-            alignment: Alignment.centerLeft,
-            color: Theme.of(context).primaryColor,
-            child: Row(
-              children: [
-                Icon(
-                  isArchived ? Icons.restore_from_trash_outlined : Icons.navigate_next_outlined,
-                  color: Theme.of(context).accentColor,
-                  size: 50,
-                ),
-                Text(
-                  isArchived ? 'Restore task' : 'Move task',
-                  style: TextStyle(color: Theme.of(context).accentColor, fontSize: 20, fontWeight: FontWeight.w400),
-                ),
-              ],
-            ),
-          ),
+          background: this.widget.task.isCanceled == null || !this.widget.task.isCanceled
+              ? Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  alignment: Alignment.centerLeft,
+                  color: Theme.of(context).primaryColor,
+                  child: Row(
+                    children: [
+                      Icon(
+                        isArchived ? Icons.restore_from_trash_outlined : Icons.navigate_next_outlined,
+                        color: Theme.of(context).accentColor,
+                        size: 50,
+                      ),
+                      Text(
+                        isArchived ? 'Restore task' : 'Move task',
+                        style: TextStyle(color: Theme.of(context).accentColor, fontSize: 20, fontWeight: FontWeight.w400),
+                      ),
+                    ],
+                  ),
+                )
+              : Container(),
           secondaryBackground: Container(
             padding: EdgeInsets.symmetric(horizontal: 10),
             alignment: Alignment.centerRight,
@@ -157,7 +161,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                 ),
               );
             }
-            if (direction == DismissDirection.startToEnd) {
+            if (direction == DismissDirection.startToEnd && (this.widget.task.isCanceled == null || !this.widget.task.isCanceled)) {
               String newLocation;
 
               if (this.widget.task.delegatedEmail == null) {
@@ -177,7 +181,7 @@ class _TaskWidgetState extends State<TaskWidget> {
             children: <Widget>[
               Row(
                 children: <Widget>[
-                  if (!isArchived || (this.widget.task.isCanceled != null && !this.widget.task.isCanceled))
+                  if (!isArchived && (this.widget.task.isCanceled != null && !this.widget.task.isCanceled))
                     IsDoneButton(
                       isDone: this.widget.task.done,
                       changeIsDoneStatus: this.changeTaskStatus,
