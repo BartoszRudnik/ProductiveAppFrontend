@@ -107,6 +107,11 @@ class _NewTaskState extends State<NewTask> {
       return;
     }
 
+    if (this._localization == 'DELEGATED' && this._delegatedEmail == null) {
+      Dialogs.showWarningDialog(context, "Delegated tasks must have delegated person");
+      return;
+    }
+
     setState(() {
       this._isValid = isValid;
     });

@@ -181,7 +181,7 @@ class _TaskWidgetState extends State<TaskWidget> {
             children: <Widget>[
               Row(
                 children: <Widget>[
-                  if (!isArchived && (this.widget.task.isCanceled != null && !this.widget.task.isCanceled))
+                  if (!isArchived && (this.widget.task.isCanceled == null || !this.widget.task.isCanceled))
                     IsDoneButton(
                       isDone: this.widget.task.done,
                       changeIsDoneStatus: this.changeTaskStatus,
