@@ -123,6 +123,11 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       Dialogs.showWarningDialog(context, "Task with specified delegated person must be on delegated list");
     }
 
+    if (originalTask.supervisorEmail != null && originalTask.supervisorEmail == taskToEdit.delegatedEmail) {
+      isValid = false;
+      Dialogs.showWarningDialog(context, 'Cannot delegate task to principal');
+    }
+
     setState(() {
       this._isValid = isValid;
     });
