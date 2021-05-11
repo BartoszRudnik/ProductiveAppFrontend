@@ -111,6 +111,16 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       Dialogs.showWarningDialog(context, "Task cannot return to inbox");
     }
 
+    if (taskToEdit.localization == 'DELEGATED' && taskToEdit.delegatedEmail == null) {
+      isValid = false;
+      Dialogs.showWarningDialog(context, "Delegated task must have delegated person");
+    }
+
+    if (originalTask.localization == 'DELEGATED' && taskToEdit.localization != 'DELEGATED' && taskToEdit.delegatedEmail != null) {
+      isValid = false;
+      Dialogs.showWarningDialog(context, "Task with specified delegated person must be on delegated list");
+    }
+
     setState(() {
       this._isValid = isValid;
     });
