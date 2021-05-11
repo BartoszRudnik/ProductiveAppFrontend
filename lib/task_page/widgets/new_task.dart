@@ -226,6 +226,7 @@ class _NewTaskState extends State<NewTask> {
                           ),
                           TaskDelegate(
                             setDelegatedEmail: this.setDelegatedEmail,
+                            collaboratorEmail: this._delegatedEmail,
                           ),
                           IconButton(
                             icon: Icon(Icons.attach_file_outlined),

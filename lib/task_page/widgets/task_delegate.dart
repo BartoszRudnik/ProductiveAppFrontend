@@ -4,12 +4,12 @@ import 'delegate_dialog.dart';
 
 class TaskDelegate extends StatelessWidget {
   Function setDelegatedEmail;
+  String collaboratorEmail;
 
   TaskDelegate({
     @required this.setDelegatedEmail,
+    this.collaboratorEmail,
   });
-
-  String collaboratorEmail;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,13 @@ class TaskDelegate extends StatelessWidget {
         collaboratorEmail = await showDialog(
           context: context,
           builder: (context) {
-            return DelegateDialog();
+            if (this.collaboratorEmail == null) {
+              return DelegateDialog();
+            } else {
+              return DelegateDialog(
+                choosenMail: this.collaboratorEmail,
+              );
+            }
           },
         );
         this.setDelegatedEmail(collaboratorEmail);

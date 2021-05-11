@@ -91,6 +91,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
   Future<void> saveTask() async {
     var isValid = this._formKey.currentState.validate();
 
+    print(taskToEdit.delegatedEmail == null);
+
     if (taskToEdit.startDate == null && taskToEdit.localization == "SCHEDULED") {
       isValid = false;
       Dialogs.showWarningDialog(context, "Scheduled tasks have to specify start date");
@@ -111,7 +113,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       Dialogs.showWarningDialog(context, "Task cannot return to inbox");
     }
 
-    if (taskToEdit.localization == 'DELEGATED' && taskToEdit.delegatedEmail == null) {
+    if (taskToEdit.localization == 'DELEGATED' && (taskToEdit.delegatedEmail == null || taskToEdit.delegatedEmail.length <= 1)) {
       isValid = false;
       Dialogs.showWarningDialog(context, "Delegated task must have delegated person");
     }
@@ -132,6 +134,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     this._formKey.currentState.save();
 
     try {
+      if (this.taskToEdit.delegatedEmail != null && this.taskToEdit.localization != 'DELEGATED' && (originalTask.localization == 'ANYTIME' || originalTask.localization == 'SCHEDULED')) {
+        this.taskToEdit.localization = 'DELEGATED';
+      }
+
       if (this.startTime != null && taskToEdit.startDate != null) {
         taskToEdit.startDate = new DateTime(taskToEdit.startDate.year, taskToEdit.startDate.month, taskToEdit.startDate.day, this.startTime.hour, this.startTime.minute);
       } else if (taskToEdit.startDate != null) {
@@ -193,7 +199,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     String value = await showDialog(
       context: context,
       builder: (context) {
-        return DelegateDialog(choosenCollaborator: this.taskToEdit.delegatedEmail);
+        return DelegateDialog(choosenMail: this.taskToEdit.delegatedEmail);
       },
     );
 
@@ -201,6 +207,18 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
     if (value != null) {
       this.taskToEdit.delegatedEmail = value;
+      setState(() {
+        this.taskToEdit.localization = 'DELEGATED';
+      });
+    } else {
+      this.taskToEdit.delegatedEmail = null;
+      setState(() {
+        if (this.taskToEdit.startDate != null) {
+          this.taskToEdit.localization = 'SCHEDULED';
+        } else {
+          this.taskToEdit.localization = 'ANYTIME';
+        }
+      });
     }
   }
 

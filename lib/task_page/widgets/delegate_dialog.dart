@@ -6,10 +6,12 @@ import 'package:provider/provider.dart';
 class DelegateDialog extends StatelessWidget {
   final _collaboratorKey = GlobalKey<FormState>();
 
-  String choosenCollaborator;
+  Collaborator choosenCollaborator;
+  String choosenMail;
 
   DelegateDialog({
     this.choosenCollaborator,
+    this.choosenMail,
   });
 
   @override
@@ -17,9 +19,13 @@ class DelegateDialog extends StatelessWidget {
     List<Collaborator> collaborators = Provider.of<DelegateProvider>(context).collaboratorsList;
     List<Collaborator> filteredCollaborators = List<Collaborator>.from(collaborators);
 
-    final index = filteredCollaborators.indexWhere((element) => element.email == this.choosenCollaborator);
+    final index = filteredCollaborators.indexWhere((element) => element.email == this.choosenMail);
     if (index != -1) {
       filteredCollaborators.elementAt(index).isSelected = true;
+    }
+
+    if (this.choosenCollaborator == null && index != -1) {
+      this.choosenCollaborator = filteredCollaborators.elementAt(index);
     }
 
     return StatefulBuilder(
@@ -147,13 +153,16 @@ class DelegateDialog extends StatelessWidget {
                       return GestureDetector(
                         onTap: () {
                           setState(() {
-                            filteredCollaborators.forEach((element) {
-                              if (element.isSelected) {
-                                element.isSelected = false;
+                            if (this.choosenCollaborator != null && this.choosenCollaborator == filteredCollaborators[collaboratorIndex]) {
+                              filteredCollaborators[collaboratorIndex].isSelected = false;
+                              this.choosenCollaborator = null;
+                            } else {
+                              if (this.choosenCollaborator != null) {
+                                this.choosenCollaborator.isSelected = false;
                               }
-                            });
-                            filteredCollaborators[collaboratorIndex].isSelected = true;
-                            this.choosenCollaborator = filteredCollaborators[collaboratorIndex].email;
+                              filteredCollaborators[collaboratorIndex].isSelected = !filteredCollaborators[collaboratorIndex].isSelected;
+                              this.choosenCollaborator = filteredCollaborators[collaboratorIndex];
+                            }
                           });
                         },
                         child: Card(
@@ -181,12 +190,11 @@ class DelegateDialog extends StatelessWidget {
                         side: BorderSide(color: Theme.of(context).primaryColor),
                       ),
                       onPressed: () {
-                        final index = filteredCollaborators.indexWhere((element) => element.email == this.choosenCollaborator);
-                        if (index != -1) {
-                          filteredCollaborators.elementAt(index).isSelected = false;
+                        if (this.choosenCollaborator != null) {
+                          this.choosenCollaborator.isSelected = false;
                         }
 
-                        Navigator.of(context).pop('');
+                        Navigator.of(context).pop();
                       },
                       child: Text(
                         'Cancel',
@@ -202,12 +210,12 @@ class DelegateDialog extends StatelessWidget {
                         side: BorderSide(color: Theme.of(context).primaryColor),
                       ),
                       onPressed: () {
-                        final index = filteredCollaborators.indexWhere((element) => element.email == this.choosenCollaborator);
-                        if (index != -1) {
-                          filteredCollaborators.elementAt(index).isSelected = false;
+                        if (this.choosenCollaborator != null) {
+                          this.choosenCollaborator.isSelected = false;
+                          Navigator.of(context).pop(this.choosenCollaborator.email);
+                        } else {
+                          Navigator.of(context).pop();
                         }
-
-                        Navigator.of(context).pop(this.choosenCollaborator);
                       },
                       child: Text(
                         'Add collaborator',
