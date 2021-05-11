@@ -353,7 +353,12 @@ class TaskProvider with ChangeNotifier {
     String url = this._serverUrl + 'task/done/${task.id}';
 
     try {
-      await http.put(url);
+      final response = await http.post(url);
+
+      if (response != null && task.localization == 'DELEGATED') {
+        final newStatus = response.body;
+        this.updateTaskStatus(task.id, newStatus);
+      }
 
       this.localizationTaskStatus(task);
 
@@ -361,7 +366,7 @@ class TaskProvider with ChangeNotifier {
     } catch (error) {
       print(error);
 
-      this.taskList[task.id] = task;
+      this.taskList[task.id - 1] = task;
       throw error;
     }
   }
@@ -384,6 +389,10 @@ class TaskProvider with ChangeNotifier {
       print(error);
       throw error;
     }
+  }
+
+  void updateTaskStatus(int id, String newStatus) {
+    this._delegatedTasks.firstWhere((element) => element.id == id).taskStatus = newStatus;
   }
 
   void localizationTaskStatus(Task task) {
