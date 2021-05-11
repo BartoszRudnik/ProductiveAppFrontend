@@ -458,39 +458,52 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        ElevatedButton(
-                          onPressed: () => selectStartDate(),
-                          style: ElevatedButton.styleFrom(
-                            primary: Color.fromRGBO(237, 237, 240, 1),
-                            onPrimary: Color.fromRGBO(119, 119, 120, 1),
-                          ),
-                          child: Center(
-                            child: taskToEdit.startDate.toString() == "null"
-                                ? Icon(Icons.calendar_today_outlined)
-                                : Text(
-                                    "Start date: " + formatter.format(taskToEdit.startDate),
-                                  ),
+                        Text(
+                          'Start date: ',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
                           ),
                         ),
-                        SizedBox(width: 10),
-                        ElevatedButton(
-                          onPressed: () async {
-                            final TimeOfDay pickTime = await DateTimePickers.pickTime(context);
+                        Container(
+                          child: Row(
+                            children: [
+                              ElevatedButton(
+                                onPressed: () => selectStartDate(),
+                                style: ElevatedButton.styleFrom(
+                                  primary: Color.fromRGBO(237, 237, 240, 1),
+                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
+                                ),
+                                child: Center(
+                                  child: taskToEdit.startDate.toString() == "null"
+                                      ? Icon(Icons.calendar_today_outlined)
+                                      : Text(
+                                          formatter.format(taskToEdit.startDate),
+                                        ),
+                                ),
+                              ),
+                              SizedBox(width: 10),
+                              ElevatedButton(
+                                onPressed: () async {
+                                  final TimeOfDay pickTime = await DateTimePickers.pickTime(context);
 
-                            setState(() {
-                              this.startTime = pickTime;
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                            primary: Color.fromRGBO(237, 237, 240, 1),
-                            onPrimary: Color.fromRGBO(119, 119, 120, 1),
-                          ),
-                          child: Center(
-                            child: this.startTime.toString() == "null"
-                                ? Icon(Icons.access_time_outlined)
-                                : Text(
-                                    'Start time: ' + this.startTime.format(context),
-                                  ),
+                                  setState(() {
+                                    this.startTime = pickTime;
+                                  });
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  primary: Color.fromRGBO(237, 237, 240, 1),
+                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
+                                ),
+                                child: Center(
+                                  child: this.startTime.toString() == "null"
+                                      ? Icon(Icons.access_time_outlined)
+                                      : Text(
+                                          this.startTime.format(context),
+                                        ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -504,39 +517,52 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        ElevatedButton(
-                          onPressed: () => selectEndDate(),
-                          style: ElevatedButton.styleFrom(
-                            primary: Color.fromRGBO(237, 237, 240, 1),
-                            onPrimary: Color.fromRGBO(119, 119, 120, 1),
-                          ),
-                          child: Center(
-                            child: taskToEdit.endDate.toString() == "null"
-                                ? Icon(Icons.calendar_today_outlined)
-                                : Text(
-                                    "End date: " + formatter.format(taskToEdit.endDate),
-                                  ),
+                        Text(
+                          'Due date:',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
                           ),
                         ),
-                        SizedBox(width: 10),
-                        ElevatedButton(
-                          onPressed: () async {
-                            final TimeOfDay pickTime = await DateTimePickers.pickTime(context);
+                        Container(
+                          child: Row(
+                            children: [
+                              ElevatedButton(
+                                onPressed: () => selectEndDate(),
+                                style: ElevatedButton.styleFrom(
+                                  primary: Color.fromRGBO(237, 237, 240, 1),
+                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
+                                ),
+                                child: Center(
+                                  child: taskToEdit.endDate.toString() == "null"
+                                      ? Icon(Icons.calendar_today_outlined)
+                                      : Text(
+                                          formatter.format(taskToEdit.endDate),
+                                        ),
+                                ),
+                              ),
+                              SizedBox(width: 10),
+                              ElevatedButton(
+                                onPressed: () async {
+                                  final TimeOfDay pickTime = await DateTimePickers.pickTime(context);
 
-                            setState(() {
-                              this.endTime = pickTime;
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                            primary: Color.fromRGBO(237, 237, 240, 1),
-                            onPrimary: Color.fromRGBO(119, 119, 120, 1),
-                          ),
-                          child: Center(
-                            child: this.endTime.toString() == "null"
-                                ? Icon(Icons.access_time_outlined)
-                                : Text(
-                                    'End time: ' + this.endTime.format(context),
-                                  ),
+                                  setState(() {
+                                    this.endTime = pickTime;
+                                  });
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  primary: Color.fromRGBO(237, 237, 240, 1),
+                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
+                                ),
+                                child: Center(
+                                  child: this.endTime.toString() == "null"
+                                      ? Icon(Icons.access_time_outlined)
+                                      : Text(
+                                          this.endTime.format(context),
+                                        ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
