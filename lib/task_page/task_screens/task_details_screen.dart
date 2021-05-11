@@ -113,7 +113,12 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
     if (taskToEdit.localization == 'DELEGATED' && taskToEdit.delegatedEmail == null) {
       isValid = false;
-      Dialogs.showWarningDialog(context, "Delegated tasks must have delegated person");
+      Dialogs.showWarningDialog(context, "Delegated task must have delegated person");
+    }
+
+    if (originalTask.localization == 'DELEGATED' && taskToEdit.localization != 'DELEGATED' && taskToEdit.delegatedEmail != null) {
+      isValid = false;
+      Dialogs.showWarningDialog(context, "Task with specified delegated person must be on delegated list");
     }
 
     setState(() {
