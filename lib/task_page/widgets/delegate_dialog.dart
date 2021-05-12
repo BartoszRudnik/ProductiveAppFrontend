@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:global_configuration/global_configuration.dart';
 import 'package:productive_app/task_page/models/collaborator.dart';
 import 'package:productive_app/task_page/providers/delegate_provider.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +9,7 @@ class DelegateDialog extends StatelessWidget {
 
   Collaborator choosenCollaborator;
   String choosenMail;
+  String _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
   DelegateDialog({
     this.choosenCollaborator,
@@ -169,10 +171,13 @@ class DelegateDialog extends StatelessWidget {
                           color: filteredCollaborators[collaboratorIndex].isSelected ? Theme.of(context).primaryColor : Theme.of(context).accentColor,
                           child: Padding(
                             padding: EdgeInsets.all(10),
-                            child: Text(
-                              filteredCollaborators[collaboratorIndex].email,
-                              style: TextStyle(
-                                color: filteredCollaborators[collaboratorIndex].isSelected ? Theme.of(context).accentColor : Theme.of(context).primaryColor,
+                            child: ListTile(
+                              leading: CircleAvatar(radius: 25, backgroundImage: NetworkImage(this._serverUrl + 'userImage/getImage/${filteredCollaborators[collaboratorIndex].email}')),
+                              title: Text(
+                                filteredCollaborators[collaboratorIndex].email,
+                                style: TextStyle(
+                                  color: filteredCollaborators[collaboratorIndex].isSelected ? Theme.of(context).accentColor : Theme.of(context).primaryColor,
+                                ),
                               ),
                             ),
                           ),

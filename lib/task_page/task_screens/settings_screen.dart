@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../../login/models/user.dart';
@@ -16,7 +19,6 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final _formKey = GlobalKey<FormState>();
-  User user;
 
   Future<void> updateUserInfo() async {
     bool hasAgreed = await Dialogs.showChoiceDialog(context, "Are you sure you want to update your account information?");
@@ -45,19 +47,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> removeAvatar() async {
     bool hasAgreed = await Dialogs.showChoiceDialog(context, "Are you sure you want to remove your avatar?");
     if (hasAgreed) {
-      //TO DO reset password
-      print("Remove avatar");
+      Provider.of<AuthProvider>(context, listen: false).removeAvatar();
     }
   }
 
   Future<void> changeAvatar() async {
-    //TO DO reset password
-    print("Change avatar");
+    String mode = await Dialogs.showImagePickerDialog(context, 'Choose picking mode');
+
+    if (mode != null) {
+      final imageSource = mode == 'Camera' ? ImageSource.camera : ImageSource.gallery;
+
+      final picker = ImagePicker();
+      final pickedImage = await picker.getImage(
+        source: imageSource,
+        imageQuality: 20,
+      );
+      final pickedImageFile = File(pickedImage.path);
+      setState(() {
+        Provider.of<AuthProvider>(context, listen: false).changeUserImage(pickedImageFile);
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    this.user = Provider.of<AuthProvider>(context, listen: false).user;
+    Provider.of<AuthProvider>(context, listen: false).checkIfAvatarExists();
+    User user = Provider.of<AuthProvider>(context).user;
+
+    if (!user.removed) {
+      Provider.of<AuthProvider>(context, listen: false).getUserImage();
+    }
+
     return Scaffold(
         appBar: TaskAppBar(
           title: 'Account settings',
@@ -74,38 +94,51 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Expanded(
                     flex: 6,
                     child: Container(
-                        width: 80,
-                        height: 80,
-                        child: GestureDetector(
-                          onTap: () => changeAvatar(),
-                          child: Badge(
-                              position: BadgePosition.topEnd(),
-                              badgeColor: Theme.of(context).accentColor,
-                              badgeContent: Icon(Icons.photo_camera),
-                              child: Container(
-                                width: 80,
-                                height: 80,
-                                child: CircleAvatar(
-                                  backgroundColor: Theme.of(context).primaryColor,
+                      width: 100,
+                      height: 100,
+                      child: GestureDetector(
+                        onTap: () => changeAvatar(),
+                        child: Badge(
+                          position: BadgePosition.topEnd(),
+                          badgeColor: Theme.of(context).accentColor,
+                          badgeContent: Icon(Icons.photo_camera),
+                          child: !user.removed
+                              ? Container(
+                                  width: 100,
+                                  height: 100,
+                                  child: CircleAvatar(
+                                    radius: 50,
+                                    backgroundImage: user.userImage != null ? user.userImage : null,
+                                  ),
+                                )
+                              : Container(
+                                  width: 100,
+                                  height: 100,
+                                  child: CircleAvatar(
+                                    radius: 50,
+                                    backgroundColor: Theme.of(context).primaryColor,
+                                  ),
                                 ),
-                              )),
-                        )),
+                        ),
+                      ),
+                    ),
                   ),
                   Expanded(
-                      flex: 15,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              user.email,
-                              style: TextStyle(fontSize: 20),
-                            ),
-                            GestureDetector(onTap: () => removeAvatar(), child: Text("Remove avatar"))
-                          ],
-                        ),
-                      ))
+                    flex: 15,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user.email,
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          GestureDetector(onTap: () => removeAvatar(), child: Text("Remove avatar"))
+                        ],
+                      ),
+                    ),
+                  )
                 ],
               ),
               SizedBox(height: 10),
@@ -136,6 +169,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           Expanded(
                             flex: 14,
                             child: TextFormField(
+                              enabled: false,
                               initialValue: user.email,
                               style: TextStyle(fontSize: 18),
                               maxLines: 1,

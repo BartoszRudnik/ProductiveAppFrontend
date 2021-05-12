@@ -1,13 +1,13 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
-import 'package:productive_app/task_page/providers/delegate_provider.dart';
-import 'package:productive_app/task_page/task_screens/completed_screen.dart';
-import 'package:productive_app/task_page/task_screens/settings_tabs_screen.dart';
-import 'package:productive_app/task_page/task_screens/trash_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../../login/providers/auth_provider.dart';
+import '../providers/delegate_provider.dart';
+import '../task_screens/completed_screen.dart';
+import '../task_screens/settings_tabs_screen.dart';
 import '../task_screens/tags_screen.dart';
+import '../task_screens/trash_screen.dart';
 import 'drawerListTile.dart';
 
 class MainDrawer extends StatelessWidget {
@@ -19,24 +19,41 @@ class MainDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<AuthProvider>(context, listen: false).checkIfAvatarExists();
+    final user = Provider.of<AuthProvider>(context).user;
+
+    if (!user.removed) {
+      Provider.of<AuthProvider>(context, listen: false).getUserImage();
+    }
+
     return SingleChildScrollView(
       child: Container(
         margin: EdgeInsets.only(
           left: 47,
-          top: 84,
+          top: 64,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Container(
-              width: 80,
-              height: 80,
-              child: CircleAvatar(
-                backgroundColor: Theme.of(context).primaryColor,
-              ),
-            ),
+            !user.removed
+                ? Container(
+                    width: 100,
+                    height: 100,
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundImage: user.userImage != null ? user.userImage : null,
+                    ),
+                  )
+                : Container(
+                    width: 100,
+                    height: 100,
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Theme.of(context).primaryColor,
+                    ),
+                  ),
             Container(
               width: 210,
               height: 72,
@@ -58,14 +75,10 @@ class MainDrawer extends StatelessWidget {
             ),
             Badge(
               position: BadgePosition.topStart(),
-              showBadge:
-                  Provider.of<DelegateProvider>(context).received.length > 0,
+              showBadge: Provider.of<DelegateProvider>(context).received.length > 0,
               badgeColor: Theme.of(context).primaryColor,
               badgeContent: Text(
-                Provider.of<DelegateProvider>(context)
-                    .received
-                    .length
-                    .toString(),
+                Provider.of<DelegateProvider>(context).received.length.toString(),
                 style: TextStyle(color: Theme.of(context).accentColor),
               ),
               child: DrawerListTile(
@@ -123,13 +136,10 @@ class MainDrawer extends StatelessWidget {
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 primary: Theme.of(context).primaryColor,
-                                side: BorderSide(
-                                    color: Theme.of(context).primaryColor),
+                                side: BorderSide(color: Theme.of(context).primaryColor),
                               ),
                               onPressed: () {
-                                Provider.of<AuthProvider>(context,
-                                        listen: false)
-                                    .logout();
+                                Provider.of<AuthProvider>(context, listen: false).logout();
                                 Navigator.of(context).pop(true);
                               },
                               child: Text(
@@ -143,8 +153,7 @@ class MainDrawer extends StatelessWidget {
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 primary: Theme.of(context).primaryColor,
-                                side: BorderSide(
-                                    color: Theme.of(context).primaryColor),
+                                side: BorderSide(color: Theme.of(context).primaryColor),
                               ),
                               onPressed: () {
                                 Navigator.of(context).pop(false);

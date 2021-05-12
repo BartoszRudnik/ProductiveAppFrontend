@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:global_configuration/global_configuration.dart';
 import 'package:productive_app/task_page/models/collaborator.dart';
 import 'package:productive_app/task_page/providers/delegate_provider.dart';
 import 'package:provider/provider.dart';
 
 class AcceptedCollaborator extends StatelessWidget {
   Collaborator collaborator;
+  String _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
   AcceptedCollaborator({
     @required this.collaborator,
@@ -98,7 +100,8 @@ class AcceptedCollaborator extends StatelessWidget {
         child: ListTile(
           leading: Container(
             child: CircleAvatar(
-              backgroundColor: Theme.of(context).primaryColor,
+              radius: 25,
+              backgroundImage: NetworkImage(this._serverUrl + 'userImage/getImage/${this.collaborator.email}'),
             ),
           ),
           title: Text(
