@@ -39,6 +39,86 @@ class AuthProvider with ChangeNotifier {
     return null;
   }
 
+  Future<void> getUserData() async {
+    String url = this._serverUrl + 'userData/get/${this._email}';
+
+    try {
+      final response = await http.get(url);
+
+      final responseBody = json.decode(response.body);
+
+      this.user.firstName = responseBody['firstName'];
+      this.user.lastName = responseBody['lastName'];
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<void> updateUserData(String firstName, String lastName) async {
+    String url = this._serverUrl + 'userData/update/${this._email}';
+
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode(
+          {
+            "firstName": firstName,
+            "lastName": lastName,
+          },
+        ),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      this.user.firstName = firstName;
+      this.user.lastName = lastName;
+
+      this.notifyListeners();
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<void> deleteAccount(String token) async {
+    String url = this._serverUrl + 'account/deleteAccount/${this._email}/$token';
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      this.logout();
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<void> getDeleteToken() async {
+    String url = this._serverUrl + 'account/deleteAccountToken/${this._email}';
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
   Future<void> _authenticate(String email, String password, String urlSegment) async {
     String url = this._serverUrl + '$urlSegment';
 
@@ -90,8 +170,6 @@ class AuthProvider with ChangeNotifier {
 
     try {
       final response = await http.get(finalUrl);
-
-      print(response.body);
 
       response.body == 'true' ? this._user.removed = false : this._user.removed = true;
     } catch (error) {

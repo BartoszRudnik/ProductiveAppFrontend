@@ -10,7 +10,7 @@ import '../task_screens/tags_screen.dart';
 import '../task_screens/trash_screen.dart';
 import 'drawerListTile.dart';
 
-class MainDrawer extends StatelessWidget {
+class MainDrawer extends StatefulWidget {
   final String username;
 
   MainDrawer({
@@ -18,7 +18,13 @@ class MainDrawer extends StatelessWidget {
   });
 
   @override
+  _MainDrawerState createState() => _MainDrawerState();
+}
+
+class _MainDrawerState extends State<MainDrawer> {
+  @override
   Widget build(BuildContext context) {
+    Provider.of<AuthProvider>(context, listen: false).getUserData();
     Provider.of<AuthProvider>(context, listen: false).checkIfAvatarExists();
     final user = Provider.of<AuthProvider>(context).user;
 
@@ -55,20 +61,29 @@ class MainDrawer extends StatelessWidget {
                     ),
                   ),
             Container(
+              alignment: Alignment.centerLeft,
               width: 210,
               height: 72,
-              child: ListView(
-                children: username
-                    .split(' ')
-                    .map((e) => Text(
-                          e,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 21,
-                          ),
-                        ))
-                    .toList(),
-              ),
+              child: user.firstName != null && user.firstName.length > 0 && user.lastName != null && user.lastName.length > 0
+                  ? Text(
+                      user.firstName + ' ' + user.lastName,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 21,
+                      ),
+                    )
+                  : ListView(
+                      children: widget.username
+                          .split(' ')
+                          .map((e) => Text(
+                                e,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 21,
+                                ),
+                              ))
+                          .toList(),
+                    ),
             ),
             SizedBox(
               height: 15,
