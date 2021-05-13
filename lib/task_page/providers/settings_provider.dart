@@ -175,9 +175,13 @@ class SettingsProvider with ChangeNotifier {
             'tag': tag,
           },
         ),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
       );
       if (tag != null) {
-        this.userSettings.tags.remove(tag);
+        print(this.userSettings.tags.remove(tag));
       }
 
       notifyListeners();

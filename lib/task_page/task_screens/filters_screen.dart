@@ -487,7 +487,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                   elevation: 8,
                   child: SwitchListTile(
                     activeColor: Theme.of(context).primaryColor,
-                    title: Text('Show only delegated tasks'),
+                    title: Text('Show only received tasks'),
                     value: showOnlyDelegated,
                     onChanged: (bool value) {
                       setState(() {

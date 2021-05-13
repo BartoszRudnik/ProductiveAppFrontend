@@ -132,7 +132,7 @@ class _CollaboratorsScreenState extends State<CollaboratorsScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'Send invitations',
+                              'Sent invitations',
                               style: TextStyle(
                                 fontSize: 27,
                                 fontWeight: FontWeight.w400,
