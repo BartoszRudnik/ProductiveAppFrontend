@@ -190,8 +190,6 @@ class _NewPasswordState extends State<NewPassword> {
                       return 'Password must be at least 7 characters long';
                     }
                     if (value != this._passwordConfirmKey.currentState.value) {
-                      print(value);
-                      print(this._repeatPassword);
                       setState(() {
                         this._validationMessage = 'Passwords must be the same';
                       });

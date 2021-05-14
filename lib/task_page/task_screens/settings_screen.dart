@@ -20,6 +20,8 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final _formKey = GlobalKey<FormState>();
   final _deleteDialogKey = GlobalKey<FormState>();
+  final _resetPasswordKey = GlobalKey<FormState>();
+  final _cofirmPasswordKey = GlobalKey<FormFieldState>();
 
   Future<void> updateUserInfo(String firstName, String lastName) async {
     bool hasAgreed = await Dialogs.showChoiceDialog(context, "Are you sure you want to update your account information?");
@@ -125,11 +127,178 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  Future<void> resetPassword() async {
+  Future<void> resetPassword(String userMail) async {
     bool hasAgreed = await Dialogs.showChoiceDialog(context, "Are you sure you want to reset your password?");
     if (hasAgreed) {
-      //TO DO reset password
-      print("Password reset");
+      Provider.of<AuthProvider>(context, listen: false).resetPassword(userMail);
+
+      String enteredToken;
+      String newPassword;
+      String newPasswordRepeated;
+
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            content: Container(
+              width: 350,
+              height: 275,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Center(
+                    child: Text(
+                      'Checkout your email for reset password token',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Form(
+                    key: _resetPasswordKey,
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.all(10),
+                            hintText: 'Enter reset token',
+                          ),
+                          validator: (value) {
+                            if (value.isEmpty || value.length < 6) {
+                              return 'Please provide valid token';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) async {
+                            enteredToken = value;
+                          },
+                        ),
+                        TextFormField(
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.all(10),
+                            hintText: 'Enter new password',
+                          ),
+                          validator: (value) {
+                            if (value != this._cofirmPasswordKey.currentState.value) {
+                              return 'Passwords must be the same';
+                            }
+                            if (value.isEmpty || value.length < 7) {
+                              return 'Password must be at least 7 characters long';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) async {
+                            newPassword = value;
+                          },
+                        ),
+                        TextFormField(
+                          obscureText: true,
+                          key: this._cofirmPasswordKey,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.all(10),
+                            hintText: 'Confirm new password',
+                          ),
+                          validator: (value) {
+                            if (value.isEmpty || value.length < 7) {
+                              return 'Password must be at least 7 characters long';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) async {
+                            newPasswordRepeated = value;
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: Theme.of(context).primaryColor,
+                          side: BorderSide(color: Theme.of(context).primaryColor),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Theme.of(context).accentColor,
+                          ),
+                        ),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: Theme.of(context).primaryColor,
+                          side: BorderSide(color: Theme.of(context).primaryColor),
+                        ),
+                        onPressed: () {
+                          bool isValid = this._resetPasswordKey.currentState.validate();
+
+                          if (isValid) {
+                            this._resetPasswordKey.currentState.save();
+                            Provider.of<AuthProvider>(context, listen: false).newPassword(userMail, enteredToken, newPassword);
+                            Navigator.of(context).pop();
+                            return showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: Center(
+                                  child: Text(
+                                    'New password successfuly set',
+                                    style: Theme.of(context).textTheme.headline2,
+                                  ),
+                                ),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            primary: Theme.of(context).primaryColor,
+                                            side: BorderSide(color: Theme.of(context).primaryColor),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text(
+                                            'OK',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: Theme.of(context).accentColor,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                        child: Text(
+                          'Reset Password',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Theme.of(context).accentColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          );
+        },
+      );
     }
   }
 
@@ -428,7 +597,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ),
                             ),
                             onPressed: () {
-                              this.resetPassword();
+                              this.resetPassword(user.email);
                             },
                             child: Text(
                               'Reset password',
