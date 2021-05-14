@@ -189,14 +189,16 @@ class _TaskWidgetState extends State<TaskWidget> {
                   SizedBox(
                     width: 7,
                   ),
-                  Text(
-                    this.widget.task.title,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: 'RobotoCondensed',
-                      decoration: this.widget.task.done || (this.widget.task.isCanceled != null && this.widget.task.isCanceled) ? TextDecoration.lineThrough : null,
-                      color: this.widget.task.done || (this.widget.task.isCanceled != null && this.widget.task.isCanceled) ? Colors.grey : Theme.of(context).primaryColor,
+                  Flexible(
+                    child: Text(
+                      this.widget.task.title,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'RobotoCondensed',
+                        decoration: this.widget.task.done || (this.widget.task.isCanceled != null && this.widget.task.isCanceled) ? TextDecoration.lineThrough : null,
+                        color: this.widget.task.done || (this.widget.task.isCanceled != null && this.widget.task.isCanceled) ? Colors.grey : Theme.of(context).primaryColor,
+                      ),
                     ),
                   ),
                   SizedBox(width: 7),

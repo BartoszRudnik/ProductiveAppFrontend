@@ -1,5 +1,6 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/delegate_provider.dart';
@@ -18,8 +19,10 @@ class TabsScreen extends StatefulWidget {
   _TabsScreenState createState() => _TabsScreenState();
 }
 
-class _TabsScreenState extends State<TabsScreen> {
+class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<TabsScreen> {
   List<Map<String, Object>> _pages;
+
+  AnimationController _hideFab;
 
   final _selectedItemColor = Colors.white;
   final _unselectedItemColor = Colors.black;
@@ -46,6 +49,9 @@ class _TabsScreenState extends State<TabsScreen> {
   void initState() {
     super.initState();
 
+    this._hideFab = AnimationController(vsync: this, duration: kThemeAnimationDuration);
+    this._hideFab.forward();
+
     _pages = [
       {
         'page': InboxScreen(),
@@ -64,6 +70,35 @@ class _TabsScreenState extends State<TabsScreen> {
         'title': 'Delegated',
       }
     ];
+  }
+
+  @override
+  void dispose() {
+    this._hideFab.dispose();
+    super.dispose();
+  }
+
+  bool _handleScrollNotification(ScrollNotification notification) {
+    if (notification.depth == 0) {
+      if (notification is UserScrollNotification) {
+        final UserScrollNotification userScroll = notification;
+        switch (userScroll.direction) {
+          case ScrollDirection.forward:
+            if (userScroll.metrics.maxScrollExtent != userScroll.metrics.minScrollExtent) {
+              this._hideFab.forward();
+            }
+            break;
+          case ScrollDirection.reverse:
+            if (userScroll.metrics.maxScrollExtent != userScroll.metrics.minScrollExtent) {
+              this._hideFab.reverse();
+            }
+            break;
+          case ScrollDirection.idle:
+            break;
+        }
+      }
+    }
+    return false;
   }
 
   void _addNewTaskForm(BuildContext buildContext) {
@@ -87,6 +122,7 @@ class _TabsScreenState extends State<TabsScreen> {
   void _selectPage(int index) {
     if (index >= 0 && index < _pages.length) {
       setState(() {
+        this._hideFab.forward();
         _selectedPageIndex = index;
       });
     }
@@ -156,44 +192,46 @@ class _TabsScreenState extends State<TabsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedContainer(
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.6),
-            spreadRadius: 5,
-            blurRadius: 7,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      transform: Matrix4.translationValues(offsetX, offsetY, 0)..scale(scale),
-      duration: Duration(milliseconds: 250),
-      child: GestureDetector(
-        onTap: () {
-          if (isDrawerVisible) _changeTranform(0, 0, 1);
-        },
-        onHorizontalDragEnd: (details) {
-          if (!isDrawerVisible) {
-            if (details.primaryVelocity < 0) {
-              _selectPage(_selectedPageIndex + 1);
-            }
-            if (details.primaryVelocity > 0) {
-              if (_selectedPageIndex == 0 && !isDrawerVisible) {
-                _changeTranform(230, 70, 0.8);
+    return NotificationListener<ScrollNotification>(
+      onNotification: this._handleScrollNotification,
+      child: AnimatedContainer(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.6),
+              spreadRadius: 5,
+              blurRadius: 7,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        transform: Matrix4.translationValues(offsetX, offsetY, 0)..scale(scale),
+        duration: Duration(milliseconds: 250),
+        child: GestureDetector(
+          onTap: () {
+            if (isDrawerVisible) _changeTranform(0, 0, 1);
+          },
+          onHorizontalDragEnd: (details) {
+            if (!isDrawerVisible) {
+              if (details.primaryVelocity < 0) {
+                _selectPage(_selectedPageIndex + 1);
               }
-              _selectPage(_selectedPageIndex - 1);
+              if (details.primaryVelocity > 0) {
+                if (_selectedPageIndex == 0 && !isDrawerVisible) {
+                  _changeTranform(230, 70, 0.8);
+                }
+                _selectPage(_selectedPageIndex - 1);
+              }
+            } else {
+              if (details.primaryVelocity < 0) {
+                _changeTranform(0, 0, 1);
+              }
             }
-          } else {
-            if (details.primaryVelocity < 0) {
-              _changeTranform(0, 0, 1);
-            }
-          }
-        },
-        child: Scaffold(
-          appBar: NewTaskAppBar(
-            title: _pages[_selectedPageIndex]['title'],
-            leadingButton: IconButton(
+          },
+          child: Scaffold(
+            appBar: NewTaskAppBar(
+              title: _pages[_selectedPageIndex]['title'],
+              leadingButton: IconButton(
                 icon: Badge(
                   position: BadgePosition.topStart(),
                   showBadge: Provider.of<DelegateProvider>(context).received.length > 0,
@@ -202,51 +240,57 @@ class _TabsScreenState extends State<TabsScreen> {
                 ),
                 onPressed: () {
                   isDrawerVisible ? _changeTranform(0, 0, 1) : _changeTranform(230, 70, 0.8);
-                }),
-          ),
-          body: _pages[_selectedPageIndex]['page'],
-          floatingActionButton: FloatingActionButton(
-            child: Icon(
-              Icons.add,
-              color: Theme.of(context).accentColor,
-              size: 50,
-            ),
-            onPressed: () {
-              this._addNewTaskForm(context);
-            },
-            backgroundColor: Theme.of(context).primaryColor,
-          ),
-          bottomNavigationBar: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor,
-              border: Border(
-                top: BorderSide(color: Theme.of(context).primaryColor, width: 1.0),
+                },
               ),
             ),
-            child: BottomNavigationBar(
-              selectedFontSize: 0,
-              currentIndex: _selectedPageIndex,
-              selectedItemColor: this._selectedItemColor,
-              unselectedItemColor: this._unselectedItemColor,
-              type: BottomNavigationBarType.fixed,
-              items: [
-                BottomNavigationBarItem(
-                  icon: _buildIconInbox(Icons.inbox_outlined, 'Inbox', 0),
-                  title: SizedBox.shrink(),
+            body: _pages[_selectedPageIndex]['page'],
+            floatingActionButton: ScaleTransition(
+              scale: this._hideFab,
+              alignment: Alignment.bottomCenter,
+              child: FloatingActionButton(
+                child: Icon(
+                  Icons.add,
+                  color: Theme.of(context).accentColor,
+                  size: 50,
                 ),
-                BottomNavigationBarItem(
-                  icon: _buildIcon(Icons.access_time, 'Anytime', 1),
-                  title: SizedBox.shrink(),
+                onPressed: () {
+                  this._addNewTaskForm(context);
+                },
+                backgroundColor: Theme.of(context).primaryColor,
+              ),
+            ),
+            bottomNavigationBar: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
+                border: Border(
+                  top: BorderSide(color: Theme.of(context).primaryColor, width: 1.0),
                 ),
-                BottomNavigationBarItem(
-                  icon: _buildIcon(Icons.calendar_today, 'Scheduled', 2),
-                  title: SizedBox.shrink(),
-                ),
-                BottomNavigationBarItem(
-                  icon: _buildIcon(Icons.person_outline_outlined, 'Delegated', 3),
-                  title: SizedBox.shrink(),
-                ),
-              ],
+              ),
+              child: BottomNavigationBar(
+                selectedFontSize: 0,
+                currentIndex: _selectedPageIndex,
+                selectedItemColor: this._selectedItemColor,
+                unselectedItemColor: this._unselectedItemColor,
+                type: BottomNavigationBarType.fixed,
+                items: [
+                  BottomNavigationBarItem(
+                    icon: _buildIconInbox(Icons.inbox_outlined, 'Inbox', 0),
+                    title: SizedBox.shrink(),
+                  ),
+                  BottomNavigationBarItem(
+                    icon: _buildIcon(Icons.access_time, 'Anytime', 1),
+                    title: SizedBox.shrink(),
+                  ),
+                  BottomNavigationBarItem(
+                    icon: _buildIcon(Icons.calendar_today, 'Scheduled', 2),
+                    title: SizedBox.shrink(),
+                  ),
+                  BottomNavigationBarItem(
+                    icon: _buildIcon(Icons.person_outline_outlined, 'Delegated', 3),
+                    title: SizedBox.shrink(),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
