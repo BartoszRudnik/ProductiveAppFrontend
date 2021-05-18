@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/task_page/widgets/details_appBar.dart';
 import 'package:provider/provider.dart';
 
 import '../../shared/dialogs.dart';
@@ -270,8 +271,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     }
 
     return Scaffold(
-        appBar: TaskAppBar(
+        appBar: DetailsAppBar(
           title: 'Details',
+          task: originalTask,
         ),
         body: SingleChildScrollView(
           child: Padding(

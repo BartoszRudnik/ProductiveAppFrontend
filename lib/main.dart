@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
+import 'package:productive_app/task_page/task_screens/related_task_info_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'login/providers/auth_provider.dart';
@@ -133,6 +134,7 @@ class MyApp extends StatelessWidget {
             CollaboratorsScreen.routeName: (ctx) => CollaboratorsScreen(),
             SettingsTabsScreen.routeName: (ctx) => SettingsTabsScreen(),
             FiltersScreen.routeName: (ctx) => FiltersScreen(),
+            RelatedTaskInfoScreen.routeName: (ctx) => RelatedTaskInfoScreen(),
           },
         ),
       ),

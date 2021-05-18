@@ -17,6 +17,8 @@ class Task with ChangeNotifier {
   bool done;
   bool isDelegated;
   bool isCanceled;
+  int parentId;
+  int childId;
 
   Task({
     @required this.id,
@@ -34,5 +36,7 @@ class Task with ChangeNotifier {
     this.taskStatus,
     this.isCanceled,
     this.supervisorEmail,
+    this.childId,
+    this.parentId
   });
 }

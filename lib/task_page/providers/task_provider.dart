@@ -300,6 +300,8 @@ class TaskProvider with ChangeNotifier {
           taskStatus: taskStatus,
           isCanceled: element['tasks']['isCanceled'],
           supervisorEmail: supervisorEmail,
+          //childId: element['tasks']['childId']
+          //parentId: element['tasks']['parentId']
         );
 
         if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
