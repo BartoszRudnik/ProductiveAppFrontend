@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
+import 'package:productive_app/task_page/models/task.dart';
 import 'package:productive_app/task_page/task_screens/related_task_info_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -45,6 +46,7 @@ class MyApp extends StatelessWidget {
             authToken: auth.token,
             taskList: previousTasks == null ? [] : previousTasks.taskList,
             taskPriorities: previousTasks == null ? [] : previousTasks.priorities,
+            singleTask: previousTasks == null ? Task(id:-1,title: '') : previousTasks.singleTask,
           ),
         ),
         ChangeNotifierProxyProvider<AuthProvider, TagProvider>(

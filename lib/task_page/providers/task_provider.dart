@@ -14,6 +14,7 @@ class TaskProvider with ChangeNotifier {
   List<Task> _scheduledTasks = [];
   List<Task> _delegatedTasks = [];
   List<Task> taskList = [];
+  Task singleTask;
 
   List<String> taskPriorities = [];
 
@@ -32,7 +33,7 @@ class TaskProvider with ChangeNotifier {
 
   String _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
-  TaskProvider({@required this.userMail, @required this.authToken, @required this.taskList, @required this.taskPriorities}) {
+  TaskProvider({@required this.userMail, @required this.authToken, @required this.taskList, @required this.taskPriorities, @required this.singleTask}) {
     this.divideTasks();
   }
 
@@ -50,6 +51,10 @@ class TaskProvider with ChangeNotifier {
 
   void setDelegatedTasks(List<Task> newList) {
     this._delegatedTasks = newList;
+  }
+
+  Task get getSingleTask{
+    return this.singleTask;
   }
 
   List<Task> get tasks {
@@ -257,6 +262,45 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
+  Future<void> fetchSingleTask(int taskId) async{
+    notifyListeners();
+    String url = this._serverUrl + 'task/getSingleTask/${this.userMail}/$taskId';
+    String supervisorEmail;
+    Task mockTask = Task(
+      id: -1,
+      title: 'Mock task',
+      description: 'Mock task desc',
+      done: false,
+      priority: 'HIGH',
+      endDate: DateTime.parse('2021-01-01'),
+      startDate: DateTime.parse('2021-01-01'),
+      supervisorEmail: 'mock@mock.com',
+    );
+    try{
+      final response = await http.get(url);
+      final responseBody = json.decode(utf8.decode(response.bodyBytes));
+
+      supervisorEmail = responseBody['ownerEmail'];
+
+      Task task = Task(
+        id: responseBody['taskId'],
+        title: responseBody['taskName'],
+        description: responseBody['description'],
+        priority: responseBody['priority'],
+        endDate: DateTime.parse(responseBody['endDate']),
+        startDate: DateTime.parse(responseBody['startDate']),
+        supervisorEmail: supervisorEmail
+      );
+      singleTask = task;
+      notifyListeners();
+    }catch (error) {
+      singleTask = mockTask;
+      notifyListeners();
+      print(error);
+      throw error;
+    }
+  }
+
   Future<void> fetchTasks() async {
     String url = this._serverUrl + 'task/getAll/${this.userMail}';
 
@@ -300,8 +344,8 @@ class TaskProvider with ChangeNotifier {
           taskStatus: taskStatus,
           isCanceled: element['tasks']['isCanceled'],
           supervisorEmail: supervisorEmail,
-          //childId: element['tasks']['childId']
-          //parentId: element['tasks']['parentId']
+          childId: element['childId'],
+          parentId: element['parentId']
         );
 
         if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {

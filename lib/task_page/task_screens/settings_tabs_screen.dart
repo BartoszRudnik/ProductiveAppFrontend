@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'collaborators_screen.dart';
 
 class SettingsTabsScreen extends StatefulWidget {
-  static const routeName = "/collaborators";
+  static const routeName = "/settingTabsScreen";
 
   @override
   _SettingsTabsScreenState createState() => _SettingsTabsScreenState();

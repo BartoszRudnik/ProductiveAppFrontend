@@ -21,11 +21,6 @@ class DetailsAppBar extends StatefulWidget with PreferredSizeWidget {
 class _DetailsAppBarState extends State<DetailsAppBar> {
   @override
   Widget build(BuildContext context) {
-    bool onlyUnfinished = false;
-    if (Provider.of<SettingsProvider>(context).userSettings.showOnlyUnfinished != null) {
-      onlyUnfinished = Provider.of<SettingsProvider>(context).userSettings.showOnlyUnfinished;
-    }
-
     return AppBar(
       elevation: 0,
       title: Text(
@@ -45,11 +40,13 @@ class _DetailsAppBarState extends State<DetailsAppBar> {
         PopupMenuButton(
           onSelected: (value) {
             if (value == 'related') {
-              Navigator.of(context).pushNamed(RelatedTaskInfoScreen.routeName);
+              Navigator.of(context).pushNamed(RelatedTaskInfoScreen.routeName,
+                arguments: this.widget.task.childId != null? this.widget.task.childId : this.widget.task.parentId
+              );
             }
           },
           icon: Icon(Icons.more_vert),
-          itemBuilder: (this.widget.task.childId != null || this.widget.task.parentId != null)? (_) => [
+          itemBuilder: (this.widget.task.childId != null || this.widget.task.isDelegated)? (_) => [
             PopupMenuItem(
               child: Text('Related task info'),
               value: 'related',
