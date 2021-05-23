@@ -55,10 +55,31 @@ class _FiltersScreenState extends State<FiltersScreen> {
               primary: Theme.of(context).primaryColor,
               side: BorderSide(color: Theme.of(context).primaryColor),
             ),
-            onPressed: () {},
+            onPressed: () async {
+              final userSettings = Provider.of<SettingsProvider>(context, listen: false).userSettings;
+
+              if (userSettings.showOnlyDelegated != null && userSettings.showOnlyDelegated) {
+                await Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyDelegated();
+              }
+              if (userSettings.showOnlyUnfinished != null && userSettings.showOnlyUnfinished) {
+                await Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyUnfinished();
+              }
+              if (userSettings.collaborators != null) {
+                await Provider.of<SettingsProvider>(context, listen: false).clearFilterCollaborators();
+              }
+              if (userSettings.priorities != null) {
+                await Provider.of<SettingsProvider>(context, listen: false).clearFilterPriorities();
+              }
+              if (userSettings.tags != null) {
+                await Provider.of<SettingsProvider>(context, listen: false).clearFilterTags();
+              }
+              if (userSettings.sortingMode != 0) {
+                await Provider.of<SettingsProvider>(context, listen: false).changeSortingMode(0);
+              }
+            },
             child: Text(
-              'Save',
-              style: TextStyle(fontSize: 30, color: Theme.of(context).accentColor),
+              'Clear Filters',
+              style: TextStyle(fontSize: 28, color: Theme.of(context).accentColor),
             ),
           ),
         ),
