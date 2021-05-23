@@ -97,6 +97,8 @@ class TagProvider with ChangeNotifier {
   Future<void> addTag(Tag newTag) async {
     final url = this._serverUrl + "tag/add";
 
+    newTag.id = this.tagList.length + 1;
+
     try {
       await http.post(
         url,

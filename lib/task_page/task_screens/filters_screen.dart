@@ -194,7 +194,9 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                   );
 
                                   if (selected != null && selected.length >= 1) {
-                                    Provider.of<SettingsProvider>(context, listen: false).addFilterTags(selected);
+                                    await Provider.of<SettingsProvider>(context, listen: false).addFilterTags(selected);
+                                  } else {
+                                    await Provider.of<SettingsProvider>(context, listen: false).clearFilterTags();
                                   }
                                 },
                                 child: Text(
@@ -305,7 +307,9 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                   );
 
                                   if (selected != null && selected.length >= 1) {
-                                    Provider.of<SettingsProvider>(context, listen: false).addFilterPriorities(selected);
+                                    await Provider.of<SettingsProvider>(context, listen: false).addFilterPriorities(selected);
+                                  } else {
+                                    await Provider.of<SettingsProvider>(context, listen: false).clearFilterPriorities();
                                   }
                                 },
                                 child: Text(
@@ -421,7 +425,9 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                   );
 
                                   if (selected != null && selected.length >= 1) {
-                                    Provider.of<SettingsProvider>(context, listen: false).addFilterCollaboratorEmail(selected);
+                                    await Provider.of<SettingsProvider>(context, listen: false).addFilterCollaboratorEmail(selected);
+                                  } else {
+                                    await Provider.of<SettingsProvider>(context, listen: false).clearFilterCollaborators();
                                   }
                                 },
                                 child: Text(

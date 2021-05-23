@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/tag.dart';
-import '../providers/delegate_provider.dart';
 import '../providers/tag_provider.dart';
 
 class FilterTagsDialog extends StatelessWidget {
@@ -98,7 +97,11 @@ class FilterTagsDialog extends StatelessWidget {
                         onTap: () {
                           setState(() {
                             filteredTags[tagIndex].isSelected = !filteredTags[tagIndex].isSelected;
-                            this.choosenTags.add(filteredTags[tagIndex].name);
+                            if (!this.choosenTags.contains(filteredTags[tagIndex].name) && filteredTags[tagIndex].isSelected) {
+                              this.choosenTags.add(filteredTags[tagIndex].name);
+                            } else if (!filteredTags[tagIndex].isSelected) {
+                              this.choosenTags.remove(filteredTags[tagIndex].name);
+                            }
                           });
                         },
                         child: Card(
