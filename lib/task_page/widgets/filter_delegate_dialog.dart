@@ -155,7 +155,9 @@ class FilterDelegateDialog extends StatelessWidget {
                         onTap: () {
                           setState(() {
                             filteredCollaborators[collaboratorIndex].isSelected = !filteredCollaborators[collaboratorIndex].isSelected;
-                            this.choosenCollaborators.add(filteredCollaborators[collaboratorIndex].email);
+                            if (!this.choosenCollaborators.contains(filteredCollaborators[collaboratorIndex].email)) {
+                              this.choosenCollaborators.add(filteredCollaborators[collaboratorIndex].email);
+                            }
                           });
                         },
                         child: Card(
