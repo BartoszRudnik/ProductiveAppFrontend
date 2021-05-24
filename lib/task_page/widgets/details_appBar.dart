@@ -21,6 +21,9 @@ class DetailsAppBar extends StatefulWidget with PreferredSizeWidget {
 class _DetailsAppBarState extends State<DetailsAppBar> {
   @override
   Widget build(BuildContext context) {
+    if(widget.task.isDelegated == null){
+      widget.task.isDelegated = false;
+    }
     return AppBar(
       elevation: 0,
       title: Text(
