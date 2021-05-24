@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:productive_app/task_page/models/task.dart';
+import 'package:productive_app/task_page/providers/location_provider.dart';
+import 'package:productive_app/task_page/task_screens/locations_screen.dart';
 import 'package:productive_app/task_page/task_screens/related_task_info_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -78,6 +80,14 @@ class MyApp extends StatelessWidget {
             authToken: auth.token,
           ),
         ),
+        ChangeNotifierProxyProvider<AuthProvider, LocationProvider>(
+          create: null,
+          update: (ctx, auth, previousTasks) => LocationProvider(
+            userMail: auth.email,
+            authToken: auth.token,
+            locationList: previousTasks == null ? [] : previousTasks.locationList,
+          ),
+        ),
       ],
       child: Consumer<AuthProvider>(
         builder: (ctx, authData, _) => MaterialApp(
@@ -137,6 +147,7 @@ class MyApp extends StatelessWidget {
             SettingsTabsScreen.routeName: (ctx) => SettingsTabsScreen(),
             FiltersScreen.routeName: (ctx) => FiltersScreen(),
             RelatedTaskInfoScreen.routeName: (ctx) => RelatedTaskInfoScreen(),
+            LocationsScreen.routeName: (ctx) => LocationsScreen()
           },
         ),
       ),

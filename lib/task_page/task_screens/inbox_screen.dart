@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/task_page/models/task.dart';
 import 'package:productive_app/task_page/providers/delegate_provider.dart';
+import 'package:productive_app/task_page/providers/location_provider.dart';
 import 'package:productive_app/task_page/providers/settings_provider.dart';
 import 'package:productive_app/task_page/providers/tag_provider.dart';
 import 'package:productive_app/task_page/utils/manage_filters.dart';
@@ -19,6 +20,7 @@ class _InboxScreenState extends State<InboxScreen> {
     await Provider.of<TaskProvider>(context, listen: false).fetchTasks();
     await Provider.of<TaskProvider>(context, listen: false).getPriorities();
     await Provider.of<TagProvider>(context, listen: false).getTags();
+    await Provider.of<LocationProvider>(context, listen: false).getLocations();
     await Provider.of<DelegateProvider>(context, listen: false).getCollaborators();
     await Provider.of<SettingsProvider>(context, listen: false).getFilterSettings();
   }

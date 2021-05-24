@@ -1,5 +1,6 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
+import 'package:productive_app/task_page/task_screens/locations_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../../login/providers/auth_provider.dart';
@@ -114,6 +115,11 @@ class _MainDrawerState extends State<MainDrawer> {
             DrawerListTile(
               icon: Icons.analytics_outlined,
               title: 'Analytics',
+            ),
+            DrawerListTile(
+              icon: Icons.location_on,
+              title: 'Locations',
+              routeName: LocationsScreen.routeName,
             ),
             DrawerListTile(
               icon: Icons.done_all_outlined,
