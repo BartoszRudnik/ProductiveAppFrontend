@@ -56,132 +56,189 @@ Future<void> a() async{
             }else{
               return SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 15.0),
                   child: RefreshIndicator(
                     onRefresh: () => this.a(),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          originalTask.title,
-                          style: TextStyle(fontSize: 25),
-                        ),
-                        Divider(
-                          color: Colors.black,
-                        ),
-                        ListTile(
-                          minLeadingWidth: 16,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 0),
-                          leading: Icon(Icons.person),
-                          title: Align(
-                            alignment: Alignment(-1.1, 0),
-                            child: Text(
-                              "Owner",
-                              style: TextStyle(fontSize: 21),
+                        Container(
+                          padding: EdgeInsets.only(top: 6, left: 6, bottom: 6),
+                          decoration: BoxDecoration(
+                            color: Color.fromRGBO(237, 237, 240, 1),
+                            border: Border.all(
+                              color: Color.fromRGBO(221, 221, 226, 1),
+                              width: 2.5,
                             ),
                           ),
-                        ),
-                        Text(
-                          originalTask.supervisorEmail,
-                          style: TextStyle(
-                            fontSize: 18
+                          child: Center(
+                            child: Text(
+                              originalTask.title,
+                              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                            )
                           ),
                         ),
-                        Divider(
-                          color: Colors.black,
-                        ),
-                        ListTile(
-                          minLeadingWidth: 16,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 0),
-                          leading: Icon(Icons.edit),
-                          title: Align(
-                            alignment: Alignment(-1.1, 0),
-                            child: Text(
-                              "Description",
-                              style: TextStyle(fontSize: 21),
+                        SizedBox(height: 10),
+                        Container(
+                          padding: EdgeInsets.only(top: 6, left: 6, bottom: 6),
+                          decoration: BoxDecoration(
+                            color: Color.fromRGBO(237, 237, 240, 1),
+                            border: Border.all(
+                              color: Color.fromRGBO(221, 221, 226, 1),
+                              width: 2.5,
                             ),
                           ),
-                        ),
-                        Text(
-                          originalTask.description,
-                          style: TextStyle(
-                            fontSize: 18
-                          ),
-                        ),
-                        Divider(
-                          color: Colors.black,
-                        ),
-                        ListTile(
-                          minLeadingWidth: 16,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 0),
-                          leading: Icon(Icons.flag),
-                          title: Align(
-                            alignment: Alignment(-1.1, 0),
-                            child: Text(
-                              "Priority",
-                              style: TextStyle(fontSize: 21),
-                            ),
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Icon(priorityIcon),
-                            Text(
-                              originalTask.priority,
-                              style: TextStyle(
-                                fontSize: 18
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.person),
+                                  Text(
+                                    "Owner",
+                                    style: TextStyle(fontSize: 21),
+                                  ),
+                                ] 
                               ),
+                              Divider(),
+                              Text(
+                                originalTask.supervisorEmail,
+                                style: TextStyle(
+                                  fontSize: 18
+                                ),
+                              ),
+                            ],
+                          )
+                        ),
+                        SizedBox(height: 10),
+                        Container(
+                          padding: EdgeInsets.only(top: 6, left: 6, bottom: 6),
+                          decoration: BoxDecoration(
+                            color: Color.fromRGBO(237, 237, 240, 1),
+                            border: Border.all(
+                              color: Color.fromRGBO(221, 221, 226, 1),
+                              width: 2.5,
                             ),
-                          ],
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.edit),
+                                  Text(
+                                    "Description",
+                                    style: TextStyle(fontSize: 21),
+                                  ),
+                                ] 
+                              ),
+                              Divider(),
+                              Text(
+                                originalTask.description,
+                                style: TextStyle(
+                                  fontSize: 18
+                                ),
+                              ),
+                            ],
+                          )
+                        ),
+                        SizedBox(height: 10),
+                        Container(
+                          padding: EdgeInsets.only(top: 6, left: 6, bottom: 6),
+                          decoration: BoxDecoration(
+                            color: Color.fromRGBO(237, 237, 240, 1),
+                            border: Border.all(
+                              color: Color.fromRGBO(221, 221, 226, 1),
+                              width: 2.5,
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.flag),
+                                  Text(
+                                    "Priority",
+                                    style: TextStyle(fontSize: 21),
+                                  ),
+                                ] 
+                              ),
+                              Divider(),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(priorityIcon),
+                                  Text(
+                                    originalTask.priority,
+                                    style: TextStyle(
+                                      fontSize: 18
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          )
                         ),
                         
-                        Divider(
-                          color: Colors.black,
-                        ),
-                        ListTile(
-                          minLeadingWidth: 16,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 0),
-                          leading: Icon(Icons.calendar_today),
-                          title: Align(
-                            alignment: Alignment(-1.1, 0),
-                            child: Text(
-                              "Start and due date",
-                              style: TextStyle(fontSize: 21),
+                        SizedBox(height: 10),
+                        Container(
+                          padding: EdgeInsets.only(top: 6, left: 6, bottom: 6),
+                          decoration: BoxDecoration(
+                            color: Color.fromRGBO(237, 237, 240, 1),
+                            border: Border.all(
+                              color: Color.fromRGBO(221, 221, 226, 1),
+                              width: 2.5,
                             ),
                           ),
-                        ),
-                        formatter.format(originalTask.startDate) == "1970-01-01"? Text(
-                            'No start date', 
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ) : 
-                        Text(
-                          'Start date: ' + formatter.format(originalTask.startDate)
-                          + ', ' + startTime.format(context),
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        formatter.format(originalTask.endDate) == "1970-01-01"? Text(
-                            'No due date', 
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ) : 
-                        Text(
-                          'Due date: ' + formatter.format(originalTask.endDate) +
-                           ', ' + endTime.format(context),
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.calendar_today),
+                                  Text(
+                                    "Start and due date",
+                                    style: TextStyle(fontSize: 21),
+                                  ),
+                                ] 
+                              ),
+                              Divider(),
+                              formatter.format(originalTask.startDate) == "1970-01-01"? Text(
+                                'No start date', 
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ) : 
+                              Text(
+                                'Start date: ' + formatter.format(originalTask.startDate)
+                                + ', ' + startTime.format(context),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              formatter.format(originalTask.endDate) == "1970-01-01"? Text(
+                                'No due date', 
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ) : 
+                              Text(
+                                'Due date: ' + formatter.format(originalTask.endDate) +
+                                ', ' + endTime.format(context),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ],
+                          )
                         ),
                       ],
                     )
