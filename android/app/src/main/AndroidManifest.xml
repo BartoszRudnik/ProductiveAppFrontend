@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.productive_app">
    <application
+        tools:replace="android:label"
         android:label="productive_app"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
