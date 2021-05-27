@@ -103,10 +103,10 @@ class _MainDrawerState extends State<MainDrawer> {
                 routeName: SettingsTabsScreen.routeName,
               ),
             ),
-            DrawerListTile(
-              icon: Icons.save,
-              title: 'Projects',
-            ),
+            // DrawerListTile(
+            //   icon: Icons.save,
+            //   title: 'Projects',
+            // ),
             DrawerListTile(
               icon: Icons.tag,
               title: 'Tags',

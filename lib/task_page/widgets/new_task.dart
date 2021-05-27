@@ -47,10 +47,27 @@ class _NewTaskState extends State<NewTask> {
   TimeOfDay _startTime;
   TimeOfDay _endTime;
 
+  int _notificationLocalizationId;
+  double _notificationLocalizationRadius;
+  bool _notificationOnEnter;
+  bool _notificationOnExit;
+
   @override
   void initState() {
     super.initState();
     this._localization = this.widget.localization;
+  }
+
+  void setNotificationLocalization(
+    int notificationLocalizationId,
+    double notificationLocalizationRadius,
+    bool notificationOnEnter,
+    bool notificationOnExit,
+  ) {
+    this._notificationLocalizationId = notificationLocalizationId;
+    this._notificationLocalizationRadius = notificationLocalizationRadius;
+    this._notificationOnEnter = notificationOnEnter;
+    this._notificationOnExit = notificationOnExit;
   }
 
   void setDate(DateTime startDate, DateTime endDate, TimeOfDay startTime, TimeOfDay endTime) {
@@ -147,6 +164,13 @@ class _NewTaskState extends State<NewTask> {
       isCanceled: false,
     );
 
+    if (this._notificationLocalizationId != null) {
+      newTask.notificationLocalizationId = this._notificationLocalizationId;
+      newTask.notificationLocalizationRadius = this._notificationLocalizationRadius;
+      newTask.notificationOnEnter = this._notificationOnEnter;
+      newTask.notificationOnExit = this._notificationOnExit;
+    }
+
     try {
       await Provider.of<TaskProvider>(context, listen: false).addTask(newTask);
 
@@ -160,6 +184,10 @@ class _NewTaskState extends State<NewTask> {
           element.isSelected = false;
         });
         this._finalTags = [];
+        this._notificationLocalizationId = null;
+        this._notificationLocalizationRadius = null;
+        this._notificationOnEnter = null;
+        this._notificationOnExit = null;
       });
     } catch (error) {
       print(error);
@@ -221,7 +249,7 @@ class _NewTaskState extends State<NewTask> {
                             finalTags: this._finalTags,
                           ),
                           IconButton(
-                            icon: Icon(Icons.save),
+                            icon: Icon(Icons.map_outlined),
                             onPressed: () {},
                           ),
                           TaskDelegate(

@@ -43,14 +43,14 @@ class Notifications {
 
   static Future _selectNotification(String payload) async {}
 
-  static void addGeofence(String identifier, double latitude, double longitude, double radius, bool onEnter) {
+  static void addGeofence(String identifier, double latitude, double longitude, double radius, bool onEnter, bool onExit) {
     bg.BackgroundGeolocation.addGeofence(bg.Geofence(
       identifier: identifier,
       radius: radius,
       latitude: latitude,
       longitude: longitude,
       notifyOnEntry: onEnter,
-      notifyOnExit: !onEnter,
+      notifyOnExit: onExit,
       notifyOnDwell: false,
       loiteringDelay: 30000,
     )).then((bool success) {

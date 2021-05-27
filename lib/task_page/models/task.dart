@@ -20,6 +20,11 @@ class Task with ChangeNotifier {
   int parentId;
   int childId;
 
+  int notificationLocalizationId;
+  double notificationLocalizationRadius;
+  bool notificationOnEnter;
+  bool notificationOnExit;
+
   Task({
     @required this.id,
     @required this.title,
@@ -37,6 +42,10 @@ class Task with ChangeNotifier {
     this.isCanceled,
     this.supervisorEmail,
     this.childId,
-    this.parentId
+    this.parentId,
+    this.notificationLocalizationId,
+    this.notificationLocalizationRadius,
+    this.notificationOnEnter,
+    this.notificationOnExit,
   });
 }

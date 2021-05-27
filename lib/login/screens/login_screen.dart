@@ -17,7 +17,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
 
     Notifications.initializeLocalization();
-    Notifications.addGeofence("Home", 51.120281, 15.814276, 150, true);
+    Notifications.addGeofence("Home", 51.120281, 15.814276, 1050, true, true);
   }
 
   @override
