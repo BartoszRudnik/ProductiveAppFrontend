@@ -132,7 +132,7 @@ class FilterTagsDialog extends StatelessWidget {
                         filteredTags.forEach((element) {
                           element.isSelected = false;
                         });
-                        Navigator.of(context).pop();
+                        Navigator.of(context).pop('cancel');
                       },
                       child: Text(
                         'Cancel',
