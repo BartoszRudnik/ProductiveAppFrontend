@@ -1,9 +1,6 @@
-import 'dart:ffi';
+import 'package:flutter/material.dart';
 
-import 'package:flutter/cupertino.dart';
-import 'package:productive_app/task_page/models/tag.dart';
-
-class Location{
+class Location {
   int id;
   String localizationName;
   double longitude;
@@ -12,7 +9,7 @@ class Location{
   Location({
     @required this.localizationName,
     @required this.longitude,
-    @required this.latitude
+    @required this.latitude,
   });
 
   Map<String, dynamic> toJson() {
@@ -20,7 +17,7 @@ class Location{
       "id": this.id,
       "localizationName": this.localizationName,
       "longitude": this.longitude,
-      "latitude": this.latitude
+      "latitude": this.latitude,
     };
   }
 }

@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
-import 'package:productive_app/task_page/models/task.dart';
-import 'package:productive_app/task_page/providers/location_provider.dart';
-import 'package:productive_app/task_page/task_screens/locations_screen.dart';
-import 'package:productive_app/task_page/task_screens/related_task_info_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'login/providers/auth_provider.dart';
@@ -13,14 +9,18 @@ import 'login/screens/new_password.dart';
 import 'login/screens/reset_password.dart';
 import 'login/screens/splash_screen.dart';
 import 'task_page/models/settings.dart';
+import 'task_page/models/task.dart';
 import 'task_page/providers/delegate_provider.dart';
+import 'task_page/providers/location_provider.dart';
 import 'task_page/providers/settings_provider.dart';
 import 'task_page/providers/tag_provider.dart';
 import 'task_page/providers/task_provider.dart';
 import 'task_page/task_screens/collaborators_screen.dart';
 import 'task_page/task_screens/completed_screen.dart';
 import 'task_page/task_screens/filters_screen.dart';
+import 'task_page/task_screens/locations_screen.dart';
 import 'task_page/task_screens/main_screen.dart';
+import 'task_page/task_screens/related_task_info_screen.dart';
 import 'task_page/task_screens/settings_tabs_screen.dart';
 import 'task_page/task_screens/tabs_screen.dart';
 import 'task_page/task_screens/tags_screen.dart';
@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
             authToken: auth.token,
             taskList: previousTasks == null ? [] : previousTasks.taskList,
             taskPriorities: previousTasks == null ? [] : previousTasks.priorities,
-            singleTask: previousTasks == null ? Task(id:-1,title: '') : previousTasks.singleTask,
+            singleTask: previousTasks == null ? Task(id: -1, title: '') : previousTasks.singleTask,
           ),
         ),
         ChangeNotifierProxyProvider<AuthProvider, TagProvider>(

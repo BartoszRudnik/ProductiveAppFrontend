@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/task_page/models/taskLocation.dart';
+import 'package:productive_app/task_page/widgets/new_task_notification_localization.dart';
 import 'package:provider/provider.dart';
 
 import '../../shared/dialogs.dart';
@@ -58,16 +60,13 @@ class _NewTaskState extends State<NewTask> {
     this._localization = this.widget.localization;
   }
 
-  void setNotificationLocalization(
-    int notificationLocalizationId,
-    double notificationLocalizationRadius,
-    bool notificationOnEnter,
-    bool notificationOnExit,
-  ) {
-    this._notificationLocalizationId = notificationLocalizationId;
-    this._notificationLocalizationRadius = notificationLocalizationRadius;
-    this._notificationOnEnter = notificationOnEnter;
-    this._notificationOnExit = notificationOnExit;
+  void setNotificationLocalization(TaskLocation taskLocation) {
+    if (taskLocation.location != null) {
+      this._notificationLocalizationId = taskLocation.location.id;
+    }
+    this._notificationLocalizationRadius = taskLocation.notificationRadius;
+    this._notificationOnEnter = taskLocation.notificationOnEnter;
+    this._notificationOnExit = taskLocation.notificationOnExit;
   }
 
   void setDate(DateTime startDate, DateTime endDate, TimeOfDay startTime, TimeOfDay endTime) {
@@ -248,9 +247,12 @@ class _NewTaskState extends State<NewTask> {
                             setTags: this.setTags,
                             finalTags: this._finalTags,
                           ),
-                          IconButton(
-                            icon: Icon(Icons.map_outlined),
-                            onPressed: () {},
+                          NewTaskNotificationLocalization(
+                            setNotificationLocalization: this.setNotificationLocalization,
+                            notificationLocalizationId: this._notificationLocalizationId,
+                            notificationOnEnter: this._notificationOnEnter,
+                            notificationOnExit: this._notificationOnExit,
+                            notificationRadius: this._notificationLocalizationRadius,
                           ),
                           TaskDelegate(
                             setDelegatedEmail: this.setDelegatedEmail,
