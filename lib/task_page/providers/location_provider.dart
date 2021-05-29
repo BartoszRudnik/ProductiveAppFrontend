@@ -3,11 +3,14 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
+import 'package:geocoding/geocoding.dart' as geocoding;
+import 'package:latlong/latlong.dart';
 
-import '../models/location.dart';
+import '../models/location.dart' as models;
 
 class LocationProvider with ChangeNotifier{
-  List<Location> locationList;
+  List<models.Location> locationList;
+  List<MapEntry<geocoding.Placemark,LatLng>> placemarks;
 
   final String userMail;
   final String authToken;
@@ -18,21 +21,27 @@ class LocationProvider with ChangeNotifier{
     @required this.userMail,
     @required this.authToken,
     @required this.locationList,
+    @required this.placemarks
   });
 
-  List<Location> get locations{
+  List<models.Location> get locations{
     return [...locationList];
+  }
+
+  List<MapEntry<geocoding.Placemark,LatLng>> get marks{
+    return [...placemarks];
   }
 
   Future<void> getLocations() async{
     final url = this._serverUrl + "localization/getLocalizations/${this.userMail}";
-    final List<Location> loadedLocations = [];
+    final List<models.Location> loadedLocations = [];
     try{
       final response = await http.get(url);
       final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
       for(var element in responseBody){
-        Location loc = Location(
+        models.Location loc = models.Location(
+          id: element['localizationId'],
           localizationName: element["localizationName"], 
           longitude: element["longitude"], 
           latitude: element["latitude"]
@@ -40,12 +49,6 @@ class LocationProvider with ChangeNotifier{
         loadedLocations.add(loc);
       }
 
-      Location loc1 = Location(localizationName: "Home", longitude: 67.45678, latitude: 65.87987);
-      loc1.id = 0;
-      Location loc2 = Location(localizationName: "Work", longitude: 36.55724662299002, latitude: 139.91113082943244);
-      loc2.id = 1;
-      loadedLocations.add(loc1);
-      loadedLocations.add(loc2);
       this.locationList = loadedLocations;
       notifyListeners();
     }catch(error){
@@ -54,15 +57,17 @@ class LocationProvider with ChangeNotifier{
     }
   }
 
-  Future<void> addLocation(Location newLocation) async{
-    final url = this._serverUrl + "localization//addLocalization/${this.userMail}";
+  Future<void> addLocation(models.Location newLocation) async{
+    final url = this._serverUrl + "localization/addLocalization/${this.userMail}";
 
     try{
-      await http.post(
+      http.post(
         url,
         body: json.encode(
           {
-            'addLocalization': newLocation.toJson()
+            'localizationName': newLocation.localizationName,
+            'longitude': newLocation.longitude,
+            'latitude': newLocation.latitude
           },
         ),
         headers: {
@@ -70,21 +75,23 @@ class LocationProvider with ChangeNotifier{
           'accept': 'application/json',
         },
       );
-
-      this.locationList.insert(0, newLocation);
+      //this.locationList.insert(0, newLocation);
       notifyListeners();
+      getLocations();
     }catch(error){
       print(error);
       throw error;
     }
   }
 
-  Future<void> updateLocation(int id, Location location) async{
+  Future<void> updateLocation(int id, models.Location location) async{
     final url = this._serverUrl + "localization/updateLocalization/$id";
     try{
       await http.put(url,
         body: json.encode({
-          'addLocalization': location.toJson(),
+          'localizationName': location.localizationName,
+          'longitude': location.longitude,
+          'latitude': location.latitude
         }),
         headers: {
           'content-type': 'application/json',
@@ -108,6 +115,37 @@ class LocationProvider with ChangeNotifier{
     }catch(error){
       print(error);
       throw error;
+    }
+  }
+
+  Future<void> findGlobalLocationsFromQuery(String query) async{
+    final url = "https://nominatim.openstreetmap.org/search?q=${query}&format=json";
+    List<MapEntry<geocoding.Placemark,LatLng>> loadedMarks = [];
+    if(query.length >= 3){ 
+      try{
+        final response = await http.get(url);
+        final responseBody = json.decode(utf8.decode(response.bodyBytes));
+
+        for(var element in responseBody){
+          models.Location loc = models.Location(
+            id: -1,
+            localizationName: element["name"], 
+            longitude: double.parse(element["lon"]), 
+            latitude: double.parse(element["lat"])
+          );
+          List<geocoding.Placemark> newMarks = await geocoding.placemarkFromCoordinates(loc.latitude, loc.longitude);
+
+          for(var mark in newMarks){
+            LatLng position = LatLng(double.parse(element["lat"]), double.parse(element["lon"]));
+            loadedMarks.add(MapEntry(mark, position));
+          }
+        }
+        this.placemarks = loadedMarks;
+        notifyListeners();
+      }catch(error){
+        print(error);
+        throw error;
+      }
     }
   }
 }

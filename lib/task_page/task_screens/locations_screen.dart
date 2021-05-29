@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:productive_app/shared/dialogs.dart';
 import 'package:productive_app/task_page/models/location.dart';
 import 'package:productive_app/task_page/providers/location_provider.dart';
+import 'package:productive_app/task_page/widgets/location_dialog.dart';
 import 'package:productive_app/task_page/widgets/task_appBar.dart';
 import 'package:provider/provider.dart';
 
@@ -13,8 +14,22 @@ class LocationsScreen extends StatefulWidget {
 }
   
 class _LocationScreenState extends State<LocationsScreen>{
-  void _addNewLocationForm(BuildContext buildContext){
-    print("add new");
+  Future<void> _addNewLocationForm(BuildContext buildContext) async{
+    Location choosenLocation = await showDialog(
+      context: context,
+      builder: (context) {
+        return LocationDialog(choosenLocation: Location(id: -1,latitude: 0.0,longitude: 0.0,localizationName: 'test'),);
+      }
+    );
+    if(choosenLocation != null){
+      String name = await Dialogs.showTextFieldDialog(context, 'Enter location name');
+      if(name == null || name.isEmpty){
+        return;
+      }
+      choosenLocation.localizationName = name;
+      Provider.of<LocationProvider>(context,listen: false).addLocation(choosenLocation);
+    }
+    await Provider.of<LocationProvider>(context,listen: false).getLocations();
   }
 
   void _editLocationForm(BuildContext buildContext) {

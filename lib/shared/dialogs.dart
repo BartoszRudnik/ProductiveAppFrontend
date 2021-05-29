@@ -20,7 +20,8 @@ class Dialogs {
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           primary: Theme.of(context).primaryColor,
-                          side: BorderSide(color: Theme.of(context).primaryColor),
+                          side:
+                              BorderSide(color: Theme.of(context).primaryColor),
                         ),
                         onPressed: () {
                           Navigator.of(context).pop(true);
@@ -40,7 +41,8 @@ class Dialogs {
             ));
   }
 
-  static Future<bool> showChoiceDialog(BuildContext context, String text) async {
+  static Future<bool> showChoiceDialog(
+      BuildContext context, String text) async {
     bool choice = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
@@ -61,7 +63,8 @@ class Dialogs {
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           primary: Theme.of(context).primaryColor,
-                          side: BorderSide(color: Theme.of(context).primaryColor),
+                          side:
+                              BorderSide(color: Theme.of(context).primaryColor),
                         ),
                         onPressed: () {
                           Navigator.of(context).pop(true);
@@ -77,7 +80,8 @@ class Dialogs {
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           primary: Theme.of(context).primaryColor,
-                          side: BorderSide(color: Theme.of(context).primaryColor),
+                          side:
+                              BorderSide(color: Theme.of(context).primaryColor),
                         ),
                         onPressed: () {
                           Navigator.of(context).pop(false);
@@ -98,7 +102,75 @@ class Dialogs {
     return choice;
   }
 
-  static Future<String> showImagePickerDialog(BuildContext context, String text) async {
+  static Future<String> showTextFieldDialog(
+      BuildContext context, String title) async {
+    final _tKey = GlobalKey<FormState>();
+    
+    String fieldValue = await showDialog(
+      context: context,
+      builder: (context){
+        final TextEditingController _textEditingController = TextEditingController();
+        String tempVal;
+        return AlertDialog(
+          title: Center(
+            child: Text(
+            title,
+            style: Theme.of(context).textTheme.headline2,
+          ),
+        ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Form(
+                    key: _tKey,
+                    child: TextFormField(
+                      controller: _textEditingController,
+                      decoration: InputDecoration(
+                        hintText: "Enter name",
+                        contentPadding: EdgeInsets.all(16.0)
+                      ),
+                      validator: (value){
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter name of the location';
+                        }
+                        return null;
+                      },
+                      onChanged: (value){
+                        tempVal = value;
+                      },
+                    ),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Theme.of(context).primaryColor,
+                      side: BorderSide(color: Theme.of(context).primaryColor),
+                    ),
+                    onPressed: () {
+                      final isValid = _tKey.currentState.validate();
+                      if (isValid) {
+                        _tKey.currentState.save();
+                        _tKey.currentState.reset();
+                        Navigator.of(context).pop(tempVal);
+                      }
+                    },
+                    child: Text(
+                      'OK',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(context).accentColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+        }
+    );        
+    return fieldValue;
+  }
+
+  static Future<String> showImagePickerDialog(
+      BuildContext context, String text) async {
     String choice = await showDialog<String>(
         context: context,
         builder: (context) => AlertDialog(
@@ -119,7 +191,8 @@ class Dialogs {
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           primary: Theme.of(context).primaryColor,
-                          side: BorderSide(color: Theme.of(context).primaryColor),
+                          side:
+                              BorderSide(color: Theme.of(context).primaryColor),
                         ),
                         onPressed: () {
                           Navigator.of(context).pop('Camera');
@@ -135,7 +208,8 @@ class Dialogs {
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           primary: Theme.of(context).primaryColor,
-                          side: BorderSide(color: Theme.of(context).primaryColor),
+                          side:
+                              BorderSide(color: Theme.of(context).primaryColor),
                         ),
                         onPressed: () {
                           Navigator.of(context).pop('Gallery');
@@ -151,7 +225,8 @@ class Dialogs {
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           primary: Theme.of(context).primaryColor,
-                          side: BorderSide(color: Theme.of(context).primaryColor),
+                          side:
+                              BorderSide(color: Theme.of(context).primaryColor),
                         ),
                         onPressed: () {
                           Navigator.of(context).pop(null);

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:productive_app/task_page/models/task.dart';
 import 'package:productive_app/task_page/providers/location_provider.dart';
@@ -86,6 +87,7 @@ class MyApp extends StatelessWidget {
             userMail: auth.email,
             authToken: auth.token,
             locationList: previousTasks == null ? [] : previousTasks.locationList,
+            placemarks: previousTasks == null? [] : previousTasks.placemarks
           ),
         ),
       ],

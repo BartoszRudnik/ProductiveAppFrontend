@@ -10,6 +10,7 @@ class Location{
   double latitude;
 
   Location({
+    @required this.id,
     @required this.localizationName,
     @required this.longitude,
     @required this.latitude
