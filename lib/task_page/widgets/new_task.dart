@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/task_page/models/taskLocation.dart';
+import 'package:productive_app/task_page/widgets/new_task_notification_localization.dart';
 import 'package:provider/provider.dart';
 
 import '../../shared/dialogs.dart';
@@ -47,10 +49,24 @@ class _NewTaskState extends State<NewTask> {
   TimeOfDay _startTime;
   TimeOfDay _endTime;
 
+  int _notificationLocalizationId;
+  double _notificationLocalizationRadius;
+  bool _notificationOnEnter;
+  bool _notificationOnExit;
+
   @override
   void initState() {
     super.initState();
     this._localization = this.widget.localization;
+  }
+
+  void setNotificationLocalization(TaskLocation taskLocation) {
+    if (taskLocation.location != null) {
+      this._notificationLocalizationId = taskLocation.location.id;
+    }
+    this._notificationLocalizationRadius = taskLocation.notificationRadius;
+    this._notificationOnEnter = taskLocation.notificationOnEnter;
+    this._notificationOnExit = taskLocation.notificationOnExit;
   }
 
   void setDate(DateTime startDate, DateTime endDate, TimeOfDay startTime, TimeOfDay endTime) {
@@ -147,6 +163,13 @@ class _NewTaskState extends State<NewTask> {
       isCanceled: false,
     );
 
+    if (this._notificationLocalizationId != null) {
+      newTask.notificationLocalizationId = this._notificationLocalizationId;
+      newTask.notificationLocalizationRadius = this._notificationLocalizationRadius;
+      newTask.notificationOnEnter = this._notificationOnEnter;
+      newTask.notificationOnExit = this._notificationOnExit;
+    }
+
     try {
       await Provider.of<TaskProvider>(context, listen: false).addTask(newTask);
 
@@ -160,6 +183,10 @@ class _NewTaskState extends State<NewTask> {
           element.isSelected = false;
         });
         this._finalTags = [];
+        this._notificationLocalizationId = null;
+        this._notificationLocalizationRadius = null;
+        this._notificationOnEnter = null;
+        this._notificationOnExit = null;
       });
     } catch (error) {
       print(error);
@@ -220,9 +247,12 @@ class _NewTaskState extends State<NewTask> {
                             setTags: this.setTags,
                             finalTags: this._finalTags,
                           ),
-                          IconButton(
-                            icon: Icon(Icons.save),
-                            onPressed: () {},
+                          NewTaskNotificationLocalization(
+                            setNotificationLocalization: this.setNotificationLocalization,
+                            notificationLocalizationId: this._notificationLocalizationId,
+                            notificationOnEnter: this._notificationOnEnter,
+                            notificationOnExit: this._notificationOnExit,
+                            notificationRadius: this._notificationLocalizationRadius,
                           ),
                           TaskDelegate(
                             setDelegatedEmail: this.setDelegatedEmail,

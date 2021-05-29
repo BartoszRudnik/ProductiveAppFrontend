@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:productive_app/task_page/widgets/details_appBar.dart';
 import 'package:provider/provider.dart';
 
 import '../../shared/dialogs.dart';
@@ -8,8 +7,8 @@ import '../models/task.dart';
 import '../providers/task_provider.dart';
 import '../utils/date_time_pickers.dart';
 import '../widgets/delegate_dialog.dart';
+import '../widgets/details_appBar.dart';
 import '../widgets/tags_dialog.dart';
-import '../widgets/task_appBar.dart';
 import '../widgets/task_tags_edit.dart';
 
 class TaskDetailScreen extends StatefulWidget {

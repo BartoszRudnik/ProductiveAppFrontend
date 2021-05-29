@@ -53,7 +53,7 @@ class TaskProvider with ChangeNotifier {
     this._delegatedTasks = newList;
   }
 
-  Task get getSingleTask{
+  Task get getSingleTask {
     return this.singleTask;
   }
 
@@ -120,6 +120,10 @@ class TaskProvider with ChangeNotifier {
             'localization': task.localization,
             'delegatedEmail': task.delegatedEmail,
             'isCanceled': task.isCanceled,
+            'localizationId': task.notificationLocalizationId,
+            'localizationRadius': task.notificationLocalizationRadius,
+            'notificationOnEnter': task.notificationOnEnter,
+            'notificationOnExit': task.notificationOnExit,
           },
         ),
         headers: {
@@ -221,6 +225,10 @@ class TaskProvider with ChangeNotifier {
             'position': task.position,
             'delegatedEmail': task.delegatedEmail,
             'isCanceled': task.isCanceled,
+            'localizationId': task.notificationLocalizationId,
+            'localizationRadius': task.notificationLocalizationRadius,
+            'notificationOnEnter': task.notificationOnEnter,
+            'notificationOnExit': task.notificationOnExit,
           },
         ),
         headers: {
@@ -262,7 +270,7 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
-  Future<void> fetchSingleTask(int taskId) async{
+  Future<void> fetchSingleTask(int taskId) async {
     notifyListeners();
     String url = this._serverUrl + 'task/getSingleTask/${this.userMail}/$taskId';
     String supervisorEmail;
@@ -276,7 +284,7 @@ class TaskProvider with ChangeNotifier {
       startDate: DateTime.parse('2021-01-01'),
       supervisorEmail: 'mock@mock.com',
     );
-    try{
+    try {
       final response = await http.get(url);
       final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
@@ -289,11 +297,11 @@ class TaskProvider with ChangeNotifier {
         priority: responseBody['priority'],
         endDate: DateTime.parse(responseBody['endDate']),
         startDate: DateTime.parse(responseBody['startDate']),
-        supervisorEmail: supervisorEmail
+        supervisorEmail: supervisorEmail,
       );
       singleTask = task;
       notifyListeners();
-    }catch (error) {
+    } catch (error) {
       singleTask = mockTask;
       notifyListeners();
       print(error);
@@ -329,24 +337,30 @@ class TaskProvider with ChangeNotifier {
         }
 
         Task task = Task(
-          id: element['tasks']['id_task'],
-          title: element['tasks']['task_name'],
-          description: element['tasks']['description'],
-          done: element['tasks']['ifDone'],
-          priority: element['tasks']['priority'],
-          endDate: DateTime.parse(element['tasks']['endDate']),
-          startDate: DateTime.parse(element['tasks']['startDate']),
-          tags: taskTags,
-          localization: element['tasks']['localization'],
-          position: element['tasks']['position'],
-          delegatedEmail: element['tasks']['delegatedEmail'],
-          isDelegated: element['tasks']['isDelegated'],
-          taskStatus: taskStatus,
-          isCanceled: element['tasks']['isCanceled'],
-          supervisorEmail: supervisorEmail,
-          childId: element['childId'],
-          parentId: element['parentId']
-        );
+            id: element['tasks']['id_task'],
+            title: element['tasks']['task_name'],
+            description: element['tasks']['description'],
+            done: element['tasks']['ifDone'],
+            priority: element['tasks']['priority'],
+            endDate: DateTime.parse(element['tasks']['endDate']),
+            startDate: DateTime.parse(element['tasks']['startDate']),
+            tags: taskTags,
+            localization: element['tasks']['localization'],
+            position: element['tasks']['position'],
+            delegatedEmail: element['tasks']['delegatedEmail'],
+            isDelegated: element['tasks']['isDelegated'],
+            taskStatus: taskStatus,
+            isCanceled: element['tasks']['isCanceled'],
+            supervisorEmail: supervisorEmail,
+            childId: element['childId'],
+            parentId: element['parentId']);
+
+        if (element['tasks']['notificationLocalization'] != null) {
+          task.notificationLocalizationId = element['tasks']['notificationLocalization']['localizationId'];
+          task.notificationLocalizationRadius = element['tasks']['localizationRadius'];
+          task.notificationOnEnter = element['tasks']['notificationOnEnter'];
+          task.notificationOnExit = element['tasks']['notificationOnExit'];
+        }
 
         if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
           task.endDate = null;

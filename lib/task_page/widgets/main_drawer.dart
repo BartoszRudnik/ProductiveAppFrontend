@@ -65,9 +65,9 @@ class _MainDrawerState extends State<MainDrawer> {
               alignment: Alignment.centerLeft,
               width: 210,
               height: 72,
-              child: user.firstName != null && user.firstName.length > 0 && user.lastName != null && user.lastName.length > 0
+              child: (user.firstName != null && user.firstName.length > 0) || (user.lastName != null && user.lastName.length > 0)
                   ? Text(
-                      user.firstName + ' ' + user.lastName,
+                      user.firstName != null ? user.firstName + ' ' + (user.lastName != null ? user.lastName : '') : '' + ' ' + (user.lastName != null ? user.lastName : ''),
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 21,
@@ -103,10 +103,10 @@ class _MainDrawerState extends State<MainDrawer> {
                 routeName: SettingsTabsScreen.routeName,
               ),
             ),
-            DrawerListTile(
-              icon: Icons.save,
-              title: 'Projects',
-            ),
+            // DrawerListTile(
+            //   icon: Icons.save,
+            //   title: 'Projects',
+            // ),
             DrawerListTile(
               icon: Icons.tag,
               title: 'Tags',

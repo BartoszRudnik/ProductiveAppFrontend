@@ -195,7 +195,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
 
                                   if (selected != null && selected.length >= 1) {
                                     await Provider.of<SettingsProvider>(context, listen: false).addFilterTags(selected);
-                                  } else {
+                                  } else if (selected != 'cancel') {
                                     await Provider.of<SettingsProvider>(context, listen: false).clearFilterTags();
                                   }
                                 },
@@ -308,7 +308,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
 
                                   if (selected != null && selected.length >= 1) {
                                     await Provider.of<SettingsProvider>(context, listen: false).addFilterPriorities(selected);
-                                  } else {
+                                  } else if (selected != 'cancel') {
                                     await Provider.of<SettingsProvider>(context, listen: false).clearFilterPriorities();
                                   }
                                 },
@@ -426,7 +426,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
 
                                   if (selected != null && selected.length >= 1) {
                                     await Provider.of<SettingsProvider>(context, listen: false).addFilterCollaboratorEmail(selected);
-                                  } else {
+                                  } else if (selected != 'cancel') {
                                     await Provider.of<SettingsProvider>(context, listen: false).clearFilterCollaborators();
                                   }
                                 },

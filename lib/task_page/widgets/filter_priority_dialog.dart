@@ -106,7 +106,7 @@ class FilterPriorityDialog extends StatelessWidget {
                         side: BorderSide(color: Theme.of(context).primaryColor),
                       ),
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Navigator.of(context).pop('cancel');
                       },
                       child: Text(
                         'Cancel',

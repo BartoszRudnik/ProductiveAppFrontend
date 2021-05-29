@@ -4,8 +4,8 @@ import '../models/tag.dart';
 import 'tags_dialog.dart';
 
 class NewTaskTags extends StatefulWidget {
-  Function setTags;
-  List<Tag> finalTags;
+  final Function setTags;
+  final List<Tag> finalTags;
 
   NewTaskTags({
     @required this.setTags,
@@ -19,19 +19,17 @@ class NewTaskTags extends StatefulWidget {
 class _NewTaskTagsState extends State<NewTaskTags> {
   @override
   Widget build(BuildContext context) {
-    List<Tag> finalTags;
-
     return IconButton(
       icon: Icon(
         Icons.tag,
       ),
       onPressed: () async {
-        finalTags = await showDialog(
+        final newTags = await showDialog(
             context: context,
             builder: (context) {
-              return TagsDialog(UniqueKey(), []);
+              return TagsDialog(UniqueKey(), this.widget.finalTags);
             });
-        this.widget.setTags(finalTags);
+        this.widget.setTags(newTags);
       },
     );
   }
