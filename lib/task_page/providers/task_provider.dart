@@ -154,12 +154,13 @@ class TaskProvider with ChangeNotifier {
 
       if (task.notificationLocalizationId != null) {
         Notifications.addGeofence(
-          task.title,
+          task.id,
           latitude,
           longitude,
           task.notificationLocalizationRadius,
           task.notificationOnEnter,
           task.notificationOnExit,
+          task.title,
           task.description,
         );
       }

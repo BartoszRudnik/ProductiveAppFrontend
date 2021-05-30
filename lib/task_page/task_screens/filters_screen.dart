@@ -125,10 +125,10 @@ class _FiltersScreenState extends State<FiltersScreen> {
                               padding: EdgeInsets.symmetric(horizontal: 4),
                               margin: EdgeInsets.symmetric(horizontal: 8),
                               decoration: BoxDecoration(
-                                color: sortingMode == index ? Colors.grey : Colors.white,
+                                color: sortingMode == index ? Color.fromRGBO(200, 200, 200, 1) : Colors.white,
                                 border: Border.all(
-                                  color: Theme.of(context).primaryColor,
-                                  width: sortingMode == index ? 0.9 : 0.2,
+                                  color: Color.fromRGBO(191, 191, 196, 1),
+                                  width: 2.5,
                                 ),
                               ),
                               child: Center(
@@ -136,6 +136,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                   sortingModes[index],
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
+                                    fontWeight: FontWeight.w500,
                                     color: sortingMode == index ? Colors.white : Colors.black,
                                   ),
                                 ),
@@ -223,10 +224,10 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                   padding: EdgeInsets.symmetric(horizontal: 4),
                                   margin: EdgeInsets.symmetric(horizontal: 8),
                                   decoration: BoxDecoration(
-                                    color: Colors.grey,
+                                    color: Color.fromRGBO(200, 200, 200, 1),
                                     border: Border.all(
-                                      color: Theme.of(context).primaryColor,
-                                      width: 0.7,
+                                      color: Color.fromRGBO(191, 191, 196, 1),
+                                      width: 2.5,
                                     ),
                                   ),
                                   child: Row(
@@ -236,7 +237,11 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                         padding: const EdgeInsets.only(left: 16.0),
                                         child: Text(
                                           tags[index],
-                                          style: TextStyle(color: Theme.of(context).accentColor, fontSize: 18),
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            color: Theme.of(context).accentColor,
+                                            fontSize: 18,
+                                          ),
                                         ),
                                       ),
                                       IconButton(
@@ -336,10 +341,10 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                   padding: EdgeInsets.symmetric(horizontal: 4),
                                   margin: EdgeInsets.symmetric(horizontal: 8),
                                   decoration: BoxDecoration(
-                                    color: Colors.grey,
+                                    color: Color.fromRGBO(200, 200, 200, 1),
                                     border: Border.all(
-                                      color: Theme.of(context).primaryColor,
-                                      width: 0.7,
+                                      color: Color.fromRGBO(191, 191, 196, 1),
+                                      width: 2.5,
                                     ),
                                   ),
                                   child: Row(
@@ -349,7 +354,11 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                         padding: const EdgeInsets.only(left: 16.0),
                                         child: Text(
                                           priorities[index],
-                                          style: TextStyle(color: Theme.of(context).accentColor, fontSize: 18),
+                                          style: TextStyle(
+                                            color: Theme.of(context).accentColor,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
                                       if (priorities[index] == 'LOW') Icon(Icons.arrow_downward_outlined, color: Theme.of(context).accentColor),
@@ -454,10 +463,10 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                   padding: EdgeInsets.symmetric(horizontal: 4),
                                   margin: EdgeInsets.symmetric(horizontal: 8),
                                   decoration: BoxDecoration(
-                                    color: Colors.grey,
+                                    color: Color.fromRGBO(200, 200, 200, 1),
                                     border: Border.all(
-                                      color: Theme.of(context).primaryColor,
-                                      width: 0.7,
+                                      color: Color.fromRGBO(191, 191, 196, 1),
+                                      width: 2.5,
                                     ),
                                   ),
                                   child: Row(
@@ -467,7 +476,11 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                         padding: const EdgeInsets.only(left: 16.0),
                                         child: Text(
                                           collaborators[index],
-                                          style: TextStyle(color: Theme.of(context).accentColor, fontSize: 18),
+                                          style: TextStyle(
+                                            color: Theme.of(context).accentColor,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
                                       IconButton(

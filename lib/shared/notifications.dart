@@ -1,9 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:provider/provider.dart';
-
-import '../task_page/providers/task_provider.dart';
 
 class Notifications {
   static void initializeLocalization() {
@@ -26,7 +22,7 @@ class Notifications {
   }
 
   static Future<void> _onGeofence(bg.GeofenceEvent event) async {
-    final eventTitle = event.identifier;
+    final eventTitle = event.extras['title'];
     final eventDescription = event.extras['description'];
 
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -41,24 +37,44 @@ class Notifications {
 
     await flutterLocalNotificationsPlugin.initialize(initializationSettings, onSelectNotification: _selectNotification);
 
-    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails('your channel id', 'your channel name', 'your channel description', importance: Importance.max, priority: Priority.high, showWhen: false);
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'your channel id',
+      'Localization',
+      'Geofence notification',
+      importance: Importance.max,
+      priority: Priority.high,
+      showWhen: false,
+    );
     const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.show(0, eventTitle, eventDescription, platformChannelSpecifics, payload: 'item x');
   }
 
   static Future _selectNotification(String payload) async {}
 
+  static void removeGeofence(int identifier) {
+    bg.BackgroundGeolocation.removeGeofence(identifier.toString()).then((bool success) {
+      print('[removeGeofence] success');
+    });
+  }
+
+  static void removeAllGeofences() {
+    bg.BackgroundGeolocation.removeGeofences().then((bool success) {
+      print('[removeGeofences] all geofences have been destroyed');
+    });
+  }
+
   static void addGeofence(
-    String identifier,
+    int identifier,
     double latitude,
     double longitude,
     double radius,
     bool onEnter,
     bool onExit,
+    String title,
     String description,
   ) {
     bg.BackgroundGeolocation.addGeofence(bg.Geofence(
-      identifier: identifier,
+      identifier: identifier.toString(),
       radius: radius * 1000,
       latitude: latitude,
       longitude: longitude,
@@ -66,7 +82,10 @@ class Notifications {
       notifyOnExit: onExit,
       notifyOnDwell: true,
       loiteringDelay: 30000,
-      extras: {'description': description},
+      extras: {
+        'description': description,
+        'title': title,
+      },
     )).then((bool success) {
       print('[addGeofence] success with $latitude and $longitude');
     }).catchError((error) {

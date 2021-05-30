@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/task_page/models/location.dart';
-import 'package:productive_app/task_page/models/taskLocation.dart';
-import 'package:productive_app/task_page/providers/location_provider.dart';
+import 'package:productive_app/shared/dialogs.dart';
+import 'package:productive_app/task_page/widgets/location_dialog.dart';
 import 'package:provider/provider.dart';
+
+import '../models/location.dart';
+import '../models/taskLocation.dart';
+import '../providers/location_provider.dart';
 
 class NotificationLocationDialog extends StatefulWidget {
   final Key key;
@@ -29,6 +32,18 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
   bool notificationOnExit = false;
   Location location;
 
+  Future<void> _addNewLocationForm(BuildContext buildContext, Location choosenLocation) async {
+    if (choosenLocation != null) {
+      String name = await Dialogs.showTextFieldDialog(context, 'Enter location name');
+      if (name == null || name.isEmpty) {
+        return;
+      }
+      choosenLocation.localizationName = name;
+      this.location = choosenLocation;
+      await Provider.of<LocationProvider>(context, listen: false).addLocation(choosenLocation);
+    }
+  }
+
   @override
   void initState() {
     if (this.widget.notificationRadius != null) {
@@ -54,8 +69,8 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
 
     return AlertDialog(
       content: Container(
-        height: 387,
-        width: 350,
+        height: 450,
+        width: 450,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -63,52 +78,106 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
               padding: const EdgeInsets.all(8.0),
               child: Card(
                 elevation: 8,
-                child: Column(
-                  children: [
-                    Text('Choose location'),
-                    PopupMenuButton(
-                      child: Column(
+                child: Container(
+                  height: 114,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Location'),
+                      this.location != null
+                          ? ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                elevation: 5,
+                                primary: Color.fromRGBO(201, 201, 206, 1),
+                                side: BorderSide(
+                                  color: Colors.grey.withOpacity(0.8),
+                                ),
+                              ),
+                              onPressed: () {},
+                              child: Text(
+                                this.location.localizationName,
+                                style: TextStyle(fontSize: 14, color: Theme.of(context).primaryColor),
+                              ),
+                            )
+                          : Container(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Text(
-                            this.location == null ? '' : this.location.localizationName,
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 6),
+                            child: Container(
+                              height: 40,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  primary: Theme.of(context).primaryColor,
+                                  side: BorderSide(color: Theme.of(context).primaryColor),
+                                ),
+                                onPressed: () async {
+                                  Location choosenLocation = await showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return LocationDialog(
+                                        choosenLocation: Location(id: -1, latitude: 0.0, longitude: 0.0, localizationName: 'test'),
+                                      );
+                                    },
+                                  );
+
+                                  this._addNewLocationForm(context, choosenLocation);
+                                },
+                                child: Text(
+                                  'New',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Theme.of(context).accentColor,
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              this.location == null
-                                  ? Text(
-                                      '',
-                                    )
-                                  : Text(
-                                      this.location.latitude.toStringAsFixed(3),
-                                    ),
-                              this.location == null
-                                  ? Text(
-                                      '',
-                                    )
-                                  : Text(
-                                      this.location.longitude.toStringAsFixed(3),
-                                    ),
-                            ],
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 6),
+                            child: Container(
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).primaryColor,
+                                border: Border.all(
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(5),
+                                ),
+                              ),
+                              child: DropdownButton(
+                                underline: Container(),
+                                hint: Text(
+                                  'Saved',
+                                  style: TextStyle(
+                                    color: Theme.of(context).accentColor,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                items: locationsList.map(
+                                  (currentLocation) {
+                                    return DropdownMenuItem(
+                                      value: currentLocation,
+                                      child: Text(
+                                        currentLocation.localizationName,
+                                      ),
+                                    );
+                                  },
+                                ).toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    this.location = value;
+                                  });
+                                },
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                      initialValue: this.location == null ? null : this.location,
-                      onSelected: (value) {
-                        setState(() {
-                          this.location = value;
-                        });
-                      },
-                      itemBuilder: (context) {
-                        return locationsList.map((location) {
-                          return PopupMenuItem(
-                            child: Text(location.localizationName),
-                            value: location,
-                          );
-                        }).toList();
-                      },
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
