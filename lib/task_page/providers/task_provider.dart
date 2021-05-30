@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:productive_app/shared/notifications.dart';
 import 'package:productive_app/task_page/models/tag.dart';
 import '../models/task.dart';
 
@@ -53,6 +54,14 @@ class TaskProvider with ChangeNotifier {
     this._delegatedTasks = newList;
   }
 
+  String getTitle(int taskId) {
+    return this.taskList.firstWhere((element) => element.id == taskId).title;
+  }
+
+  String getDescription(int taskId) {
+    return this.taskList.firstWhere((element) => element.id == taskId).description;
+  }
+
   Task get getSingleTask {
     return this.singleTask;
   }
@@ -93,7 +102,7 @@ class TaskProvider with ChangeNotifier {
     return [...this._localizations];
   }
 
-  Future<void> addTask(Task task) async {
+  Future<void> addTaskWithGeolocation(Task task, double latitude, double longitude) async {
     String url = this._serverUrl + 'task/add';
 
     if (task.startDate == null) {
@@ -132,7 +141,76 @@ class TaskProvider with ChangeNotifier {
         },
       );
 
-      print(response.body);
+      task.id = int.parse(response.body);
+      task.position = int.parse(response.body) + 1000.0;
+
+      if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+        task.endDate = null;
+      }
+
+      if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+        task.startDate = null;
+      }
+
+      if (task.notificationLocalizationId != null) {
+        Notifications.addGeofence(
+          task.title,
+          latitude,
+          longitude,
+          task.notificationLocalizationRadius,
+          task.notificationOnEnter,
+          task.notificationOnExit,
+          task.description,
+        );
+      }
+
+      this.addToLocalication(task);
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw error;
+    }
+  }
+
+  Future<void> addTask(Task task) async {
+    String url = this._serverUrl + 'task/add';
+
+    if (task.startDate == null) {
+      task.startDate = DateTime.fromMicrosecondsSinceEpoch(0);
+    }
+
+    if (task.endDate == null) {
+      task.endDate = DateTime.fromMicrosecondsSinceEpoch(0);
+    }
+
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode(
+          {
+            'taskName': task.title,
+            'taskDescription': task.description,
+            'userEmail': this.userMail,
+            'startDate': task.startDate.toIso8601String(),
+            'endDate': task.endDate.toIso8601String(),
+            'ifDone': task.done,
+            'priority': task.priority,
+            'tags': task.tags.map((tag) => tag.toJson()).toList(),
+            'localization': task.localization,
+            'delegatedEmail': task.delegatedEmail,
+            'isCanceled': task.isCanceled,
+            'localizationId': task.notificationLocalizationId,
+            'localizationRadius': task.notificationLocalizationRadius,
+            'notificationOnEnter': task.notificationOnEnter,
+            'notificationOnExit': task.notificationOnExit,
+          },
+        ),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
 
       task.id = int.parse(response.body);
       task.position = int.parse(response.body) + 1000.0;

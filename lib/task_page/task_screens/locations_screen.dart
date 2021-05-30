@@ -12,24 +12,17 @@ class LocationsScreen extends StatefulWidget {
   @override
   _LocationScreenState createState() => _LocationScreenState();
 }
-  
-class _LocationScreenState extends State<LocationsScreen>{
-  Future<void> _addNewLocationForm(BuildContext buildContext) async{
-    Location choosenLocation = await showDialog(
-      context: context,
-      builder: (context) {
-        return LocationDialog(choosenLocation: Location(id: -1,latitude: 0.0,longitude: 0.0,localizationName: 'test'),);
-      }
-    );
-    if(choosenLocation != null){
+
+class _LocationScreenState extends State<LocationsScreen> {
+  Future<void> _addNewLocationForm(BuildContext buildContext, Location choosenLocation) async {
+    if (choosenLocation != null) {
       String name = await Dialogs.showTextFieldDialog(context, 'Enter location name');
-      if(name == null || name.isEmpty){
+      if (name == null || name.isEmpty) {
         return;
       }
       choosenLocation.localizationName = name;
-      Provider.of<LocationProvider>(context,listen: false).addLocation(choosenLocation);
+      await Provider.of<LocationProvider>(context, listen: false).addLocation(choosenLocation);
     }
-    await Provider.of<LocationProvider>(context,listen: false).getLocations();
   }
 
   void _editLocationForm(BuildContext buildContext) {
@@ -38,7 +31,8 @@ class _LocationScreenState extends State<LocationsScreen>{
 
   @override
   Widget build(BuildContext context) {
-    List<Location> locations = Provider.of<LocationProvider>(context).locationList;
+    final locations = Provider.of<LocationProvider>(context).locationList;
+
     return Scaffold(
       appBar: TaskAppBar(
         title: "Saved locations",
@@ -49,8 +43,17 @@ class _LocationScreenState extends State<LocationsScreen>{
           color: Theme.of(context).accentColor,
           size: 50,
         ),
-        onPressed: (){
-          this._addNewLocationForm(context);
+        onPressed: () async {
+          Location choosenLocation = await showDialog(
+            context: context,
+            builder: (context) {
+              return LocationDialog(
+                choosenLocation: Location(id: -1, latitude: 0.0, longitude: 0.0, localizationName: 'test'),
+              );
+            },
+          );
+
+          this._addNewLocationForm(context, choosenLocation);
         },
         backgroundColor: Theme.of(context).primaryColor,
       ),
@@ -58,8 +61,8 @@ class _LocationScreenState extends State<LocationsScreen>{
         padding: EdgeInsets.only(left: 21, right: 17, top: 10),
         shrinkWrap: true,
         itemCount: locations.length,
-        itemBuilder: (context,index) => Dismissible(
-          key: ValueKey(locations[index]), 
+        itemBuilder: (context, index) => Dismissible(
+          key: ValueKey(locations[index]),
           background: Container(
             padding: EdgeInsets.symmetric(horizontal: 10),
             alignment: Alignment.centerLeft,
@@ -97,14 +100,14 @@ class _LocationScreenState extends State<LocationsScreen>{
               ],
             ),
           ),
-          confirmDismiss: (direction) async{
-            if(direction == DismissDirection.endToStart){
+          confirmDismiss: (direction) async {
+            if (direction == DismissDirection.endToStart) {
               bool hasAgreed = await Dialogs.showChoiceDialog(context, "Are you sure you want to delete this location?");
               if (hasAgreed) {
                 Provider.of<LocationProvider>(context, listen: false).deleteLocation(locations[index].id);
               }
             }
-            if(direction == DismissDirection.startToEnd){
+            if (direction == DismissDirection.startToEnd) {
               this._editLocationForm(context);
             }
             return false;
@@ -118,11 +121,10 @@ class _LocationScreenState extends State<LocationsScreen>{
               subtitle: Text(
                 locations[index].longitude.toString() + ", " + locations[index].latitude.toString(),
               ),
-            )
-          )
+            ),
+          ),
         ),
       ),
     );
   }
-
 }

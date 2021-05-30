@@ -1,5 +1,9 @@
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:provider/provider.dart';
+
+import '../task_page/providers/task_provider.dart';
 
 class Notifications {
   static void initializeLocalization() {
@@ -22,7 +26,8 @@ class Notifications {
   }
 
   static Future<void> _onGeofence(bg.GeofenceEvent event) async {
-    print('in onGeofence method $event');
+    final eventTitle = event.identifier;
+    final eventDescription = event.extras['description'];
 
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
@@ -38,21 +43,30 @@ class Notifications {
 
     const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails('your channel id', 'your channel name', 'your channel description', importance: Importance.max, priority: Priority.high, showWhen: false);
     const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin.show(0, '${event.identifier}', 'Test tresci powiadomienia', platformChannelSpecifics, payload: 'item x');
+    await flutterLocalNotificationsPlugin.show(0, eventTitle, eventDescription, platformChannelSpecifics, payload: 'item x');
   }
 
   static Future _selectNotification(String payload) async {}
 
-  static void addGeofence(String identifier, double latitude, double longitude, double radius, bool onEnter, bool onExit) {
+  static void addGeofence(
+    String identifier,
+    double latitude,
+    double longitude,
+    double radius,
+    bool onEnter,
+    bool onExit,
+    String description,
+  ) {
     bg.BackgroundGeolocation.addGeofence(bg.Geofence(
       identifier: identifier,
-      radius: radius,
+      radius: radius * 1000,
       latitude: latitude,
       longitude: longitude,
       notifyOnEntry: onEnter,
       notifyOnExit: onExit,
-      notifyOnDwell: false,
+      notifyOnDwell: true,
       loiteringDelay: 30000,
+      extras: {'description': description},
     )).then((bool success) {
       print('[addGeofence] success with $latitude and $longitude');
     }).catchError((error) {

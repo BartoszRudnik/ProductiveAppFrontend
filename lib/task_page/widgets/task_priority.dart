@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class TaskPriority extends StatefulWidget {
-  Function setTaskPriority;
+  final Function setTaskPriority;
   String priority;
-  List<String> priorities;
+  final List<String> priorities;
 
   TaskPriority({
     @required this.setTaskPriority,

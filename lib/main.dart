@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:global_configuration/global_configuration.dart';
+import 'package:productive_app/shared/notifications.dart';
 import 'package:provider/provider.dart';
 
 import 'login/providers/auth_provider.dart';
@@ -31,6 +31,7 @@ import 'task_page/task_screens/trash_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GlobalConfiguration().loadFromAsset("properties");
+  Notifications.initializeLocalization();
   runApp(MyApp());
 }
 
@@ -83,12 +84,8 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProxyProvider<AuthProvider, LocationProvider>(
           create: null,
-          update: (ctx, auth, previousTasks) => LocationProvider(
-            userMail: auth.email,
-            authToken: auth.token,
-            locationList: previousTasks == null ? [] : previousTasks.locationList,
-            placemarks: previousTasks == null? [] : previousTasks.placemarks
-          ),
+          update: (ctx, auth, previousTasks) =>
+              LocationProvider(userMail: auth.email, authToken: auth.token, locationList: previousTasks == null ? [] : previousTasks.locationList, placemarks: previousTasks == null ? [] : previousTasks.placemarks),
         ),
       ],
       child: Consumer<AuthProvider>(

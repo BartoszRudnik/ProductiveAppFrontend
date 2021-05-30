@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/task_page/widgets/NotificationLocationDialog.dart';
+import 'package:productive_app/task_page/widgets/notification_location_dialog.dart';
 
 class NewTaskNotificationLocalization extends StatefulWidget {
   final Function setNotificationLocalization;

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/task_page/models/taskLocation.dart';
+import 'package:productive_app/task_page/widgets/new_task_notification_localization.dart';
 import 'package:provider/provider.dart';
 
 import '../../shared/dialogs.dart';
@@ -187,6 +189,15 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     }
   }
 
+  void setNotificationLocalization(TaskLocation taskLocation) {
+    if (taskLocation.location != null) {
+      this.taskToEdit.notificationLocalizationId = taskLocation.location.id;
+    }
+    this.taskToEdit.notificationLocalizationRadius = taskLocation.notificationRadius;
+    this.taskToEdit.notificationOnEnter = taskLocation.notificationOnEnter;
+    this.taskToEdit.notificationOnExit = taskLocation.notificationOnExit;
+  }
+
   Future<void> editTags(BuildContext context) async {
     final newTags = await showDialog(
         context: context,
@@ -335,6 +346,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                     height: 10,
                   ),
                   Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
                         flex: 5,
@@ -384,7 +397,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                           ),
                         ),
                       ),
-                      Expanded(flex: 1, child: SizedBox()),
+                      Expanded(flex: 2, child: SizedBox()),
                       Expanded(
                         flex: 5,
                         child: SizedBox(
@@ -404,7 +417,13 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                           ),
                         ),
                       ),
-                      Expanded(flex: 1, child: SizedBox()),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    children: [
                       Expanded(
                         flex: 5,
                         child: SizedBox(
@@ -417,16 +436,23 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                               });
                             },
                             child: Container(
-                              decoration: BoxDecoration(color: Color.fromRGBO(221, 221, 226, 1), borderRadius: BorderRadius.circular(3), boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.8),
-                                  offset: Offset(0.0, 1.0),
-                                  blurRadius: 1.0,
-                                )
-                              ]),
+                              decoration: BoxDecoration(
+                                color: Color.fromRGBO(221, 221, 226, 1),
+                                borderRadius: BorderRadius.circular(3),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.8),
+                                    offset: Offset(0.0, 1.0),
+                                    blurRadius: 1.0,
+                                  )
+                                ],
+                              ),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                children: [Icon(Icons.inbox), Text(taskToEdit.localization)],
+                                children: [
+                                  Icon(Icons.inbox),
+                                  Text(taskToEdit.localization),
+                                ],
                               ),
                             ),
                             itemBuilder: (context) {
@@ -437,6 +463,39 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                                 );
                               }).toList();
                             },
+                          ),
+                        ),
+                      ),
+                      Expanded(flex: 2, child: SizedBox()),
+                      Expanded(
+                        flex: 5,
+                        child: SizedBox(
+                          height: 100,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Color.fromRGBO(221, 221, 226, 1),
+                              borderRadius: BorderRadius.circular(3),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.8),
+                                  offset: Offset(0.0, 1.0),
+                                  blurRadius: 1.0,
+                                )
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                NewTaskNotificationLocalization(
+                                  setNotificationLocalization: this.setNotificationLocalization,
+                                  notificationLocalizationId: this.originalTask.notificationLocalizationId,
+                                  notificationOnEnter: this.originalTask.notificationOnEnter,
+                                  notificationOnExit: this.originalTask.notificationOnExit,
+                                  notificationRadius: this.originalTask.notificationLocalizationRadius,
+                                ),
+                                Text('Notification'),
+                              ],
+                            ),
                           ),
                         ),
                       ),

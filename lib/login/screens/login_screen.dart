@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../shared/notifications.dart';
 import '../appBars/login_appbar.dart';
 import '../widgets/login_widget.dart';
 
@@ -15,9 +14,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-
-    Notifications.initializeLocalization();
-    Notifications.addGeofence("Home", 51.120281, 15.814276, 1050, true, true);
   }
 
   @override

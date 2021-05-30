@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/task_page/models/location.dart';
 import 'package:productive_app/task_page/models/taskLocation.dart';
+import 'package:productive_app/task_page/providers/location_provider.dart';
+import 'package:provider/provider.dart';
 
 class NotificationLocationDialog extends StatefulWidget {
   final Key key;
@@ -24,6 +27,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
   double notificationRadius = 0.0;
   bool notificationOnEnter = false;
   bool notificationOnExit = false;
+  Location location;
 
   @override
   void initState() {
@@ -42,9 +46,15 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
 
   @override
   Widget build(BuildContext context) {
+    final locationsList = Provider.of<LocationProvider>(context).locations;
+
+    if (this.widget.notificationLocationId != null) {
+      this.location = locationsList.firstWhere((element) => element.id == this.widget.notificationLocationId);
+    }
+
     return AlertDialog(
       content: Container(
-        height: 400,
+        height: 387,
         width: 350,
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -52,6 +62,60 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Card(
+                elevation: 8,
+                child: Column(
+                  children: [
+                    Text('Choose location'),
+                    PopupMenuButton(
+                      child: Column(
+                        children: [
+                          Text(
+                            this.location == null ? '' : this.location.localizationName,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              this.location == null
+                                  ? Text(
+                                      '',
+                                    )
+                                  : Text(
+                                      this.location.latitude.toStringAsFixed(3),
+                                    ),
+                              this.location == null
+                                  ? Text(
+                                      '',
+                                    )
+                                  : Text(
+                                      this.location.longitude.toStringAsFixed(3),
+                                    ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      initialValue: this.location == null ? null : this.location,
+                      onSelected: (value) {
+                        setState(() {
+                          this.location = value;
+                        });
+                      },
+                      itemBuilder: (context) {
+                        return locationsList.map((location) {
+                          return PopupMenuItem(
+                            child: Text(location.localizationName),
+                            value: location,
+                          );
+                        }).toList();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Card(
+                elevation: 8,
                 child: Column(
                   children: [
                     Text('Change notification range'),
@@ -111,6 +175,9 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                 ),
               ),
             ),
+            SizedBox(
+              height: 10,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -121,7 +188,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                   ),
                   onPressed: () {
                     TaskLocation returnLocation = TaskLocation(
-                      location: null, //TO-DO
+                      location: this.location,
                       notificationOnEnter: this.widget.notificationOnEnter,
                       notificationOnExit: this.widget.notificationOnExit,
                       notificationRadius: this.widget.notificationRadius,
@@ -144,7 +211,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                   ),
                   onPressed: () {
                     TaskLocation returnLocation = TaskLocation(
-                      location: null, //TO-DO
+                      location: this.location,
                       notificationOnEnter: this.notificationOnEnter,
                       notificationOnExit: this.notificationOnExit,
                       notificationRadius: this.notificationRadius,
