@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:productive_app/task_page/models/taskLocation.dart';
-import 'package:productive_app/task_page/widgets/new_task_notification_localization.dart';
 import 'package:provider/provider.dart';
 
 import '../../shared/dialogs.dart';
 import '../models/task.dart';
+import '../models/taskLocation.dart';
+import '../providers/location_provider.dart';
 import '../providers/task_provider.dart';
 import '../utils/date_time_pickers.dart';
 import '../widgets/delegate_dialog.dart';
 import '../widgets/details_appBar.dart';
+import '../widgets/new_task_notification_localization.dart';
 import '../widgets/tags_dialog.dart';
 import '../widgets/task_tags_edit.dart';
 
@@ -54,6 +55,23 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       _description = text;
     });
     checkColor();
+  }
+
+  bool differentNotification(Task newTask, Task oldTask) {
+    if (newTask.notificationLocalizationId != null && oldTask.notificationLocalizationId == null) {
+      return true;
+    } else if (newTask.notificationLocalizationId != null && oldTask.notificationLocalizationId != null) {
+      if (newTask.notificationLocalizationId != oldTask.notificationLocalizationId ||
+          newTask.notificationLocalizationRadius != oldTask.notificationLocalizationRadius ||
+          newTask.notificationOnEnter != oldTask.notificationOnEnter ||
+          newTask.notificationOnExit != oldTask.notificationOnExit) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
 
   void checkColor() {
@@ -160,7 +178,13 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       final newLocalization = taskToEdit.localization;
       taskToEdit.localization = originalTask.localization;
 
-      await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, newLocalization);
+      if (this.differentNotification(taskToEdit, originalTask)) {
+        final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(taskToEdit.notificationLocalizationId);
+        final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(taskToEdit.notificationLocalizationId);
+        await Provider.of<TaskProvider>(context, listen: false).updateTaskWithGeolocation(taskToEdit, newLocalization, longitude, latitude);
+      } else {
+        await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, newLocalization);
+      }
       Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);
     } catch (error) {
       print(error);
@@ -190,12 +214,14 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
   }
 
   void setNotificationLocalization(TaskLocation taskLocation) {
-    if (taskLocation.location != null) {
-      this.taskToEdit.notificationLocalizationId = taskLocation.location.id;
-    }
-    this.taskToEdit.notificationLocalizationRadius = taskLocation.notificationRadius;
-    this.taskToEdit.notificationOnEnter = taskLocation.notificationOnEnter;
-    this.taskToEdit.notificationOnExit = taskLocation.notificationOnExit;
+    setState(() {
+      if (taskLocation.location != null) {
+        this.taskToEdit.notificationLocalizationId = taskLocation.location.id;
+        this.taskToEdit.notificationLocalizationRadius = taskLocation.notificationRadius;
+        this.taskToEdit.notificationOnEnter = taskLocation.notificationOnEnter;
+        this.taskToEdit.notificationOnExit = taskLocation.notificationOnExit;
+      }
+    });
   }
 
   Future<void> editTags(BuildContext context) async {
@@ -263,6 +289,15 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       position: argTask.position,
       delegatedEmail: argTask.delegatedEmail,
       isCanceled: argTask.isCanceled,
+      childId: argTask.childId,
+      isDelegated: argTask.isDelegated,
+      notificationLocalizationId: argTask.notificationLocalizationId,
+      notificationLocalizationRadius: argTask.notificationLocalizationRadius,
+      notificationOnEnter: argTask.notificationOnEnter,
+      notificationOnExit: argTask.notificationOnExit,
+      parentId: argTask.parentId,
+      supervisorEmail: argTask.supervisorEmail,
+      taskStatus: argTask.taskStatus,
     );
   }
 
@@ -488,10 +523,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                               children: [
                                 NewTaskNotificationLocalization(
                                   setNotificationLocalization: this.setNotificationLocalization,
-                                  notificationLocalizationId: this.originalTask.notificationLocalizationId,
-                                  notificationOnEnter: this.originalTask.notificationOnEnter,
-                                  notificationOnExit: this.originalTask.notificationOnExit,
-                                  notificationRadius: this.originalTask.notificationLocalizationRadius,
+                                  notificationLocalizationId: this.taskToEdit.notificationLocalizationId,
+                                  notificationOnEnter: this.taskToEdit.notificationOnEnter,
+                                  notificationOnExit: this.taskToEdit.notificationOnExit,
+                                  notificationRadius: this.taskToEdit.notificationLocalizationRadius,
                                 ),
                                 Text('Notification'),
                               ],

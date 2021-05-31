@@ -27,7 +27,7 @@ class NotificationLocationDialog extends StatefulWidget {
 }
 
 class _NotificationLocationDialogState extends State<NotificationLocationDialog> {
-  double notificationRadius = 0.0;
+  double notificationRadius = 0.25;
   bool notificationOnEnter = false;
   bool notificationOnExit = false;
   Location location;
@@ -63,7 +63,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
   Widget build(BuildContext context) {
     final locationsList = Provider.of<LocationProvider>(context).locations;
 
-    if (this.widget.notificationLocationId != null) {
+    if (this.widget.notificationLocationId != null && this.location == null) {
       this.location = locationsList.firstWhere((element) => element.id == this.widget.notificationLocationId);
     }
 
@@ -189,10 +189,10 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                   children: [
                     Text('Change notification range'),
                     Slider(
-                      divisions: 20,
+                      divisions: 19,
                       activeColor: Theme.of(context).primaryColor,
                       inactiveColor: Color.fromRGBO(0, 0, 0, 0.3),
-                      min: 0.0,
+                      min: 0.25,
                       max: 5.0,
                       value: this.notificationRadius,
                       onChanged: (newRadius) {

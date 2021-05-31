@@ -62,12 +62,14 @@ class _NewTaskState extends State<NewTask> {
   }
 
   void setNotificationLocalization(TaskLocation taskLocation) {
-    if (taskLocation.location != null) {
-      this._notificationLocalizationId = taskLocation.location.id;
-      this._notificationLocalizationRadius = taskLocation.notificationRadius;
-      this._notificationOnEnter = taskLocation.notificationOnEnter;
-      this._notificationOnExit = taskLocation.notificationOnExit;
-    }
+    setState(() {
+      if (taskLocation.location != null) {
+        this._notificationLocalizationId = taskLocation.location.id;
+        this._notificationLocalizationRadius = taskLocation.notificationRadius;
+        this._notificationOnEnter = taskLocation.notificationOnEnter;
+        this._notificationOnExit = taskLocation.notificationOnExit;
+      }
+    });
   }
 
   void setDate(DateTime startDate, DateTime endDate, TimeOfDay startTime, TimeOfDay endTime) {
@@ -175,7 +177,6 @@ class _NewTaskState extends State<NewTask> {
       if (this._notificationLocalizationId == null) {
         await Provider.of<TaskProvider>(context, listen: false).addTask(newTask);
       } else {
-        print(this._notificationLocalizationId);
         final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this._notificationLocalizationId);
         final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this._notificationLocalizationId);
 

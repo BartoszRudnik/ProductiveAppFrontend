@@ -39,7 +39,6 @@ class _NewTaskNotificationLocalizationState extends State<NewTaskNotificationLoc
             );
           },
         );
-
         this.widget.setNotificationLocalization(taskLocation);
       },
     );

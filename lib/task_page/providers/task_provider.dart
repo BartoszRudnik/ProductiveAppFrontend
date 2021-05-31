@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter_background_geolocation/flutter_background_geolocation.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -316,7 +317,84 @@ class TaskProvider with ChangeNotifier {
         },
       );
 
-      print(response.body);
+      if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+        task.endDate = null;
+      }
+
+      if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+        task.startDate = null;
+      }
+
+      this.deleteFromLocalization(task);
+
+      task.localization = newLocation;
+
+      this.addToLocalication(task);
+
+      if (task.localization == 'INBOX') {
+        this.sortByPosition(this._inboxTasks);
+      } else if (task.localization == 'ANYTIME') {
+        this.sortByPosition(this._anytimeTasks);
+      } else if (task.localization == 'SCHEDULED') {
+        this.sortByPosition(this._scheduledTasks);
+      } else if (task.localization == 'DELEGATED') {
+        this.sortByPosition(this._delegatedTasks);
+      }
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<void> updateTaskWithGeolocation(Task task, String newLocation, double longitude, double latitude) async {
+    String url = this._serverUrl + 'task/update/${task.id}';
+
+    if (task.localization != newLocation) {
+      if (newLocation == 'ANYTIME' && this._anytimeTasks.length > 0) {
+        task.position = this._anytimeTasks[this._anytimeTasks.length - 1].position + 1000.0;
+      } else if (newLocation == 'SCHEDULED' && this._scheduledTasks.length > 0) {
+        task.position = this._scheduledTasks[this._scheduledTasks.length - 1].position + 1000.0;
+      }
+    }
+
+    if (task.startDate == null) {
+      task.startDate = DateTime.fromMicrosecondsSinceEpoch(0);
+    }
+
+    if (task.endDate == null) {
+      task.endDate = DateTime.fromMicrosecondsSinceEpoch(0);
+    }
+
+    try {
+      final response = await http.put(
+        url,
+        body: json.encode(
+          {
+            'taskName': task.title,
+            'taskDescription': task.description,
+            'userEmail': this.userMail,
+            'startDate': task.startDate.toIso8601String(),
+            'endDate': task.endDate.toIso8601String(),
+            'ifDone': task.done,
+            'priority': task.priority,
+            'tags': task.tags.map((tag) => tag.toJson()).toList(),
+            'localization': newLocation,
+            'position': task.position,
+            'delegatedEmail': task.delegatedEmail,
+            'isCanceled': task.isCanceled,
+            'localizationId': task.notificationLocalizationId,
+            'localizationRadius': task.notificationLocalizationRadius,
+            'notificationOnEnter': task.notificationOnEnter,
+            'notificationOnExit': task.notificationOnExit,
+          },
+        ),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
 
       if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
         task.endDate = null;
@@ -341,6 +419,18 @@ class TaskProvider with ChangeNotifier {
       } else if (task.localization == 'DELEGATED') {
         this.sortByPosition(this._delegatedTasks);
       }
+
+      this.notificationChange(
+        task.id,
+        task.notificationLocalizationId,
+        task.notificationLocalizationRadius,
+        task.notificationOnExit,
+        task.notificationOnEnter,
+        latitude,
+        longitude,
+        task.title,
+        task.description,
+      );
 
       notifyListeners();
     } catch (error) {
@@ -763,6 +853,21 @@ class TaskProvider with ChangeNotifier {
         : a.startDate == null
             ? -1
             : 1);
+  }
+
+  void notificationChange(
+    int taskId,
+    int notificationId,
+    double notificationRadius,
+    bool onExit,
+    bool onEnter,
+    double latitude,
+    double longitude,
+    String title,
+    String description,
+  ) {
+    Notifications.removeGeofence(taskId);
+    Notifications.addGeofence(taskId, latitude, longitude, notificationRadius, onEnter, onExit, title, description);
   }
 
   int countInboxDelegated() {
