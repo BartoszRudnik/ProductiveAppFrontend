@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/shared/notifications.dart';
 import 'package:productive_app/task_page/models/taskLocation.dart';
 import 'package:productive_app/task_page/providers/location_provider.dart';
 import 'package:productive_app/task_page/widgets/new_task_notification_localization.dart';

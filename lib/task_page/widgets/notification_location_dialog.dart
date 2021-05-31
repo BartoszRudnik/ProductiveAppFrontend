@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/shared/dialogs.dart';
+import 'package:productive_app/shared/notifications.dart';
 import 'package:productive_app/task_page/widgets/location_dialog.dart';
 import 'package:provider/provider.dart';
 
@@ -13,6 +14,7 @@ class NotificationLocationDialog extends StatefulWidget {
   final notificationRadius;
   final notificationOnEnter;
   final notificationOnExit;
+  final taskId;
 
   NotificationLocationDialog({
     @required this.key,
@@ -20,6 +22,7 @@ class NotificationLocationDialog extends StatefulWidget {
     @required this.notificationOnEnter,
     @required this.notificationOnExit,
     @required this.notificationRadius,
+    this.taskId,
   });
 
   @override
@@ -31,6 +34,8 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
   bool notificationOnEnter = false;
   bool notificationOnExit = false;
   Location location;
+
+  bool deleted = false;
 
   Future<void> _addNewLocationForm(BuildContext buildContext, Location choosenLocation) async {
     if (choosenLocation != null) {
@@ -63,7 +68,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
   Widget build(BuildContext context) {
     final locationsList = Provider.of<LocationProvider>(context).locations;
 
-    if (this.widget.notificationLocationId != null && this.location == null) {
+    if (this.widget.notificationLocationId != null && this.location == null && !this.deleted) {
       this.location = locationsList.firstWhere((element) => element.id == this.widget.notificationLocationId);
     }
 
@@ -168,6 +173,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                                 ).toList(),
                                 onChanged: (value) {
                                   setState(() {
+                                    this.deleted = false;
                                     this.location = value;
                                   });
                                 },
@@ -256,14 +262,18 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                     side: BorderSide(color: Theme.of(context).primaryColor),
                   ),
                   onPressed: () {
-                    TaskLocation returnLocation = TaskLocation(
-                      location: this.location,
-                      notificationOnEnter: this.widget.notificationOnEnter,
-                      notificationOnExit: this.widget.notificationOnExit,
-                      notificationRadius: this.widget.notificationRadius,
-                    );
+                    if (this.location != null) {
+                      TaskLocation returnLocation = TaskLocation(
+                        location: this.location,
+                        notificationOnEnter: this.notificationOnEnter,
+                        notificationOnExit: this.notificationOnExit,
+                        notificationRadius: this.notificationRadius,
+                      );
 
-                    Navigator.of(context).pop(returnLocation);
+                      Navigator.of(context).pop(returnLocation);
+                    } else {
+                      Navigator.of(context).pop(null);
+                    }
                   },
                   child: Text(
                     'Cancel',
@@ -279,14 +289,41 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                     side: BorderSide(color: Theme.of(context).primaryColor),
                   ),
                   onPressed: () {
-                    TaskLocation returnLocation = TaskLocation(
-                      location: this.location,
-                      notificationOnEnter: this.notificationOnEnter,
-                      notificationOnExit: this.notificationOnExit,
-                      notificationRadius: this.notificationRadius,
-                    );
+                    Notifications.removeGeofence(this.widget.taskId);
+                    setState(() {
+                      this.deleted = true;
+                      this.location = null;
+                      this.notificationOnEnter = false;
+                      this.notificationOnExit = false;
+                      this.notificationRadius = 0.25;
+                    });
+                  },
+                  child: Text(
+                    'Delete',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Theme.of(context).accentColor,
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    primary: Theme.of(context).primaryColor,
+                    side: BorderSide(color: Theme.of(context).primaryColor),
+                  ),
+                  onPressed: () {
+                    if (this.location != null) {
+                      TaskLocation returnLocation = TaskLocation(
+                        location: this.location,
+                        notificationOnEnter: this.notificationOnEnter,
+                        notificationOnExit: this.notificationOnExit,
+                        notificationRadius: this.notificationRadius,
+                      );
 
-                    Navigator.of(context).pop(returnLocation);
+                      Navigator.of(context).pop(returnLocation);
+                    } else {
+                      Navigator.of(context).pop(null);
+                    }
                   },
                   child: Text(
                     'Save',

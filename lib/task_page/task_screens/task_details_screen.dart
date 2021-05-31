@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/shared/notifications.dart';
 import 'package:provider/provider.dart';
 
 import '../../shared/dialogs.dart';
@@ -215,11 +216,16 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
   void setNotificationLocalization(TaskLocation taskLocation) {
     setState(() {
-      if (taskLocation.location != null) {
+      if (taskLocation != null && taskLocation.location != null) {
         this.taskToEdit.notificationLocalizationId = taskLocation.location.id;
         this.taskToEdit.notificationLocalizationRadius = taskLocation.notificationRadius;
         this.taskToEdit.notificationOnEnter = taskLocation.notificationOnEnter;
         this.taskToEdit.notificationOnExit = taskLocation.notificationOnExit;
+      } else {
+        this.taskToEdit.notificationLocalizationId = null;
+        this.taskToEdit.notificationLocalizationRadius = 0.25;
+        this.taskToEdit.notificationOnEnter = false;
+        this.taskToEdit.notificationOnExit = false;
       }
     });
   }
@@ -527,6 +533,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                                   notificationOnEnter: this.taskToEdit.notificationOnEnter,
                                   notificationOnExit: this.taskToEdit.notificationOnExit,
                                   notificationRadius: this.taskToEdit.notificationLocalizationRadius,
+                                  taskId: this.originalTask.id,
                                 ),
                                 Text('Notification'),
                               ],
