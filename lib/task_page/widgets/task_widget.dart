@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:productive_app/task_page/widgets/is_done_button.dart';
-import 'package:productive_app/task_page/widgets/task_tags.dart';
 import 'package:provider/provider.dart';
 
+import '../models/task.dart';
+import '../providers/location_provider.dart';
 import '../providers/task_provider.dart';
 import '../task_screens/task_details_screen.dart';
+import 'is_done_button.dart';
+import 'task_tags.dart';
 
 class TaskWidget extends StatefulWidget {
-  final task;
+  final Task task;
   final key;
 
   TaskWidget({
@@ -22,7 +24,14 @@ class TaskWidget extends StatefulWidget {
 
 class _TaskWidgetState extends State<TaskWidget> {
   void changeTaskStatus() {
-    Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(this.widget.task);
+    if (this.widget.task.notificationLocalizationId == null) {
+      Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(this.widget.task);
+    } else {
+      final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.widget.task.id);
+      final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.widget.task.id);
+
+      Provider.of<TaskProvider>(context, listen: false).toggleTaskStatusWithGeolocation(this.widget.task, latitude, longitude);
+    }
   }
 
   @override
@@ -174,7 +183,14 @@ class _TaskWidgetState extends State<TaskWidget> {
                 newLocation = 'DELEGATED';
               }
 
-              Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
+              if (this.widget.task.notificationLocalizationId == null) {
+                Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
+              } else {
+                final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.widget.task.id);
+                final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.widget.task.id);
+
+                Provider.of<TaskProvider>(context, listen: false).updateTaskWithGeolocation(this.widget.task, newLocation, longitude, latitude);
+              }
             }
           },
           child: Column(

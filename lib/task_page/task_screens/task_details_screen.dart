@@ -110,9 +110,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
   }
 
   Future<void> saveTask() async {
-    var isValid = this._formKey.currentState.validate();
-
-    print(taskToEdit.delegatedEmail == null);
+    bool isValid = this._formKey.currentState.validate();
 
     if (taskToEdit.startDate == null && taskToEdit.localization == "SCHEDULED") {
       isValid = false;
@@ -179,13 +177,36 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       final newLocalization = taskToEdit.localization;
       taskToEdit.localization = originalTask.localization;
 
-      if (this.differentNotification(taskToEdit, originalTask)) {
+      if (taskToEdit.done != originalTask.done) {
+        if (taskToEdit.notificationLocalizationId != null) {
+          if (taskToEdit.done) {
+            Notifications.removeGeofence(taskToEdit.id);
+          } else {
+            double latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(taskToEdit.id);
+            double longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(taskToEdit.id);
+
+            Notifications.addGeofence(
+              taskToEdit.id,
+              latitude,
+              longitude,
+              taskToEdit.notificationLocalizationRadius,
+              taskToEdit.notificationOnEnter,
+              taskToEdit.notificationOnExit,
+              taskToEdit.title,
+              taskToEdit.description,
+            );
+          }
+        }
+        await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, newLocalization);
+      } else if (this.differentNotification(taskToEdit, originalTask)) {
         final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(taskToEdit.notificationLocalizationId);
         final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(taskToEdit.notificationLocalizationId);
+
         await Provider.of<TaskProvider>(context, listen: false).updateTaskWithGeolocation(taskToEdit, newLocalization, longitude, latitude);
       } else {
         await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, newLocalization);
       }
+
       Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);
     } catch (error) {
       print(error);

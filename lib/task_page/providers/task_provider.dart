@@ -280,6 +280,10 @@ class TaskProvider with ChangeNotifier {
       }
     }
 
+    if (newLocation == 'TRASH' || newLocation == 'COMPLETED') {
+      Notifications.removeGeofence(task.id);
+    }
+
     if (task.startDate == null) {
       task.startDate = DateTime.fromMicrosecondsSinceEpoch(0);
     }
@@ -359,6 +363,10 @@ class TaskProvider with ChangeNotifier {
       }
     }
 
+    if (newLocation == 'TRASH' || newLocation == 'COMPLETED') {
+      Notifications.removeGeofence(task.id);
+    }
+
     if (task.startDate == null) {
       task.startDate = DateTime.fromMicrosecondsSinceEpoch(0);
     }
@@ -420,17 +428,19 @@ class TaskProvider with ChangeNotifier {
         this.sortByPosition(this._delegatedTasks);
       }
 
-      this.notificationChange(
-        task.id,
-        task.notificationLocalizationId,
-        task.notificationLocalizationRadius,
-        task.notificationOnExit,
-        task.notificationOnEnter,
-        latitude,
-        longitude,
-        task.title,
-        task.description,
-      );
+      if (newLocation != 'TRASH' && newLocation != 'COMPLETED') {
+        this.notificationChange(
+          task.id,
+          task.notificationLocalizationId,
+          task.notificationLocalizationRadius,
+          task.notificationOnExit,
+          task.notificationOnEnter,
+          latitude,
+          longitude,
+          task.title,
+          task.description,
+        );
+      }
 
       notifyListeners();
     } catch (error) {
@@ -529,6 +539,8 @@ class TaskProvider with ChangeNotifier {
           task.notificationLocalizationRadius = element['tasks']['localizationRadius'];
           task.notificationOnEnter = element['tasks']['notificationOnEnter'];
           task.notificationOnExit = element['tasks']['notificationOnExit'];
+        } else {
+          task.notificationLocalizationId = null;
         }
 
         if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
@@ -590,6 +602,43 @@ class TaskProvider with ChangeNotifier {
       }
 
       this.localizationTaskStatus(task);
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+
+      this.taskList[task.id - 1] = task;
+      throw error;
+    }
+  }
+
+  Future<void> toggleTaskStatusWithGeolocation(Task task, double latitude, double longitude) async {
+    String url = this._serverUrl + 'task/done/${task.id}';
+
+    try {
+      final response = await http.post(url);
+
+      if (response != null && task.localization == 'DELEGATED') {
+        final newStatus = response.body;
+        this.updateTaskStatus(task.id, newStatus);
+      }
+
+      this.localizationTaskStatus(task);
+
+      if (task.done) {
+        Notifications.removeGeofence(task.id);
+      } else {
+        Notifications.addGeofence(
+          task.id,
+          latitude,
+          longitude,
+          task.notificationLocalizationRadius,
+          task.notificationOnEnter,
+          task.notificationOnExit,
+          task.title,
+          task.description,
+        );
+      }
 
       notifyListeners();
     } catch (error) {

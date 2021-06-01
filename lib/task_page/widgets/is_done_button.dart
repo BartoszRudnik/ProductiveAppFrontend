@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 
 class IsDoneButton extends StatefulWidget {
   bool isDone;
-  Function changeIsDoneStatus;
-  Future<void> changeTaskStatusOnServer;
+  final Function changeIsDoneStatus;
 
   IsDoneButton({
     @required this.isDone,
     this.changeIsDoneStatus,
-    this.changeTaskStatusOnServer,
   });
 
   @override
