@@ -182,8 +182,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
           if (taskToEdit.done) {
             Notifications.removeGeofence(taskToEdit.id);
           } else {
-            double latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(taskToEdit.id);
-            double longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(taskToEdit.id);
+            double latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(taskToEdit.notificationLocalizationId);
+            double longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(taskToEdit.notificationLocalizationId);
 
             Notifications.addGeofence(
               taskToEdit.id,

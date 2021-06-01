@@ -51,13 +51,14 @@ class Notifications {
 
   static Future _selectNotification(String payload) async {}
 
-  static bool checkIfGeofenceExists(int identifier) {
-    bg.BackgroundGeolocation.geofenceExists(identifier.toString()).then((bool result) {
-      return result;
-    }).catchError((error) {
-      print(error);
-      return false;
+  static Future<bool> checkIfGeofenceExists(int identifier) async {
+    bool result = false;
+
+    await bg.BackgroundGeolocation.geofenceExists(identifier.toString()).then((bool exists) {
+      result = exists;
     });
+
+    return result;
   }
 
   static void removeGeofence(int identifier) {

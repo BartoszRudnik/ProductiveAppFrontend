@@ -27,8 +27,8 @@ class _TaskWidgetState extends State<TaskWidget> {
     if (this.widget.task.notificationLocalizationId == null) {
       Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(this.widget.task);
     } else {
-      final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.widget.task.id);
-      final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.widget.task.id);
+      final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.widget.task.notificationLocalizationId);
+      final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.widget.task.notificationLocalizationId);
 
       Provider.of<TaskProvider>(context, listen: false).toggleTaskStatusWithGeolocation(this.widget.task, latitude, longitude);
     }
@@ -186,8 +186,8 @@ class _TaskWidgetState extends State<TaskWidget> {
               if (this.widget.task.notificationLocalizationId == null) {
                 Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
               } else {
-                final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.widget.task.id);
-                final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.widget.task.id);
+                final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.widget.task.notificationLocalizationId);
+                final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.widget.task.notificationLocalizationId);
 
                 Provider.of<TaskProvider>(context, listen: false).updateTaskWithGeolocation(this.widget.task, newLocation, longitude, latitude);
               }

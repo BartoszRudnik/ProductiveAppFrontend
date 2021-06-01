@@ -1,11 +1,11 @@
 import 'dart:convert';
 
-import 'package:flutter_background_geolocation/flutter_background_geolocation.dart';
-import 'package:global_configuration/global_configuration.dart';
 import 'package:flutter/foundation.dart';
+import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
-import 'package:productive_app/shared/notifications.dart';
-import 'package:productive_app/task_page/models/tag.dart';
+
+import '../../shared/notifications.dart';
+import '../models/tag.dart';
 import '../models/task.dart';
 
 class TaskProvider with ChangeNotifier {
@@ -35,7 +35,13 @@ class TaskProvider with ChangeNotifier {
 
   String _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
-  TaskProvider({@required this.userMail, @required this.authToken, @required this.taskList, @required this.taskPriorities, @required this.singleTask}) {
+  TaskProvider({
+    @required this.userMail,
+    @required this.authToken,
+    @required this.taskList,
+    @required this.taskPriorities,
+    @required this.singleTask,
+  }) {
     this.divideTasks();
   }
 
@@ -488,6 +494,35 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
+  Future<void> addGeofenceFromOtherDevice(Task task) async {
+    String url = this._serverUrl + 'localization/getCoordinates/${task.notificationLocalizationId}';
+
+    double latitude;
+    double longitude;
+
+    try {
+      final response = await http.get(url);
+      final responseBody = json.decode(response.body);
+
+      latitude = responseBody['latitude'];
+      longitude = responseBody['longitude'];
+
+      Notifications.addGeofence(
+        task.id,
+        latitude,
+        longitude,
+        task.notificationLocalizationRadius,
+        task.notificationOnEnter,
+        task.notificationOnExit,
+        task.title,
+        task.description,
+      );
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
   Future<void> fetchTasks() async {
     String url = this._serverUrl + 'task/getAll/${this.userMail}';
 
@@ -541,6 +576,12 @@ class TaskProvider with ChangeNotifier {
           task.notificationOnExit = element['tasks']['notificationOnExit'];
         } else {
           task.notificationLocalizationId = null;
+        }
+
+        final notificationExists = await Notifications.checkIfGeofenceExists(task.id);
+
+        if (task.localization != 'COMPLETED' && task.localization != 'TRASH' && !task.done && task.notificationLocalizationId != null && !notificationExists) {
+          this.addGeofenceFromOtherDevice(task);
         }
 
         if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
