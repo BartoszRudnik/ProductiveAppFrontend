@@ -45,7 +45,7 @@ class AuthProvider with ChangeNotifier {
     try {
       final response = await http.get(url);
 
-      final responseBody = json.decode(response.body);
+      final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
       this.user.firstName = responseBody['firstName'];
       this.user.lastName = responseBody['lastName'];
