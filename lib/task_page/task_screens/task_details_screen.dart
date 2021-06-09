@@ -556,7 +556,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                                   notificationRadius: this.taskToEdit.notificationLocalizationRadius,
                                   taskId: this.originalTask.id,
                                 ),
-                                Text('Notification'),
+                                Text('Location'),
                               ],
                             ),
                           ),
