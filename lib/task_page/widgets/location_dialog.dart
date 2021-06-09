@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:latlong/latlong.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
 
 import '../models/location.dart' as model;
 import '../providers/location_provider.dart';
@@ -59,8 +60,29 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
     controller.forward();
   }
 
+  void getUserLocation() async {
+    if (this.widget.choosenLocation.latitude == 0.0 && this.widget.choosenLocation.longitude == 0.0) {
+      bg.Location location = await bg.BackgroundGeolocation.getCurrentPosition(
+        timeout: 3,
+        maximumAge: 10000,
+        desiredAccuracy: 100,
+        samples: 3,
+      );
+
+      setState(() {
+        this.widget.choosenLocation.latitude = location.coords.latitude;
+        this.widget.choosenLocation.longitude = location.coords.longitude;
+      });
+
+      LatLng point = LatLng(this.widget.choosenLocation.latitude, this.widget.choosenLocation.longitude);
+      this._animatedMapMove(point, 18.0);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    this.getUserLocation();
+
     return StatefulBuilder(
       builder: (context, setState) {
         return AlertDialog(
@@ -108,7 +130,7 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
                   padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
                   child: Card(
                     child: Container(
-                      height: this.searchString.length > 2 ? 180 : 52,
+                      height: this.searchString != null && this.searchString.length > 2 ? 180 : 52,
                       child: Column(
                         children: [
                           TextField(
@@ -137,9 +159,9 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
                                     setState(
                                       () {
                                         LatLng point = LatLng(placemarks[index].value.latitude, placemarks[index].value.longitude);
-                                        widget.choosenLocation.latitude = point.latitude;
-                                        widget.choosenLocation.longitude = point.longitude;
-                                        _animatedMapMove(point, 15.0);
+                                        this.widget.choosenLocation.latitude = point.latitude;
+                                        this.widget.choosenLocation.longitude = point.longitude;
+                                        _animatedMapMove(point, 18.0);
                                         print(widget.choosenLocation.latitude.toString() + "," + widget.choosenLocation.longitude.toString());
                                         _textEditingController.clear();
                                         searchString = '';
