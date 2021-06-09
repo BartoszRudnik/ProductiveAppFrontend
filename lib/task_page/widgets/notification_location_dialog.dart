@@ -122,7 +122,15 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                                     context: context,
                                     builder: (context) {
                                       return LocationDialog(
-                                        choosenLocation: Location(id: -1, latitude: 0.0, longitude: 0.0, localizationName: 'test'),
+                                        choosenLocation: Location(
+                                          id: -1,
+                                          latitude: 0.0,
+                                          longitude: 0.0,
+                                          localizationName: 'test',
+                                          country: "",
+                                          locality: "",
+                                          street: "",
+                                        ),
                                       );
                                     },
                                   );

@@ -36,6 +36,14 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
     placemarks = Provider.of<LocationProvider>(context, listen: false).marks;
   }
 
+  Future<void> getAddress(double latitude, double longitude) async {
+    List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+
+    this.widget.choosenLocation.country = placemarks.first.country;
+    this.widget.choosenLocation.locality = placemarks.first.locality;
+    this.widget.choosenLocation.street = placemarks.first.street;
+  }
+
   void _animatedMapMove(LatLng destLocation, double destZoom) {
     final _latTween = Tween<double>(begin: _mapController.center.latitude, end: destLocation.latitude);
     final _lngTween = Tween<double>(begin: _mapController.center.longitude, end: destLocation.longitude);
@@ -72,6 +80,7 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
       setState(() {
         this.widget.choosenLocation.latitude = location.coords.latitude;
         this.widget.choosenLocation.longitude = location.coords.longitude;
+        this.getAddress(location.coords.latitude, location.coords.longitude);
       });
 
       LatLng point = LatLng(this.widget.choosenLocation.latitude, this.widget.choosenLocation.longitude);
@@ -100,6 +109,7 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
                         setState(() {
                           this.widget.choosenLocation.latitude = point.latitude;
                           this.widget.choosenLocation.longitude = point.longitude;
+                          this.getAddress(point.latitude, point.longitude);
                         });
                       },
                       center: LatLng(widget.choosenLocation.latitude, widget.choosenLocation.longitude),
@@ -159,10 +169,14 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
                                     setState(
                                       () {
                                         LatLng point = LatLng(placemarks[index].value.latitude, placemarks[index].value.longitude);
+                                        this._animatedMapMove(point, 18.0);
+
                                         this.widget.choosenLocation.latitude = point.latitude;
                                         this.widget.choosenLocation.longitude = point.longitude;
-                                        _animatedMapMove(point, 18.0);
-                                        print(widget.choosenLocation.latitude.toString() + "," + widget.choosenLocation.longitude.toString());
+                                        this.widget.choosenLocation.country = placemarks[index].key.country;
+                                        this.widget.choosenLocation.street = placemarks[index].key.street;
+                                        this.widget.choosenLocation.locality = placemarks[index].key.locality;
+
                                         _textEditingController.clear();
                                         searchString = '';
                                       },

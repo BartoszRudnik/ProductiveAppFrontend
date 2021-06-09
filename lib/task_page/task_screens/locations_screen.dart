@@ -48,7 +48,15 @@ class _LocationScreenState extends State<LocationsScreen> {
             context: context,
             builder: (context) {
               return LocationDialog(
-                choosenLocation: Location(id: -1, latitude: 0.0, longitude: 0.0, localizationName: 'test'),
+                choosenLocation: Location(
+                  id: -1,
+                  latitude: 0.0,
+                  longitude: 0.0,
+                  localizationName: 'test',
+                  country: "",
+                  locality: "",
+                  street: "",
+                ),
               );
             },
           );
@@ -118,9 +126,13 @@ class _LocationScreenState extends State<LocationsScreen> {
                 locations[index].localizationName,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
               ),
-              subtitle: Text(
-                locations[index].longitude.toString() + ", " + locations[index].latitude.toString(),
-              ),
+              subtitle: locations[index].locality.length <= 1 && locations[index].street.length <= 1
+                  ? Text(
+                      locations[index].latitude.toStringAsFixed(3) + ", " + locations[index].longitude.toStringAsFixed(3),
+                    )
+                  : Text(
+                      locations[index].locality + ", " + locations[index].street + ", " + locations[index].country,
+                    ),
             ),
           ),
         ),

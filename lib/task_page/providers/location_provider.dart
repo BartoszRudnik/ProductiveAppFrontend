@@ -53,6 +53,9 @@ class LocationProvider with ChangeNotifier {
           localizationName: element["localizationName"],
           longitude: element["longitude"],
           latitude: element["latitude"],
+          country: element["country"],
+          locality: element["locality"],
+          street: element["street"],
         );
         loadedLocations.add(loc);
       }
@@ -72,7 +75,14 @@ class LocationProvider with ChangeNotifier {
       final response = await http.post(
         url,
         body: json.encode(
-          {'localizationName': newLocation.localizationName, 'longitude': newLocation.longitude, 'latitude': newLocation.latitude},
+          {
+            'localizationName': newLocation.localizationName,
+            'longitude': newLocation.longitude,
+            'latitude': newLocation.latitude,
+            'street': newLocation.street,
+            'country': newLocation.country,
+            'locality': newLocation.locality,
+          },
         ),
         headers: {
           'content-type': 'application/json',
@@ -95,7 +105,14 @@ class LocationProvider with ChangeNotifier {
     try {
       await http.put(
         url,
-        body: json.encode({'localizationName': location.localizationName, 'longitude': location.longitude, 'latitude': location.latitude}),
+        body: json.encode({
+          'localizationName': location.localizationName,
+          'longitude': location.longitude,
+          'latitude': location.latitude,
+          'street': location.street,
+          'locality': location.locality,
+          'country': location.country,
+        }),
         headers: {
           'content-type': 'application/json',
           'accept': 'application/json',
@@ -130,7 +147,15 @@ class LocationProvider with ChangeNotifier {
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
         for (var element in responseBody) {
-          models.Location loc = models.Location(id: -1, localizationName: element["name"], longitude: double.parse(element["lon"]), latitude: double.parse(element["lat"]));
+          models.Location loc = models.Location(
+            id: -1,
+            localizationName: element["name"],
+            longitude: double.parse(element["lon"]),
+            latitude: double.parse(element["lat"]),
+            country: " ",
+            locality: " ",
+            street: " ",
+          );
           List<geocoding.Placemark> newMarks = await geocoding.placemarkFromCoordinates(loc.latitude, loc.longitude);
 
           for (var mark in newMarks) {
