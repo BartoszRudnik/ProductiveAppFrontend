@@ -74,7 +74,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
 
     return AlertDialog(
       content: Container(
-        height: 450,
+        height: this.location != null ? 462 : 410,
         width: 450,
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -84,27 +84,29 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
               child: Card(
                 elevation: 8,
                 child: Container(
-                  height: 114,
+                  height: this.location != null ? 125 : 70,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('Location'),
-                      this.location != null
-                          ? ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                elevation: 5,
-                                primary: Color.fromRGBO(201, 201, 206, 1),
-                                side: BorderSide(
-                                  color: Colors.grey.withOpacity(0.8),
-                                ),
+                      if (this.location != null)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 10),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              elevation: 5,
+                              primary: Color.fromRGBO(201, 201, 206, 1),
+                              side: BorderSide(
+                                color: Colors.grey.withOpacity(0.8),
                               ),
-                              onPressed: () {},
-                              child: Text(
-                                this.location.localizationName,
-                                style: TextStyle(fontSize: 14, color: Theme.of(context).primaryColor),
-                              ),
-                            )
-                          : Container(),
+                            ),
+                            onPressed: () {},
+                            child: Text(
+                              this.location.localizationName + ": " + this.location.locality + ", " + this.location.street,
+                              style: TextStyle(fontSize: 14, color: Theme.of(context).primaryColor),
+                            ),
+                          ),
+                        ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -151,6 +153,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                             padding: const EdgeInsets.only(bottom: 6),
                             child: Container(
                               height: 40,
+                              width: 102,
                               decoration: BoxDecoration(
                                 color: Theme.of(context).primaryColor,
                                 border: Border.all(
@@ -160,31 +163,44 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                                   Radius.circular(5),
                                 ),
                               ),
-                              child: DropdownButton(
-                                underline: Container(),
-                                hint: Text(
-                                  'Saved',
-                                  style: TextStyle(
-                                    color: Theme.of(context).accentColor,
-                                    fontSize: 14,
+                              child: DropdownButtonHideUnderline(
+                                child: ButtonTheme(
+                                  child: DropdownButton(
+                                    isExpanded: true,
+                                    hint: Text(
+                                      'Saved',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Theme.of(context).accentColor,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    items: locationsList.map(
+                                      (currentLocation) {
+                                        return DropdownMenuItem(
+                                          value: currentLocation,
+                                          child: Container(
+                                            margin: EdgeInsets.all(0),
+                                            padding: EdgeInsets.all(0),
+                                            width: double.infinity,
+                                            child: Flexible(
+                                              child: Text(
+                                                currentLocation.localizationName,
+                                                style: TextStyle(fontSize: 16),
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ).toList(),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        this.deleted = false;
+                                        this.location = value;
+                                      });
+                                    },
                                   ),
                                 ),
-                                items: locationsList.map(
-                                  (currentLocation) {
-                                    return DropdownMenuItem(
-                                      value: currentLocation,
-                                      child: Text(
-                                        currentLocation.localizationName,
-                                      ),
-                                    );
-                                  },
-                                ).toList(),
-                                onChanged: (value) {
-                                  setState(() {
-                                    this.deleted = false;
-                                    this.location = value;
-                                  });
-                                },
                               ),
                             ),
                           ),
