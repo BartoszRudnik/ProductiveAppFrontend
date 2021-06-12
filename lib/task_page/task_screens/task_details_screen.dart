@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:intl/intl.dart';
+import 'package:latlong/latlong.dart';
 import 'package:productive_app/shared/notifications.dart';
+import 'package:productive_app/task_page/widgets/new_task_notification_localization.dart';
+import 'package:productive_app/task_page/widgets/notification_location_dialog.dart';
 import 'package:provider/provider.dart';
 
 import '../../shared/dialogs.dart';
@@ -11,7 +15,6 @@ import '../providers/task_provider.dart';
 import '../utils/date_time_pickers.dart';
 import '../widgets/delegate_dialog.dart';
 import '../widgets/details_appBar.dart';
-import '../widgets/new_task_notification_localization.dart';
 import '../widgets/tags_dialog.dart';
 import '../widgets/task_tags_edit.dart';
 
@@ -22,24 +25,29 @@ class TaskDetailScreen extends StatefulWidget {
   _TaskDetailScreenState createState() => _TaskDetailScreenState();
 }
 
-class _TaskDetailScreenState extends State<TaskDetailScreen> {
+class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProviderStateMixin {
   FocusNode _descriptionFocus = new FocusNode();
   final _formKey = GlobalKey<FormState>();
   Task taskToEdit;
   Task originalTask;
 
+  MapController _mapController;
+
   TimeOfDay startTime;
   TimeOfDay endTime;
 
+  bool _locationChanged = false;
   bool _isValid = true;
   bool _isFocused = false;
   bool _isDescriptionInitial = true;
   String _description = "";
   DateFormat formatter = DateFormat("yyyy-MM-dd");
+
   @override
   void initState() {
     _descriptionFocus.addListener(onDescriptionFocusChange);
     taskToEdit = null;
+    _mapController = MapController();
     super.initState();
   }
 
@@ -48,7 +56,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       _isFocused = !_isFocused;
     });
     checkColor();
-    print("change");
   }
 
   void onDescriptionChanged(String text) {
@@ -242,6 +249,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
         this.taskToEdit.notificationLocalizationRadius = taskLocation.notificationRadius;
         this.taskToEdit.notificationOnEnter = taskLocation.notificationOnEnter;
         this.taskToEdit.notificationOnExit = taskLocation.notificationOnExit;
+
+        this._locationChanged = true;
       } else {
         this.taskToEdit.notificationLocalizationId = null;
         this.taskToEdit.notificationLocalizationRadius = 0.25;
@@ -264,6 +273,55 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     }
   }
 
+  void _animatedMapMove(LatLng destLocation, double destZoom) {
+    if (this._locationChanged) {
+      Tween<double> _latTween = Tween<double>(begin: 0, end: destLocation.latitude);
+      Tween<double> _lngTween = Tween<double>(begin: 0, end: destLocation.longitude);
+      Tween<double> _zoomTween = Tween<double>(begin: 16.5, end: 16.5);
+
+      if (this._mapController != null && this._mapController.center != null) {
+        _latTween = Tween<double>(begin: this._mapController.center.latitude, end: destLocation.latitude);
+        _lngTween = Tween<double>(begin: this._mapController.center.longitude, end: destLocation.longitude);
+      }
+
+      var controller = AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
+
+      Animation<double> animation = CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
+
+      controller.addListener(() {
+        this._mapController.move(LatLng(_latTween.evaluate(animation), _lngTween.evaluate(animation)), _zoomTween.evaluate(animation));
+      });
+
+      animation.addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          controller.dispose();
+        } else if (status == AnimationStatus.dismissed) {
+          controller.dispose();
+        }
+      });
+
+      controller.forward();
+    }
+  }
+
+  void setLocation() async {
+    final taskLocation = await showDialog(
+      context: context,
+      builder: (context) {
+        return NotificationLocationDialog(
+          key: UniqueKey(),
+          notificationLocationId: this.taskToEdit.notificationLocalizationId,
+          notificationOnEnter: this.taskToEdit.notificationOnEnter,
+          notificationOnExit: this.taskToEdit.notificationOnExit,
+          notificationRadius: this.taskToEdit.notificationLocalizationRadius,
+          taskId: this.taskToEdit.id,
+        );
+      },
+    );
+
+    this.setNotificationLocalization(taskLocation);
+  }
+
   void setDelegatedEmail() async {
     String value = await showDialog(
       context: context,
@@ -271,8 +329,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
         return DelegateDialog(choosenMail: this.taskToEdit.delegatedEmail);
       },
     );
-
-    print(value);
 
     if (value != null) {
       this.taskToEdit.delegatedEmail = value;
@@ -340,6 +396,18 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       if (_description.isNotEmpty && _description.trim() != '') {
         onDescriptionChanged(taskToEdit.description);
       }
+    }
+
+    double latitude = -1;
+    double longitude = -1;
+
+    if (this.taskToEdit.notificationLocalizationId != null) {
+      latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.taskToEdit.notificationLocalizationId);
+      longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.taskToEdit.notificationLocalizationId);
+
+      LatLng point = LatLng(latitude, longitude);
+
+      this._animatedMapMove(point, 16.5);
     }
 
     return Scaffold(
@@ -459,7 +527,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                           ),
                         ),
                       ),
-                      Expanded(flex: 2, child: SizedBox()),
+                      Expanded(flex: 1, child: SizedBox()),
                       Expanded(
                         flex: 5,
                         child: SizedBox(
@@ -479,13 +547,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Row(
-                    children: [
+                      Expanded(flex: 1, child: SizedBox()),
                       Expanded(
                         flex: 5,
                         child: SizedBox(
@@ -528,41 +590,90 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                           ),
                         ),
                       ),
-                      Expanded(flex: 2, child: SizedBox()),
-                      Expanded(
-                        flex: 5,
-                        child: SizedBox(
-                          height: 100,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Color.fromRGBO(221, 221, 226, 1),
-                              borderRadius: BorderRadius.circular(3),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.8),
-                                  offset: Offset(0.0, 1.0),
-                                  blurRadius: 1.0,
-                                )
-                              ],
+                    ],
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  Container(
+                    height: 150,
+                    child: Stack(
+                      children: [
+                        Container(
+                          height: 150,
+                          width: double.infinity,
+                          child: FlutterMap(
+                            mapController: this._mapController,
+                            options: MapOptions(
+                              interactive: false,
+                              center: this.taskToEdit.notificationLocalizationId != null ? LatLng(latitude, longitude) : LatLng(0, 0),
+                              zoom: 16.5,
                             ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                NewTaskNotificationLocalization(
-                                  setNotificationLocalization: this.setNotificationLocalization,
-                                  notificationLocalizationId: this.taskToEdit.notificationLocalizationId,
-                                  notificationOnEnter: this.taskToEdit.notificationOnEnter,
-                                  notificationOnExit: this.taskToEdit.notificationOnExit,
-                                  notificationRadius: this.taskToEdit.notificationLocalizationRadius,
-                                  taskId: this.originalTask.id,
-                                ),
-                                Text('Location'),
-                              ],
-                            ),
+                            layers: [
+                              TileLayerOptions(
+                                urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                                subdomains: ['a', 'b', 'c'],
+                              ),
+                              MarkerLayerOptions(
+                                markers: [
+                                  Marker(
+                                    width: 150.0,
+                                    height: 150.0,
+                                    point: LatLng(latitude, longitude),
+                                    builder: (context) => Icon(
+                                      Icons.location_on,
+                                      color: Colors.red,
+                                    ),
+                                  )
+                                ],
+                              )
+                            ],
                           ),
                         ),
-                      ),
-                    ],
+                        if (this.taskToEdit.notificationLocalizationId == null)
+                          Expanded(
+                            flex: 5,
+                            child: Container(
+                              height: 150,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Color.fromRGBO(221, 221, 226, 1),
+                                borderRadius: BorderRadius.circular(3),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.8),
+                                    offset: Offset(0.0, 1.0),
+                                    blurRadius: 1.0,
+                                  )
+                                ],
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  NewTaskNotificationLocalization(
+                                    bigIcon: true,
+                                    setNotificationLocalization: this.setNotificationLocalization,
+                                    notificationLocalizationId: this.taskToEdit.notificationLocalizationId,
+                                    notificationOnEnter: this.taskToEdit.notificationOnEnter,
+                                    notificationOnExit: this.taskToEdit.notificationOnExit,
+                                    notificationRadius: this.taskToEdit.notificationLocalizationRadius,
+                                    taskId: this.originalTask.id,
+                                  ),
+                                  Text(
+                                    'Tap to add location',
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        GestureDetector(
+                          onTap: () {
+                            this.setLocation();
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                   ListTile(
                     minLeadingWidth: 16,

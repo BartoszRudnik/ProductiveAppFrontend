@@ -10,7 +10,10 @@ class NewTaskNotificationLocalization extends StatefulWidget {
   final bool notificationOnExit;
   final int taskId;
 
+  bool bigIcon = false;
+
   NewTaskNotificationLocalization({
+    this.bigIcon,
     @required this.setNotificationLocalization,
     @required this.notificationLocalizationId,
     @required this.notificationOnEnter,
@@ -27,7 +30,10 @@ class _NewTaskNotificationLocalizationState extends State<NewTaskNotificationLoc
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: Icon(Icons.map_outlined),
+      icon: Icon(
+        Icons.map_outlined,
+        size: this.widget.bigIcon != null && this.widget.bigIcon ? 32 : 24,
+      ),
       onPressed: () async {
         final taskLocation = await showDialog(
           context: context,
