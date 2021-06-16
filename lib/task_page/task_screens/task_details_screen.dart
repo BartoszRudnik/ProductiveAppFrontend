@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong/latlong.dart';
-import 'package:productive_app/shared/notifications.dart';
-import 'package:productive_app/task_page/widgets/new_task_notification_localization.dart';
-import 'package:productive_app/task_page/widgets/notification_location_dialog.dart';
 import 'package:provider/provider.dart';
 
 import '../../shared/dialogs.dart';
+import '../../shared/notifications.dart';
 import '../models/task.dart';
 import '../models/taskLocation.dart';
 import '../providers/location_provider.dart';
@@ -15,6 +13,8 @@ import '../providers/task_provider.dart';
 import '../utils/date_time_pickers.dart';
 import '../widgets/delegate_dialog.dart';
 import '../widgets/details_appBar.dart';
+import '../widgets/new_task_notification_localization.dart';
+import '../widgets/notification_location_dialog.dart';
 import '../widgets/tags_dialog.dart';
 import '../widgets/task_tags_edit.dart';
 
@@ -253,7 +253,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         this._locationChanged = true;
       } else {
         this.taskToEdit.notificationLocalizationId = null;
-        this.taskToEdit.notificationLocalizationRadius = 0.25;
+        this.taskToEdit.notificationLocalizationRadius = 0.1;
         this.taskToEdit.notificationOnEnter = false;
         this.taskToEdit.notificationOnExit = false;
       }
@@ -277,7 +277,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     if (this._locationChanged) {
       Tween<double> _latTween = Tween<double>(begin: 0, end: destLocation.latitude);
       Tween<double> _lngTween = Tween<double>(begin: 0, end: destLocation.longitude);
-      Tween<double> _zoomTween = Tween<double>(begin: 16.5, end: 16.5);
+      Tween<double> _zoomTween = Tween<double>(begin: destZoom, end: destZoom);
 
       if (this._mapController != null && this._mapController.center != null) {
         _latTween = Tween<double>(begin: this._mapController.center.latitude, end: destLocation.latitude);
@@ -407,7 +407,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
 
       LatLng point = LatLng(latitude, longitude);
 
-      this._animatedMapMove(point, 16.5);
+      this._animatedMapMove(point, 15.5);
+
+      print(this.taskToEdit.notificationLocalizationRadius * 1000);
     }
 
     return Scaffold(
@@ -596,18 +598,18 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                     height: 15,
                   ),
                   Container(
-                    height: 150,
+                    height: 175,
                     child: Stack(
                       children: [
                         Container(
-                          height: 150,
+                          height: 175,
                           width: double.infinity,
                           child: FlutterMap(
                             mapController: this._mapController,
                             options: MapOptions(
                               interactive: false,
                               center: this.taskToEdit.notificationLocalizationId != null ? LatLng(latitude, longitude) : LatLng(0, 0),
-                              zoom: 16.5,
+                              zoom: 15.5,
                             ),
                             layers: [
                               TileLayerOptions(
@@ -626,7 +628,18 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                                     ),
                                   )
                                 ],
-                              )
+                              ),
+                              CircleLayerOptions(
+                                circles: [
+                                  CircleMarker(
+                                    point: LatLng(latitude, longitude),
+                                    color: Colors.blueGrey.withOpacity(0.4),
+                                    borderStrokeWidth: 3.0,
+                                    borderColor: Colors.grey,
+                                    radius: this.taskToEdit.notificationLocalizationRadius * 1000 / 2,
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
                         ),
@@ -634,7 +647,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                           Expanded(
                             flex: 5,
                             child: Container(
-                              height: 150,
+                              height: 175,
                               width: double.infinity,
                               decoration: BoxDecoration(
                                 color: Color.fromRGBO(221, 221, 226, 1),

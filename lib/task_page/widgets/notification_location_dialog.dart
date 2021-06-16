@@ -30,7 +30,7 @@ class NotificationLocationDialog extends StatefulWidget {
 }
 
 class _NotificationLocationDialogState extends State<NotificationLocationDialog> {
-  double notificationRadius = 0.25;
+  double notificationRadius = 0.1;
   bool notificationOnEnter = false;
   bool notificationOnExit = false;
   Location location;
@@ -222,10 +222,10 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                     children: [
                       Text('Change notification range'),
                       Slider(
-                        divisions: 19,
+                        divisions: 49,
                         activeColor: Theme.of(context).primaryColor,
                         inactiveColor: Color.fromRGBO(0, 0, 0, 0.3),
-                        min: 0.25,
+                        min: 0.1,
                         max: 5.0,
                         value: this.notificationRadius,
                         onChanged: (newRadius) {
