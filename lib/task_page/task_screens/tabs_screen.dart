@@ -42,6 +42,8 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
       return 'ANYTIME';
     } else if (this._selectedPageIndex == 2) {
       return 'SCHEDULED';
+    } else if (this._selectedPageIndex == 3) {
+      return 'DELEGATED';
     }
   }
 

@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/shared/notifications.dart';
-import 'package:productive_app/task_page/models/taskLocation.dart';
-import 'package:productive_app/task_page/providers/location_provider.dart';
-import 'package:productive_app/task_page/widgets/new_task_notification_localization.dart';
 import 'package:provider/provider.dart';
 
 import '../../shared/dialogs.dart';
 import '../models/tag.dart';
 import '../models/task.dart';
+import '../models/taskLocation.dart';
+import '../providers/location_provider.dart';
 import '../providers/task_provider.dart';
 import 'add_task_button.dart';
 import 'full_screen_button.dart';
 import 'is_done_button.dart';
+import 'new_task_notification_localization.dart';
 import 'new_task_tags.dart';
 import 'task_date.dart';
 import 'task_delegate.dart';

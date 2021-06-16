@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
-import 'package:productive_app/shared/notifications.dart';
 import 'package:provider/provider.dart';
 
 import 'login/providers/auth_provider.dart';
@@ -9,6 +8,7 @@ import 'login/screens/login_screen.dart';
 import 'login/screens/new_password.dart';
 import 'login/screens/reset_password.dart';
 import 'login/screens/splash_screen.dart';
+import 'shared/notifications.dart';
 import 'task_page/models/settings.dart';
 import 'task_page/models/task.dart';
 import 'task_page/providers/delegate_provider.dart';

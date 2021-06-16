@@ -629,17 +629,18 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                                   )
                                 ],
                               ),
-                              CircleLayerOptions(
-                                circles: [
-                                  CircleMarker(
-                                    point: LatLng(latitude, longitude),
-                                    color: Colors.blueGrey.withOpacity(0.4),
-                                    borderStrokeWidth: 3.0,
-                                    borderColor: Colors.grey,
-                                    radius: this.taskToEdit.notificationLocalizationRadius * 1000 / 2,
-                                  ),
-                                ],
-                              ),
+                              if (this.taskToEdit.notificationLocalizationRadius != null)
+                                CircleLayerOptions(
+                                  circles: [
+                                    CircleMarker(
+                                      point: LatLng(latitude, longitude),
+                                      color: Colors.blueGrey.withOpacity(0.4),
+                                      borderStrokeWidth: 3.0,
+                                      borderColor: Colors.grey,
+                                      radius: this.taskToEdit.notificationLocalizationRadius * 1000 / 2,
+                                    ),
+                                  ],
+                                ),
                             ],
                           ),
                         ),
