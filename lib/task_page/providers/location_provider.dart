@@ -25,11 +25,23 @@ class LocationProvider with ChangeNotifier {
   });
 
   double getLongitude(int id) {
-    return this.locationList.firstWhere((element) => element.id == id).longitude;
+    final location = this.locationList.firstWhere((element) => element.id == id, orElse: () => null);
+
+    if (location != null) {
+      return location.longitude;
+    } else {
+      return null;
+    }
   }
 
   double getLatitude(int id) {
-    return this.locationList.firstWhere((element) => element.id == id).latitude;
+    final location = this.locationList.firstWhere((element) => element.id == id, orElse: () => null);
+
+    if (location != null) {
+      return location.latitude;
+    } else {
+      return null;
+    }
   }
 
   List<models.Location> get locations {

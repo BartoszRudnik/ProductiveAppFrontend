@@ -405,11 +405,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.taskToEdit.notificationLocalizationId);
       longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.taskToEdit.notificationLocalizationId);
 
-      LatLng point = LatLng(latitude, longitude);
-
-      this._animatedMapMove(point, 15.5);
-
-      print(this.taskToEdit.notificationLocalizationRadius * 1000);
+      if (latitude != null && longitude != null) {
+        LatLng point = LatLng(latitude, longitude);
+        this._animatedMapMove(point, 15.5);
+      }
     }
 
     return Scaffold(
@@ -601,50 +600,51 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                     height: 175,
                     child: Stack(
                       children: [
-                        Container(
-                          height: 175,
-                          width: double.infinity,
-                          child: FlutterMap(
-                            mapController: this._mapController,
-                            options: MapOptions(
-                              interactive: false,
-                              center: this.taskToEdit.notificationLocalizationId != null ? LatLng(latitude, longitude) : LatLng(0, 0),
-                              zoom: 15.5,
-                            ),
-                            layers: [
-                              TileLayerOptions(
-                                urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                                subdomains: ['a', 'b', 'c'],
+                        if (this.taskToEdit.notificationLocalizationId != null && latitude != null && longitude != null)
+                          Container(
+                            height: 175,
+                            width: double.infinity,
+                            child: FlutterMap(
+                              mapController: this._mapController,
+                              options: MapOptions(
+                                interactive: false,
+                                center: this.taskToEdit.notificationLocalizationId != null ? LatLng(latitude, longitude) : LatLng(0, 0),
+                                zoom: 15.5,
                               ),
-                              MarkerLayerOptions(
-                                markers: [
-                                  Marker(
-                                    width: 150.0,
-                                    height: 150.0,
-                                    point: LatLng(latitude, longitude),
-                                    builder: (context) => Icon(
-                                      Icons.location_on,
-                                      color: Colors.red,
-                                    ),
-                                  )
-                                ],
-                              ),
-                              if (this.taskToEdit.notificationLocalizationRadius != null)
-                                CircleLayerOptions(
-                                  circles: [
-                                    CircleMarker(
+                              layers: [
+                                TileLayerOptions(
+                                  urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                                  subdomains: ['a', 'b', 'c'],
+                                ),
+                                MarkerLayerOptions(
+                                  markers: [
+                                    Marker(
+                                      width: 150.0,
+                                      height: 150.0,
                                       point: LatLng(latitude, longitude),
-                                      color: Colors.blueGrey.withOpacity(0.4),
-                                      borderStrokeWidth: 3.0,
-                                      borderColor: Colors.grey,
-                                      radius: this.taskToEdit.notificationLocalizationRadius * 1000 / 2,
-                                    ),
+                                      builder: (context) => Icon(
+                                        Icons.location_on,
+                                        color: Colors.red,
+                                      ),
+                                    )
                                   ],
                                 ),
-                            ],
+                                if (this.taskToEdit.notificationLocalizationRadius != null)
+                                  CircleLayerOptions(
+                                    circles: [
+                                      CircleMarker(
+                                        point: LatLng(latitude, longitude),
+                                        color: Colors.blueGrey.withOpacity(0.4),
+                                        borderStrokeWidth: 3.0,
+                                        borderColor: Colors.grey,
+                                        radius: this.taskToEdit.notificationLocalizationRadius * 1000 / 2,
+                                      ),
+                                    ],
+                                  ),
+                              ],
+                            ),
                           ),
-                        ),
-                        if (this.taskToEdit.notificationLocalizationId == null)
+                        if (this.taskToEdit.notificationLocalizationId == null || longitude == null || latitude == null)
                           Expanded(
                             flex: 5,
                             child: Container(

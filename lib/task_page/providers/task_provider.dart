@@ -957,7 +957,9 @@ class TaskProvider with ChangeNotifier {
     String description,
   ) {
     Notifications.removeGeofence(taskId);
-    Notifications.addGeofence(taskId, latitude, longitude, notificationRadius, onEnter, onExit, title, description);
+    if (taskId != null && latitude != null && longitude != null && notificationRadius != null) {
+      Notifications.addGeofence(taskId, latitude, longitude, notificationRadius, onEnter, onExit, title, description);
+    }
   }
 
   int countInboxDelegated() {
