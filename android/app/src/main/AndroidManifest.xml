@@ -8,9 +8,9 @@
         
    
         tools:replace="android:label"
-        android:label="productive_app"
+        android:label="Productive App"
         android:usesCleartextTraffic="true"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
         <activity
 
         

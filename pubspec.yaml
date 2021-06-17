@@ -39,10 +39,16 @@ dependencies:
   positioned_tap_detector_2: ^1.0.0  
   flutter_background_geolocation: ^2.0.5  
   flutter_local_notifications: ^4.0.1+2
+  flutter_launcher_icons: ^0.7.5
   
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
+
+flutter_icons:
+    android: "launcher_icon" 
+    ios: true
+    image_path: "assets/images/clipboard.png"
 
 dev_dependencies:
   flutter_test:
@@ -61,7 +67,9 @@ flutter:
   
   assets:
     - assets/cfg/
-    - assets/images/logo.png
+    - assets/images/clipboard.png
+
+  
     
   fonts:             
     - family: Lato

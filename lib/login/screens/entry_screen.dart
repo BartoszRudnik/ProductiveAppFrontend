@@ -18,9 +18,9 @@ class EntryScreen extends StatelessWidget {
         children: <Widget>[
           Container(
             width: double.infinity,
-            height: 89,
+            height: 100,
             child: Image(
-              image: AssetImage('assets/images/logo.png'),
+              image: AssetImage('assets/images/clipboard.png'),
               fit: BoxFit.fitHeight,
             ),
           ),
