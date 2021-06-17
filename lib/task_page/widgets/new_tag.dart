@@ -4,11 +4,10 @@ import 'package:productive_app/task_page/providers/tag_provider.dart';
 import 'package:productive_app/task_page/providers/task_provider.dart';
 import 'package:provider/provider.dart';
 
-class NewTag extends StatelessWidget {
+class NewTag extends StatefulWidget {
   int tagsLength;
   String initialValue;
   bool editMode;
-  final _formKey = GlobalKey<FormState>();
 
   NewTag({
     @required this.tagsLength,
@@ -17,6 +16,13 @@ class NewTag extends StatelessWidget {
   });
 
   @override
+  State<StatefulWidget> createState() => _NewTagState();
+}
+
+class _NewTagState extends State<NewTag> {
+  final _formKey = GlobalKey<FormState>();
+  
+  @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 20),
@@ -24,16 +30,16 @@ class NewTag extends StatelessWidget {
         key: this._formKey,
         child: ListTile(
           title: TextFormField(
-            initialValue: editMode ? this.initialValue : ' ',
+            initialValue: widget.editMode ? widget.initialValue : ' ',
             autofocus: true,
             key: ValueKey('TagName'),
             onSaved: (value) {
-              if (!editMode) {
-                Tag newTag = Tag(id: this.tagsLength + 1, name: value);
+              if (!widget.editMode) {
+                Tag newTag = Tag(id: widget.tagsLength + 1, name: value);
                 Provider.of<TagProvider>(context, listen: false).addTag(newTag);
               } else {
-                Provider.of<TagProvider>(context, listen: false).updateTag(value, this.initialValue);
-                Provider.of<TaskProvider>(context, listen: false).editTag(this.initialValue, value);
+                Provider.of<TagProvider>(context, listen: false).updateTag(value, widget.initialValue);
+                Provider.of<TaskProvider>(context, listen: false).editTag(widget.initialValue, value);
                 Navigator.of(context).pop();
               }
             },

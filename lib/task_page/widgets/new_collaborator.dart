@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:productive_app/task_page/providers/delegate_provider.dart';
 import 'package:provider/provider.dart';
 
-class NewCollaborator extends StatelessWidget {
-  final _formKey = GlobalKey<FormState>();
+class NewCollaborator extends StatefulWidget {
+    @override
+  State<StatefulWidget> createState() => _NewCollaboratorState();
+}
 
+class _NewCollaboratorState extends State<NewCollaborator> {
+  final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -117,4 +121,6 @@ class NewCollaborator extends StatelessWidget {
       ),
     );
   }
+
+
 }
