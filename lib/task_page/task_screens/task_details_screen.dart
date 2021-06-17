@@ -31,7 +31,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
   Task taskToEdit;
   Task originalTask;
 
-  MapController _mapController;
+  final MapController _mapController = MapController();
+  bool mapControllerReady = false;
 
   TimeOfDay startTime;
   TimeOfDay endTime;
@@ -47,7 +48,11 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
   void initState() {
     _descriptionFocus.addListener(onDescriptionFocusChange);
     taskToEdit = null;
-    _mapController = MapController();
+    this._mapController.onReady.then((_) {
+      setState(() {
+        this.mapControllerReady = true;
+      });
+    });
     super.initState();
   }
 
@@ -251,12 +256,16 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         this.taskToEdit.notificationOnExit = taskLocation.notificationOnExit;
 
         this._locationChanged = true;
-      } else {
-        this.taskToEdit.notificationLocalizationId = null;
-        this.taskToEdit.notificationLocalizationRadius = 0.1;
-        this.taskToEdit.notificationOnEnter = false;
-        this.taskToEdit.notificationOnExit = false;
       }
+    });
+  }
+
+  void deleteNotificationLocalization() {
+    setState(() {
+      this.taskToEdit.notificationLocalizationId = null;
+      this.taskToEdit.notificationLocalizationRadius = 0.1;
+      this.taskToEdit.notificationOnEnter = false;
+      this.taskToEdit.notificationOnExit = false;
     });
   }
 
@@ -279,7 +288,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       Tween<double> _lngTween = Tween<double>(begin: 0, end: destLocation.longitude);
       Tween<double> _zoomTween = Tween<double>(begin: destZoom, end: destZoom);
 
-      if (this._mapController != null && this._mapController.center != null) {
+      if (this.mapControllerReady && this._mapController != null && this._mapController.center != null) {
         _latTween = Tween<double>(begin: this._mapController.center.latitude, end: destLocation.latitude);
         _lngTween = Tween<double>(begin: this._mapController.center.longitude, end: destLocation.longitude);
       }
@@ -288,9 +297,11 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
 
       Animation<double> animation = CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
 
-      controller.addListener(() {
-        this._mapController.move(LatLng(_latTween.evaluate(animation), _lngTween.evaluate(animation)), _zoomTween.evaluate(animation));
-      });
+      if (this._mapController != null) {
+        controller.addListener(() {
+          this._mapController.move(LatLng(_latTween.evaluate(animation), _lngTween.evaluate(animation)), _zoomTween.evaluate(animation));
+        });
+      }
 
       animation.addStatusListener((status) {
         if (status == AnimationStatus.completed) {
@@ -319,7 +330,11 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       },
     );
 
-    this.setNotificationLocalization(taskLocation);
+    if (taskLocation == -1) {
+      this.deleteNotificationLocalization();
+    } else {
+      this.setNotificationLocalization(taskLocation);
+    }
   }
 
   void setDelegatedEmail() async {
@@ -405,9 +420,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.taskToEdit.notificationLocalizationId);
       longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.taskToEdit.notificationLocalizationId);
 
-      if (latitude != null && longitude != null) {
+      if (latitude != null && longitude != null && this.mapControllerReady) {
         LatLng point = LatLng(latitude, longitude);
-        this._animatedMapMove(point, 15.5);
+        this._animatedMapMove(point, 15);
       }
     }
 
@@ -600,16 +615,16 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                     height: 175,
                     child: Stack(
                       children: [
-                        if (this.taskToEdit.notificationLocalizationId != null && latitude != null && longitude != null)
+                        if (this.taskToEdit.notificationLocalizationId != null && latitude != null && longitude != null && this._mapController != null)
                           Container(
                             height: 175,
                             width: double.infinity,
                             child: FlutterMap(
                               mapController: this._mapController,
                               options: MapOptions(
-                                interactive: false,
+                                interactive: true,
                                 center: this.taskToEdit.notificationLocalizationId != null ? LatLng(latitude, longitude) : LatLng(0, 0),
-                                zoom: 15.5,
+                                zoom: 15,
                               ),
                               layers: [
                                 TileLayerOptions(
@@ -637,7 +652,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                                         color: Colors.blueGrey.withOpacity(0.4),
                                         borderStrokeWidth: 3.0,
                                         borderColor: Colors.grey,
-                                        radius: this.taskToEdit.notificationLocalizationRadius * 1000 / 2,
+                                        useRadiusInMeter: true,
+                                        radius: this.taskToEdit.notificationLocalizationRadius * 1000,
                                       ),
                                     ],
                                   ),

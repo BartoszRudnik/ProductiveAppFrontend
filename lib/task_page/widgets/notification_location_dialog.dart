@@ -348,6 +348,8 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                         );
 
                         Navigator.of(context).pop(returnLocation);
+                      } else if (this.deleted && this.widget.taskId != null) {
+                        Navigator.of(context).pop(-1);
                       } else {
                         Navigator.of(context).pop(null);
                       }
