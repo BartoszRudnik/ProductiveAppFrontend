@@ -139,8 +139,10 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
                   child: Card(
-                    child: Container(
-                      height: this.searchString != null && this.searchString.length > 2 ? 180 : 52,
+                    child: AnimatedContainer(
+                      duration: Duration(milliseconds: 400),
+                      curve: Curves.easeInOut,
+                      height: (this.searchString != null && this.searchString.length > 2) ? 180 : 52,
                       child: Column(
                         children: [
                           TextField(
