@@ -31,6 +31,7 @@ class NewTask extends StatefulWidget {
 }
 
 class _NewTaskState extends State<NewTask> {
+  double _screenHeight;
   var _isFullScreen = false;
   var _isValid = true;
 
@@ -104,9 +105,17 @@ class _NewTaskState extends State<NewTask> {
   }
 
   void setFullScreen() {
-    setState(() {
-      this._isFullScreen = !this._isFullScreen;
-    });
+    setState(
+      () {
+        this._isFullScreen = !this._isFullScreen;
+
+        if (this._isFullScreen) {
+          this._screenHeight = MediaQuery.of(context).size.height * 0.95;
+        } else {
+          this._screenHeight = MediaQuery.of(context).size.height * 0.33;
+        }
+      },
+    );
   }
 
   void setTags(List<Tag> newTags) {
@@ -211,88 +220,88 @@ class _NewTaskState extends State<NewTask> {
 
     return LayoutBuilder(
       builder: (context, constraint) {
-        return SingleChildScrollView(
-          child: Container(
-            height: this._isFullScreen ? MediaQuery.of(context).size.height - 25 : null,
-            padding: EdgeInsets.symmetric(
-              horizontal: 20,
-            ),
-            child: Form(
-              key: this._formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ListTile(
-                    isThreeLine: true,
-                    horizontalTitleGap: 5,
-                    minLeadingWidth: 20,
-                    contentPadding: EdgeInsets.all(0),
-                    leading: IsDoneButton(
-                      isDone: this._isDone,
-                      changeIsDoneStatus: this.changeIsDone,
+        return AnimatedContainer(
+          curve: Curves.easeInOut,
+          duration: Duration(milliseconds: 300),
+          height: this._screenHeight == null ? MediaQuery.of(context).size.height * 0.33 : this._screenHeight,
+          padding: EdgeInsets.symmetric(
+            horizontal: 20,
+          ),
+          child: Form(
+            key: this._formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ListTile(
+                  isThreeLine: true,
+                  horizontalTitleGap: 5,
+                  minLeadingWidth: 20,
+                  contentPadding: EdgeInsets.all(0),
+                  leading: IsDoneButton(
+                    isDone: this._isDone,
+                    changeIsDoneStatus: this.changeIsDone,
+                  ),
+                  title: TaskTitle(setTaskName: this.setTaskName),
+                  trailing: FullScreenButton(setFullScreen: this.setFullScreen),
+                  subtitle: TaskDescription(setTaskDescription: this.setTaskDescription),
+                ),
+                Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        TaskPriority(
+                          setTaskPriority: this.setPriority,
+                          priority: this._priority,
+                          priorities: priorities,
+                        ),
+                        TaskDate(
+                          startValue: this._startDate,
+                          endValue: this._endDate,
+                          startTime: this._startTime,
+                          endTime: this._endTime,
+                          setDate: this.setDate,
+                        ),
+                        NewTaskTags(
+                          setTags: this.setTags,
+                          finalTags: this._finalTags,
+                        ),
+                        NewTaskNotificationLocalization(
+                          setNotificationLocalization: this.setNotificationLocalization,
+                          notificationLocalizationId: this._notificationLocalizationId,
+                          notificationOnEnter: this._notificationOnEnter,
+                          notificationOnExit: this._notificationOnExit,
+                          notificationRadius: this._notificationLocalizationRadius,
+                        ),
+                        TaskDelegate(
+                          setDelegatedEmail: this.setDelegatedEmail,
+                          collaboratorEmail: this._delegatedEmail,
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.attach_file_outlined),
+                          onPressed: () {},
+                        ),
+                      ],
                     ),
-                    title: TaskTitle(setTaskName: this.setTaskName),
-                    trailing: FullScreenButton(setFullScreen: this.setFullScreen),
-                    subtitle: TaskDescription(setTaskDescription: this.setTaskDescription),
-                  ),
-                  Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          TaskPriority(
-                            setTaskPriority: this.setPriority,
-                            priority: this._priority,
-                            priorities: priorities,
-                          ),
-                          TaskDate(
-                            startValue: this._startDate,
-                            endValue: this._endDate,
-                            startTime: this._startTime,
-                            endTime: this._endTime,
-                            setDate: this.setDate,
-                          ),
-                          NewTaskTags(
-                            setTags: this.setTags,
-                            finalTags: this._finalTags,
-                          ),
-                          NewTaskNotificationLocalization(
-                            setNotificationLocalization: this.setNotificationLocalization,
-                            notificationLocalizationId: this._notificationLocalizationId,
-                            notificationOnEnter: this._notificationOnEnter,
-                            notificationOnExit: this._notificationOnExit,
-                            notificationRadius: this._notificationLocalizationRadius,
-                          ),
-                          TaskDelegate(
-                            setDelegatedEmail: this.setDelegatedEmail,
-                            collaboratorEmail: this._delegatedEmail,
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.attach_file_outlined),
-                            onPressed: () {},
-                          ),
-                        ],
-                      ),
-                      Divider(
-                        thickness: 1.5,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          TaskLocalization(
-                            localization: this._localization,
-                            localizations: localizations,
-                            setLocalization: this.setLocalization,
-                          ),
-                          AddTaskButton(addNewTask: this._addNewTask),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                    Divider(
+                      thickness: 1.5,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TaskLocalization(
+                          localization: this._localization,
+                          localizations: localizations,
+                          setLocalization: this.setLocalization,
+                        ),
+                        AddTaskButton(addNewTask: this._addNewTask),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         );
