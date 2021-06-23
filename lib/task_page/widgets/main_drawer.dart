@@ -44,23 +44,24 @@ class _MainDrawerState extends State<MainDrawer> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            !user.removed
-                ? Container(
-                    width: 100,
-                    height: 100,
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundImage: user.userImage != null ? user.userImage : null,
-                    ),
-                  )
-                : Container(
-                    width: 100,
-                    height: 100,
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Theme.of(context).primaryColor,
-                    ),
-                  ),
+            if (!user.removed)
+              Container(
+                width: 100,
+                height: 100,
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundImage: user.userImage != null ? user.userImage : null,
+                ),
+              )
+            else
+              Container(
+                width: 100,
+                height: 100,
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundImage: AssetImage('assets/images/profile_placeholder.jpg'),
+                ),
+              ),
             Container(
               alignment: Alignment.centerLeft,
               width: 180,

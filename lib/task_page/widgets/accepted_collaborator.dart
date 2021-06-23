@@ -99,9 +99,12 @@ class AcceptedCollaborator extends StatelessWidget {
       child: Card(
         child: ListTile(
           leading: Container(
-            child: CircleAvatar(
-              radius: 25,
-              backgroundImage: NetworkImage(this._serverUrl + 'userImage/getImage/${this.collaborator.email}'),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(25),
+              child: FadeInImage(
+                image: NetworkImage(this._serverUrl + 'userImage/getImage/${this.collaborator.email}'),
+                placeholder: AssetImage('assets/images/profile_placeholder.jpg'),
+              ),
             ),
           ),
           title: Text(

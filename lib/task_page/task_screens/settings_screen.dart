@@ -382,7 +382,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     height: 100,
                                     child: CircleAvatar(
                                       radius: 50,
-                                      backgroundColor: Theme.of(context).primaryColor,
+                                      backgroundImage: AssetImage('assets/images/profile_placeholder.jpg'),
                                     ),
                                   ),
                           ),

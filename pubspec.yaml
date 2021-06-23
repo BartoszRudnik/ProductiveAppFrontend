@@ -68,6 +68,7 @@ flutter:
   assets:
     - assets/cfg/
     - assets/images/clipboard.png
+    - assets/images/profile_placeholder.jpg
 
   
     

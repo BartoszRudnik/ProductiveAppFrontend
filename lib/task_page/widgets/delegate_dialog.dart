@@ -172,7 +172,13 @@ class DelegateDialog extends StatelessWidget {
                           child: Padding(
                             padding: EdgeInsets.all(10),
                             child: ListTile(
-                              leading: CircleAvatar(radius: 25, backgroundImage: NetworkImage(this._serverUrl + 'userImage/getImage/${filteredCollaborators[collaboratorIndex].email}')),
+                              leading: ClipRRect(
+                                borderRadius: BorderRadius.circular(25),
+                                child: FadeInImage(
+                                  image: NetworkImage(this._serverUrl + 'userImage/getImage/${filteredCollaborators[collaboratorIndex].email}'),
+                                  placeholder: AssetImage('assets/images/profile_placeholder.jpg'),
+                                ),
+                              ),
                               title: Text(
                                 filteredCollaborators[collaboratorIndex].email,
                                 style: TextStyle(
