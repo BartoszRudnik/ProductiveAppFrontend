@@ -74,7 +74,9 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
 
     return AlertDialog(
       content: SingleChildScrollView(
-        child: Container(
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
           height: this.location != null ? 462 : 410,
           width: 450,
           child: Column(
@@ -84,29 +86,33 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                 padding: const EdgeInsets.all(8.0),
                 child: Card(
                   elevation: 8,
-                  child: Container(
+                  child: AnimatedContainer(
+                    duration: Duration(milliseconds: 500),
+                    curve: Curves.easeInOut,
                     height: this.location != null ? 125 : 70,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('Location'),
                         if (this.location != null)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 10),
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                elevation: 5,
-                                primary: Color.fromRGBO(201, 201, 206, 1),
-                                side: BorderSide(
-                                  color: Colors.grey.withOpacity(0.8),
+                          Flexible(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 10),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  elevation: 5,
+                                  primary: Color.fromRGBO(201, 201, 206, 1),
+                                  side: BorderSide(
+                                    color: Colors.grey.withOpacity(0.8),
+                                  ),
                                 ),
-                              ),
-                              onPressed: () {},
-                              child: Text(
-                                this.location.localizationName + ": " + this.location.locality + ", " + this.location.street,
-                                style: TextStyle(fontSize: 14, color: Theme.of(context).primaryColor),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 3,
+                                onPressed: () {},
+                                child: Text(
+                                  this.location.localizationName + ": " + this.location.locality + ", " + this.location.street,
+                                  style: TextStyle(fontSize: 14, color: Theme.of(context).primaryColor),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 3,
+                                ),
                               ),
                             ),
                           ),
