@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
-import '../../login/models/user.dart';
 import '../../login/providers/auth_provider.dart';
 import '../../shared/dialogs.dart';
 import '../widgets/task_appBar.dart';
@@ -389,8 +388,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                         ),
                       ),
-                      Container(
-                        height: 100,
+                      Flexible(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -399,6 +397,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               child: Text(
                                 user.email,
                                 style: TextStyle(fontSize: 20),
+                                maxLines: 2,
+                                softWrap: true,
+                                overflow: TextOverflow.clip,
                               ),
                             ),
                             ElevatedButton(

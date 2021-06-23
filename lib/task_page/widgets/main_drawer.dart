@@ -63,7 +63,7 @@ class _MainDrawerState extends State<MainDrawer> {
                   ),
             Container(
               alignment: Alignment.centerLeft,
-              width: 210,
+              width: 180,
               height: 72,
               child: (user.firstName != null && user.firstName.length > 0) || (user.lastName != null && user.lastName.length > 0)
                   ? Text(
@@ -72,6 +72,8 @@ class _MainDrawerState extends State<MainDrawer> {
                         fontWeight: FontWeight.bold,
                         fontSize: 21,
                       ),
+                      softWrap: true,
+                      maxLines: 3,
                     )
                   : ListView(
                       children: widget.username
