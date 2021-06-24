@@ -7,12 +7,14 @@ class Settings {
   List<String> collaborators;
   List<String> priorities;
   List<String> tags;
+  List<int> locations;
   int sortingMode;
 
   Settings({
     @required this.showOnlyUnfinished,
     @required this.showOnlyDelegated,
     @required this.showOnlyWithLocalization,
+    this.locations,
     this.collaborators,
     this.priorities,
     this.tags,

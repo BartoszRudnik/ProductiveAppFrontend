@@ -44,6 +44,10 @@ class LocationProvider with ChangeNotifier {
     }
   }
 
+  String getLocationName(int id) {
+    return this.locationList.firstWhere((element) => element.id == id).localizationName;
+  }
+
   List<models.Location> get locations {
     return [...locationList];
   }

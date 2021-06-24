@@ -9,6 +9,8 @@ class Location {
   double longitude;
   double latitude;
 
+  bool isSelected = false;
+
   Location({
     @required this.id,
     @required this.localizationName,

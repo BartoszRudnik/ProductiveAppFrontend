@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/task_page/providers/location_provider.dart';
+import 'package:productive_app/task_page/widgets/filter_location_dialog.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/settings_provider.dart';
@@ -30,6 +32,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
     final userSettings = Provider.of<SettingsProvider>(context).userSettings;
 
     List<String> tags = userSettings.tags;
+    List<int> locations = userSettings.locations;
     List<String> priorities = userSettings.priorities;
     List<String> collaborators = userSettings.collaborators;
     bool showOnlyUnfinished = userSettings.showOnlyUnfinished;
@@ -70,6 +73,9 @@ class _FiltersScreenState extends State<FiltersScreen> {
               }
               if (userSettings.collaborators != null) {
                 await Provider.of<SettingsProvider>(context, listen: false).clearFilterCollaborators();
+              }
+              if (userSettings.locations != null) {
+                await Provider.of<SettingsProvider>(context, listen: false).clearFilterLocations();
               }
               if (userSettings.priorities != null) {
                 await Provider.of<SettingsProvider>(context, listen: false).clearFilterPriorities();
@@ -282,7 +288,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                           child: Row(
                             children: [
                               Text(
-                                'Priorities',
+                                'Locations',
                                 style: TextStyle(
                                   fontSize: 26,
                                   fontWeight: FontWeight.w400,
@@ -305,24 +311,24 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                   final selected = await showDialog(
                                     context: context,
                                     builder: (context) {
-                                      if (priorities != null) {
-                                        return FilterPriorityDialog(
-                                          choosenPriorities: priorities,
+                                      if (locations != null) {
+                                        return FilterLocationDialog(
+                                          choosenLocations: locations,
                                         );
                                       } else {
-                                        return FilterPriorityDialog();
+                                        return FilterLocationDialog();
                                       }
                                     },
                                   );
 
                                   if (selected != null && selected.length >= 1) {
-                                    await Provider.of<SettingsProvider>(context, listen: false).addFilterPriorities(selected);
+                                    await Provider.of<SettingsProvider>(context, listen: false).addFilterLocations(selected);
                                   } else if (selected != 'cancel') {
-                                    await Provider.of<SettingsProvider>(context, listen: false).clearFilterPriorities();
+                                    await Provider.of<SettingsProvider>(context, listen: false).clearFilterLocations();
                                   }
                                 },
                                 child: Text(
-                                  'Choose priorities',
+                                  'Choose locations',
                                   style: TextStyle(
                                     fontSize: 24,
                                     color: Theme.of(context).primaryColor,
@@ -332,12 +338,12 @@ class _FiltersScreenState extends State<FiltersScreen> {
                             ),
                           ],
                         ),
-                        if (priorities != null && priorities.length >= 1)
+                        if (locations != null && locations.length >= 1)
                           Container(
                             height: 60,
                             child: ListView.builder(
                               scrollDirection: Axis.horizontal,
-                              itemCount: priorities.length,
+                              itemCount: locations.length,
                               itemBuilder: (context, index) => Padding(
                                 padding: const EdgeInsets.symmetric(vertical: 8),
                                 child: Container(
@@ -357,7 +363,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                       Padding(
                                         padding: const EdgeInsets.only(left: 16.0),
                                         child: Text(
-                                          priorities[index],
+                                          Provider.of<LocationProvider>(context, listen: false).getLocationName(locations[index]),
                                           style: TextStyle(
                                             color: Theme.of(context).accentColor,
                                             fontSize: 18,
@@ -365,17 +371,12 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                           ),
                                         ),
                                       ),
-                                      if (priorities[index] == 'LOW') Icon(Icons.arrow_downward_outlined, color: Theme.of(context).accentColor),
-                                      if (priorities[index] == 'HIGH') Icon(Icons.arrow_upward_outlined, color: Theme.of(context).accentColor),
-                                      if (priorities[index] == 'HIGHER') Icon(Icons.arrow_upward_outlined, color: Theme.of(context).accentColor),
-                                      if (priorities[index] == 'HIGHER') Icon(Icons.arrow_upward_outlined, color: Theme.of(context).accentColor),
-                                      if (priorities[index] == 'CRITICAL') Icon(Icons.warning_amber_sharp, color: Theme.of(context).accentColor),
                                       IconButton(
                                         icon: Icon(Icons.cancel_outlined, color: Theme.of(context).accentColor),
                                         onPressed: () {
                                           setState(
                                             () {
-                                              Provider.of<SettingsProvider>(context, listen: false).deleteFilterPriority(priorities[index]);
+                                              Provider.of<SettingsProvider>(context, listen: false).deleteFilterLocation(locations[index]);
                                             },
                                           );
                                         },
@@ -493,6 +494,128 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                           setState(
                                             () {
                                               Provider.of<SettingsProvider>(context, listen: false).deleteFilterCollaboratorEmail(collaborators[index]);
+                                            },
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Card(
+                  elevation: 8,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 6),
+                          child: Row(
+                            children: [
+                              Text(
+                                'Priorities',
+                                style: TextStyle(
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  padding: EdgeInsets.all(4),
+                                  primary: Theme.of(context).accentColor,
+                                  side: BorderSide(color: Theme.of(context).primaryColor),
+                                ),
+                                onPressed: () async {
+                                  final selected = await showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      if (priorities != null) {
+                                        return FilterPriorityDialog(
+                                          choosenPriorities: priorities,
+                                        );
+                                      } else {
+                                        return FilterPriorityDialog();
+                                      }
+                                    },
+                                  );
+
+                                  if (selected != null && selected.length >= 1) {
+                                    await Provider.of<SettingsProvider>(context, listen: false).addFilterPriorities(selected);
+                                  } else if (selected != 'cancel') {
+                                    await Provider.of<SettingsProvider>(context, listen: false).clearFilterPriorities();
+                                  }
+                                },
+                                child: Text(
+                                  'Choose priorities',
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (priorities != null && priorities.length >= 1)
+                          Container(
+                            height: 60,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: priorities.length,
+                              itemBuilder: (context, index) => Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 8),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  padding: EdgeInsets.symmetric(horizontal: 4),
+                                  margin: EdgeInsets.symmetric(horizontal: 8),
+                                  decoration: BoxDecoration(
+                                    color: Color.fromRGBO(200, 200, 200, 1),
+                                    border: Border.all(
+                                      color: Color.fromRGBO(191, 191, 196, 1),
+                                      width: 2.5,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 16.0),
+                                        child: Text(
+                                          priorities[index],
+                                          style: TextStyle(
+                                            color: Theme.of(context).accentColor,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                      if (priorities[index] == 'LOW') Icon(Icons.arrow_downward_outlined, color: Theme.of(context).accentColor),
+                                      if (priorities[index] == 'HIGH') Icon(Icons.arrow_upward_outlined, color: Theme.of(context).accentColor),
+                                      if (priorities[index] == 'HIGHER') Icon(Icons.arrow_upward_outlined, color: Theme.of(context).accentColor),
+                                      if (priorities[index] == 'HIGHER') Icon(Icons.arrow_upward_outlined, color: Theme.of(context).accentColor),
+                                      if (priorities[index] == 'CRITICAL') Icon(Icons.warning_amber_sharp, color: Theme.of(context).accentColor),
+                                      IconButton(
+                                        icon: Icon(Icons.cancel_outlined, color: Theme.of(context).accentColor),
+                                        onPressed: () {
+                                          setState(
+                                            () {
+                                              Provider.of<SettingsProvider>(context, listen: false).deleteFilterPriority(priorities[index]);
                                             },
                                           );
                                         },

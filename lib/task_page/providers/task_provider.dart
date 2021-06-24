@@ -884,6 +884,10 @@ class TaskProvider with ChangeNotifier {
     return [...listToFilter.where((element) => ((element.priority != null && filterPriorities.contains(element.priority))))];
   }
 
+  List<Task> filterLocations(List<Task> listToFilter, List<int> filterLocations) {
+    return [...listToFilter.where((element) => (element.notificationLocalizationId != null && filterLocations.contains(element.notificationLocalizationId)))];
+  }
+
   List<Task> filterTags(List<Task> listToFilter, List<String> filterTags) {
     List<Task> result = [];
 

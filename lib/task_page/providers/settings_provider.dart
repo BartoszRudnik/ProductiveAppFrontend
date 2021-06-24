@@ -34,6 +34,11 @@ class SettingsProvider with ChangeNotifier {
       List<String> collaborators = [];
       List<String> priorities = [];
       List<String> tags = [];
+      List<int> locations = [];
+
+      for (var element in responseBody['locations']) {
+        locations.add(element);
+      }
 
       for (var element in responseBody['tags']) {
         tags.add(element);
@@ -54,9 +59,42 @@ class SettingsProvider with ChangeNotifier {
         collaborators: collaborators,
         priorities: priorities,
         tags: tags,
+        locations: locations,
         sortingMode: responseBody['sortingMode'],
       );
       this.userSettings = newSettings;
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<void> addFilterLocations(List<int> locations) async {
+    final finalUrl = this._serverUrl + 'filterSettings/addFilterLocations/${this.userMail}';
+
+    try {
+      final response = await http.post(
+        finalUrl,
+        body: json.encode(
+          {'locations': locations},
+        ),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      if (locations != null) {
+        locations.forEach(
+          (element) {
+            if (!this.userSettings.locations.contains(element)) {
+              this.userSettings.locations.add(element);
+            }
+          },
+        );
+      }
 
       notifyListeners();
     } catch (error) {
@@ -165,6 +203,33 @@ class SettingsProvider with ChangeNotifier {
     }
   }
 
+  Future<void> deleteFilterLocation(int location) async {
+    final finalUrl = this._serverUrl + 'filterSettings/deleteFilterLocation/${this.userMail}';
+
+    try {
+      final response = await http.post(
+        finalUrl,
+        body: json.encode(
+          {
+            'location': location,
+          },
+        ),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      if (location != null) {
+        this.userSettings.locations.remove(location);
+      }
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
   Future<void> deleteFilterTag(String tag) async {
     final finalUrl = this._serverUrl + 'filterSettings/deleteFilterTag/${this.userMail}';
 
@@ -182,7 +247,7 @@ class SettingsProvider with ChangeNotifier {
         },
       );
       if (tag != null) {
-        print(this.userSettings.tags.remove(tag));
+        this.userSettings.tags.remove(tag);
       }
 
       notifyListeners();
@@ -240,6 +305,27 @@ class SettingsProvider with ChangeNotifier {
       if (collaboratorEmail != null) {
         this.userSettings.collaborators.remove(collaboratorEmail);
       }
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<void> clearFilterLocations() async {
+    final finalUrl = this._serverUrl + 'filterSettings/clearFilterLocations/${this.userMail}';
+
+    try {
+      await http.post(
+        finalUrl,
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      this.userSettings.locations = [];
 
       notifyListeners();
     } catch (error) {

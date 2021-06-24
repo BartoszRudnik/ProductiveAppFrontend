@@ -25,6 +25,9 @@ class ManageFilters {
     if (userSettings.tags != null && userSettings.tags.length >= 1) {
       tasks = Provider.of<TaskProvider>(context, listen: false).filterTags(tasks, userSettings.tags);
     }
+    if (userSettings.locations != null && userSettings.locations.length >= 1) {
+      tasks = Provider.of<TaskProvider>(context, listen: false).filterLocations(tasks, userSettings.locations);
+    }
     if (userSettings.sortingMode == 0) {
       Provider.of<TaskProvider>(context, listen: false).sortByEndDateAscending(tasks);
     } else if (userSettings.sortingMode == 1) {
