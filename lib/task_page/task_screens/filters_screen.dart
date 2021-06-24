@@ -34,6 +34,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
     List<String> collaborators = userSettings.collaborators;
     bool showOnlyUnfinished = userSettings.showOnlyUnfinished;
     bool showOnlyDelegated = userSettings.showOnlyDelegated;
+    bool showOnlyLocalization = userSettings.showOnlyWithLocalization;
     int sortingMode = userSettings.sortingMode;
 
     return Scaffold(
@@ -58,6 +59,9 @@ class _FiltersScreenState extends State<FiltersScreen> {
             onPressed: () async {
               final userSettings = Provider.of<SettingsProvider>(context, listen: false).userSettings;
 
+              if (userSettings.showOnlyWithLocalization != null && userSettings.showOnlyWithLocalization) {
+                await Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyWithLocalization();
+              }
               if (userSettings.showOnlyDelegated != null && userSettings.showOnlyDelegated) {
                 await Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyDelegated();
               }
@@ -533,6 +537,23 @@ class _FiltersScreenState extends State<FiltersScreen> {
                       setState(() {
                         showOnlyDelegated = value;
                         Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyDelegated();
+                      });
+                    },
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Card(
+                  elevation: 8,
+                  child: SwitchListTile(
+                    activeColor: Theme.of(context).primaryColor,
+                    title: Text('Show only tasks with localization'),
+                    value: showOnlyLocalization,
+                    onChanged: (bool value) {
+                      setState(() {
+                        showOnlyLocalization = value;
+                        Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyWithLocalization();
                       });
                     },
                   ),

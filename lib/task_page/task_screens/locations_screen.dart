@@ -25,8 +25,24 @@ class _LocationScreenState extends State<LocationsScreen> {
     }
   }
 
-  void _editLocationForm(BuildContext buildContext) {
-    print("edit");
+  Future<void> _editLocationForm(BuildContext buildContext, Location locationToEdit) async {
+    locationToEdit = await showDialog(
+      context: context,
+      builder: (context) {
+        return LocationDialog(
+          choosenLocation: locationToEdit,
+        );
+      },
+    );
+
+    if (locationToEdit != null) {
+      String name = await Dialogs.showTextFieldDialogWithInitialValue(context, 'Enter location name', locationToEdit.localizationName);
+      if (name == null || name.isEmpty) {
+        return;
+      }
+      locationToEdit.localizationName = name;
+      await Provider.of<LocationProvider>(context, listen: false).updateLocation(locationToEdit.id, locationToEdit);
+    }
   }
 
   @override
@@ -116,7 +132,7 @@ class _LocationScreenState extends State<LocationsScreen> {
               }
             }
             if (direction == DismissDirection.startToEnd) {
-              this._editLocationForm(context);
+              this._editLocationForm(context, locations[index]);
             }
             return false;
           },

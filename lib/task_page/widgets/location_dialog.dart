@@ -210,7 +210,7 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
                                 Navigator.of(context).pop(widget.choosenLocation);
                               },
                               child: Text(
-                                'Add location',
+                                'Save location',
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Theme.of(context).accentColor,

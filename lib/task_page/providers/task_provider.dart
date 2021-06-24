@@ -864,6 +864,10 @@ class TaskProvider with ChangeNotifier {
         .toList();
   }
 
+  List<Task> onlyWithLocalization(List<Task> listToFilter) {
+    return [...listToFilter.where((element) => element.notificationLocalizationId != null)];
+  }
+
   List<Task> onlyUnfinishedTasks(List<Task> listToFilter) {
     return [...listToFilter.where((element) => !element.done)];
   }

@@ -7,6 +7,9 @@ import '../providers/task_provider.dart';
 
 class ManageFilters {
   static List<Task> filter(List<Task> tasks, Settings userSettings, BuildContext context) {
+    if (userSettings.showOnlyWithLocalization != null && userSettings.showOnlyWithLocalization) {
+      tasks = Provider.of<TaskProvider>(context, listen: false).onlyWithLocalization(tasks);
+    }
     if (userSettings.showOnlyUnfinished != null && userSettings.showOnlyUnfinished) {
       tasks = Provider.of<TaskProvider>(context, listen: false).onlyUnfinishedTasks(tasks);
     }
@@ -24,20 +27,15 @@ class ManageFilters {
     }
     if (userSettings.sortingMode == 0) {
       Provider.of<TaskProvider>(context, listen: false).sortByEndDateAscending(tasks);
-    }
-    if (userSettings.sortingMode == 1) {
+    } else if (userSettings.sortingMode == 1) {
       Provider.of<TaskProvider>(context, listen: false).sortByEndDateDescending(tasks);
-    }
-    if (userSettings.sortingMode == 2) {
+    } else if (userSettings.sortingMode == 2) {
       Provider.of<TaskProvider>(context, listen: false).sortByStartDateAscending(tasks);
-    }
-    if (userSettings.sortingMode == 3) {
+    } else if (userSettings.sortingMode == 3) {
       Provider.of<TaskProvider>(context, listen: false).sortByStartDateDescending(tasks);
-    }
-    if (userSettings.sortingMode == 4) {
+    } else if (userSettings.sortingMode == 4) {
       Provider.of<TaskProvider>(context, listen: false).sortByPriorityDescending(tasks);
-    }
-    if (userSettings.sortingMode == 5) {
+    } else if (userSettings.sortingMode == 5) {
       Provider.of<TaskProvider>(context, listen: false).sortByPriorityAscending(tasks);
     }
 

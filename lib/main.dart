@@ -74,6 +74,7 @@ class MyApp extends StatelessWidget {
           update: (ctx, auth, previousSettings) => SettingsProvider(
             userSettings: previousSettings == null
                 ? Settings(
+                    showOnlyWithLocalization: false,
                     showOnlyUnfinished: false,
                     showOnlyDelegated: false,
                   )

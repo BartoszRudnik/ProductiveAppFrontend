@@ -50,6 +50,7 @@ class SettingsProvider with ChangeNotifier {
       Settings newSettings = Settings(
         showOnlyUnfinished: responseBody['showOnlyUnfinished'],
         showOnlyDelegated: responseBody['showOnlyDelegated'],
+        showOnlyWithLocalization: responseBody['showOnlyWithLocalization'],
         collaborators: collaborators,
         priorities: priorities,
         tags: tags,
@@ -303,6 +304,26 @@ class SettingsProvider with ChangeNotifier {
 
       this.userSettings.collaborators = [];
 
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<void> changeShowOnlyWithLocalization() async {
+    final finalUrl = this._serverUrl + 'filterSettings/changeShowOnlyWithLocalization/${this.userMail}';
+
+    try {
+      final response = await http.post(
+        finalUrl,
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      this.userSettings.showOnlyWithLocalization = !this.userSettings.showOnlyWithLocalization;
       notifyListeners();
     } catch (error) {
       print(error);
