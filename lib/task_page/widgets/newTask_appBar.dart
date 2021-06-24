@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:productive_app/task_page/providers/settings_provider.dart';
 import 'package:productive_app/task_page/task_screens/filters_screen.dart';
+import 'package:productive_app/task_page/task_screens/task_map.dart';
 import 'package:provider/provider.dart';
 
 class NewTaskAppBar extends StatefulWidget with PreferredSizeWidget {
@@ -19,11 +20,6 @@ class NewTaskAppBar extends StatefulWidget with PreferredSizeWidget {
 class _NewTaskAppBarState extends State<NewTaskAppBar> {
   @override
   Widget build(BuildContext context) {
-    bool onlyUnfinished = false;
-    if (Provider.of<SettingsProvider>(context).userSettings.showOnlyUnfinished != null) {
-      onlyUnfinished = Provider.of<SettingsProvider>(context).userSettings.showOnlyUnfinished;
-    }
-
     return AppBar(
       elevation: 0,
       title: Text(
@@ -44,6 +40,8 @@ class _NewTaskAppBarState extends State<NewTaskAppBar> {
           onSelected: (value) {
             if (value == 'filters') {
               Navigator.of(context).pushNamed(FiltersScreen.routeName);
+            } else if (value == 'map') {
+              Navigator.of(context).pushNamed(TaskMap.routeName);
             }
           },
           icon: Icon(Icons.more_vert),
@@ -51,6 +49,10 @@ class _NewTaskAppBarState extends State<NewTaskAppBar> {
             PopupMenuItem(
               child: Text('Filters'),
               value: 'filters',
+            ),
+            PopupMenuItem(
+              child: Text('Task map'),
+              value: 'map',
             ),
           ],
         ),
