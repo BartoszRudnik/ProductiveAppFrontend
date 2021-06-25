@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong/latlong.dart';
@@ -23,8 +24,62 @@ class TaskMap extends StatefulWidget {
 class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
   final MapController _mapController = MapController();
 
+  int actualMarkerId;
+  List<Marker> markers = [];
+  List<Task> tasks = [];
+
   double startLatitude = 0.0;
   double startLongitude = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    tasks = Provider.of<TaskProvider>(context, listen: false).tasksWithLocation;
+
+    for (int i = 0; i < tasks.length; i++) {
+      final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(tasks[i].notificationLocalizationId);
+      final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(tasks[i].notificationLocalizationId);
+
+      final newMarker = Marker(
+        width: 150.0,
+        height: 150.0,
+        point: LatLng(latitude, longitude),
+        builder: (context) => GestureDetector(
+          onTap: () {
+            LatLng point = LatLng(latitude, longitude);
+            this._animatedMapMove(point, 16.0);
+            setState(() {
+              startLatitude = latitude;
+              startLongitude = longitude;
+            });
+
+            int nextIndex = i;
+            int previousIndex = i;
+
+            if (i > 0) {
+              previousIndex -= 1;
+            } else {
+              previousIndex = tasks.length - 1;
+            }
+
+            if (i < tasks.length - 1) {
+              nextIndex += 1;
+            } else {
+              nextIndex = 0;
+            }
+
+            return this._onMarkerPressed(tasks[i], previousIndex, nextIndex);
+          },
+          child: Icon(
+            Icons.location_on,
+            color: tasks[i].id == actualMarkerId ? Colors.red : Colors.black,
+          ),
+        ),
+      );
+
+      markers.add(newMarker);
+    }
+  }
 
   void getUserLocation() async {
     if (startLatitude == 0.0 && startLongitude == 0.0) {
@@ -69,7 +124,11 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
     controller.forward();
   }
 
-  void _onMarkerPressed(Task task) {
+  void _onMarkerPressed(Task task, int previousTaskIndex, int nextTaskIndex) {
+    setState(() {
+      this.actualMarkerId = task.id;
+    });
+
     showModalBottomSheet(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
@@ -123,8 +182,18 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
                         width: 2.5,
                       ),
                     ),
-                    child: Center(
-                      child: Text(task.description),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          width: 30,
+                        ),
+                        Text('Task description: '),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(task.description),
+                      ],
                     ),
                   ),
                 ),
@@ -144,22 +213,32 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
                     children: [
                       if (task.priority == 'LOW') Icon(Icons.arrow_downward_outlined),
                       if (task.priority == 'HIGH') Icon(Icons.arrow_upward_outlined),
-                      if (task.priority == 'HIGHER') Icon(Icons.arrow_upward_outlined),
-                      if (task.priority == 'HIGHER') Icon(Icons.arrow_upward_outlined),
+                      if (task.priority == 'HIGHER')
+                        Row(
+                          children: [
+                            Icon(Icons.arrow_upward_outlined),
+                            Icon(Icons.arrow_upward_outlined),
+                          ],
+                        ),
                       if (task.priority == 'CRITICAL') Icon(Icons.warning_amber_sharp),
                       SizedBox(width: 6),
-                      if (task.startDate != null || task.endDate != null) Icon(Icons.calendar_today),
-                      SizedBox(width: 6),
-                      task.startDate != null
-                          ? Text(
-                              DateFormat('MMM d').format(task.startDate) + ' - ',
-                            )
-                          : Text(''),
-                      task.endDate != null
-                          ? Text(
-                              DateFormat('MMM d').format(task.endDate),
-                            )
-                          : Text(''),
+                      if (task.startDate != null || task.endDate != null)
+                        Row(
+                          children: [
+                            Icon(Icons.calendar_today),
+                            SizedBox(width: 6),
+                            task.startDate != null
+                                ? Text(
+                                    DateFormat('MMM d').format(task.startDate) + ' - ',
+                                  )
+                                : Text(''),
+                            task.endDate != null
+                                ? Text(
+                                    DateFormat('MMM d').format(task.endDate),
+                                  )
+                                : Text(''),
+                          ],
+                        ),
                     ],
                   ),
                 ),
@@ -167,7 +246,7 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4),
                 child: Container(
-                  padding: EdgeInsets.all(8),
+                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 30),
                   decoration: BoxDecoration(
                     color: Color.fromRGBO(237, 237, 240, 1),
                     border: Border.all(
@@ -175,7 +254,11 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
                       width: 2.5,
                     ),
                   ),
-                  child: TaskTags(tags: task.tags),
+                  child: Row(
+                    children: [
+                      TaskTags(tags: task.tags),
+                    ],
+                  ),
                 ),
               ),
               Container(
@@ -190,6 +273,38 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
+                    IconButton(
+                      icon: Icon(Icons.navigate_before_outlined),
+                      onPressed: () {
+                        final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(tasks[previousTaskIndex].notificationLocalizationId);
+                        final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(tasks[previousTaskIndex].notificationLocalizationId);
+
+                        LatLng point = LatLng(latitude, longitude);
+                        this._animatedMapMove(point, 16.0);
+                        setState(() {
+                          startLatitude = latitude;
+                          startLongitude = longitude;
+                        });
+
+                        int nextIndex = previousTaskIndex;
+                        int previousIndex = previousTaskIndex;
+
+                        if (previousTaskIndex > 0) {
+                          previousIndex -= 1;
+                        } else {
+                          previousIndex = tasks.length - 1;
+                        }
+
+                        if (previousTaskIndex < tasks.length - 1) {
+                          nextIndex += 1;
+                        } else {
+                          nextIndex = 0;
+                        }
+
+                        Navigator.of(context).pop('nextTask');
+                        return this._onMarkerPressed(tasks[previousTaskIndex], previousIndex, nextIndex);
+                      },
+                    ),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         primary: Theme.of(context).primaryColor,
@@ -222,6 +337,38 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
                         ),
                       ),
                     ),
+                    IconButton(
+                      icon: Icon(Icons.navigate_next_outlined),
+                      onPressed: () {
+                        final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(tasks[nextTaskIndex].notificationLocalizationId);
+                        final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(tasks[nextTaskIndex].notificationLocalizationId);
+
+                        LatLng point = LatLng(latitude, longitude);
+                        this._animatedMapMove(point, 16.0);
+                        setState(() {
+                          startLatitude = latitude;
+                          startLongitude = longitude;
+                        });
+
+                        int nextIndex = nextTaskIndex;
+                        int previousIndex = nextTaskIndex;
+
+                        if (nextTaskIndex > 0) {
+                          previousIndex -= 1;
+                        } else {
+                          previousIndex = tasks.length - 1;
+                        }
+
+                        if (nextTaskIndex < tasks.length - 1) {
+                          nextIndex += 1;
+                        } else {
+                          nextIndex = 0;
+                        }
+
+                        Navigator.of(context).pop('nextTask');
+                        return this._onMarkerPressed(tasks[nextTaskIndex], previousIndex, nextIndex);
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -229,39 +376,34 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
           ),
         );
       },
-    );
+    ).then((value) {
+      if (value == null || value != 'nextTask') {
+        setState(() {
+          this.actualMarkerId = -1;
+        });
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     this.getUserLocation();
 
-    final tasks = Provider.of<TaskProvider>(context, listen: false).tasksWithLocation;
-    List<Marker> markers = [];
-
-    tasks.forEach((task) {
-      final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(task.notificationLocalizationId);
-      final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(task.notificationLocalizationId);
-
-      final newMarker = Marker(
-        width: 150.0,
-        height: 150.0,
-        point: LatLng(latitude, longitude),
-        builder: (context) => GestureDetector(
-          onTap: () {
-            return this._onMarkerPressed(task);
-          },
-          child: Icon(
-            Icons.location_on,
-            color: Colors.red,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Tasks map',
+          style: TextStyle(
+            fontSize: 30,
+            fontWeight: FontWeight.w400,
+            color: Theme.of(context).primaryColor,
           ),
         ),
-      );
-
-      markers.add(newMarker);
-    });
-
-    return Scaffold(
+        systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: Colors.black),
+        backgroundColor: Theme.of(context).accentColor,
+        iconTheme: Theme.of(context).iconTheme,
+        brightness: Brightness.dark,
+      ),
       body: StatefulBuilder(
         builder: (context, setState) {
           return Container(
