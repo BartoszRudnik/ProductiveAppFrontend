@@ -34,7 +34,13 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+
+    this.getTasks();
+  }
+
+  void getTasks() {
     tasks = Provider.of<TaskProvider>(context, listen: false).tasksWithLocation;
+    this.markers = [];
 
     for (int i = 0; i < tasks.length; i++) {
       final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(tasks[i].notificationLocalizationId);
@@ -327,7 +333,13 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
                         side: BorderSide(color: Theme.of(context).primaryColor),
                       ),
                       onPressed: () {
-                        Navigator.of(context).pushNamed(TaskDetailScreen.routeName, arguments: task);
+                        Navigator.of(context).pushNamed(TaskDetailScreen.routeName, arguments: task).then((value) {
+                          setState(() {
+                            this.getTasks();
+                          });
+                          Navigator.of(context).pop('nextTask');
+                          return this._onMarkerPressed(tasks.firstWhere((element) => element.id == task.id), previousTaskIndex, nextTaskIndex);
+                        });
                       },
                       child: Text(
                         'Task details',

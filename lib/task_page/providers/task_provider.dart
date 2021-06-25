@@ -78,7 +78,13 @@ class TaskProvider with ChangeNotifier {
   }
 
   List<Task> get tasksWithLocation {
-    return [...this.taskList.where((element) => element.notificationLocalizationId != null)];
+    List<Task> withLocation = [];
+
+    withLocation.addAll(this.inboxTasks.where((element) => element.notificationLocalizationId != null));
+    withLocation.addAll(this.anytimeTasks.where((element) => element.notificationLocalizationId != null));
+    withLocation.addAll(this.scheduledTasks.where((element) => element.notificationLocalizationId != null));
+
+    return withLocation;
   }
 
   List<Task> get inboxTasks {
@@ -235,7 +241,6 @@ class TaskProvider with ChangeNotifier {
         task.startDate = null;
       }
 
-      this.taskList.add(task);
       this.addToLocalication(task);
 
       notifyListeners();
