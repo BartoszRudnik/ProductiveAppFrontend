@@ -146,125 +146,22 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
       context: context,
       builder: (context) {
         return Container(
-          height: 260,
+          height: task.description != null && task.description.length > 0 ? 160 : 135,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4),
-                child: Container(
-                  padding: EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Color.fromRGBO(237, 237, 240, 1),
-                    border: Border.all(
-                      color: Color.fromRGBO(221, 221, 226, 1),
-                      width: 2.5,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        width: 30,
-                      ),
-                      Text('Task title: '),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Text(task.title),
-                    ],
-                  ),
+              Center(
+                child: Text(
+                  "Task info",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
-              if (task.description.length > 0)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4),
-                  child: Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Color.fromRGBO(237, 237, 240, 1),
-                      border: Border.all(
-                        color: Color.fromRGBO(221, 221, 226, 1),
-                        width: 2.5,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: 30,
-                        ),
-                        Text('Task description: '),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Text(task.description),
-                      ],
-                    ),
-                  ),
+              ListTile(
+                title: Text(
+                  'Task title: ' + task.title,
                 ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4),
-                child: Container(
-                  padding: EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Color.fromRGBO(237, 237, 240, 1),
-                    border: Border.all(
-                      color: Color.fromRGBO(221, 221, 226, 1),
-                      width: 2.5,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      if (task.priority == 'LOW') Icon(Icons.arrow_downward_outlined),
-                      if (task.priority == 'HIGH') Icon(Icons.arrow_upward_outlined),
-                      if (task.priority == 'HIGHER')
-                        Row(
-                          children: [
-                            Icon(Icons.arrow_upward_outlined),
-                            Icon(Icons.arrow_upward_outlined),
-                          ],
-                        ),
-                      if (task.priority == 'CRITICAL') Icon(Icons.warning_amber_sharp),
-                      SizedBox(width: 6),
-                      if (task.startDate != null || task.endDate != null)
-                        Row(
-                          children: [
-                            Icon(Icons.calendar_today),
-                            SizedBox(width: 6),
-                            task.startDate != null
-                                ? Text(
-                                    DateFormat('MMM d').format(task.startDate) + ' - ',
-                                  )
-                                : Text(''),
-                            task.endDate != null
-                                ? Text(
-                                    DateFormat('MMM d').format(task.endDate),
-                                  )
-                                : Text(''),
-                          ],
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4),
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 30),
-                  decoration: BoxDecoration(
-                    color: Color.fromRGBO(237, 237, 240, 1),
-                    border: Border.all(
-                      color: Color.fromRGBO(221, 221, 226, 1),
-                      width: 2.5,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      TaskTags(tags: task.tags),
-                    ],
-                  ),
+                subtitle: Text(
+                  task.description.length > 0 ? 'Task description: ' + task.description : '',
                 ),
               ),
               Container(
