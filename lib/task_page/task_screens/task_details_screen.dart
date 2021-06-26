@@ -624,11 +624,11 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                               options: MapOptions(
                                 interactive: true,
                                 center: this.taskToEdit.notificationLocalizationId != null ? LatLng(latitude, longitude) : LatLng(0, 0),
-                                zoom: 15,
+                                zoom: 16,
                               ),
                               layers: [
                                 TileLayerOptions(
-                                  urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                                  urlTemplate: "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png",
                                   subdomains: ['a', 'b', 'c'],
                                 ),
                                 MarkerLayerOptions(
@@ -639,7 +639,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                                       point: LatLng(latitude, longitude),
                                       builder: (context) => Icon(
                                         Icons.location_on,
-                                        color: Colors.red,
+                                        color: Colors.black,
                                       ),
                                     )
                                   ],

@@ -117,7 +117,7 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
                     ),
                     layers: [
                       TileLayerOptions(
-                        urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                        urlTemplate: "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png",
                         subdomains: ['a', 'b', 'c'],
                       ),
                       MarkerLayerOptions(
@@ -128,7 +128,7 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
                             point: LatLng(widget.choosenLocation.latitude, widget.choosenLocation.longitude),
                             builder: (context) => Icon(
                               Icons.location_on,
-                              color: Colors.red,
+                              color: Colors.black,
                             ),
                           )
                         ],
