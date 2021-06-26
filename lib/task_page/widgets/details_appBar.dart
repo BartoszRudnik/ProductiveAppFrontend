@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:productive_app/task_page/models/task.dart';
-import 'package:productive_app/task_page/providers/settings_provider.dart';
-import 'package:productive_app/task_page/task_screens/related_task_info_screen.dart';
-import 'package:provider/provider.dart';
+
+import '../models/task.dart';
+import '../task_screens/related_task_info_screen.dart';
 
 class DetailsAppBar extends StatefulWidget with PreferredSizeWidget {
   final String title;
@@ -21,7 +20,7 @@ class DetailsAppBar extends StatefulWidget with PreferredSizeWidget {
 class _DetailsAppBarState extends State<DetailsAppBar> {
   @override
   Widget build(BuildContext context) {
-    if(widget.task.isDelegated == null){
+    if (widget.task.isDelegated == null) {
       widget.task.isDelegated = false;
     }
     return AppBar(
@@ -43,20 +42,18 @@ class _DetailsAppBarState extends State<DetailsAppBar> {
         PopupMenuButton(
           onSelected: (value) {
             if (value == 'related') {
-              Navigator.of(context).pushNamed(RelatedTaskInfoScreen.routeName,
-                arguments: this.widget.task.childId != null? this.widget.task.childId : this.widget.task.parentId
-              );
+              Navigator.of(context).pushNamed(RelatedTaskInfoScreen.routeName, arguments: this.widget.task.childId != null ? this.widget.task.childId : this.widget.task.parentId);
             }
           },
           icon: Icon(Icons.more_vert),
-          itemBuilder: (this.widget.task.childId != null || this.widget.task.isDelegated)? (_) => [
-            PopupMenuItem(
-              child: Text('Related task info'),
-              value: 'related',
-            ),
-          ]: (_) =>[
-
-          ],
+          itemBuilder: (this.widget.task.childId != null || this.widget.task.isDelegated)
+              ? (_) => [
+                    PopupMenuItem(
+                      child: Text('Related task info'),
+                      value: 'related',
+                    ),
+                  ]
+              : (_) => [],
         ),
       ],
     );
