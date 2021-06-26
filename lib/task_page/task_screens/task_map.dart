@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:intl/intl.dart';
-import 'package:latlong/latlong.dart';
-import 'package:productive_app/task_page/models/task.dart';
-import 'package:productive_app/task_page/task_screens/task_details_screen.dart';
-import 'package:productive_app/task_page/widgets/task_tags.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong/latlong.dart';
+import 'package:provider/provider.dart';
 
+import '../models/task.dart';
 import '../providers/location_provider.dart';
 import '../providers/task_provider.dart';
+import 'task_details_screen.dart';
 
 class TaskMap extends StatefulWidget {
   static const routeName = "/task-map";
