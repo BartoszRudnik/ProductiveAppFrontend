@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:productive_app/task_page/models/collaborator.dart';
 import 'package:productive_app/task_page/providers/delegate_provider.dart';
+import 'package:productive_app/task_page/task_screens/collaborator_profile.dart';
+import 'package:productive_app/task_page/task_screens/collaborator_profile_tabs.dart';
 import 'package:provider/provider.dart';
 
 class AcceptedCollaborator extends StatelessWidget {
@@ -96,20 +98,25 @@ class AcceptedCollaborator extends StatelessWidget {
           );
         }
       },
-      child: Card(
-        child: ListTile(
-          leading: Container(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(25),
-              child: FadeInImage(
-                image: NetworkImage(this._serverUrl + 'userImage/getImage/${this.collaborator.email}'),
-                placeholder: AssetImage('assets/images/profile_placeholder.jpg'),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.of(context).pushNamed(CollaboratorProfileTabs.routeName, arguments: this.collaborator);
+        },
+        child: Card(
+          child: ListTile(
+            leading: Container(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(25),
+                child: FadeInImage(
+                  image: NetworkImage(this._serverUrl + 'userImage/getImage/${this.collaborator.email}'),
+                  placeholder: AssetImage('assets/images/profile_placeholder.jpg'),
+                ),
               ),
             ),
-          ),
-          title: Text(
-            this.collaborator.email,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+            title: Text(
+              this.collaborator.email,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+            ),
           ),
         ),
       ),

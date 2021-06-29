@@ -4,11 +4,15 @@ class Collaborator {
   int id;
   String email;
   String relationState;
+  bool sentPermission;
+  bool receivedPermission;
   bool received = false;
   bool isSelected = false;
 
   Collaborator({
     this.id,
+    this.sentPermission,
+    this.receivedPermission,
     @required this.email,
     @required this.relationState,
     this.isSelected,

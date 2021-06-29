@@ -41,6 +41,52 @@ class DelegateProvider with ChangeNotifier {
     return [...this._send];
   }
 
+  Future<void> changePermission(String collaboratorEmail) async {
+    final requestUrl = this._serverUrl + 'delegate/changePermission/${this.userEmail}/$collaboratorEmail';
+
+    try {
+      final response = await http.post(
+        requestUrl,
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      this.collaborators.firstWhere((collaborator) => collaborator.email == collaboratorEmail).sentPermission = !this.collaborators.firstWhere((collaborator) => collaborator.email == collaboratorEmail).sentPermission;
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw error;
+    }
+  }
+
+  Future<String> getCollaboratorName(String collaboratorEmail) async {
+    final requestUrl = this._serverUrl + 'delegate/getCollaboratorName/${this.userEmail}/$collaboratorEmail';
+
+    try {
+      final response = await http.get(
+        requestUrl,
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      final responseBody = json.decode(utf8.decode(response.bodyBytes));
+
+      if (responseBody['collaboratorName'] != null) {
+        return responseBody['collaboratorName'];
+      } else {
+        return '';
+      }
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
   Future<void> getCollaborators() async {
     final requestUrl = this._serverUrl + 'delegate/getAllCollaborators/${this.userEmail}';
 
@@ -52,14 +98,22 @@ class DelegateProvider with ChangeNotifier {
       final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
       for (var element in responseBody) {
+        print(element);
+
+        bool receivedPermission = false;
+        bool sentPermission = false;
         bool isReceived = false;
         String collaboratorEmail = '';
 
         if (element['invitationSender'] == this.userEmail) {
           collaboratorEmail = element['invitationReceiver'];
+          sentPermission = element['user2Permission'];
+          receivedPermission = element['user1Permission'];
         } else {
           isReceived = true;
           collaboratorEmail = element['invitationSender'];
+          sentPermission = element['user1Permission'];
+          receivedPermission = element['user2Permission'];
         }
 
         Collaborator newCollaborator = Collaborator(
@@ -68,6 +122,8 @@ class DelegateProvider with ChangeNotifier {
           relationState: element['relationState'],
           isSelected: false,
           received: isReceived,
+          sentPermission: sentPermission,
+          receivedPermission: receivedPermission,
         );
 
         loadedCollaborators.add(newCollaborator);
