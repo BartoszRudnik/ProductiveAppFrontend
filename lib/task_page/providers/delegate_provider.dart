@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:productive_app/task_page/models/collaborator.dart';
+import 'package:productive_app/task_page/models/task.dart';
 
 class DelegateProvider with ChangeNotifier {
   List<Collaborator> collaborators = [];
@@ -87,6 +88,85 @@ class DelegateProvider with ChangeNotifier {
     }
   }
 
+  Future<int> getNumberOfCollaboratorFinishedTasks(String collaboratorEmail) async {
+    final requestUrl = this._serverUrl + 'delegate/getNumberOfCollaboratorFinishedTasks/${this.userEmail}/$collaboratorEmail';
+
+    try {
+      final response = await http.get(requestUrl);
+
+      print(response.body);
+
+      final responseBody = response.body;
+
+      print(responseBody);
+
+      if (responseBody != null) {
+        return int.parse(responseBody);
+      } else {
+        return 0;
+      }
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<List<Task>> getCollaboratorRecentlyFinishedTasks(String collaboratorEmail, int page, int size) async {
+    final requestUrl = this._serverUrl + 'delegate/getCollaboratorRecentlyFinished/${this.userEmail}/$collaboratorEmail/$page/$size';
+
+    List<Task> loadedTasks = [];
+
+    try {
+      final response = await http.get(requestUrl);
+
+      final responseBody = json.decode(utf8.decode(response.bodyBytes));
+
+      for (var element in responseBody) {
+        Task task = Task(
+          id: element['id_task'],
+          title: element['task_name'],
+          description: element['description'],
+          done: element['ifDone'],
+          priority: element['priority'],
+          endDate: DateTime.parse(element['endDate']),
+          startDate: DateTime.parse(element['startDate']),
+          tags: [],
+          localization: element['localization'],
+          position: element['position'],
+          delegatedEmail: element['delegatedEmail'],
+          isDelegated: element['isDelegated'],
+          taskStatus: '',
+          isCanceled: element['isCanceled'],
+          supervisorEmail: '',
+        );
+
+        if (element['notificationLocalization'] != null) {
+          task.notificationLocalizationId = element['notificationLocalization']['localizationId'];
+          task.notificationLocalizationRadius = element['localizationRadius'];
+          task.notificationOnEnter = element['notificationOnEnter'];
+          task.notificationOnExit = element['notificationOnExit'];
+        } else {
+          task.notificationLocalizationId = null;
+        }
+
+        if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+          task.endDate = null;
+        }
+
+        if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+          task.startDate = null;
+        }
+
+        loadedTasks.add(task);
+      }
+
+      return loadedTasks;
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
   Future<void> getCollaborators() async {
     final requestUrl = this._serverUrl + 'delegate/getAllCollaborators/${this.userEmail}';
 
@@ -98,8 +178,6 @@ class DelegateProvider with ChangeNotifier {
       final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
       for (var element in responseBody) {
-        print(element);
-
         bool receivedPermission = false;
         bool sentPermission = false;
         bool isReceived = false;
