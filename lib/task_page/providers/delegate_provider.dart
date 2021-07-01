@@ -5,7 +5,6 @@ import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:productive_app/task_page/models/collaborator.dart';
 import 'package:productive_app/task_page/models/collaboratorTask.dart';
-import 'package:productive_app/task_page/models/task.dart';
 
 class DelegateProvider with ChangeNotifier {
   List<Collaborator> collaborators = [];
@@ -89,23 +88,66 @@ class DelegateProvider with ChangeNotifier {
     }
   }
 
-  Future<int> getNumberOfCollaboratorFinishedTasks(String collaboratorEmail) async {
-    final requestUrl = this._serverUrl + 'delegate/getNumberOfCollaboratorFinishedTasks/${this.userEmail}/$collaboratorEmail';
+  Future<int> getNumberOfCollaboratorActiveTasks(String collaboratorEmail) async {
+    final requestUrl = this._serverUrl + 'delegate/getNumberOfCollaboratorActiveTasks/${this.userEmail}/$collaboratorEmail';
 
     try {
       final response = await http.get(requestUrl);
-
-      print(response.body);
-
       final responseBody = response.body;
-
-      print(responseBody);
 
       if (responseBody != null) {
         return int.parse(responseBody);
       } else {
         return 0;
       }
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<int> getNumberOfCollaboratorFinishedTasks(String collaboratorEmail) async {
+    final requestUrl = this._serverUrl + 'delegate/getNumberOfCollaboratorFinishedTasks/${this.userEmail}/$collaboratorEmail';
+
+    try {
+      final response = await http.get(requestUrl);
+
+      final responseBody = response.body;
+
+      if (responseBody != null) {
+        return int.parse(responseBody);
+      } else {
+        return 0;
+      }
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<List<CollaboratorTask>> getCollaboratorActiveTasks(String collaboratorEmail, int page, int size) async {
+    final requestUrl = this._serverUrl + 'delegate/getCollaboratorActiveTasks/${this.userEmail}/$collaboratorEmail/$page/$size';
+
+    List<CollaboratorTask> loadedTasks = [];
+
+    try {
+      final response = await http.get(requestUrl);
+      final responseBody = json.decode(utf8.decode(response.bodyBytes));
+
+      for (var element in responseBody) {
+        CollaboratorTask collaboratorTask = CollaboratorTask(
+          id: element['id_task'],
+          title: element['task_name'],
+          description: element['description'],
+          startDate: DateTime.parse(element['startDate']),
+          endDate: DateTime.parse(element['endDate']),
+          lastUpdated: DateTime.parse(element['lastUpdated']),
+        );
+
+        loadedTasks.add(collaboratorTask);
+      }
+
+      return loadedTasks;
     } catch (error) {
       print(error);
       throw (error);

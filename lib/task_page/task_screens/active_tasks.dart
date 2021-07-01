@@ -2,26 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/task_page/models/collaborator.dart';
 import 'package:productive_app/task_page/models/collaboratorTask.dart';
 import 'package:productive_app/task_page/providers/delegate_provider.dart';
 import 'package:productive_app/task_page/utils/collaborator_show_modal.dart';
-import 'package:productive_app/task_page/widgets/chart.dart';
 import 'package:provider/provider.dart';
 
-import '../models/collaborator.dart';
-
-class RecentTasks extends StatefulWidget {
+class ActiveTasks extends StatefulWidget {
   Collaborator collaborator;
 
-  RecentTasks({
+  ActiveTasks({
     @required this.collaborator,
   });
 
   @override
-  _RecentTasksState createState() => _RecentTasksState();
+  _ActiveTasksState createState() => _ActiveTasksState();
 }
 
-class _RecentTasksState extends State<RecentTasks> {
+class _ActiveTasksState extends State<ActiveTasks> {
   final _pagingController = PagingController<int, CollaboratorTask>(firstPageKey: 0);
   int allTasksNumber = 0;
 
@@ -43,7 +41,7 @@ class _RecentTasksState extends State<RecentTasks> {
 
   Future<void> _fetchAllTasksNumber() async {
     try {
-      await Provider.of<DelegateProvider>(context, listen: false).getNumberOfCollaboratorFinishedTasks(this.widget.collaborator.email).then((value) {
+      await Provider.of<DelegateProvider>(context, listen: false).getNumberOfCollaboratorActiveTasks(this.widget.collaborator.email).then((value) {
         setState(() {
           allTasksNumber = value;
         });
@@ -57,7 +55,7 @@ class _RecentTasksState extends State<RecentTasks> {
     try {
       List<CollaboratorTask> newPage = [];
 
-      await Provider.of<DelegateProvider>(context, listen: false).getCollaboratorRecentlyFinishedTasks(this.widget.collaborator.email, page, 50).then((value) {
+      await Provider.of<DelegateProvider>(context, listen: false).getCollaboratorActiveTasks(this.widget.collaborator.email, page, 50).then((value) {
         newPage = value;
       });
 
@@ -80,24 +78,12 @@ class _RecentTasksState extends State<RecentTasks> {
     }
   }
 
-  int _dayDifference(DateTime today, DateTime transactionDate) {
-    return today.difference(transactionDate).inDays;
-  }
-
-  List<CollaboratorTask> get _recentTasks {
-    return this._pagingController.itemList != null
-        ? this._pagingController.itemList.where((task) {
-            return _dayDifference(DateTime.now(), task.lastUpdated) <= 7;
-          }).toList()
-        : [];
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Recently finished tasks',
+          'Active tasks',
           style: TextStyle(color: Colors.black),
         ),
         toolbarHeight: 50,
@@ -116,8 +102,8 @@ class _RecentTasksState extends State<RecentTasks> {
             children: [
               Container(
                 height: 190,
-                child: Chart(
-                  recentTasks: this._recentTasks,
+                child: Text(
+                  'tu cos jeszcze bedzie',
                 ),
               ),
               Expanded(

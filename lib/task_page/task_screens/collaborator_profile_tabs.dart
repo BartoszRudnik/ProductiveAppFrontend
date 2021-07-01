@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/task_page/models/collaborator.dart';
+import 'package:productive_app/task_page/task_screens/active_tasks.dart';
 import 'package:productive_app/task_page/task_screens/collaborator_profile.dart';
 import 'package:productive_app/task_page/task_screens/recent_tasks.dart';
 
@@ -38,6 +39,12 @@ class _CollaboratorProfileTabsState extends State<CollaboratorProfileTabs> {
         ),
         'title': 'Recently finished tasks',
       },
+      {
+        'page': ActiveTasks(
+          collaborator: collaborator,
+        ),
+        'title': 'Active tasks',
+      }
     ];
   }
 
@@ -74,7 +81,7 @@ class _CollaboratorProfileTabsState extends State<CollaboratorProfileTabs> {
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      duration: Duration(milliseconds: 250),
+      duration: Duration(milliseconds: 300),
       child: Scaffold(
         body: _pages[this._selectedPageIndex]['page'],
         bottomNavigationBar: Container(
@@ -96,7 +103,11 @@ class _CollaboratorProfileTabsState extends State<CollaboratorProfileTabs> {
                 title: SizedBox.shrink(),
               ),
               BottomNavigationBarItem(
-                icon: _buildIcon(Icons.people_outline, "Recently finished tasks", 1),
+                icon: _buildIcon(Icons.done_all_outlined, "Recently finished tasks", 1),
+                title: SizedBox.shrink(),
+              ),
+              BottomNavigationBarItem(
+                icon: _buildIcon(Icons.present_to_all_outlined, "Active tasks", 2),
                 title: SizedBox.shrink(),
               )
             ],
