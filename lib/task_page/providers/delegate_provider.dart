@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:productive_app/task_page/models/collaborator.dart';
+import 'package:productive_app/task_page/models/collaboratorTask.dart';
 import 'package:productive_app/task_page/models/task.dart';
 
 class DelegateProvider with ChangeNotifier {
@@ -111,10 +112,10 @@ class DelegateProvider with ChangeNotifier {
     }
   }
 
-  Future<List<Task>> getCollaboratorRecentlyFinishedTasks(String collaboratorEmail, int page, int size) async {
+  Future<List<CollaboratorTask>> getCollaboratorRecentlyFinishedTasks(String collaboratorEmail, int page, int size) async {
     final requestUrl = this._serverUrl + 'delegate/getCollaboratorRecentlyFinished/${this.userEmail}/$collaboratorEmail/$page/$size';
 
-    List<Task> loadedTasks = [];
+    List<CollaboratorTask> loadedTasks = [];
 
     try {
       final response = await http.get(requestUrl);
@@ -122,42 +123,16 @@ class DelegateProvider with ChangeNotifier {
       final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
       for (var element in responseBody) {
-        Task task = Task(
+        CollaboratorTask collaboratorTask = CollaboratorTask(
           id: element['id_task'],
           title: element['task_name'],
           description: element['description'],
-          done: element['ifDone'],
-          priority: element['priority'],
-          endDate: DateTime.parse(element['endDate']),
           startDate: DateTime.parse(element['startDate']),
-          tags: [],
-          localization: element['localization'],
-          position: element['position'],
-          delegatedEmail: element['delegatedEmail'],
-          isDelegated: element['isDelegated'],
-          taskStatus: '',
-          isCanceled: element['isCanceled'],
-          supervisorEmail: '',
+          endDate: DateTime.parse(element['endDate']),
+          lastUpdated: DateTime.parse(element['lastUpdated']),
         );
 
-        if (element['notificationLocalization'] != null) {
-          task.notificationLocalizationId = element['notificationLocalization']['localizationId'];
-          task.notificationLocalizationRadius = element['localizationRadius'];
-          task.notificationOnEnter = element['notificationOnEnter'];
-          task.notificationOnExit = element['notificationOnExit'];
-        } else {
-          task.notificationLocalizationId = null;
-        }
-
-        if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
-          task.endDate = null;
-        }
-
-        if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
-          task.startDate = null;
-        }
-
-        loadedTasks.add(task);
+        loadedTasks.add(collaboratorTask);
       }
 
       return loadedTasks;

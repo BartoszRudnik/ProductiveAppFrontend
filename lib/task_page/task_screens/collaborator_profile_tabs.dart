@@ -63,7 +63,7 @@ class _CollaboratorProfileTabsState extends State<CollaboratorProfileTabs> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Text(text, style: TextStyle(fontSize: 12, color: this._getItemColor(index))),
+                Text(text, style: TextStyle(fontSize: 14, color: this._getItemColor(index))),
               ],
             ),
             onTap: () => this._selectPage(index),

@@ -464,7 +464,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   ),
                                 ),
                                 Expanded(
-                                  flex: 14,
+                                  flex: 8,
                                   child: TextFormField(
                                     enabled: false,
                                     initialValue: user.email,

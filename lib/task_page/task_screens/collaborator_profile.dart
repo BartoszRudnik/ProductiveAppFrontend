@@ -29,8 +29,8 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
   }
 
   @override
-  void didChangeDependencies() {
-    Provider.of<DelegateProvider>(context, listen: false).getCollaboratorName(this.widget.collaborator.email).then((value) {
+  void didChangeDependencies() async {
+    await Provider.of<DelegateProvider>(context, listen: false).getCollaboratorName(this.widget.collaborator.email).then((value) {
       setState(() {
         collaboratorName = value;
       });
@@ -53,14 +53,24 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(90),
-              child: FadeInImage(
-                fit: BoxFit.cover,
-                width: 220,
-                height: 220,
-                image: NetworkImage(this._serverUrl + 'userImage/getImage/${this.widget.collaborator.email}'),
-                placeholder: AssetImage('assets/images/profile_placeholder.jpg'),
+            Container(
+              padding: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Color.fromRGBO(237, 237, 240, 1),
+                border: Border.all(
+                  color: Color.fromRGBO(221, 221, 226, 1),
+                  width: 2.5,
+                ),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(90),
+                child: FadeInImage(
+                  fit: BoxFit.cover,
+                  width: 220,
+                  height: 220,
+                  image: NetworkImage(this._serverUrl + 'userImage/getImage/${this.widget.collaborator.email}'),
+                  placeholder: AssetImage('assets/images/profile_placeholder.jpg'),
+                ),
               ),
             ),
             Container(
@@ -84,18 +94,12 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
                         ),
                       ),
                       Expanded(
-                        flex: 14,
+                        flex: 8,
                         child: TextFormField(
                           enabled: false,
                           initialValue: this.widget.collaborator.email,
                           style: TextStyle(fontSize: 18),
                           maxLines: 1,
-                          validator: (value) {
-                            if (value.isEmpty) {
-                              return 'Email cannot be empty';
-                            }
-                            return null;
-                          },
                         ),
                       )
                     ],
@@ -112,6 +116,7 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
                       Expanded(
                         flex: 8,
                         child: TextFormField(
+                          key: ObjectKey(collaboratorName),
                           enabled: false,
                           initialValue: collaboratorName,
                           style: TextStyle(fontSize: 18),
