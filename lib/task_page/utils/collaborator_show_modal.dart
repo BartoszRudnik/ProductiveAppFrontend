@@ -176,7 +176,7 @@ class CollaboratorModal {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.done_all_outlined),
+                    Icon(Icons.update_outlined),
                     SizedBox(
                       width: 16,
                     ),

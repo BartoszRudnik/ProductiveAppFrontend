@@ -106,66 +106,88 @@ class _RecentTasksState extends State<RecentTasks> {
         iconTheme: Theme.of(context).iconTheme,
         brightness: Brightness.dark,
       ),
-      body: Container(
-        height: MediaQuery.of(context).size.height,
-        child: RefreshIndicator(
-          onRefresh: () => Future.sync(
-            () => this._pagingController.refresh(),
-          ),
-          child: Column(
-            children: [
-              Container(
-                height: 190,
-                child: Chart(
-                  recentTasks: this._recentTasks,
+      body: this.widget.collaborator.receivedPermission
+          ? Container(
+              height: MediaQuery.of(context).size.height,
+              child: RefreshIndicator(
+                onRefresh: () => Future.sync(
+                  () => this._pagingController.refresh(),
                 ),
-              ),
-              Expanded(
-                child: PagedListView.separated(
-                  builderDelegate: PagedChildBuilderDelegate<CollaboratorTask>(
-                    itemBuilder: (context, task, index) => GestureDetector(
-                      onTap: () {
-                        return CollaboratorModal.onTaskPressed(task, context);
-                      },
-                      child: Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                task.title,
-                                textAlign: TextAlign.start,
-                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                child: Column(
+                  children: [
+                    Container(
+                      height: 190,
+                      child: Chart(
+                        recentTasks: this._recentTasks,
+                      ),
+                    ),
+                    Expanded(
+                      child: PagedListView.separated(
+                        builderDelegate: PagedChildBuilderDelegate<CollaboratorTask>(
+                          itemBuilder: (context, task, index) => GestureDetector(
+                            onTap: () {
+                              return CollaboratorModal.onTaskPressed(task, context);
+                            },
+                            child: Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      task.title,
+                                      textAlign: TextAlign.start,
+                                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                                    ),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.update_outlined),
+                                        SizedBox(
+                                          width: 10,
+                                        ),
+                                        Text(
+                                          DateFormat('yMMMMd').format(task.lastUpdated) + ' ' + DateFormat('Hm').format(task.lastUpdated),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ),
                               ),
-                              Row(
-                                children: [
-                                  Icon(Icons.done_all_outlined),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Text(
-                                    DateFormat('yMMMMd').format(task.lastUpdated) + ' ' + DateFormat('Hm').format(task.lastUpdated),
-                                  ),
-                                ],
-                              )
-                            ],
+                            ),
                           ),
+                        ),
+                        pagingController: this._pagingController,
+                        padding: const EdgeInsets.all(12),
+                        separatorBuilder: (context, index) => const SizedBox(
+                          height: 12,
                         ),
                       ),
                     ),
-                  ),
-                  pagingController: this._pagingController,
-                  padding: const EdgeInsets.all(12),
-                  separatorBuilder: (context, index) => const SizedBox(
-                    height: 16,
-                  ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
+            )
+          : Center(
+              child: Column(
+                children: [
+                  Text('You don\'t have permission to see collaborator acitivity!'),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Theme.of(context).primaryColor,
+                      side: BorderSide(color: Theme.of(context).primaryColor),
+                    ),
+                    onPressed: () {},
+                    child: Text(
+                      'Ask for permission',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(context).accentColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
     );
   }
 }
