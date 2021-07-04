@@ -5,9 +5,11 @@ class Dialogs {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
-              title: Text(
-                'Warning',
-                style: Theme.of(context).textTheme.headline2,
+              title: Center(
+                child: Text(
+                  'Warning',
+                  style: Theme.of(context).textTheme.headline2,
+                ),
               ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
-import 'package:productive_app/task_page/task_screens/task_map.dart';
+import 'package:productive_app/task_page/task_screens/collaborator_profile_tabs.dart';
 import 'package:provider/provider.dart';
 
 import 'login/providers/auth_provider.dart';
@@ -27,6 +27,7 @@ import 'task_page/task_screens/settings_tabs_screen.dart';
 import 'task_page/task_screens/tabs_screen.dart';
 import 'task_page/task_screens/tags_screen.dart';
 import 'task_page/task_screens/task_details_screen.dart';
+import 'task_page/task_screens/task_map.dart';
 import 'task_page/task_screens/trash_screen.dart';
 
 void main() async {
@@ -150,6 +151,7 @@ class MyApp extends StatelessWidget {
             RelatedTaskInfoScreen.routeName: (ctx) => RelatedTaskInfoScreen(),
             LocationsScreen.routeName: (ctx) => LocationsScreen(),
             TaskMap.routeName: (ctx) => TaskMap(),
+            CollaboratorProfileTabs.routeName: (ctx) => CollaboratorProfileTabs(),
           },
         ),
       ),

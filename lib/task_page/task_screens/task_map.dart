@@ -150,7 +150,7 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
             children: [
               Center(
                 child: Text(
-                  "Task info",
+                  "Task (" + (this.tasks.indexWhere((element) => element.id == task.id) + 1).toString() + '/' + this.tasks.length.toString() + ')',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),

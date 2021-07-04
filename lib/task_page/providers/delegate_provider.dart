@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:productive_app/task_page/models/collaborator.dart';
+import 'package:productive_app/task_page/models/collaboratorTask.dart';
 
 class DelegateProvider with ChangeNotifier {
   List<Collaborator> collaborators = [];
@@ -41,6 +42,199 @@ class DelegateProvider with ChangeNotifier {
     return [...this._send];
   }
 
+  Future<void> askForPermission(String collaboratorEmail) async {
+    final requestUrl = this._serverUrl + 'delegate/askForPermission/${this.userEmail}/$collaboratorEmail';
+
+    try {
+      final response = await http.post(
+        requestUrl,
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<void> acceptAskForPermission(String collaboratorEmail) async {
+    final requestUrl = this._serverUrl + 'delegate/acceptAskForPermission/${this.userEmail}/$collaboratorEmail';
+
+    try {
+      final response = await http.post(
+        requestUrl,
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<void> declineAskForPermission(String collaboratorEmail) async {
+    final requestUrl = this._serverUrl + 'delegate/declineAskForPermission/${this.userEmail}/$collaboratorEmail';
+
+    try {
+      final response = await http.post(
+        requestUrl,
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<void> changePermission(String collaboratorEmail) async {
+    final requestUrl = this._serverUrl + 'delegate/changePermission/${this.userEmail}/$collaboratorEmail';
+
+    try {
+      final response = await http.post(
+        requestUrl,
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      this.collaborators.firstWhere((collaborator) => collaborator.email == collaboratorEmail).sentPermission = !this.collaborators.firstWhere((collaborator) => collaborator.email == collaboratorEmail).sentPermission;
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw error;
+    }
+  }
+
+  Future<String> getCollaboratorName(String collaboratorEmail) async {
+    final requestUrl = this._serverUrl + 'delegate/getCollaboratorName/${this.userEmail}/$collaboratorEmail';
+
+    try {
+      final response = await http.get(
+        requestUrl,
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      final responseBody = json.decode(utf8.decode(response.bodyBytes));
+
+      if (responseBody['collaboratorName'] != null) {
+        return responseBody['collaboratorName'];
+      } else {
+        return '';
+      }
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<int> getNumberOfCollaboratorActiveTasks(String collaboratorEmail) async {
+    final requestUrl = this._serverUrl + 'delegate/getNumberOfCollaboratorActiveTasks/${this.userEmail}/$collaboratorEmail';
+
+    try {
+      final response = await http.get(requestUrl);
+      final responseBody = response.body;
+
+      if (responseBody != null) {
+        return int.parse(responseBody);
+      } else {
+        return 0;
+      }
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<int> getNumberOfCollaboratorFinishedTasks(String collaboratorEmail) async {
+    final requestUrl = this._serverUrl + 'delegate/getNumberOfCollaboratorFinishedTasks/${this.userEmail}/$collaboratorEmail';
+
+    try {
+      final response = await http.get(requestUrl);
+
+      final responseBody = response.body;
+
+      if (responseBody != null) {
+        return int.parse(responseBody);
+      } else {
+        return 0;
+      }
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<List<CollaboratorTask>> getCollaboratorActiveTasks(String collaboratorEmail, int page, int size) async {
+    final requestUrl = this._serverUrl + 'delegate/getCollaboratorActiveTasks/${this.userEmail}/$collaboratorEmail/$page/$size';
+
+    List<CollaboratorTask> loadedTasks = [];
+
+    try {
+      final response = await http.get(requestUrl);
+      final responseBody = json.decode(utf8.decode(response.bodyBytes));
+
+      for (var element in responseBody) {
+        CollaboratorTask collaboratorTask = CollaboratorTask(
+          id: element['id_task'],
+          title: element['task_name'],
+          description: element['description'],
+          startDate: DateTime.parse(element['startDate']),
+          endDate: DateTime.parse(element['endDate']),
+          lastUpdated: DateTime.parse(element['lastUpdated']),
+        );
+
+        loadedTasks.add(collaboratorTask);
+      }
+
+      return loadedTasks;
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<List<CollaboratorTask>> getCollaboratorRecentlyFinishedTasks(String collaboratorEmail, int page, int size) async {
+    final requestUrl = this._serverUrl + 'delegate/getCollaboratorRecentlyFinished/${this.userEmail}/$collaboratorEmail/$page/$size';
+
+    List<CollaboratorTask> loadedTasks = [];
+
+    try {
+      final response = await http.get(requestUrl);
+
+      final responseBody = json.decode(utf8.decode(response.bodyBytes));
+
+      for (var element in responseBody) {
+        CollaboratorTask collaboratorTask = CollaboratorTask(
+          id: element['id_task'],
+          title: element['task_name'],
+          description: element['description'],
+          startDate: DateTime.parse(element['startDate']),
+          endDate: DateTime.parse(element['endDate']),
+          lastUpdated: DateTime.parse(element['lastUpdated']),
+        );
+
+        loadedTasks.add(collaboratorTask);
+      }
+
+      return loadedTasks;
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
   Future<void> getCollaborators() async {
     final requestUrl = this._serverUrl + 'delegate/getAllCollaborators/${this.userEmail}';
 
@@ -52,14 +246,26 @@ class DelegateProvider with ChangeNotifier {
       final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
       for (var element in responseBody) {
+        bool isAskingForPermission = false;
+        bool alreadyAsked = false;
+        bool receivedPermission = false;
+        bool sentPermission = false;
         bool isReceived = false;
         String collaboratorEmail = '';
 
         if (element['invitationSender'] == this.userEmail) {
           collaboratorEmail = element['invitationReceiver'];
+          sentPermission = element['user2Permission'];
+          receivedPermission = element['user1Permission'];
+          isAskingForPermission = element['user2AskForPermission'];
+          alreadyAsked = element['user1AskForPermission'];
         } else {
           isReceived = true;
           collaboratorEmail = element['invitationSender'];
+          sentPermission = element['user1Permission'];
+          receivedPermission = element['user2Permission'];
+          isAskingForPermission = element['user1AskForPermission'];
+          alreadyAsked = element['user2AskForPermission'];
         }
 
         Collaborator newCollaborator = Collaborator(
@@ -68,6 +274,10 @@ class DelegateProvider with ChangeNotifier {
           relationState: element['relationState'],
           isSelected: false,
           received: isReceived,
+          sentPermission: sentPermission,
+          receivedPermission: receivedPermission,
+          alreadyAsked: alreadyAsked,
+          isAskingForPermission: isAskingForPermission,
         );
 
         loadedCollaborators.add(newCollaborator);
@@ -100,9 +310,7 @@ class DelegateProvider with ChangeNotifier {
 
       if (collaborator.relationState == 'WAITING') {
         this._send.remove(collaborator);
-        print('usuwanie wyslanych');
       } else {
-        print('usuwanie accepted');
         this._accepted.remove(collaborator);
       }
 
