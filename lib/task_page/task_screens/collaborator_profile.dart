@@ -139,24 +139,48 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
                 ),
               ),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Card(
-                      elevation: 8,
-                      child: SwitchListTile(
-                        activeColor: Theme.of(context).primaryColor,
-                        title: Text('Grant access to my activity'),
-                        value: grantAccess,
-                        onChanged: (bool value) {
-                          setState(
-                            () {
-                              grantAccess = value;
-                              Provider.of<DelegateProvider>(context, listen: false).changePermission(this.widget.collaborator.email);
-                            },
-                          );
-                        },
+                  if (this.widget.collaborator.isAskingForPermission)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Color.fromRGBO(201, 201, 206, 1),
+                        border: Border.all(
+                          color: Colors.grey.withOpacity(0.8),
+                        ),
                       ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Text(
+                            'Asked for permission to see your activity',
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.cancel_outlined),
+                            onPressed: () {
+                              Provider.of<DelegateProvider>(context, listen: false).declineAskForPermission(this.widget.collaborator.email);
+                              setState(() {
+                                this.widget.collaborator.isAskingForPermission = false;
+                              });
+                            },
+                          )
+                        ],
+                      ),
+                    ),
+                  Card(
+                    elevation: 8,
+                    child: SwitchListTile(
+                      activeColor: Theme.of(context).primaryColor,
+                      title: Text('Grant access to my activity'),
+                      value: grantAccess,
+                      onChanged: (bool value) {
+                        setState(
+                          () {
+                            grantAccess = value;
+                            Provider.of<DelegateProvider>(context, listen: false).changePermission(this.widget.collaborator.email);
+                          },
+                        );
+                      },
                     ),
                   ),
                   ElevatedButton(

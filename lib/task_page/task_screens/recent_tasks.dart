@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/shared/dialogs.dart';
 import 'package:productive_app/task_page/models/collaboratorTask.dart';
 import 'package:productive_app/task_page/providers/delegate_provider.dart';
 import 'package:productive_app/task_page/utils/collaborator_show_modal.dart';
@@ -169,6 +170,7 @@ class _RecentTasksState extends State<RecentTasks> {
             )
           : Center(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text('You don\'t have permission to see collaborator acitivity!'),
                   ElevatedButton(
@@ -176,7 +178,14 @@ class _RecentTasksState extends State<RecentTasks> {
                       primary: Theme.of(context).primaryColor,
                       side: BorderSide(color: Theme.of(context).primaryColor),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      if (this.widget.collaborator.alreadyAsked) {
+                        return Dialogs.showWarningDialog(context, 'You already asked for permission!');
+                      } else {
+                        Provider.of<DelegateProvider>(context, listen: false).askForPermission(this.widget.collaborator.email);
+                        this.widget.collaborator.alreadyAsked = true;
+                      }
+                    },
                     child: Text(
                       'Ask for permission',
                       style: TextStyle(

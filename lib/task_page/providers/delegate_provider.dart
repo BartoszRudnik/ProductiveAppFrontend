@@ -42,6 +42,57 @@ class DelegateProvider with ChangeNotifier {
     return [...this._send];
   }
 
+  Future<void> askForPermission(String collaboratorEmail) async {
+    final requestUrl = this._serverUrl + 'delegate/askForPermission/${this.userEmail}/$collaboratorEmail';
+
+    try {
+      final response = await http.post(
+        requestUrl,
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<void> acceptAskForPermission(String collaboratorEmail) async {
+    final requestUrl = this._serverUrl + 'delegate/acceptAskForPermission/${this.userEmail}/$collaboratorEmail';
+
+    try {
+      final response = await http.post(
+        requestUrl,
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<void> declineAskForPermission(String collaboratorEmail) async {
+    final requestUrl = this._serverUrl + 'delegate/declineAskForPermission/${this.userEmail}/$collaboratorEmail';
+
+    try {
+      final response = await http.post(
+        requestUrl,
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
   Future<void> changePermission(String collaboratorEmail) async {
     final requestUrl = this._serverUrl + 'delegate/changePermission/${this.userEmail}/$collaboratorEmail';
 
@@ -195,6 +246,8 @@ class DelegateProvider with ChangeNotifier {
       final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
       for (var element in responseBody) {
+        bool isAskingForPermission = false;
+        bool alreadyAsked = false;
         bool receivedPermission = false;
         bool sentPermission = false;
         bool isReceived = false;
@@ -204,11 +257,15 @@ class DelegateProvider with ChangeNotifier {
           collaboratorEmail = element['invitationReceiver'];
           sentPermission = element['user2Permission'];
           receivedPermission = element['user1Permission'];
+          isAskingForPermission = element['user2AskForPermission'];
+          alreadyAsked = element['user1AskForPermission'];
         } else {
           isReceived = true;
           collaboratorEmail = element['invitationSender'];
           sentPermission = element['user1Permission'];
           receivedPermission = element['user2Permission'];
+          isAskingForPermission = element['user1AskForPermission'];
+          alreadyAsked = element['user2AskForPermission'];
         }
 
         Collaborator newCollaborator = Collaborator(
@@ -219,6 +276,8 @@ class DelegateProvider with ChangeNotifier {
           received: isReceived,
           sentPermission: sentPermission,
           receivedPermission: receivedPermission,
+          alreadyAsked: alreadyAsked,
+          isAskingForPermission: isAskingForPermission,
         );
 
         loadedCollaborators.add(newCollaborator);
@@ -251,9 +310,7 @@ class DelegateProvider with ChangeNotifier {
 
       if (collaborator.relationState == 'WAITING') {
         this._send.remove(collaborator);
-        print('usuwanie wyslanych');
       } else {
-        print('usuwanie accepted');
         this._accepted.remove(collaborator);
       }
 
