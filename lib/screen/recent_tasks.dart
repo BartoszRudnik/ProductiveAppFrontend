@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/widget/chart/collaborator_tasks_chart.dart';
 import 'package:provider/provider.dart';
 import '../model/collaborator.dart';
 import '../model/collaboratorTask.dart';
@@ -8,7 +9,6 @@ import '../provider/delegate_provider.dart';
 import '../utils/collaborator_show_modal.dart';
 import '../widget/appBar/active_tasks_appBar.dart';
 import '../widget/ask_for_activity_permission.dart';
-import '../widget/chart.dart';
 
 class RecentTasks extends StatefulWidget {
   Collaborator collaborator;
@@ -92,6 +92,37 @@ class _RecentTasksState extends State<RecentTasks> {
         : [];
   }
 
+  int get _weekTasks {
+    int totalTasks = 0;
+    _groupedTransactionsValues.forEach((element) {
+      totalTasks += element['amount'];
+    });
+    return totalTasks;
+  }
+
+  List<Map<String, Object>> get _groupedTransactionsValues {
+    return List.generate(7, (index) {
+      final weekDay = DateTime.now().subtract(
+        Duration(days: index),
+      );
+      int dayTotalTasks = 0;
+
+      final recentTasks = this._recentTasks;
+
+      for (var i = 0; i < recentTasks.length; i++) {
+        if (recentTasks[i].lastUpdated.day == weekDay.day && recentTasks[i].lastUpdated.month == weekDay.month && recentTasks[i].lastUpdated.year == weekDay.year) {
+          dayTotalTasks += 1;
+        }
+      }
+
+      return {
+        'calendarDay': DateFormat.MMMd().format(weekDay),
+        'day': DateFormat.E().format(weekDay),
+        'amount': dayTotalTasks,
+      };
+    }).reversed.toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,9 +137,10 @@ class _RecentTasksState extends State<RecentTasks> {
                 child: Column(
                   children: [
                     Container(
-                      height: 190,
-                      child: Chart(
-                        recentTasks: this._recentTasks,
+                      height: 205,
+                      child: CollaboratorTasksChart(
+                        tasks: this._groupedTransactionsValues,
+                        weekTasks: this._weekTasks,
                       ),
                     ),
                     Expanded(

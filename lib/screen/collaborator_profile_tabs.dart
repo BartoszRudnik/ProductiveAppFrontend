@@ -21,18 +21,13 @@ class _CollaboratorProfileTabsState extends State<CollaboratorProfileTabs> {
   int _selectedPageIndex = 0;
 
   @override
-  void initState() {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
     this._selectedItemColor = Theme.of(context).accentColor;
     this._unselectedItemColor = Theme.of(context).primaryColor;
     this._selectedBgColor = Theme.of(context).primaryColor;
     this._unselectedBgColor = Theme.of(context).accentColor;
-
-    super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
 
     final collaborator = ModalRoute.of(context).settings.arguments as Collaborator;
 

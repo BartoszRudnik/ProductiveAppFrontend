@@ -4,17 +4,19 @@ class ChartBar extends StatelessWidget {
   final String weekDayLabel;
   final int tasksFinished;
   final double tasksFinishedPercent;
+  final String calendarDay;
 
   ChartBar({
-    this.tasksFinished,
-    this.tasksFinishedPercent,
-    this.weekDayLabel,
+    @required this.tasksFinished,
+    @required this.tasksFinishedPercent,
+    @required this.weekDayLabel,
+    @required this.calendarDay,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: <Widget>[
+      children: [
         Container(
           height: 20,
           child: FittedBox(
@@ -30,7 +32,7 @@ class ChartBar extends StatelessWidget {
           height: 80,
           width: 10,
           child: Stack(
-            children: <Widget>[
+            children: [
               Container(
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey, width: 1.0),
@@ -61,7 +63,12 @@ class ChartBar extends StatelessWidget {
         ),
         FittedBox(
           child: Text(
-            weekDayLabel,
+            this.weekDayLabel,
+          ),
+        ),
+        FittedBox(
+          child: Text(
+            this.calendarDay,
           ),
         ),
       ],
