@@ -22,6 +22,7 @@ class FiltersAppBar extends StatelessWidget with PreferredSizeWidget {
       backgroundColor: Theme.of(context).accentColor,
       iconTheme: Theme.of(context).iconTheme,
       brightness: Brightness.dark,
+      backwardsCompatibility: false,
       leading: (leadingButton != null) ? leadingButton : null,
     );
   }

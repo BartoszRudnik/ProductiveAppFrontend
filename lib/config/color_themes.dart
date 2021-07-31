@@ -37,4 +37,33 @@ class ColorThemes {
     fontFamily: 'Lato',
     textTheme: TextThemes.textTheme,
   );
+
+  static InputDecoration loginFormFieldDecoration(BuildContext context, String labelText, IconData icon) {
+    return InputDecoration(
+      focusedBorder: UnderlineInputBorder(
+        borderSide: BorderSide(color: Theme.of(context).primaryColorDark),
+      ),
+      enabledBorder: UnderlineInputBorder(
+        borderSide: BorderSide(color: Theme.of(context).primaryColorDark),
+      ),
+      border: UnderlineInputBorder(
+        borderSide: BorderSide(color: Theme.of(context).primaryColorDark),
+      ),
+      errorStyle: TextStyle(
+        height: 0,
+        color: Colors.transparent,
+      ),
+      focusedErrorBorder: UnderlineInputBorder(
+        borderSide: BorderSide(color: Theme.of(context).primaryColor),
+      ),
+      errorBorder: UnderlineInputBorder(
+        borderSide: BorderSide(color: Theme.of(context).primaryColor),
+      ),
+      labelText: labelText,
+      prefixIcon: Icon(
+        icon,
+        color: Theme.of(context).primaryColorDark,
+      ),
+    );
+  }
 }

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:productive_app/config/color_themes.dart';
 import 'package:provider/provider.dart';
 
 import '../widget/appBar/login_appbar.dart';
@@ -54,7 +55,10 @@ class _ResetPasswordState extends State<ResetPassword> {
         builder: (context) => AlertDialog(
           title: Text(
             'Reset Password Success',
-            style: Theme.of(context).textTheme.headline2,
+            style: TextStyle(
+              fontSize: 26,
+              fontFamily: 'RobotoCondensed',
+            ),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -141,19 +145,10 @@ class _ResetPasswordState extends State<ResetPassword> {
                     }
                     return null;
                   },
-                  decoration: InputDecoration(
-                    errorStyle: TextStyle(
-                      height: 0,
-                      color: Colors.transparent,
-                    ),
-                    focusedErrorBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Theme.of(context).primaryColor),
-                    ),
-                    errorBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Theme.of(context).primaryColor),
-                    ),
-                    labelText: 'E-mail',
-                    prefixIcon: Icon(Icons.person_outline),
+                  decoration: ColorThemes.loginFormFieldDecoration(
+                    context,
+                    'Email',
+                    Icons.email_outlined,
                   ),
                 ),
                 SizedBox(height: 50),

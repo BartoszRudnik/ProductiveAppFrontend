@@ -31,6 +31,7 @@ class _NewTaskAppBarState extends State<NewTaskAppBar> {
       systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: Colors.black),
       backgroundColor: Theme.of(context).accentColor,
       iconTheme: Theme.of(context).iconTheme,
+      backwardsCompatibility: false,
       brightness: Brightness.dark,
       leading: (widget.leadingButton != null) ? widget.leadingButton : null,
       actions: <Widget>[

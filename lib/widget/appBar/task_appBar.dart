@@ -20,6 +20,7 @@ class TaskAppBar extends StatelessWidget with PreferredSizeWidget {
       ),
       systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: Colors.black),
       backgroundColor: Theme.of(context).accentColor,
+      backwardsCompatibility: false,
       iconTheme: Theme.of(context).iconTheme,
       brightness: Brightness.dark,
       leading: (leadingButton != null) ? leadingButton : null,

@@ -1,8 +1,7 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:productive_app/config/color_themes.dart';
 import 'package:provider/provider.dart';
-
 import '../exception/HttpException.dart';
 import '../provider/auth_provider.dart';
 import '../screen/reset_password_screen.dart';
@@ -21,10 +20,8 @@ class _LoginWidgetState extends State<LoginWidget> {
   var _isLogin = true;
   var _isLoading = false;
   var _isSuccessfull = false;
-
   var _email = '';
   var _password = '';
-
   var _authenticationFailedMessage = 'Authentication failed';
 
   @override
@@ -159,7 +156,7 @@ class _LoginWidgetState extends State<LoginWidget> {
         child: Form(
           key: this._formKey,
           child: Column(
-            children: <Widget>[
+            children: [
               LoginGreet(greetText: this._isLogin ? 'Welcome back' : 'Create account'),
               if (!this._isValid) ValidationFailWidget(message: this._authenticationFailedMessage),
               SizedBox(
@@ -180,19 +177,10 @@ class _LoginWidgetState extends State<LoginWidget> {
                   }
                   return null;
                 },
-                decoration: InputDecoration(
-                  errorStyle: TextStyle(
-                    height: 0,
-                    color: Colors.transparent,
-                  ),
-                  focusedErrorBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Theme.of(context).primaryColor),
-                  ),
-                  errorBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Theme.of(context).primaryColor),
-                  ),
-                  labelText: 'E-mail',
-                  prefixIcon: Icon(Icons.person_outline),
+                decoration: ColorThemes.loginFormFieldDecoration(
+                  context,
+                  'Email',
+                  Icons.email_outlined,
                 ),
               ),
               SizedBox(
@@ -213,19 +201,10 @@ class _LoginWidgetState extends State<LoginWidget> {
                   this._password = value;
                 },
                 obscureText: true,
-                decoration: InputDecoration(
-                  errorStyle: TextStyle(
-                    height: 0,
-                    color: Colors.transparent,
-                  ),
-                  focusedErrorBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Theme.of(context).primaryColor),
-                  ),
-                  errorBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Theme.of(context).primaryColor),
-                  ),
-                  labelText: 'Password',
-                  prefixIcon: Icon(Icons.lock_outline),
+                decoration: ColorThemes.loginFormFieldDecoration(
+                  context,
+                  'Password',
+                  Icons.lock_outline,
                 ),
               ),
               this._isLogin
@@ -276,7 +255,10 @@ class _LoginWidgetState extends State<LoginWidget> {
                 children: <Widget>[
                   Text(
                     this._isLogin ? 'Don\'t have account?' : 'Already have a account',
-                    style: Theme.of(context).textTheme.headline4,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontFamily: 'RobotoCondensed',
+                    ),
                   ),
                   TextButton(
                     onPressed: () {

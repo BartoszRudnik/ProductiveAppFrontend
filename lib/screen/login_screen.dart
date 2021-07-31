@@ -11,15 +11,9 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: LoginAppBar(),
-      backgroundColor: Theme.of(context).accentColor,
       body: LoginWidget(),
     );
   }

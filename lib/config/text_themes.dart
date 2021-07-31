@@ -15,17 +15,14 @@ class TextThemes {
     headline4: TextStyle(
       fontSize: 12,
       fontFamily: 'RobotoCondensed',
-      color: Colors.black,
     ),
     headline3: TextStyle(
       fontSize: 36,
       fontFamily: 'RobotoCondensed',
-      color: Colors.black,
     ),
     headline2: TextStyle(
       fontSize: 26,
       fontFamily: 'RobotoCondensed',
-      color: Colors.black,
     ),
   );
 }
