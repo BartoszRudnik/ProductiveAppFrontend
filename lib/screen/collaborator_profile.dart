@@ -162,6 +162,7 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
                       ),
                     ),
                   Card(
+                    color: Theme.of(context).primaryColorDark,
                     elevation: 8,
                     child: SwitchListTile(
                       activeColor: Theme.of(context).primaryColor,

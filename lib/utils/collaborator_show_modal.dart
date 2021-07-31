@@ -12,7 +12,6 @@ class CollaboratorModal {
           topRight: const Radius.circular(30.0),
         ),
       ),
-      backgroundColor: Colors.white,
       context: context,
       builder: (context) {
         return Container(
@@ -24,9 +23,9 @@ class CollaboratorModal {
               Container(
                 padding: EdgeInsets.only(top: 10, left: 6, bottom: 6),
                 decoration: BoxDecoration(
-                  color: Color.fromRGBO(250, 250, 250, 1),
+                  color: Theme.of(context).primaryColorLight,
                   border: Border.all(
-                    color: Color.fromRGBO(221, 221, 226, 1),
+                    color: Theme.of(context).primaryColorDark,
                     width: 2.5,
                   ),
                 ),
@@ -63,9 +62,9 @@ class CollaboratorModal {
               Container(
                 padding: EdgeInsets.only(top: 10, left: 6, bottom: 6),
                 decoration: BoxDecoration(
-                  color: Color.fromRGBO(250, 250, 250, 1),
+                  color: Theme.of(context).primaryColorLight,
                   border: Border.all(
-                    color: Color.fromRGBO(221, 221, 226, 1),
+                    color: Theme.of(context).primaryColorDark,
                     width: 2.5,
                   ),
                 ),
@@ -90,8 +89,8 @@ class CollaboratorModal {
                               ElevatedButton(
                                 onPressed: () {},
                                 style: ElevatedButton.styleFrom(
-                                  primary: Color.fromRGBO(237, 237, 240, 1),
-                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
+                                  primary: Theme.of(context).primaryColorLight,
+                                  onPrimary: Theme.of(context).primaryColor,
                                 ),
                                 child: Center(
                                   child: task.startDate.toString() == "null" || task.startDate.year == 1970
@@ -105,8 +104,8 @@ class CollaboratorModal {
                               ElevatedButton(
                                 onPressed: () {},
                                 style: ElevatedButton.styleFrom(
-                                  primary: Color.fromRGBO(237, 237, 240, 1),
-                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
+                                  primary: Theme.of(context).primaryColorLight,
+                                  onPrimary: Theme.of(context).primaryColor,
                                 ),
                                 child: Center(
                                   child: task.startDate.toString() == "null" || task.startDate.year == 1970
@@ -131,8 +130,8 @@ class CollaboratorModal {
                               ElevatedButton(
                                 onPressed: () {},
                                 style: ElevatedButton.styleFrom(
-                                  primary: Color.fromRGBO(237, 237, 240, 1),
-                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
+                                  primary: Theme.of(context).primaryColorLight,
+                                  onPrimary: Theme.of(context).primaryColor,
                                 ),
                                 child: Center(
                                   child: task.endDate.toString() == "null" || task.endDate.year == 1970
@@ -146,8 +145,8 @@ class CollaboratorModal {
                               ElevatedButton(
                                 onPressed: () {},
                                 style: ElevatedButton.styleFrom(
-                                  primary: Color.fromRGBO(237, 237, 240, 1),
-                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
+                                  primary: Theme.of(context).primaryColorLight,
+                                  onPrimary: Theme.of(context).primaryColor,
                                 ),
                                 child: Center(
                                   child: task.endDate.toString() == "null" || task.endDate.year == 1970
@@ -168,9 +167,9 @@ class CollaboratorModal {
               Container(
                 padding: EdgeInsets.only(top: 10, left: 6, bottom: 6),
                 decoration: BoxDecoration(
-                  color: Color.fromRGBO(250, 250, 250, 1),
+                  color: Theme.of(context).primaryColorLight,
                   border: Border.all(
-                    color: Color.fromRGBO(221, 221, 226, 1),
+                    color: Theme.of(context).primaryColorDark,
                     width: 2.5,
                   ),
                 ),
@@ -190,8 +189,8 @@ class CollaboratorModal {
                           ElevatedButton(
                             onPressed: () {},
                             style: ElevatedButton.styleFrom(
-                              primary: Color.fromRGBO(237, 237, 240, 1),
-                              onPrimary: Color.fromRGBO(119, 119, 120, 1),
+                              primary: Theme.of(context).primaryColorLight,
+                              onPrimary: Theme.of(context).primaryColor,
                             ),
                             child: Center(
                               child: task.lastUpdated.toString() == "null" || task.lastUpdated.year == 1970
@@ -205,8 +204,8 @@ class CollaboratorModal {
                           ElevatedButton(
                             onPressed: () {},
                             style: ElevatedButton.styleFrom(
-                              primary: Color.fromRGBO(237, 237, 240, 1),
-                              onPrimary: Color.fromRGBO(119, 119, 120, 1),
+                              primary: Theme.of(context).primaryColorLight,
+                              onPrimary: Theme.of(context).primaryColor,
                             ),
                             child: Center(
                               child: task.lastUpdated.toString() == "null" || task.lastUpdated.year == 1970

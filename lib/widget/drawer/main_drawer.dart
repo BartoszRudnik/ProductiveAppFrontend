@@ -1,8 +1,9 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
+import 'package:productive_app/config/images.dart';
 import 'package:productive_app/screen/locations_screen.dart';
+import 'package:productive_app/utils/dialogs.dart';
 import 'package:provider/provider.dart';
-
 import '../../provider/auth_provider.dart';
 import '../../provider/delegate_provider.dart';
 import '../../screen/completed_screen.dart';
@@ -59,7 +60,7 @@ class _MainDrawerState extends State<MainDrawer> {
                 height: 100,
                 child: CircleAvatar(
                   radius: 50,
-                  backgroundImage: AssetImage('assets/images/profile_placeholder.jpg'),
+                  backgroundImage: AssetImage(Images.profilePicturePlacholder),
                 ),
               ),
             Container(
@@ -106,10 +107,6 @@ class _MainDrawerState extends State<MainDrawer> {
                 routeName: SettingsTabsScreen.routeName,
               ),
             ),
-            // DrawerListTile(
-            //   icon: Icons.save,
-            //   title: 'Projects',
-            // ),
             DrawerListTile(
               icon: Icons.tag,
               title: 'Tags',
@@ -139,64 +136,7 @@ class _MainDrawerState extends State<MainDrawer> {
               contentPadding: EdgeInsets.symmetric(horizontal: 0),
               leading: Icon(Icons.logout),
               title: Text('Log out'),
-              onTap: () {
-                return showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Center(
-                      child: Text(
-                        'Log out',
-                        style: Theme.of(context).textTheme.headline3,
-                      ),
-                    ),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text('Are you sure you want to log out?'),
-                        SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                primary: Theme.of(context).primaryColor,
-                                side: BorderSide(color: Theme.of(context).primaryColor),
-                              ),
-                              onPressed: () {
-                                Provider.of<AuthProvider>(context, listen: false).logout();
-                                Navigator.of(context).pop(true);
-                              },
-                              child: Text(
-                                'Yes',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Theme.of(context).accentColor,
-                                ),
-                              ),
-                            ),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                primary: Theme.of(context).primaryColor,
-                                side: BorderSide(color: Theme.of(context).primaryColor),
-                              ),
-                              onPressed: () {
-                                Navigator.of(context).pop(false);
-                              },
-                              child: Text(
-                                'No',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Theme.of(context).accentColor,
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                );
-              },
+              onTap: () => Dialogs.logoutDialog(context),
             ),
           ],
         ),

@@ -43,13 +43,12 @@ class _CollaboratorsScreenState extends State<CollaboratorsScreen> {
       floatingActionButton: FloatingActionButton(
         child: Icon(
           Icons.add,
-          color: Theme.of(context).accentColor,
+          color: Colors.white,
           size: 50,
         ),
         onPressed: () {
           this._addNewCollaboratorForm(context);
         },
-        backgroundColor: Theme.of(context).primaryColor,
       ),
       body: RefreshIndicator(
         backgroundColor: Theme.of(context).primaryColor,

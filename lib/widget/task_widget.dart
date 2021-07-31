@@ -104,7 +104,11 @@ class _TaskWidgetState extends State<TaskWidget> {
                     title: Center(
                       child: Text(
                         isArchived ? 'Delete' : 'Archive',
-                        style: Theme.of(context).textTheme.headline3,
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                     content: Column(
