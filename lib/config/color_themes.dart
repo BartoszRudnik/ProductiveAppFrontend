@@ -8,6 +8,13 @@ class ColorThemes {
     accentColor: Colors.white,
     primaryColorLight: Color.fromRGBO(237, 237, 240, 1),
     primaryColorDark: Color.fromRGBO(221, 221, 226, 1),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: Colors.black,
+    ),
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      selectedItemColor: Colors.white,
+      unselectedItemColor: Colors.black,
+    ),
     colorScheme: ColorScheme.light(),
     fontFamily: 'Lato',
     textTheme: TextThemes.textTheme,
@@ -19,6 +26,13 @@ class ColorThemes {
     accentColor: Colors.black,
     primaryColorDark: Colors.grey[700],
     primaryColorLight: Colors.grey[600],
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      selectedItemColor: Colors.black,
+      unselectedItemColor: Colors.white,
+    ),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: Colors.grey[700],
+    ),
     colorScheme: ColorScheme.dark(),
     fontFamily: 'Lato',
     textTheme: TextThemes.textTheme,

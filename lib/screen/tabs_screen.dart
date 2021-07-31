@@ -1,6 +1,7 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:productive_app/provider/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../provider/delegate_provider.dart';
@@ -24,10 +25,10 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
 
   AnimationController _hideFab;
 
-  final _selectedItemColor = Colors.white;
-  final _unselectedItemColor = Colors.black;
-  final _selectedBgColor = Colors.black;
-  final _unselectedBgColor = Colors.white;
+  Color _selectedItemColor;
+  Color _unselectedItemColor;
+  Color _selectedBgColor;
+  Color _unselectedBgColor;
   int _selectedPageIndex = 0;
 
   double offsetX = 0;
@@ -46,6 +47,25 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
       return 'DELEGATED';
     } else
       return 'INBOX';
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+
+    if (isDarkMode) {
+      this._selectedItemColor = Colors.black;
+      this._unselectedItemColor = Colors.white;
+      this._selectedBgColor = Colors.white;
+      this._unselectedBgColor = Colors.grey[700];
+    } else {
+      this._selectedItemColor = Colors.white;
+      this._unselectedItemColor = Colors.black;
+      this._selectedBgColor = Colors.black;
+      this._unselectedBgColor = Colors.white;
+    }
   }
 
   @override
@@ -252,47 +272,36 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
               child: FloatingActionButton(
                 child: Icon(
                   Icons.add,
-                  color: Theme.of(context).accentColor,
+                  color: Colors.white,
                   size: 50,
                 ),
                 onPressed: () {
                   this._addNewTaskForm(context);
                 },
-                backgroundColor: Theme.of(context).primaryColor,
               ),
             ),
-            bottomNavigationBar: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                border: Border(
-                  top: BorderSide(color: Theme.of(context).primaryColor, width: 1.0),
+            bottomNavigationBar: BottomNavigationBar(
+              selectedFontSize: 0,
+              currentIndex: _selectedPageIndex,
+              type: BottomNavigationBarType.fixed,
+              items: [
+                BottomNavigationBarItem(
+                  icon: _buildIconInbox(Icons.inbox_outlined, 'Inbox', 0),
+                  title: SizedBox.shrink(),
                 ),
-              ),
-              child: BottomNavigationBar(
-                selectedFontSize: 0,
-                currentIndex: _selectedPageIndex,
-                selectedItemColor: this._selectedItemColor,
-                unselectedItemColor: this._unselectedItemColor,
-                type: BottomNavigationBarType.fixed,
-                items: [
-                  BottomNavigationBarItem(
-                    icon: _buildIconInbox(Icons.inbox_outlined, 'Inbox', 0),
-                    title: SizedBox.shrink(),
-                  ),
-                  BottomNavigationBarItem(
-                    icon: _buildIcon(Icons.access_time, 'Anytime', 1),
-                    title: SizedBox.shrink(),
-                  ),
-                  BottomNavigationBarItem(
-                    icon: _buildIcon(Icons.calendar_today, 'Scheduled', 2),
-                    title: SizedBox.shrink(),
-                  ),
-                  BottomNavigationBarItem(
-                    icon: _buildIcon(Icons.person_outline_outlined, 'Delegated', 3),
-                    title: SizedBox.shrink(),
-                  ),
-                ],
-              ),
+                BottomNavigationBarItem(
+                  icon: _buildIcon(Icons.access_time, 'Anytime', 1),
+                  title: SizedBox.shrink(),
+                ),
+                BottomNavigationBarItem(
+                  icon: _buildIcon(Icons.calendar_today, 'Scheduled', 2),
+                  title: SizedBox.shrink(),
+                ),
+                BottomNavigationBarItem(
+                  icon: _buildIcon(Icons.person_outline_outlined, 'Delegated', 3),
+                  title: SizedBox.shrink(),
+                ),
+              ],
             ),
           ),
         ),

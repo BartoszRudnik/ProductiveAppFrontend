@@ -23,31 +23,34 @@ class TaskTagsEdit extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 margin: EdgeInsets.symmetric(horizontal: 4),
                 decoration: BoxDecoration(
-                    color: Color.fromRGBO(237, 237, 240, 1),
-                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                  color: Theme.of(context).primaryColorLight,
+                  borderRadius: BorderRadius.all(Radius.circular(5)),
+                ),
                 child: Center(
                   child: Text(
                     this.tags[secondIndex].name,
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.black),
+                    style: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                    ),
                   ),
                 ),
               ),
             ),
           )
         : Container(
-          height: 30,
+            height: 30,
             alignment: Alignment.center,
             padding: EdgeInsets.symmetric(horizontal: 20),
             margin: EdgeInsets.symmetric(horizontal: 4),
-            decoration: BoxDecoration(
-                color: Color.fromRGBO(237, 237, 240, 1),
-                borderRadius: BorderRadius.all(Radius.circular(5))),
+            decoration: BoxDecoration(color: Color.fromRGBO(237, 237, 240, 1), borderRadius: BorderRadius.all(Radius.circular(5))),
             child: Center(
               child: Text(
                 "Add tags",
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Color.fromRGBO(119, 119, 120, 1),),
+                style: TextStyle(
+                  color: Color.fromRGBO(119, 119, 120, 1),
+                ),
               ),
             ),
           );

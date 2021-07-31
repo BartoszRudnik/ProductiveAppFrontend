@@ -1,6 +1,7 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:productive_app/provider/delegate_provider.dart';
+import 'package:productive_app/provider/theme_provider.dart';
 import 'package:productive_app/screen/settings_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -26,10 +27,19 @@ class _SettingsTabsScreenState extends State<SettingsTabsScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    this._selectedItemColor = Theme.of(context).accentColor;
-    this._unselectedItemColor = Theme.of(context).primaryColor;
-    this._selectedBgColor = Theme.of(context).primaryColor;
-    this._unselectedBgColor = Theme.of(context).accentColor;
+    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+
+    if (isDarkMode) {
+      this._selectedItemColor = Colors.black;
+      this._unselectedItemColor = Colors.white;
+      this._selectedBgColor = Colors.white;
+      this._unselectedBgColor = Colors.grey[700];
+    } else {
+      this._selectedItemColor = Colors.white;
+      this._unselectedItemColor = Colors.black;
+      this._selectedBgColor = Colors.black;
+      this._unselectedBgColor = Colors.white;
+    }
   }
 
   @override
@@ -98,17 +108,9 @@ class _SettingsTabsScreenState extends State<SettingsTabsScreen> {
       child: Scaffold(
         body: _pages[this._selectedPageIndex]['page'],
         bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor,
-            border: Border(
-              top: BorderSide(color: Theme.of(context).primaryColor, width: 1.0),
-            ),
-          ),
           child: BottomNavigationBar(
             selectedFontSize: 0,
             currentIndex: _selectedPageIndex,
-            selectedItemColor: this._selectedItemColor,
-            unselectedItemColor: this._unselectedItemColor,
             type: BottomNavigationBarType.fixed,
             items: [
               BottomNavigationBarItem(

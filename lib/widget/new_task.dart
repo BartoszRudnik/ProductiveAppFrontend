@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/provider/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../utils/dialogs.dart';
@@ -215,12 +216,14 @@ class _NewTaskState extends State<NewTask> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeProvider>(context, listen: false).isDarkMode;
     final priorities = Provider.of<TaskProvider>(context, listen: false).priorities;
     final localizations = Provider.of<TaskProvider>(context, listen: false).localizations;
 
     return LayoutBuilder(
       builder: (context, constraint) {
         return AnimatedContainer(
+          color: isDarkMode ? Colors.grey[700] : Colors.white,
           curve: Curves.easeInOut,
           duration: Duration(milliseconds: 300),
           height: this._screenHeight == null ? MediaQuery.of(context).size.height * 0.33 : this._screenHeight,
@@ -243,7 +246,10 @@ class _NewTaskState extends State<NewTask> {
                     changeIsDoneStatus: this.changeIsDone,
                   ),
                   title: TaskTitle(setTaskName: this.setTaskName),
-                  trailing: FullScreenButton(setFullScreen: this.setFullScreen),
+                  trailing: FullScreenButton(
+                    setFullScreen: this.setFullScreen,
+                    isDarkMode: Provider.of<ThemeProvider>(context).isDarkMode,
+                  ),
                   subtitle: TaskDescription(setTaskDescription: this.setTaskDescription),
                 ),
                 Column(
@@ -296,7 +302,10 @@ class _NewTaskState extends State<NewTask> {
                           localizations: localizations,
                           setLocalization: this.setLocalization,
                         ),
-                        AddTaskButton(addNewTask: this._addNewTask),
+                        AddTaskButton(
+                          addNewTask: this._addNewTask,
+                          isDarkMode: Provider.of<ThemeProvider>(context).isDarkMode,
+                        ),
                       ],
                     ),
                   ],

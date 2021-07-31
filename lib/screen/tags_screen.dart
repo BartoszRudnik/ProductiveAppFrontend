@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../model/tag.dart';
 import '../provider/tag_provider.dart';
 import '../provider/task_provider.dart';
@@ -60,13 +59,12 @@ class _TagsScreenState extends State<TagsScreen> {
       floatingActionButton: FloatingActionButton(
         child: Icon(
           Icons.add,
-          color: Theme.of(context).accentColor,
+          color: Colors.white,
           size: 50,
         ),
         onPressed: () {
           this._addNewTagForm(context, tags.length);
         },
-        backgroundColor: Theme.of(context).primaryColor,
       ),
       body: ListView.builder(
         padding: EdgeInsets.symmetric(vertical: 12),
