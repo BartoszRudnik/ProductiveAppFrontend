@@ -41,8 +41,8 @@ class FilterPriorities extends StatelessWidget {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.all(4),
-                        primary: Theme.of(context).accentColor,
-                        side: BorderSide(color: Theme.of(context).primaryColor),
+                        primary: Theme.of(context).primaryColorLight,
+                        side: BorderSide(color: Theme.of(context).primaryColorDark),
                       ),
                       onPressed: () async {
                         final selected = await showDialog(
@@ -88,11 +88,7 @@ class FilterPriorities extends StatelessWidget {
                         padding: EdgeInsets.symmetric(horizontal: 4),
                         margin: EdgeInsets.symmetric(horizontal: 8),
                         decoration: BoxDecoration(
-                          color: Color.fromRGBO(200, 200, 200, 1),
-                          border: Border.all(
-                            color: Color.fromRGBO(191, 191, 196, 1),
-                            width: 2.5,
-                          ),
+                          color: Theme.of(context).primaryColor,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,

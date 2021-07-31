@@ -16,11 +16,21 @@ class SettingsTabsScreen extends StatefulWidget {
 class _SettingsTabsScreenState extends State<SettingsTabsScreen> {
   List<Map<String, Object>> _pages;
 
-  final _selectedItemColor = Colors.white;
-  final _unselectedItemColor = Colors.black;
-  final _selectedBgColor = Colors.black;
-  final _unselectedBgColor = Colors.white;
+  Color _selectedItemColor;
+  Color _unselectedItemColor;
+  Color _selectedBgColor;
+  Color _unselectedBgColor;
   int _selectedPageIndex = 0;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    this._selectedItemColor = Theme.of(context).accentColor;
+    this._unselectedItemColor = Theme.of(context).primaryColor;
+    this._selectedBgColor = Theme.of(context).primaryColor;
+    this._unselectedBgColor = Theme.of(context).accentColor;
+  }
 
   @override
   void initState() {

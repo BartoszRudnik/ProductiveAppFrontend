@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:productive_app/widget/button/new_password_button.dart';
 import 'package:provider/provider.dart';
-import '../config/HttpException.dart';
+import '../exception/HttpException.dart';
 import '../provider/auth_provider.dart';
 import '../widget/appBar/login_appbar.dart';
 import '../widget/login_greet.dart';

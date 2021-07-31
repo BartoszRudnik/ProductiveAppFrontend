@@ -8,7 +8,7 @@ import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/painting.dart';
-import '../config/HttpException.dart';
+import '../exception/HttpException.dart';
 import '../model/user.dart';
 
 class AuthProvider with ChangeNotifier {

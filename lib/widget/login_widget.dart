@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../config/HttpException.dart';
+import '../exception/HttpException.dart';
 import '../provider/auth_provider.dart';
 import '../screen/reset_password_screen.dart';
 import 'validation_fail_widget.dart';

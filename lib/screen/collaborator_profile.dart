@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:provider/provider.dart';
-import '../config/app_colors.dart';
 import '../model/collaborator.dart';
 import '../provider/delegate_provider.dart';
 import '../widget/appBar/collaborator_profile_appBar.dart';
@@ -51,9 +50,9 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
             Container(
               padding: EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.grayBackground,
+                color: Theme.of(context).primaryColorLight,
                 border: Border.all(
-                  color: AppColors.grayBorder,
+                  color: Theme.of(context).primaryColorDark,
                   width: 2.5,
                 ),
               ),
@@ -71,9 +70,9 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
             Container(
               padding: EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.grayBackground,
+                color: Theme.of(context).primaryColorLight,
                 border: Border.all(
-                  color: AppColors.grayBorder,
+                  color: Theme.of(context).primaryColorDark,
                   width: 2.5,
                 ),
               ),
@@ -127,9 +126,9 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
             Container(
               padding: EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.grayBackground,
+                color: Theme.of(context).primaryColorLight,
                 border: Border.all(
-                  color: AppColors.grayBorder,
+                  color: Theme.of(context).primaryColorDark,
                   width: 2.5,
                 ),
               ),
@@ -139,7 +138,7 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
                   if (this.widget.collaborator.isAskingForPermission)
                     Container(
                       decoration: BoxDecoration(
-                        color: AppColors.grayButton,
+                        color: Theme.of(context).primaryColorDark,
                         border: Border.all(
                           color: Colors.grey.withOpacity(0.8),
                         ),
@@ -181,7 +180,7 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       elevation: 5,
-                      primary: AppColors.grayButton,
+                      primary: Theme.of(context).primaryColorDark,
                       side: BorderSide(
                         color: Colors.grey.withOpacity(0.8),
                       ),

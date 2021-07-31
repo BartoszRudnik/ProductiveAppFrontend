@@ -4,6 +4,7 @@ import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:productive_app/config/images.dart';
+import 'package:productive_app/widget/switch_list_tile/theme_switch_list_tile.dart';
 import 'package:provider/provider.dart';
 
 import '../provider/auth_provider.dart';
@@ -351,9 +352,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Container(
                   padding: EdgeInsets.only(top: 10, left: 6, bottom: 6),
                   decoration: BoxDecoration(
-                    color: Color.fromRGBO(237, 237, 240, 1),
+                    color: Theme.of(context).primaryColorLight,
                     border: Border.all(
-                      color: Color.fromRGBO(221, 221, 226, 1),
+                      color: Theme.of(context).primaryColorDark,
                       width: 2.5,
                     ),
                   ),
@@ -406,7 +407,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 elevation: 5,
-                                primary: Color.fromRGBO(201, 201, 206, 1),
+                                primary: Theme.of(context).primaryColorDark,
                                 side: BorderSide(
                                   color: Colors.grey.withOpacity(0.8),
                                 ),
@@ -429,9 +430,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Container(
                   padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Color.fromRGBO(237, 237, 240, 1),
+                    color: Theme.of(context).primaryColorLight,
                     border: Border.all(
-                      color: Color.fromRGBO(221, 221, 226, 1),
+                      color: Theme.of(context).primaryColorDark,
                       width: 2.5,
                     ),
                   ),
@@ -536,7 +537,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 elevation: 5,
-                                primary: Color.fromRGBO(201, 201, 206, 1),
+                                primary: Theme.of(context).primaryColorDark,
                                 side: BorderSide(
                                   color: Colors.grey.withOpacity(0.8),
                                 ),
@@ -565,9 +566,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Container(
                   padding: EdgeInsets.only(bottom: 4),
                   decoration: BoxDecoration(
-                    color: Color.fromRGBO(237, 237, 240, 1),
+                    color: Theme.of(context).primaryColorLight,
                     border: Border.all(
-                      color: Color.fromRGBO(221, 221, 226, 1),
+                      color: Theme.of(context).primaryColorDark,
                       width: 2.5,
                     ),
                   ),
@@ -587,13 +588,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                         ),
                       ),
+                      ThemeSwitchListTile(),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               elevation: 5,
-                              primary: Color.fromRGBO(201, 201, 206, 1),
+                              primary: Theme.of(context).primaryColorDark,
                               side: BorderSide(
                                 color: Colors.grey.withOpacity(0.8),
                               ),
@@ -612,7 +614,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               elevation: 5,
-                              primary: Color.fromRGBO(201, 201, 206, 1),
+                              primary: Theme.of(context).primaryColorDark,
                               side: BorderSide(
                                 color: Colors.grey.withOpacity(0.8),
                               ),
