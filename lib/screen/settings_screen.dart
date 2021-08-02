@@ -80,26 +80,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).primaryColor,
-                          side: BorderSide(color: Theme.of(context).primaryColor),
-                        ),
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
-                        child: Text(
-                          'Cancel',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Theme.of(context).accentColor,
-                          ),
-                        ),
+                        child: Text('Cancel'),
                       ),
                       ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).primaryColor,
-                          side: BorderSide(color: Theme.of(context).primaryColor),
-                        ),
                         onPressed: () {
                           bool isValid = this._deleteDialogKey.currentState.validate();
 
@@ -109,13 +95,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             Navigator.of(context).pop();
                           }
                         },
-                        child: Text(
-                          'Delete Account',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Theme.of(context).accentColor,
-                          ),
-                        ),
+                        child: Text('Delete Account'),
                       ),
                     ],
                   )
@@ -218,26 +198,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).primaryColor,
-                          side: BorderSide(color: Theme.of(context).primaryColor),
-                        ),
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
-                        child: Text(
-                          'Cancel',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Theme.of(context).accentColor,
-                          ),
-                        ),
+                        child: Text('Cancel'),
                       ),
                       ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).primaryColor,
-                          side: BorderSide(color: Theme.of(context).primaryColor),
-                        ),
                         onPressed: () {
                           bool isValid = this._resetPasswordKey.currentState.validate();
 
@@ -261,20 +227,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            primary: Theme.of(context).primaryColor,
-                                            side: BorderSide(color: Theme.of(context).primaryColor),
-                                          ),
                                           onPressed: () {
                                             Navigator.of(context).pop();
                                           },
-                                          child: Text(
-                                            'OK',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: Theme.of(context).accentColor,
-                                            ),
-                                          ),
+                                          child: Text('OK'),
                                         ),
                                       ],
                                     ),
@@ -405,20 +361,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ),
                             ),
                             ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                elevation: 5,
-                                primary: Theme.of(context).primaryColorDark,
-                                side: BorderSide(
-                                  color: Colors.grey.withOpacity(0.8),
-                                ),
-                              ),
                               onPressed: () {
                                 this.removeAvatar();
                               },
-                              child: Text(
-                                'Remove avatar',
-                                style: TextStyle(fontSize: 14, color: Theme.of(context).primaryColor),
-                              ),
+                              child: Text('Remove avatar'),
                             ),
                           ],
                         ),
@@ -535,26 +481,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               height: 15,
                             ),
                             ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                elevation: 5,
-                                primary: Theme.of(context).primaryColorDark,
-                                side: BorderSide(
-                                  color: Colors.grey.withOpacity(0.8),
-                                ),
-                              ),
                               onPressed: () {
                                 if (this._formKey.currentState.validate()) {
                                   this._formKey.currentState.save();
                                   this.updateUserInfo(user.firstName, user.lastName);
                                 }
                               },
-                              child: Text(
-                                'Save account information',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Theme.of(context).primaryColor,
-                                ),
-                              ),
+                              child: Text('Save account information'),
                             ),
                           ],
                         ),
@@ -593,42 +526,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              elevation: 5,
-                              primary: Theme.of(context).primaryColorDark,
-                              side: BorderSide(
-                                color: Colors.grey.withOpacity(0.8),
-                              ),
-                            ),
                             onPressed: () {
                               this.resetPassword(user.email);
                             },
-                            child: Text(
-                              'Reset password',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                            ),
+                            child: Text('Reset password'),
                           ),
                           ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              elevation: 5,
-                              primary: Theme.of(context).primaryColorDark,
-                              side: BorderSide(
-                                color: Colors.grey.withOpacity(0.8),
-                              ),
-                            ),
                             onPressed: () {
                               this.deleteUser();
                             },
-                            child: Text(
-                              'Delete Account',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                            ),
+                            child: Text('Delete Account'),
                           ),
                         ],
                       )

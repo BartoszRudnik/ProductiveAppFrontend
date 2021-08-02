@@ -5,9 +5,9 @@ import 'package:productive_app/provider/task_provider.dart';
 import 'package:provider/provider.dart';
 
 class NewTag extends StatefulWidget {
-  int tagsLength;
+  final int tagsLength;
   String initialValue;
-  bool editMode;
+  final bool editMode;
 
   NewTag({
     @required this.tagsLength,
@@ -30,7 +30,7 @@ class _NewTagState extends State<NewTag> {
         key: this._formKey,
         child: ListTile(
           title: TextFormField(
-            initialValue: widget.editMode ? widget.initialValue : ' ',
+            initialValue: widget.editMode ? widget.initialValue : '',
             autofocus: true,
             key: ValueKey('TagName'),
             onSaved: (value) {
@@ -56,14 +56,13 @@ class _NewTagState extends State<NewTag> {
             mini: true,
             child: Icon(
               Icons.add,
-              color: Theme.of(context).accentColor,
+              color: Colors.white,
               size: 30,
             ),
             onPressed: () {
               this._formKey.currentState.save();
               this._formKey.currentState.reset();
             },
-            backgroundColor: Theme.of(context).primaryColor,
           ),
         ),
       ),

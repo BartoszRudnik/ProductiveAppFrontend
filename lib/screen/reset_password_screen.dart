@@ -69,10 +69,6 @@ class _ResetPasswordState extends State<ResetPassword> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Theme.of(context).primaryColor,
-                      side: BorderSide(color: Theme.of(context).primaryColor),
-                    ),
                     onPressed: () {
                       Navigator.of(context).pop(true);
                       Navigator.of(context).pushReplacementNamed(
@@ -82,13 +78,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                         },
                       );
                     },
-                    child: Text(
-                      'OK',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).accentColor,
-                      ),
-                    ),
+                    child: Text('OK'),
                   ),
                 ],
               ),
@@ -159,17 +149,11 @@ class _ResetPasswordState extends State<ResetPassword> {
                     width: 304,
                     height: 47,
                     child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: Theme.of(context).primaryColor,
-                        side: BorderSide(color: Theme.of(context).primaryColor),
-                      ),
+                      style: ColorThemes.loginButtonStyle(context),
                       onPressed: this._tryReset,
                       child: Text(
                         'Reset',
-                        style: TextStyle(
-                          fontSize: 25,
-                          color: Theme.of(context).accentColor,
-                        ),
+                        style: TextStyle(fontSize: 25),
                       ),
                     ),
                   ),

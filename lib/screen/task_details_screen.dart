@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong/latlong.dart';
+import 'package:productive_app/config/color_themes.dart';
 import 'package:provider/provider.dart';
 
 import '../utils/dialogs.dart';
@@ -556,16 +557,16 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                       child: SizedBox(
                         height: 100,
                         child: ElevatedButton(
+                          style: ColorThemes.taskDetailsButtonStyle(context),
                           onPressed: () {
                             this.setDelegatedEmail();
                           },
-                          style: ElevatedButton.styleFrom(
-                            primary: Theme.of(context).primaryColorLight,
-                            onPrimary: Theme.of(context).primaryColor,
-                          ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: [Icon(Icons.person_add), Text("Assigned")],
+                            children: [
+                              Icon(Icons.person_add),
+                              Text("Assigned"),
+                            ],
                           ),
                         ),
                       ),
@@ -741,10 +742,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                           children: [
                             ElevatedButton(
                               onPressed: () => selectStartDate(),
-                              style: ElevatedButton.styleFrom(
-                                primary: Theme.of(context).primaryColorLight,
-                                onPrimary: Theme.of(context).primaryColor,
-                              ),
+                              style: ColorThemes.taskDetailsButtonStyle(context),
                               child: Center(
                                 child: taskToEdit.startDate.toString() == "null"
                                     ? Icon(Icons.calendar_today_outlined)
@@ -755,6 +753,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                             ),
                             SizedBox(width: 10),
                             ElevatedButton(
+                              style: ColorThemes.taskDetailsButtonStyle(context),
                               onPressed: () async {
                                 final TimeOfDay pickTime = await DateTimePickers.pickTime(context);
 
@@ -762,10 +761,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                                   this.startTime = pickTime;
                                 });
                               },
-                              style: ElevatedButton.styleFrom(
-                                primary: Theme.of(context).primaryColorLight,
-                                onPrimary: Theme.of(context).primaryColor,
-                              ),
                               child: Center(
                                 child: this.startTime.toString() == "null"
                                     ? Icon(Icons.access_time_outlined)
@@ -799,11 +794,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                         child: Row(
                           children: [
                             ElevatedButton(
+                              style: ColorThemes.taskDetailsButtonStyle(context),
                               onPressed: () => selectEndDate(),
-                              style: ElevatedButton.styleFrom(
-                                primary: Theme.of(context).primaryColorLight,
-                                onPrimary: Theme.of(context).primaryColor,
-                              ),
                               child: Center(
                                 child: taskToEdit.endDate.toString() == "null"
                                     ? Icon(Icons.calendar_today_outlined)
@@ -814,6 +806,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                             ),
                             SizedBox(width: 10),
                             ElevatedButton(
+                              style: ColorThemes.taskDetailsButtonStyle(context),
                               onPressed: () async {
                                 final TimeOfDay pickTime = await DateTimePickers.pickTime(context);
 
@@ -821,10 +814,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                                   this.endTime = pickTime;
                                 });
                               },
-                              style: ElevatedButton.styleFrom(
-                                primary: Theme.of(context).primaryColorLight,
-                                onPrimary: Theme.of(context).primaryColor,
-                              ),
                               child: Center(
                                 child: this.endTime.toString() == "null"
                                     ? Icon(Icons.access_time_outlined)

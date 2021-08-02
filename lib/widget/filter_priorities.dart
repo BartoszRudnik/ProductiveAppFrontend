@@ -39,11 +39,6 @@ class FilterPriorities extends StatelessWidget {
                 children: [
                   Expanded(
                     child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.all(4),
-                        primary: Theme.of(context).primaryColorLight,
-                        side: BorderSide(color: Theme.of(context).primaryColorDark),
-                      ),
                       onPressed: () async {
                         final selected = await showDialog(
                           context: context,
@@ -66,10 +61,7 @@ class FilterPriorities extends StatelessWidget {
                       },
                       child: Text(
                         'Choose priorities',
-                        style: TextStyle(
-                          fontSize: 24,
-                          color: Theme.of(context).primaryColor,
-                        ),
+                        style: TextStyle(fontSize: 24),
                       ),
                     ),
                   ),
@@ -88,7 +80,7 @@ class FilterPriorities extends StatelessWidget {
                         padding: EdgeInsets.symmetric(horizontal: 4),
                         margin: EdgeInsets.symmetric(horizontal: 8),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor,
+                          color: Theme.of(context).primaryColorDark,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -98,19 +90,19 @@ class FilterPriorities extends StatelessWidget {
                               child: Text(
                                 this.priorities[index],
                                 style: TextStyle(
-                                  color: Theme.of(context).accentColor,
+                                  color: Theme.of(context).primaryColor,
                                   fontSize: 18,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ),
-                            if (this.priorities[index] == 'LOW') Icon(Icons.arrow_downward_outlined, color: Theme.of(context).accentColor),
-                            if (this.priorities[index] == 'HIGH') Icon(Icons.arrow_upward_outlined, color: Theme.of(context).accentColor),
-                            if (this.priorities[index] == 'HIGHER') Icon(Icons.arrow_upward_outlined, color: Theme.of(context).accentColor),
-                            if (this.priorities[index] == 'HIGHER') Icon(Icons.arrow_upward_outlined, color: Theme.of(context).accentColor),
-                            if (this.priorities[index] == 'CRITICAL') Icon(Icons.warning_amber_sharp, color: Theme.of(context).accentColor),
+                            if (this.priorities[index] == 'LOW') Icon(Icons.arrow_downward_outlined, color: Theme.of(context).primaryColor),
+                            if (this.priorities[index] == 'HIGH') Icon(Icons.arrow_upward_outlined, color: Theme.of(context).primaryColor),
+                            if (this.priorities[index] == 'HIGHER') Icon(Icons.arrow_upward_outlined, color: Theme.of(context).primaryColor),
+                            if (this.priorities[index] == 'HIGHER') Icon(Icons.arrow_upward_outlined, color: Theme.of(context).primaryColor),
+                            if (this.priorities[index] == 'CRITICAL') Icon(Icons.warning_amber_sharp, color: Theme.of(context).primaryColor),
                             IconButton(
-                              icon: Icon(Icons.cancel_outlined, color: Theme.of(context).accentColor),
+                              icon: Icon(Icons.cancel_outlined, color: Theme.of(context).primaryColor),
                               onPressed: () {
                                 Provider.of<SettingsProvider>(context, listen: false).deleteFilterPriority(this.priorities[index]);
                               },

@@ -9,12 +9,24 @@ class ThemeSwitchListTile extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.all(12),
-      child: Card(
-        color: Theme.of(context).primaryColorDark,
-        elevation: 8,
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
         child: SwitchListTile(
+          tileColor: themeProvider.isDarkMode ? Theme.of(context).primaryColorDark : Colors.black,
           activeColor: Theme.of(context).primaryColor,
-          title: Text('Dark Mode'),
+          inactiveTrackColor: Theme.of(context).primaryColorLight,
+          activeTrackColor: Theme.of(context).primaryColor,
+          title: Text(
+            'Dark Mode',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white,
+            ),
+          ),
           value: themeProvider.isDarkMode,
           onChanged: (bool value) {
             themeProvider.toggleTheme(value);

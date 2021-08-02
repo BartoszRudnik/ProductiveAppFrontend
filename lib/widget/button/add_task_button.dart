@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 
 class AddTaskButton extends StatelessWidget {
-  Function addNewTask;
-  final isDarkMode;
+  final Function addNewTask;
 
   AddTaskButton({
     @required this.addNewTask,
-    @required this.isDarkMode,
   });
 
   @override
@@ -14,7 +12,8 @@ class AddTaskButton extends StatelessWidget {
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
         onPrimary: Theme.of(context).primaryColor,
-        primary: this.isDarkMode ? Theme.of(context).primaryColorDark : Theme.of(context).accentColor,
+        side: BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColorDark : Theme.of(context).accentColor),
+        primary: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColorDark : Theme.of(context).accentColor,
         elevation: 0,
       ),
       onPressed: () {

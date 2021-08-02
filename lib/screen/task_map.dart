@@ -207,26 +207,12 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
                       },
                     ),
                     ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: Theme.of(context).primaryColor,
-                        side: BorderSide(color: Theme.of(context).primaryColor),
-                      ),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: Text(
-                        'Cancel',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Theme.of(context).accentColor,
-                        ),
-                      ),
+                      child: Text('Cancel'),
                     ),
                     ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: Theme.of(context).primaryColor,
-                        side: BorderSide(color: Theme.of(context).primaryColor),
-                      ),
                       onPressed: () {
                         Navigator.of(context).pushNamed(TaskDetailScreen.routeName, arguments: task).then((value) {
                           setState(() {
@@ -236,13 +222,7 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
                           return this._onMarkerPressed(tasks.firstWhere((element) => element.id == task.id), previousTaskIndex, nextTaskIndex);
                         });
                       },
-                      child: Text(
-                        'Task details',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Theme.of(context).accentColor,
-                        ),
-                      ),
+                      child: Text('Task details'),
                     ),
                     IconButton(
                       icon: Icon(Icons.navigate_next_outlined),

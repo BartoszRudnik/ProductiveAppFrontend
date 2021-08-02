@@ -202,20 +202,10 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
                         child: Column(
                           children: [
                             ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                primary: Theme.of(context).primaryColor,
-                                side: BorderSide(color: Theme.of(context).primaryColor),
-                              ),
                               onPressed: () {
                                 Navigator.of(context).pop(widget.choosenLocation);
                               },
-                              child: Text(
-                                'Save location',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Theme.of(context).accentColor,
-                                ),
-                              ),
+                              child: Text('Save location'),
                             ),
                           ],
                         ),

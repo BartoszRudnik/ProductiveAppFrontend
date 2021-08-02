@@ -26,37 +26,17 @@ class Dialogs {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).primaryColorDark,
-                    side: BorderSide(color: Theme.of(context).primaryColor),
-                  ),
                   onPressed: () {
                     Provider.of<AuthProvider>(context, listen: false).logout();
                     Navigator.of(context).pop(true);
                   },
-                  child: Text(
-                    'Yes',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  ),
+                  child: Text('Yes'),
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).primaryColorDark,
-                    side: BorderSide(color: Theme.of(context).primaryColor),
-                  ),
                   onPressed: () {
                     Navigator.of(context).pop(false);
                   },
-                  child: Text(
-                    'No',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  ),
+                  child: Text('No'),
                 ),
               ],
             )
@@ -89,20 +69,10 @@ class Dialogs {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).primaryColor,
-                    side: BorderSide(color: Theme.of(context).primaryColor),
-                  ),
                   onPressed: () {
                     Navigator.of(context).pop(true);
                   },
-                  child: Text(
-                    'OK',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).accentColor,
-                    ),
-                  ),
+                  child: Text('OK'),
                 ),
               ],
             ),
@@ -135,36 +105,16 @@ class Dialogs {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).primaryColorDark,
-                    side: BorderSide(color: Theme.of(context).primaryColor),
-                  ),
                   onPressed: () {
                     Navigator.of(context).pop(true);
                   },
-                  child: Text(
-                    'Yes',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  ),
+                  child: Text('Yes'),
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).primaryColorDark,
-                    side: BorderSide(color: Theme.of(context).primaryColor),
-                  ),
                   onPressed: () {
                     Navigator.of(context).pop(false);
                   },
-                  child: Text(
-                    'No',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  ),
+                  child: Text('No'),
                 ),
               ],
             ),
@@ -214,10 +164,6 @@ class Dialogs {
                   ),
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).primaryColor,
-                    side: BorderSide(color: Theme.of(context).primaryColor),
-                  ),
                   onPressed: () {
                     final isValid = _tKey.currentState.validate();
                     if (isValid) {
@@ -226,13 +172,7 @@ class Dialogs {
                       Navigator.of(context).pop(tempVal);
                     }
                   },
-                  child: Text(
-                    'OK',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  ),
+                  child: Text('OK'),
                 ),
               ],
             ),
@@ -279,10 +219,6 @@ class Dialogs {
                   ),
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).primaryColor,
-                    side: BorderSide(color: Theme.of(context).primaryColor),
-                  ),
                   onPressed: () {
                     final isValid = _tKey.currentState.validate();
                     if (isValid) {
@@ -291,13 +227,7 @@ class Dialogs {
                       Navigator.of(context).pop(tempVal);
                     }
                   },
-                  child: Text(
-                    'OK',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  ),
+                  child: Text('OK'),
                 ),
               ],
             ),
@@ -329,52 +259,22 @@ class Dialogs {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).primaryColor,
-                          side: BorderSide(color: Theme.of(context).primaryColor),
-                        ),
                         onPressed: () {
                           Navigator.of(context).pop('Camera');
                         },
-                        child: Text(
-                          'Camera',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Theme.of(context).accentColor,
-                          ),
-                        ),
+                        child: Text('Camera'),
                       ),
                       ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).primaryColor,
-                          side: BorderSide(color: Theme.of(context).primaryColor),
-                        ),
                         onPressed: () {
                           Navigator.of(context).pop('Gallery');
                         },
-                        child: Text(
-                          'Gallery',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Theme.of(context).accentColor,
-                          ),
-                        ),
+                        child: Text('Gallery'),
                       ),
                       ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).primaryColor,
-                          side: BorderSide(color: Theme.of(context).primaryColor),
-                        ),
                         onPressed: () {
                           Navigator.of(context).pop(null);
                         },
-                        child: Text(
-                          'Cancel',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Theme.of(context).accentColor,
-                          ),
-                        ),
+                        child: Text('Cancel'),
                       ),
                     ],
                   ),

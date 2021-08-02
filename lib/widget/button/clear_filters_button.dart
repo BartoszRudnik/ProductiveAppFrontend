@@ -15,11 +15,6 @@ class ClearFiltersButton extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.all(4),
-            primary: Theme.of(context).primaryColorLight,
-            side: BorderSide(color: Theme.of(context).primaryColorDark),
-          ),
           onPressed: () async {
             final userSettings = Provider.of<SettingsProvider>(context, listen: false).userSettings;
 
@@ -50,10 +45,7 @@ class ClearFiltersButton extends StatelessWidget {
           },
           child: Text(
             'Clear Filters',
-            style: TextStyle(
-              fontSize: 28,
-              color: Theme.of(context).primaryColor,
-            ),
+            style: TextStyle(fontSize: 28),
           ),
         ),
       ),

@@ -70,10 +70,6 @@ class _TaskDateState extends State<TaskDate> {
                                     this._startInitialValue = pick;
                                   });
                                 },
-                                style: ElevatedButton.styleFrom(
-                                  primary: Color.fromRGBO(237, 237, 240, 1),
-                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
-                                ),
                                 child: Center(
                                   child: this._startInitialValue.toString() == "null"
                                       ? Icon(Icons.calendar_today_outlined)
@@ -91,10 +87,6 @@ class _TaskDateState extends State<TaskDate> {
                                     this._startInitialTime = pickTime;
                                   });
                                 },
-                                style: ElevatedButton.styleFrom(
-                                  primary: Color.fromRGBO(237, 237, 240, 1),
-                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
-                                ),
                                 child: Center(
                                   child: this._startInitialTime.toString() == "null"
                                       ? Icon(Icons.access_time_outlined)
@@ -130,10 +122,6 @@ class _TaskDateState extends State<TaskDate> {
                                     this._endInitialValue = pick;
                                   });
                                 },
-                                style: ElevatedButton.styleFrom(
-                                  primary: Color.fromRGBO(237, 237, 240, 1),
-                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
-                                ),
                                 child: Center(
                                   child: this._endInitialValue.toString() == "null"
                                       ? Icon(Icons.calendar_today_outlined)
@@ -151,10 +139,6 @@ class _TaskDateState extends State<TaskDate> {
                                     this._endInitialTime = pickTime;
                                   });
                                 },
-                                style: ElevatedButton.styleFrom(
-                                  primary: Color.fromRGBO(237, 237, 240, 1),
-                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
-                                ),
                                 child: Center(
                                   child: this._endInitialTime.toString() == "null"
                                       ? Icon(Icons.access_time_outlined)
@@ -173,10 +157,6 @@ class _TaskDateState extends State<TaskDate> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                primary: Theme.of(context).primaryColor,
-                                side: BorderSide(color: Theme.of(context).primaryColor),
-                              ),
                               onPressed: () {
                                 this._startInitialValue = this.widget.startValue;
                                 this._endInitialValue = this.widget.endValue;
@@ -193,10 +173,6 @@ class _TaskDateState extends State<TaskDate> {
                               ),
                             ),
                             ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                primary: Theme.of(context).primaryColor,
-                                side: BorderSide(color: Theme.of(context).primaryColor),
-                              ),
                               onPressed: () {
                                 if ((this._startInitialTime != null && this._startInitialValue == null) || (this._endInitialTime != null && this._endInitialValue == null)) {
                                   return showDialog(
@@ -217,10 +193,6 @@ class _TaskDateState extends State<TaskDate> {
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
                                               ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                  primary: Theme.of(context).primaryColor,
-                                                  side: BorderSide(color: Theme.of(context).primaryColor),
-                                                ),
                                                 onPressed: () {
                                                   Navigator.of(context).pop(false);
                                                 },

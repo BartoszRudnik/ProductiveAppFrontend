@@ -88,10 +88,6 @@ class CollaboratorModal {
                             children: [
                               ElevatedButton(
                                 onPressed: () {},
-                                style: ElevatedButton.styleFrom(
-                                  primary: Theme.of(context).primaryColorLight,
-                                  onPrimary: Theme.of(context).primaryColor,
-                                ),
                                 child: Center(
                                   child: task.startDate.toString() == "null" || task.startDate.year == 1970
                                       ? Icon(Icons.calendar_today_outlined)
@@ -103,10 +99,6 @@ class CollaboratorModal {
                               SizedBox(width: 10),
                               ElevatedButton(
                                 onPressed: () {},
-                                style: ElevatedButton.styleFrom(
-                                  primary: Theme.of(context).primaryColorLight,
-                                  onPrimary: Theme.of(context).primaryColor,
-                                ),
                                 child: Center(
                                   child: task.startDate.toString() == "null" || task.startDate.year == 1970
                                       ? Icon(Icons.access_time_outlined)
@@ -129,10 +121,6 @@ class CollaboratorModal {
                             children: [
                               ElevatedButton(
                                 onPressed: () {},
-                                style: ElevatedButton.styleFrom(
-                                  primary: Theme.of(context).primaryColorLight,
-                                  onPrimary: Theme.of(context).primaryColor,
-                                ),
                                 child: Center(
                                   child: task.endDate.toString() == "null" || task.endDate.year == 1970
                                       ? Icon(Icons.calendar_today_outlined)
@@ -144,10 +132,6 @@ class CollaboratorModal {
                               SizedBox(width: 10),
                               ElevatedButton(
                                 onPressed: () {},
-                                style: ElevatedButton.styleFrom(
-                                  primary: Theme.of(context).primaryColorLight,
-                                  onPrimary: Theme.of(context).primaryColor,
-                                ),
                                 child: Center(
                                   child: task.endDate.toString() == "null" || task.endDate.year == 1970
                                       ? Icon(Icons.access_time_outlined)
@@ -188,10 +172,6 @@ class CollaboratorModal {
                         children: [
                           ElevatedButton(
                             onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              primary: Theme.of(context).primaryColorLight,
-                              onPrimary: Theme.of(context).primaryColor,
-                            ),
                             child: Center(
                               child: task.lastUpdated.toString() == "null" || task.lastUpdated.year == 1970
                                   ? Icon(Icons.calendar_today_outlined)
@@ -203,10 +183,6 @@ class CollaboratorModal {
                           SizedBox(width: 10),
                           ElevatedButton(
                             onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              primary: Theme.of(context).primaryColorLight,
-                              onPrimary: Theme.of(context).primaryColor,
-                            ),
                             child: Center(
                               child: task.lastUpdated.toString() == "null" || task.lastUpdated.year == 1970
                                   ? Icon(Icons.access_time_outlined)

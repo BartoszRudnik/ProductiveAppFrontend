@@ -90,42 +90,22 @@ class FilterLocationDialog extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: Theme.of(context).primaryColor,
-                        side: BorderSide(color: Theme.of(context).primaryColor),
-                      ),
                       onPressed: () {
                         filteredLocations.forEach((element) {
                           element.isSelected = false;
                         });
                         Navigator.of(context).pop('cancel');
                       },
-                      child: Text(
-                        'Cancel',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Theme.of(context).accentColor,
-                        ),
-                      ),
+                      child: Text('Cancel'),
                     ),
                     ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: Theme.of(context).primaryColor,
-                        side: BorderSide(color: Theme.of(context).primaryColor),
-                      ),
                       onPressed: () {
                         filteredLocations.forEach((element) {
                           element.isSelected = false;
                         });
                         Navigator.of(context).pop(this.choosenLocations);
                       },
-                      child: Text(
-                        'Save',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Theme.of(context).accentColor,
-                        ),
-                      ),
+                      child: Text('Save'),
                     ),
                   ],
                 ),

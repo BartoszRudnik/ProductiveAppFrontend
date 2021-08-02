@@ -15,6 +15,13 @@ class ColorThemes {
       selectedItemColor: Colors.white,
       unselectedItemColor: Colors.black,
     ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        onPrimary: Colors.white,
+        side: BorderSide(color: Colors.black),
+        primary: Colors.black,
+      ),
+    ),
     colorScheme: ColorScheme.light(),
     fontFamily: 'Lato',
     textTheme: TextThemes.textTheme,
@@ -32,6 +39,13 @@ class ColorThemes {
     ),
     floatingActionButtonTheme: FloatingActionButtonThemeData(
       backgroundColor: Colors.grey[700],
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        onPrimary: Colors.white,
+        side: BorderSide(color: Colors.white),
+        primary: Colors.grey[700],
+      ),
     ),
     colorScheme: ColorScheme.dark(),
     fontFamily: 'Lato',
@@ -63,6 +77,24 @@ class ColorThemes {
       prefixIcon: Icon(
         icon,
         color: Theme.of(context).primaryColorDark,
+      ),
+    );
+  }
+
+  static ButtonStyle taskDetailsButtonStyle(BuildContext context) {
+    return ElevatedButton.styleFrom(
+      elevation: 3,
+      primary: Theme.of(context).primaryColorLight,
+      side: BorderSide(color: Theme.of(context).primaryColorLight),
+      onPrimary: Theme.of(context).primaryColor,
+    );
+  }
+
+  static ButtonStyle loginButtonStyle(BuildContext context) {
+    return ElevatedButton.styleFrom(
+      primary: Theme.of(context).brightness == Brightness.light ? Theme.of(context).primaryColor : Theme.of(context).accentColor,
+      side: BorderSide(
+        color: Theme.of(context).primaryColor,
       ),
     );
   }

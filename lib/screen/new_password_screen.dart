@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:productive_app/config/color_themes.dart';
-import 'package:productive_app/widget/button/new_password_button.dart';
 import 'package:provider/provider.dart';
+import '../config/color_themes.dart';
 import '../exception/HttpException.dart';
 import '../provider/auth_provider.dart';
 import '../widget/appBar/login_appbar.dart';
+import '../widget/button/new_password_button.dart';
 import '../widget/login_greet.dart';
 import '../widget/validation_fail_widget.dart';
 import 'login_screen.dart';
@@ -90,21 +90,11 @@ class _NewPasswordState extends State<NewPassword> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Theme.of(context).primaryColor,
-                      side: BorderSide(color: Theme.of(context).primaryColor),
-                    ),
                     onPressed: () {
                       Navigator.of(context).pop(true);
                       Navigator.of(context).pop();
                     },
-                    child: Text(
-                      'OK',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).accentColor,
-                      ),
-                    ),
+                    child: Text('OK'),
                   ),
                 ],
               ),

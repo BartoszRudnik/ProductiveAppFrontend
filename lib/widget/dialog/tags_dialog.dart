@@ -145,36 +145,16 @@ class _TagsDialogState extends State<TagsDialog> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).primaryColor,
-                    side: BorderSide(color: Theme.of(context).primaryColor),
-                  ),
                   onPressed: () {
                     Navigator.of(context).pop(widget.taskTags);
                   },
-                  child: Text(
-                    'Cancel',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).accentColor,
-                    ),
-                  ),
+                  child: Text('Cancel'),
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).primaryColor,
-                    side: BorderSide(color: Theme.of(context).primaryColor),
-                  ),
                   onPressed: () {
                     Navigator.of(context).pop(_finalTags);
                   },
-                  child: Text(
-                    'Add tag/tags',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).accentColor,
-                    ),
-                  ),
+                  child: Text('Add tag/tags'),
                 ),
               ],
             ),

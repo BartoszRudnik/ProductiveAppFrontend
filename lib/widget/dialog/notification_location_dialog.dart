@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/utils/dialogs.dart';
-import 'package:productive_app/utils/notifications.dart';
-import 'package:productive_app/widget/dialog/location_dialog.dart';
 import 'package:provider/provider.dart';
-
 import '../../model/location.dart';
 import '../../model/taskLocation.dart';
 import '../../provider/location_provider.dart';
+import '../../utils/dialogs.dart';
+import '../../utils/notifications.dart';
+import 'location_dialog.dart';
 
 class NotificationLocationDialog extends StatefulWidget {
   final Key key;
@@ -100,16 +99,13 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                               padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 10),
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  elevation: 5,
-                                  primary: Color.fromRGBO(201, 201, 206, 1),
-                                  side: BorderSide(
-                                    color: Colors.grey.withOpacity(0.8),
-                                  ),
+                                  side: BorderSide(color: Theme.of(context).primaryColor),
+                                  primary: Theme.of(context).primaryColorLight,
+                                  onPrimary: Theme.of(context).primaryColor,
                                 ),
                                 onPressed: () {},
                                 child: Text(
                                   this.location.localizationName + ": " + this.location.locality + ", " + this.location.street,
-                                  style: TextStyle(fontSize: 14, color: Theme.of(context).primaryColor),
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 3,
                                 ),
@@ -124,10 +120,6 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                               child: Container(
                                 height: 40,
                                 child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    primary: Theme.of(context).primaryColor,
-                                    side: BorderSide(color: Theme.of(context).primaryColor),
-                                  ),
                                   onPressed: () async {
                                     Location choosenLocation = await showDialog(
                                       context: context,
@@ -148,13 +140,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
 
                                     this._addNewLocationForm(context, choosenLocation);
                                   },
-                                  child: Text(
-                                    'New',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Theme.of(context).accentColor,
-                                    ),
-                                  ),
+                                  child: Text('New'),
                                 ),
                               ),
                             ),
@@ -164,7 +150,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                                 height: 40,
                                 width: 102,
                                 decoration: BoxDecoration(
-                                  color: Theme.of(context).primaryColor,
+                                  color: Theme.of(context).brightness == Brightness.light ? Theme.of(context).primaryColor : Theme.of(context).primaryColorDark,
                                   border: Border.all(
                                     color: Theme.of(context).primaryColor,
                                   ),
@@ -174,40 +160,43 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                                 ),
                                 child: DropdownButtonHideUnderline(
                                   child: ButtonTheme(
-                                    child: DropdownButton(
-                                      isExpanded: true,
-                                      hint: Text(
-                                        'Saved',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: Theme.of(context).accentColor,
-                                          fontSize: 14,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: DropdownButton(
+                                        isExpanded: true,
+                                        hint: Text(
+                                          'Saved',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14,
+                                          ),
                                         ),
-                                      ),
-                                      items: locationsList.map(
-                                        (currentLocation) {
-                                          return DropdownMenuItem(
-                                            value: currentLocation,
-                                            child: Container(
-                                              margin: EdgeInsets.all(0),
-                                              padding: EdgeInsets.all(0),
-                                              width: double.infinity,
+                                        items: locationsList.map(
+                                          (currentLocation) {
+                                            return DropdownMenuItem(
+                                              value: currentLocation,
                                               child: Container(
-                                                child: Text(
-                                                  currentLocation.localizationName,
-                                                  style: TextStyle(fontSize: 16),
+                                                margin: EdgeInsets.all(0),
+                                                padding: EdgeInsets.all(0),
+                                                width: double.infinity,
+                                                child: Container(
+                                                  child: Text(
+                                                    currentLocation.localizationName,
+                                                    style: TextStyle(fontSize: 16),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          );
+                                            );
+                                          },
+                                        ).toList(),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            this.deleted = false;
+                                            this.location = value;
+                                          });
                                         },
-                                      ).toList(),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          this.deleted = false;
-                                          this.location = value;
-                                        });
-                                      },
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -290,10 +279,6 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Theme.of(context).primaryColor,
-                      side: BorderSide(color: Theme.of(context).primaryColor),
-                    ),
                     onPressed: () {
                       if (this.location != null) {
                         TaskLocation returnLocation = TaskLocation(
@@ -308,19 +293,9 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                         Navigator.of(context).pop(null);
                       }
                     },
-                    child: Text(
-                      'Cancel',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).accentColor,
-                      ),
-                    ),
+                    child: Text('Cancel'),
                   ),
                   ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Theme.of(context).primaryColor,
-                      side: BorderSide(color: Theme.of(context).primaryColor),
-                    ),
                     onPressed: () {
                       Notifications.removeGeofence(this.widget.taskId);
                       setState(() {
@@ -331,19 +306,9 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                         this.notificationRadius = 0.25;
                       });
                     },
-                    child: Text(
-                      'Delete',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).accentColor,
-                      ),
-                    ),
+                    child: Text('Delete'),
                   ),
                   ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Theme.of(context).primaryColor,
-                      side: BorderSide(color: Theme.of(context).primaryColor),
-                    ),
                     onPressed: () {
                       if (this.location != null) {
                         TaskLocation returnLocation = TaskLocation(
@@ -360,13 +325,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                         Navigator.of(context).pop(null);
                       }
                     },
-                    child: Text(
-                      'Save',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).accentColor,
-                      ),
-                    ),
+                    child: Text('Save'),
                   ),
                 ],
               ),

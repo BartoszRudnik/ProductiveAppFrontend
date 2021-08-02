@@ -27,7 +27,7 @@ class _SettingsTabsScreenState extends State<SettingsTabsScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     if (isDarkMode) {
       this._selectedItemColor = Colors.black;

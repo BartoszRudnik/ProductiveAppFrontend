@@ -82,36 +82,16 @@ class DelegateDialog extends StatelessWidget {
                                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                                       children: [
                                         ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            primary: Theme.of(context).primaryColor,
-                                            side: BorderSide(color: Theme.of(context).primaryColor),
-                                          ),
                                           onPressed: () {
                                             Navigator.of(context).pop(false);
                                           },
-                                          child: Text(
-                                            'Cancel',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: Theme.of(context).accentColor,
-                                            ),
-                                          ),
+                                          child: Text('Cancel'),
                                         ),
                                         ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            primary: Theme.of(context).primaryColor,
-                                            side: BorderSide(color: Theme.of(context).primaryColor),
-                                          ),
                                           onPressed: () {
                                             Navigator.of(context).pop(true);
                                           },
-                                          child: Text(
-                                            'Send invitation',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: Theme.of(context).accentColor,
-                                            ),
-                                          ),
+                                          child: Text('Send invitation'),
                                         ),
                                       ],
                                     ),
@@ -196,10 +176,6 @@ class DelegateDialog extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: Theme.of(context).primaryColor,
-                        side: BorderSide(color: Theme.of(context).primaryColor),
-                      ),
                       onPressed: () {
                         if (this.choosenCollaborator != null) {
                           this.choosenCollaborator.isSelected = false;
@@ -207,19 +183,9 @@ class DelegateDialog extends StatelessWidget {
 
                         Navigator.of(context).pop();
                       },
-                      child: Text(
-                        'Cancel',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Theme.of(context).accentColor,
-                        ),
-                      ),
+                      child: Text('Cancel'),
                     ),
                     ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: Theme.of(context).primaryColor,
-                        side: BorderSide(color: Theme.of(context).primaryColor),
-                      ),
                       onPressed: () {
                         if (this.choosenCollaborator != null) {
                           this.choosenCollaborator.isSelected = false;
@@ -228,13 +194,7 @@ class DelegateDialog extends StatelessWidget {
                           Navigator.of(context).pop();
                         }
                       },
-                      child: Text(
-                        'Add collaborator',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Theme.of(context).accentColor,
-                        ),
-                      ),
+                      child: Text('Add collaborator'),
                     ),
                   ],
                 ),

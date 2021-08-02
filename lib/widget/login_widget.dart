@@ -83,10 +83,6 @@ class _LoginWidgetState extends State<LoginWidget> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: Theme.of(context).primaryColor,
-                        side: BorderSide(color: Theme.of(context).primaryColor),
-                      ),
                       onPressed: () {
                         Navigator.of(context).pop(true);
                         Navigator.of(context).pop();
@@ -232,16 +228,12 @@ class _LoginWidgetState extends State<LoginWidget> {
                   child: this._isSuccessfull
                       ? null
                       : ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            primary: Theme.of(context).primaryColor,
-                            side: BorderSide(color: Theme.of(context).primaryColor),
-                          ),
+                          style: ColorThemes.loginButtonStyle(context),
                           onPressed: this._trySubmit,
                           child: Text(
                             this._isLogin ? 'Sign in' : 'Sign up',
                             style: TextStyle(
                               fontSize: 25,
-                              color: Theme.of(context).accentColor,
                             ),
                           ),
                         ),

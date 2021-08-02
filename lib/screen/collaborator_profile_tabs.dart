@@ -26,7 +26,7 @@ class _CollaboratorProfileTabsState extends State<CollaboratorProfileTabs> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final isDarkMode = Provider.of<ThemeProvider>(context).isDarkMode;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     if (isDarkMode) {
       this._selectedItemColor = Colors.black;
@@ -105,7 +105,7 @@ class _CollaboratorProfileTabsState extends State<CollaboratorProfileTabs> {
             color: Theme.of(context).primaryColor,
             border: Border(
               top: BorderSide(
-                color: Provider.of<ThemeProvider>(context).isDarkMode ? Theme.of(context).primaryColorDark : Colors.black,
+                color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColorDark : Colors.black,
                 width: 1.0,
               ),
             ),

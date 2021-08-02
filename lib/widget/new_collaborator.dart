@@ -38,7 +38,10 @@ class _NewCollaboratorState extends State<NewCollaborator> {
                     title: Center(
                       child: Text(
                         'User not found',
-                        style: Theme.of(context).textTheme.headline2,
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontFamily: 'RobotoCondensed',
+                        ),
                       ),
                     ),
                     content: Column(
@@ -50,38 +53,18 @@ class _NewCollaboratorState extends State<NewCollaborator> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                primary: Theme.of(context).primaryColor,
-                                side: BorderSide(color: Theme.of(context).primaryColor),
-                              ),
                               onPressed: () {
                                 Navigator.of(context).pop(false);
                                 Navigator.of(context).pop();
                               },
-                              child: Text(
-                                'Cancel',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Theme.of(context).accentColor,
-                                ),
-                              ),
+                              child: Text('Cancel'),
                             ),
                             ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                primary: Theme.of(context).primaryColor,
-                                side: BorderSide(color: Theme.of(context).primaryColor),
-                              ),
                               onPressed: () {
                                 Navigator.of(context).pop(true);
                                 Navigator.of(context).pop();
                               },
-                              child: Text(
-                                'Send invitation',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Theme.of(context).accentColor,
-                                ),
-                              ),
+                              child: Text('Send invitation'),
                             ),
                           ],
                         ),
@@ -104,7 +87,7 @@ class _NewCollaboratorState extends State<NewCollaborator> {
             mini: true,
             child: Icon(
               Icons.add,
-              color: Theme.of(context).accentColor,
+              color: Colors.white,
               size: 30,
             ),
             onPressed: () {
@@ -115,7 +98,6 @@ class _NewCollaboratorState extends State<NewCollaborator> {
                 this._formKey.currentState.reset();
               }
             },
-            backgroundColor: Theme.of(context).primaryColor,
           ),
         ),
       ),
