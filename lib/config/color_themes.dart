@@ -98,4 +98,32 @@ class ColorThemes {
       ),
     );
   }
+
+  static ThemeData lightDateTimePicker(BuildContext context) {
+    return Theme.of(context).copyWith(
+      colorScheme: ColorScheme.light(
+        primary: Colors.grey,
+        onPrimary: Colors.white,
+        onSurface: Colors.black,
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          primary: Colors.black,
+        ),
+      ),
+    );
+  }
+
+  static ThemeData darkDateTimePicker(BuildContext context) {
+    return Theme.of(context).copyWith(
+      colorScheme: ColorScheme.dark(
+        primary: Colors.grey,
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          primary: Colors.white,
+        ),
+      ),
+    );
+  }
 }

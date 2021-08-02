@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/config/color_themes.dart';
 import 'package:productive_app/utils/date_time_pickers.dart';
 
 class TaskDate extends StatefulWidget {
@@ -7,7 +8,7 @@ class TaskDate extends StatefulWidget {
   DateTime endValue;
   TimeOfDay startTime;
   TimeOfDay endTime;
-  Function setDate;
+  final Function setDate;
 
   TaskDate({
     @required this.startValue,
@@ -48,7 +49,7 @@ class _TaskDateState extends State<TaskDate> {
                     width: 200,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
+                      children: [
                         Center(
                           child: Text('Start date'),
                         ),
@@ -59,6 +60,7 @@ class _TaskDateState extends State<TaskDate> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               ElevatedButton(
+                                style: ColorThemes.taskDetailsButtonStyle(context),
                                 onPressed: () async {
                                   DateTime initDate = this.widget.startValue;
                                   if (this.widget.startValue == null) {
@@ -80,6 +82,7 @@ class _TaskDateState extends State<TaskDate> {
                               ),
                               SizedBox(width: 30),
                               ElevatedButton(
+                                style: ColorThemes.taskDetailsButtonStyle(context),
                                 onPressed: () async {
                                   final TimeOfDay pickTime = await DateTimePickers.pickTime(context);
 
@@ -111,6 +114,7 @@ class _TaskDateState extends State<TaskDate> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               ElevatedButton(
+                                style: ColorThemes.taskDetailsButtonStyle(context),
                                 onPressed: () async {
                                   DateTime initDate = this.widget.endValue;
                                   if (this.widget.endValue == null) {
@@ -132,6 +136,7 @@ class _TaskDateState extends State<TaskDate> {
                               ),
                               SizedBox(width: 30),
                               ElevatedButton(
+                                style: ColorThemes.taskDetailsButtonStyle(context),
                                 onPressed: () async {
                                   final TimeOfDay pickTime = await DateTimePickers.pickTime(context);
 
@@ -164,13 +169,7 @@ class _TaskDateState extends State<TaskDate> {
                                 this._endInitialTime = this.widget.endTime;
                                 Navigator.of(context).pop(false);
                               },
-                              child: Text(
-                                'Cancel',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Theme.of(context).accentColor,
-                                ),
-                              ),
+                              child: Text('Cancel'),
                             ),
                             ElevatedButton(
                               onPressed: () {
@@ -227,13 +226,7 @@ class _TaskDateState extends State<TaskDate> {
                                 });
                                 Navigator.of(context).pop(true);
                               },
-                              child: Text(
-                                'Save',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Theme.of(context).accentColor,
-                                ),
-                              ),
+                              child: Text('Save'),
                             ),
                           ],
                         ),

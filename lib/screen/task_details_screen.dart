@@ -483,12 +483,13 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                   decoration: InputDecoration(
                     hintText: _isFocused ? "" : "Tap to add description",
                     filled: true,
-                    fillColor: _isDescriptionInitial ? Theme.of(context).primaryColorLight : Colors.white,
+                    fillColor: Theme.of(context).primaryColorLight,
                     enabledBorder: _description.isEmpty
                         ? OutlineInputBorder(
                             borderSide: BorderSide(
-                            color: Theme.of(context).primaryColorDark,
-                          ))
+                              color: Theme.of(context).primaryColorDark,
+                            ),
+                          )
                         : InputBorder.none,
                   ),
                 ),

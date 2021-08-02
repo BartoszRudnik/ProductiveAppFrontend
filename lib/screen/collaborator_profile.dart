@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
+import 'package:productive_app/config/images.dart';
+import 'package:productive_app/widget/switch_list_tile/grant_access_list_tile.dart';
 import 'package:provider/provider.dart';
 import '../model/collaborator.dart';
 import '../provider/delegate_provider.dart';
@@ -63,7 +65,7 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
                   width: 220,
                   height: 220,
                   image: NetworkImage(this._serverUrl + 'userImage/getImage/${this.widget.collaborator.email}'),
-                  placeholder: AssetImage('assets/images/profile_placeholder.jpg'),
+                  placeholder: AssetImage(Images.profilePicturePlacholder),
                 ),
               ),
             ),
@@ -161,22 +163,9 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
                         ],
                       ),
                     ),
-                  Card(
-                    color: Theme.of(context).primaryColorDark,
-                    elevation: 8,
-                    child: SwitchListTile(
-                      activeColor: Theme.of(context).primaryColor,
-                      title: Text('Grant access to my activity'),
-                      value: grantAccess,
-                      onChanged: (bool value) {
-                        setState(
-                          () {
-                            grantAccess = value;
-                            Provider.of<DelegateProvider>(context, listen: false).changePermission(this.widget.collaborator.email);
-                          },
-                        );
-                      },
-                    ),
+                  GrantAccessListTile(
+                    email: this.widget.collaborator.email,
+                    grantAccess: this.grantAccess,
                   ),
                   ElevatedButton(
                     onPressed: () {
@@ -218,13 +207,7 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
                         ),
                       );
                     },
-                    child: Text(
-                      'Delete from collaborators',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
+                    child: Text('Delete from collaborators'),
                   ),
                 ],
               ),
