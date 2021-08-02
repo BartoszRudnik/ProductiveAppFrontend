@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-class Tag with ChangeNotifier {
+class Tag {
   int id;
   String name;
   bool isSelected = false;

@@ -33,8 +33,13 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => AuthProvider(),
         ),
-        ChangeNotifierProvider(
-          create: (context) => ThemeProvider(),
+        ChangeNotifierProxyProvider<AuthProvider, ThemeProvider>(
+          create: null,
+          update: (ctx, auth, previousTheme) => ThemeProvider(
+            themeMode: previousTheme == null ? ThemeMode.system : previousTheme.themeMode,
+            userEmail: auth.email,
+            userToken: auth.token,
+          ),
         ),
         ChangeNotifierProxyProvider<AuthProvider, TaskProvider>(
           create: null,

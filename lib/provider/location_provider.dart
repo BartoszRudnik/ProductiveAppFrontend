@@ -65,7 +65,7 @@ class LocationProvider with ChangeNotifier {
 
       for (var element in responseBody) {
         models.Location loc = models.Location(
-          id: element['localizationId'],
+          id: element['id'],
           localizationName: element["localizationName"],
           longitude: element["longitude"],
           latitude: element["latitude"],

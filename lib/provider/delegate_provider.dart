@@ -187,8 +187,8 @@ class DelegateProvider with ChangeNotifier {
 
       for (var element in responseBody) {
         CollaboratorTask collaboratorTask = CollaboratorTask(
-          id: element['id_task'],
-          title: element['task_name'],
+          id: element['id'],
+          title: element['taskName'],
           description: element['description'],
           startDate: DateTime.parse(element['startDate']),
           endDate: DateTime.parse(element['endDate']),
@@ -217,8 +217,8 @@ class DelegateProvider with ChangeNotifier {
 
       for (var element in responseBody) {
         CollaboratorTask collaboratorTask = CollaboratorTask(
-          id: element['id_task'],
-          title: element['task_name'],
+          id: element['id'],
+          title: element['taskName'],
           description: element['description'],
           startDate: DateTime.parse(element['startDate']),
           endDate: DateTime.parse(element['endDate']),
