@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_app/config/color_themes.dart';
+import 'package:productive_app/widget/task_details_bottom_bar.dart';
 
 import 'package:provider/provider.dart';
 import '../utils/dialogs.dart';
@@ -830,47 +831,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
           ),
         ),
       ),
-      bottomNavigationBar: Container(
-        child: Row(
-          children: [
-            Expanded(
-              flex: 4,
-              child: TextButton.icon(
-                onPressed: () => deleteTask(),
-                style: ElevatedButton.styleFrom(
-                  onPrimary: Theme.of(context).primaryColor,
-                ),
-                icon: Icon(Icons.delete),
-                label: Text("Archive"),
-              ),
-            ),
-            Expanded(
-              flex: 6,
-              child: TextButton.icon(
-                onPressed: () {
-                  setState(() {
-                    taskToEdit.done = !taskToEdit.done;
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  onPrimary: Theme.of(context).primaryColor,
-                ),
-                icon: Icon(taskToEdit.done ? Icons.cancel : Icons.done),
-                label: Text(taskToEdit.done ? "Unmark as done" : "Mark as done"),
-              ),
-            ),
-            Expanded(
-                flex: 4,
-                child: TextButton.icon(
-                  onPressed: () => saveTask(),
-                  style: ElevatedButton.styleFrom(
-                    onPrimary: Theme.of(context).primaryColor,
-                  ),
-                  icon: Icon(Icons.save),
-                  label: Text("Save"),
-                )),
-          ],
-        ),
+      bottomNavigationBar: TaskDetailsBottomBar(
+        deleteTask: this.deleteTask,
+        saveTask: this.saveTask,
+        taskToEdit: taskToEdit,
       ),
     );
   }
