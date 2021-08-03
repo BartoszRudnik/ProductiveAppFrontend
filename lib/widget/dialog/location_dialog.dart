@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:latlong/latlong.dart';
-import 'package:productive_app/config/const_values.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
-
+import 'package:geocoding/geocoding.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
 import '../../model/location.dart' as model;
 import '../../provider/location_provider.dart';
 
@@ -28,9 +26,28 @@ class LocationDialog extends StatefulWidget {
 class LocationDialogState extends State<LocationDialog> with TickerProviderStateMixin {
   List<MapEntry<Placemark, LatLng>> placemarks = [];
   String searchString;
+  String _darkMapStyle = '';
+  String _lightMapStyle = '';
 
   final TextEditingController _textEditingController = TextEditingController();
-  final MapController _mapController = MapController();
+  GoogleMapController _mapController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    this._loadMapStyles();
+  }
+
+  final _startPosition = CameraPosition(
+    target: LatLng(0, 0),
+    zoom: 15,
+  );
+
+  Future _loadMapStyles() async {
+    this._darkMapStyle = await rootBundle.loadString('assets/map/darkMap.json');
+    this._lightMapStyle = await rootBundle.loadString('assets/map/lightMap.json');
+  }
 
   Future<void> getPlacemarks(BuildContext context, String search) async {
     await Provider.of<LocationProvider>(context, listen: false).findGlobalLocationsFromQuery(search);
@@ -45,28 +62,12 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
     this.widget.choosenLocation.street = placemarks.first.street;
   }
 
-  void _animatedMapMove(LatLng destLocation, double destZoom) {
-    final _latTween = Tween<double>(begin: _mapController.center.latitude, end: destLocation.latitude);
-    final _lngTween = Tween<double>(begin: _mapController.center.longitude, end: destLocation.longitude);
-    final _zoomTween = Tween<double>(begin: _mapController.zoom, end: destZoom);
-
-    var controller = AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
-
-    Animation<double> animation = CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
-
-    controller.addListener(() {
-      _mapController.move(LatLng(_latTween.evaluate(animation), _lngTween.evaluate(animation)), _zoomTween.evaluate(animation));
-    });
-
-    animation.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        controller.dispose();
-      } else if (status == AnimationStatus.dismissed) {
-        controller.dispose();
-      }
-    });
-
-    controller.forward();
+  void _animatedMapMove(LatLng point, double zoom) {
+    this._mapController.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(target: point, zoom: zoom),
+          ),
+        );
   }
 
   void getUserLocation() async {
@@ -85,13 +86,29 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
       });
 
       LatLng point = LatLng(this.widget.choosenLocation.latitude, this.widget.choosenLocation.longitude);
-      this._animatedMapMove(point, 18.0);
+      this._animatedMapMove(point, 15);
     }
+  }
+
+  void _onMapCreated(GoogleMapController _controller, double longitude, double latitude) async {
+    this._mapController = _controller;
+
+    if (longitude != null && latitude != null) {
+      this._animatedMapMove(LatLng(latitude, longitude), 15);
+    }
+
+    this._mapController.setMapStyle(
+          Theme.of(context).brightness == Brightness.light ? this._lightMapStyle : this._darkMapStyle,
+        );
   }
 
   @override
   Widget build(BuildContext context) {
     this.getUserLocation();
+
+    if (this.widget.choosenLocation.latitude != null && this.widget.choosenLocation.longitude != null && this._mapController != null) {
+      this._animatedMapMove(LatLng(this.widget.choosenLocation.latitude, this.widget.choosenLocation.longitude), 15);
+    }
 
     return StatefulBuilder(
       builder: (context, setState) {
@@ -103,38 +120,27 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
                 Container(
                   height: 600,
                   width: 400,
-                  child: FlutterMap(
-                    mapController: _mapController,
-                    options: MapOptions(
-                      onTap: (point) {
-                        setState(() {
-                          this.widget.choosenLocation.latitude = point.latitude;
-                          this.widget.choosenLocation.longitude = point.longitude;
-                          this.getAddress(point.latitude, point.longitude);
-                        });
-                      },
-                      center: LatLng(widget.choosenLocation.latitude, widget.choosenLocation.longitude),
-                      zoom: 10.0,
-                    ),
-                    layers: [
-                      TileLayerOptions(
-                        urlTemplate: Theme.of(context).brightness == Brightness.light ? ConstValues.lightMapTemplate : ConstValues.darkMapTemplate,
-                        subdomains: ConstValues.mapSubdomains,
+                  child: GoogleMap(
+                    initialCameraPosition: this._startPosition,
+                    onMapCreated: (final controller) {
+                      this._onMapCreated(controller, this.widget.choosenLocation.longitude, this.widget.choosenLocation.latitude);
+                    },
+                    onTap: (point) {
+                      setState(() {
+                        this.widget.choosenLocation.latitude = point.latitude;
+                        this.widget.choosenLocation.longitude = point.longitude;
+                        this.getAddress(point.latitude, point.longitude);
+                      });
+                    },
+                    markers: Set<Marker>.of([
+                      Marker(
+                        markerId: MarkerId((this.widget.choosenLocation.latitude + this.widget.choosenLocation.longitude).toString()),
+                        position: LatLng(
+                          this.widget.choosenLocation.latitude,
+                          this.widget.choosenLocation.longitude,
+                        ),
                       ),
-                      MarkerLayerOptions(
-                        markers: [
-                          Marker(
-                            width: 150.0,
-                            height: 150.0,
-                            point: LatLng(widget.choosenLocation.latitude, widget.choosenLocation.longitude),
-                            builder: (context) => Icon(
-                              Icons.location_on,
-                              color: Colors.black,
-                            ),
-                          )
-                        ],
-                      )
-                    ],
+                    ]),
                   ),
                 ),
                 Padding(

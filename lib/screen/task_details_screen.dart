@@ -416,7 +416,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.taskToEdit.notificationLocalizationId);
     }
 
-    if (this._locationChanged) {
+    if (this._locationChanged && this._mapController != null) {
       this._animatedMapMove(LatLng(latitude, longitude), 15);
     }
 

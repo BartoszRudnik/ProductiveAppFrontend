@@ -41,9 +41,6 @@ class ThemeProvider with ChangeNotifier {
         },
       );
 
-      print(response);
-      print(response.body);
-
       final responseBody = json.decode(response.body);
 
       this.themeMode = this._selectColorMode(responseBody['backgroundType']);
