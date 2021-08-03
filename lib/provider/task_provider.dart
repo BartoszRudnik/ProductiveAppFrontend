@@ -578,7 +578,7 @@ class TaskProvider with ChangeNotifier {
             parentId: element['parentId']);
 
         if (element['tasks']['notificationLocalization'] != null) {
-          task.notificationLocalizationId = element['tasks']['notificationLocalization']['localizationId'];
+          task.notificationLocalizationId = element['tasks']['notificationLocalization']['id'];
           task.notificationLocalizationRadius = element['tasks']['localizationRadius'];
           task.notificationOnEnter = element['tasks']['notificationOnEnter'];
           task.notificationOnExit = element['tasks']['notificationOnExit'];

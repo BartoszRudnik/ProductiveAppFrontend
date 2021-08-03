@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:latlong/latlong.dart';
+import 'package:productive_app/config/const_values.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
 
@@ -117,8 +118,8 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
                     ),
                     layers: [
                       TileLayerOptions(
-                        urlTemplate: "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png",
-                        subdomains: ['a', 'b', 'c'],
+                        urlTemplate: Theme.of(context).brightness == Brightness.light ? ConstValues.lightMapTemplate : ConstValues.darkMapTemplate,
+                        subdomains: ConstValues.mapSubdomains,
                       ),
                       MarkerLayerOptions(
                         markers: [

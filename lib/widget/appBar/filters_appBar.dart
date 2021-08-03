@@ -4,7 +4,11 @@ import 'package:flutter/services.dart';
 class FiltersAppBar extends StatelessWidget with PreferredSizeWidget {
   final String title;
   final IconButton leadingButton;
-  FiltersAppBar({@required this.title, this.leadingButton});
+
+  FiltersAppBar({
+    @required this.title,
+    this.leadingButton,
+  });
 
   @override
   Widget build(BuildContext context) {

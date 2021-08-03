@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter/services.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:latlong/latlong.dart';
 import 'package:productive_app/config/color_themes.dart';
-import 'package:provider/provider.dart';
 
+import 'package:provider/provider.dart';
 import '../utils/dialogs.dart';
 import '../utils/notifications.dart';
 import '../model/task.dart';
@@ -32,8 +32,15 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
   Task taskToEdit;
   Task originalTask;
 
-  final MapController _mapController = MapController();
-  bool mapControllerReady = false;
+  GoogleMapController _mapController;
+
+  final _startPosition = CameraPosition(
+    target: LatLng(0, 0),
+    zoom: 15,
+  );
+
+  String _darkMapStyle = '';
+  String _lightMapStyle = '';
 
   TimeOfDay startTime;
   TimeOfDay endTime;
@@ -49,12 +56,14 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
   void initState() {
     _descriptionFocus.addListener(onDescriptionFocusChange);
     taskToEdit = null;
-    this._mapController.onReady.then((_) {
-      setState(() {
-        this.mapControllerReady = true;
-      });
-    });
+    this._loadMapStyles();
+
     super.initState();
+  }
+
+  Future _loadMapStyles() async {
+    this._darkMapStyle = await rootBundle.loadString('assets/map/darkMap.json');
+    this._lightMapStyle = await rootBundle.loadString('assets/map/lightMap.json');
   }
 
   void onDescriptionFocusChange() {
@@ -283,37 +292,22 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     }
   }
 
-  void _animatedMapMove(LatLng destLocation, double destZoom) {
-    if (this._locationChanged) {
-      Tween<double> _latTween = Tween<double>(begin: 0, end: destLocation.latitude);
-      Tween<double> _lngTween = Tween<double>(begin: 0, end: destLocation.longitude);
-      Tween<double> _zoomTween = Tween<double>(begin: destZoom, end: destZoom);
+  void _animatedMapMove(LatLng point, double zoom) {
+    this._mapController.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(target: point, zoom: zoom),
+          ),
+        );
+  }
 
-      if (this.mapControllerReady && this._mapController != null && this._mapController.center != null) {
-        _latTween = Tween<double>(begin: this._mapController.center.latitude, end: destLocation.latitude);
-        _lngTween = Tween<double>(begin: this._mapController.center.longitude, end: destLocation.longitude);
-      }
+  void _onMapCreated(GoogleMapController _controller, LatLng point, double zoom) async {
+    this._mapController = _controller;
 
-      var controller = AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
+    this._animatedMapMove(point, zoom);
 
-      Animation<double> animation = CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
-
-      if (this._mapController != null) {
-        controller.addListener(() {
-          this._mapController.move(LatLng(_latTween.evaluate(animation), _lngTween.evaluate(animation)), _zoomTween.evaluate(animation));
-        });
-      }
-
-      animation.addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          controller.dispose();
-        } else if (status == AnimationStatus.dismissed) {
-          controller.dispose();
-        }
-      });
-
-      controller.forward();
-    }
+    this._mapController.setMapStyle(
+          Theme.of(context).brightness == Brightness.light ? this._lightMapStyle : this._darkMapStyle,
+        );
   }
 
   void setLocation() async {
@@ -420,11 +414,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     if (this.taskToEdit.notificationLocalizationId != null) {
       latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.taskToEdit.notificationLocalizationId);
       longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.taskToEdit.notificationLocalizationId);
+    }
 
-      if (latitude != null && longitude != null && this.mapControllerReady) {
-        LatLng point = LatLng(latitude, longitude);
-        this._animatedMapMove(point, 15);
-      }
+    if (this._locationChanged) {
+      this._animatedMapMove(LatLng(latitude, longitude), 15);
     }
 
     return Scaffold(
@@ -624,49 +617,34 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                   height: 175,
                   child: Stack(
                     children: [
-                      if (this.taskToEdit.notificationLocalizationId != null && latitude != null && longitude != null && this._mapController != null)
+                      if (this.taskToEdit.notificationLocalizationId != null && latitude != null && longitude != null)
                         Container(
                           height: 175,
                           width: double.infinity,
-                          child: FlutterMap(
-                            mapController: this._mapController,
-                            options: MapOptions(
-                              interactive: true,
-                              center: this.taskToEdit.notificationLocalizationId != null ? LatLng(latitude, longitude) : LatLng(0, 0),
-                              zoom: 16,
-                            ),
-                            layers: [
-                              TileLayerOptions(
-                                urlTemplate: "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png",
-                                subdomains: ['a', 'b', 'c'],
-                              ),
-                              MarkerLayerOptions(
-                                markers: [
-                                  Marker(
-                                    width: 150.0,
-                                    height: 150.0,
-                                    point: LatLng(latitude, longitude),
-                                    builder: (context) => Icon(
-                                      Icons.location_on,
-                                      color: Colors.black,
-                                    ),
-                                  )
-                                ],
-                              ),
-                              if (this.taskToEdit.notificationLocalizationRadius != null)
-                                CircleLayerOptions(
-                                  circles: [
-                                    CircleMarker(
-                                      point: LatLng(latitude, longitude),
-                                      color: Colors.blueGrey.withOpacity(0.4),
-                                      borderStrokeWidth: 3.0,
-                                      borderColor: Colors.grey,
-                                      useRadiusInMeter: true,
-                                      radius: this.taskToEdit.notificationLocalizationRadius * 1000,
-                                    ),
-                                  ],
-                                ),
-                            ],
+                          child: GoogleMap(
+                            compassEnabled: false,
+                            zoomControlsEnabled: false,
+                            mapType: MapType.normal,
+                            initialCameraPosition: this._startPosition,
+                            onMapCreated: (final controller) {
+                              this._onMapCreated(controller, LatLng(latitude, longitude), 15);
+                            },
+                            markers: Set<Marker>.of([
+                              Marker(
+                                markerId: MarkerId(taskToEdit.id.toString()),
+                                position: LatLng(latitude, longitude),
+                              )
+                            ]),
+                            circles: Set<Circle>.of([
+                              Circle(
+                                circleId: CircleId(taskToEdit.id.toString()),
+                                center: LatLng(latitude, longitude),
+                                radius: this.taskToEdit.notificationLocalizationRadius * 1000,
+                                fillColor: Theme.of(context).primaryColorDark.withOpacity(0.8),
+                                strokeColor: Theme.of(context).primaryColor,
+                                strokeWidth: 2,
+                              )
+                            ]),
                           ),
                         ),
                       if (this.taskToEdit.notificationLocalizationId == null || longitude == null || latitude == null)
