@@ -8,7 +8,7 @@ import '../model/collaboratorTask.dart';
 import '../provider/delegate_provider.dart';
 import '../utils/collaborator_show_modal.dart';
 import '../widget/appBar/active_tasks_appBar.dart';
-import '../widget/ask_for_activity_permission.dart';
+import '../widget/button/ask_for_activity_permission.dart';
 
 class RecentTasks extends StatefulWidget {
   Collaborator collaborator;

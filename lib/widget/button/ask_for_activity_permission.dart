@@ -25,6 +25,21 @@ class AskForActivityPermission extends StatelessWidget {
               } else {
                 Provider.of<DelegateProvider>(context, listen: false).askForPermission(this.collaborator.email);
                 this.collaborator.alreadyAsked = true;
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'Request has been sent',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                    backgroundColor: Theme.of(context).primaryColorDark,
+                    duration: Duration(seconds: 2),
+                  ),
+                );
               }
             },
             child: Text('Ask for permission'),

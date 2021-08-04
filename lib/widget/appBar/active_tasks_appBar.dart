@@ -13,7 +13,10 @@ class ActiveTasksAppBar extends StatelessWidget with PreferredSizeWidget {
     return AppBar(
       title: Text(
         this.message,
-        style: TextStyle(color: Colors.black),
+        style: TextStyle(
+          fontSize: 26,
+          color: Theme.of(context).primaryColor,
+        ),
       ),
       toolbarHeight: 50,
       systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: Colors.black),

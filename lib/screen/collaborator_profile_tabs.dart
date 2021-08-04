@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/model/collaborator.dart';
-import 'package:productive_app/provider/theme_provider.dart';
-import 'package:productive_app/screen/active_tasks_screen.dart';
-import 'package:productive_app/screen/collaborator_profile.dart';
-import 'package:productive_app/screen/recent_tasks.dart';
-import 'package:provider/provider.dart';
+import '../model/collaborator.dart';
+import 'active_tasks_screen.dart';
+import 'collaborator_profile.dart';
+import 'recent_tasks.dart';
 
 class CollaboratorProfileTabs extends StatefulWidget {
   static const routeName = "/collaboratorProfileTabs";
