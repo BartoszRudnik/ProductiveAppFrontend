@@ -1,3 +1,4 @@
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:productive_app/model/collaborator.dart';
@@ -83,12 +84,18 @@ class AcceptedCollaborator extends StatelessWidget {
         },
         child: Card(
           child: ListTile(
-            leading: Container(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(25),
-                child: FadeInImage(
-                  image: NetworkImage(this._serverUrl + 'userImage/getImage/${this.collaborator.email}'),
-                  placeholder: AssetImage('assets/images/profile_placeholder.jpg'),
+            leading: Badge(
+              padding: EdgeInsets.all(8.5),
+              position: BadgePosition.topStart(),
+              showBadge: this.collaborator.isAskingForPermission,
+              badgeColor: Theme.of(context).primaryColor,
+              child: Container(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(25),
+                  child: FadeInImage(
+                    image: NetworkImage(this._serverUrl + 'userImage/getImage/${this.collaborator.email}'),
+                    placeholder: AssetImage('assets/images/profile_placeholder.jpg'),
+                  ),
                 ),
               ),
             ),

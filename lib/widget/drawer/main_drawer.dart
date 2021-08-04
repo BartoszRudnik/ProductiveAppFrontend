@@ -95,10 +95,10 @@ class _MainDrawerState extends State<MainDrawer> {
             ),
             Badge(
               position: BadgePosition.topStart(),
-              showBadge: Provider.of<DelegateProvider>(context).received.length > 0,
+              showBadge: Provider.of<DelegateProvider>(context).received.length > 0 || Provider.of<DelegateProvider>(context).numberOfPermissionRequest > 0,
               badgeColor: Theme.of(context).primaryColor,
               badgeContent: Text(
-                Provider.of<DelegateProvider>(context).received.length.toString(),
+                (Provider.of<DelegateProvider>(context).received.length + Provider.of<DelegateProvider>(context).numberOfPermissionRequest).toString(),
                 style: TextStyle(color: Theme.of(context).accentColor),
               ),
               child: DrawerListTile(

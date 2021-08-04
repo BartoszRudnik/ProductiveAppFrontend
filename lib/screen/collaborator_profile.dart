@@ -44,175 +44,201 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CollaboratorProfileAppBar(),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Container(
-              padding: EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColorLight,
-                border: Border.all(
-                  color: Theme.of(context).primaryColorDark,
-                  width: 2.5,
-                ),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(90),
-                child: FadeInImage(
-                  fit: BoxFit.cover,
-                  width: 220,
-                  height: 220,
-                  image: NetworkImage(this._serverUrl + 'userImage/getImage/${this.widget.collaborator.email}'),
-                  placeholder: AssetImage(Images.profilePicturePlacholder),
-                ),
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColorLight,
-                border: Border.all(
-                  color: Theme.of(context).primaryColorDark,
-                  width: 2.5,
-                ),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 4,
-                        child: Text(
-                          "E-mail:",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 8,
-                        child: TextFormField(
-                          enabled: false,
-                          initialValue: this.widget.collaborator.email,
-                          style: TextStyle(fontSize: 18),
-                          maxLines: 1,
-                        ),
-                      )
-                    ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColorLight,
+                  border: Border.all(
+                    color: Theme.of(context).primaryColorDark,
+                    width: 2.5,
                   ),
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 4,
-                        child: Text(
-                          "Name:",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 8,
-                        child: TextFormField(
-                          key: ObjectKey(collaboratorName),
-                          enabled: false,
-                          initialValue: collaboratorName,
-                          style: TextStyle(fontSize: 18),
-                          maxLines: 1,
-                          decoration: InputDecoration(hintText: "Name"),
-                        ),
-                      )
-                    ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(90),
+                  child: FadeInImage(
+                    fit: BoxFit.cover,
+                    width: 220,
+                    height: 220,
+                    image: NetworkImage(this._serverUrl + 'userImage/getImage/${this.widget.collaborator.email}'),
+                    placeholder: AssetImage(Images.profilePicturePlacholder),
                   ),
-                ],
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColorLight,
-                border: Border.all(
-                  color: Theme.of(context).primaryColorDark,
-                  width: 2.5,
                 ),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  if (this.widget.collaborator.isAskingForPermission)
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColorDark,
-                        border: Border.all(
-                          color: Colors.grey.withOpacity(0.8),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Text(
-                            'Asked for permission to see your activity',
+              SizedBox(height: 10),
+              Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColorLight,
+                  border: Border.all(
+                    color: Theme.of(context).primaryColorDark,
+                    width: 2.5,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 4,
+                          child: Text(
+                            "E-mail:",
+                            style: TextStyle(fontSize: 18),
                           ),
-                          IconButton(
-                            icon: Icon(Icons.cancel_outlined),
-                            onPressed: () {
-                              Provider.of<DelegateProvider>(context, listen: false).declineAskForPermission(this.widget.collaborator.email);
-                              setState(() {
-                                this.widget.collaborator.isAskingForPermission = false;
-                              });
-                            },
-                          )
-                        ],
-                      ),
+                        ),
+                        Expanded(
+                          flex: 8,
+                          child: TextFormField(
+                            enabled: false,
+                            initialValue: this.widget.collaborator.email,
+                            style: TextStyle(fontSize: 18),
+                            maxLines: 1,
+                          ),
+                        )
+                      ],
                     ),
-                  GrantAccessListTile(
-                    email: this.widget.collaborator.email,
-                    grantAccess: this.grantAccess,
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 4,
+                          child: Text(
+                            "Name:",
+                            style: TextStyle(fontSize: 18),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 8,
+                          child: TextFormField(
+                            key: ObjectKey(collaboratorName),
+                            enabled: false,
+                            initialValue: collaboratorName,
+                            style: TextStyle(fontSize: 18),
+                            maxLines: 1,
+                            decoration: InputDecoration(hintText: "Name"),
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 10),
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColorLight,
+                  border: Border.all(
+                    color: Theme.of(context).primaryColorDark,
+                    width: 2.5,
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      return showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: Center(
-                            child: Text(
-                              'Delete',
-                              style: Theme.of(context).textTheme.headline3,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    if (this.widget.collaborator.isAskingForPermission)
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).primaryColorDark,
+                          border: Border.all(
+                            color: Colors.grey.withOpacity(0.8),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Text(
+                              'Asked for permission to see your activity',
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.cancel_outlined),
+                              onPressed: () {
+                                Provider.of<DelegateProvider>(context, listen: false).declineAskForPermission(this.widget.collaborator.email);
+                                setState(() {
+                                  this.widget.collaborator.isAskingForPermission = false;
+                                });
+                              },
+                            )
+                          ],
+                        ),
+                      ),
+                    if (this.widget.collaborator.isAskingForPermission)
+                      SizedBox(
+                        height: 10,
+                      ),
+                    GrantAccessListTile(
+                      email: this.widget.collaborator.email,
+                      grantAccess: this.grantAccess,
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 10),
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColorLight,
+                  border: Border.all(
+                    color: Theme.of(context).primaryColorDark,
+                    width: 2.5,
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        return showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Center(
+                              child: Text(
+                                'Delete',
+                                style: Theme.of(context).textTheme.headline3,
+                              ),
+                            ),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text('Are you sure you want to delete this collaborator?'),
+                                SizedBox(height: 10),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    ElevatedButton(
+                                      onPressed: () async {
+                                        await Provider.of<DelegateProvider>(context, listen: false).deleteCollaborator(this.widget.collaborator.id);
+                                        Navigator.of(context).pop(true);
+                                        Navigator.of(context).pop(true);
+                                      },
+                                      child: Text('Yes'),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(false);
+                                      },
+                                      child: Text('No'),
+                                    ),
+                                  ],
+                                )
+                              ],
                             ),
                           ),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text('Are you sure you want to delete this collaborator?'),
-                              SizedBox(height: 10),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  ElevatedButton(
-                                    onPressed: () async {
-                                      await Provider.of<DelegateProvider>(context, listen: false).deleteCollaborator(this.widget.collaborator.id);
-                                      Navigator.of(context).pop(true);
-                                      Navigator.of(context).pop(true);
-                                    },
-                                    child: Text('Yes'),
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop(false);
-                                    },
-                                    child: Text('No'),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                    child: Text('Delete from collaborators'),
-                  ),
-                ],
+                        );
+                      },
+                      child: Text('Delete from collaborators'),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

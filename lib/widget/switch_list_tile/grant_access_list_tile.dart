@@ -18,33 +18,24 @@ class GrantAccessListTile extends StatefulWidget {
 class _GrantAccessListTileState extends State<GrantAccessListTile> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: Theme.of(context).primaryColor,
-        ),
+    return SwitchListTile(
+      tileColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColorDark : Colors.black,
+      activeColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColor : Theme.of(context).primaryColorDark,
+      inactiveTrackColor: Theme.of(context).primaryColorLight,
+      activeTrackColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColor : Theme.of(context).accentColor,
+      title: Text(
+        'Grant access to my activity',
+        style: TextStyle(color: Colors.white),
       ),
-      child: Card(
-        child: SwitchListTile(
-          tileColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColorDark : Colors.black,
-          activeColor: Theme.of(context).primaryColor,
-          inactiveTrackColor: Theme.of(context).primaryColorLight,
-          activeTrackColor: Theme.of(context).primaryColor,
-          title: Text(
-            'Grant access to my activity',
-            style: TextStyle(color: Colors.white),
-          ),
-          value: this.widget.grantAccess,
-          onChanged: (bool value) {
-            setState(
-              () {
-                this.widget.grantAccess = value;
-                Provider.of<DelegateProvider>(context, listen: false).changePermission(this.widget.email);
-              },
-            );
+      value: this.widget.grantAccess,
+      onChanged: (bool value) {
+        setState(
+          () {
+            this.widget.grantAccess = value;
+            Provider.of<DelegateProvider>(context, listen: false).changePermission(this.widget.email);
           },
-        ),
-      ),
+        );
+      },
     );
   }
 }
