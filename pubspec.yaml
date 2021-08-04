@@ -31,6 +31,7 @@ dependencies:
   global_configuration: ^1.6.0
   badges: ^1.2.0
   image_picker: ^0.6.7+22
+  google_maps_flutter: ^1.2.0
   geolocator: ^6.0.0
   geocoding: ^1.0.0 
   flutter_map: ^0.12.0
@@ -70,6 +71,7 @@ flutter:
     - assets/cfg/
     - assets/images/clipboard.png
     - assets/images/profile_placeholder.jpg
+    - assets/map/
 
   
     

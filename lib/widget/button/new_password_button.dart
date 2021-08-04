@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/config/color_themes.dart';
 
 class NewPasswordButton extends StatelessWidget {
   final Function setNewPassword;
@@ -13,16 +14,12 @@ class NewPasswordButton extends StatelessWidget {
       width: 304,
       height: 47,
       child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          primary: Theme.of(context).primaryColor,
-          side: BorderSide(color: Theme.of(context).primaryColor),
-        ),
+        style: ColorThemes.loginButtonStyle(context),
         onPressed: this.setNewPassword,
         child: Text(
           'Submit',
           style: TextStyle(
             fontSize: 25,
-            color: Theme.of(context).accentColor,
           ),
         ),
       ),

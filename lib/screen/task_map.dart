@@ -1,13 +1,13 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
-
 import '../model/task.dart';
 import '../provider/location_provider.dart';
 import '../provider/task_provider.dart';
+import '../widget/appBar/filters_appBar.dart';
 import 'task_details_screen.dart';
 
 class TaskMap extends StatefulWidget {
@@ -20,23 +20,35 @@ class TaskMap extends StatefulWidget {
 }
 
 class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
-  final MapController _mapController = MapController();
+  GoogleMapController _mapController;
+  String _darkMapStyle = '';
+  String _lightMapStyle = '';
 
   int actualMarkerId;
   List<Marker> markers = [];
   List<Task> tasks = [];
 
-  double startLatitude = 0.0;
-  double startLongitude = 0.0;
+  BitmapDescriptor defaultIcon = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
+  BitmapDescriptor selectedIcon = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan);
+
+  final _startPosition = CameraPosition(
+    target: LatLng(0, 0),
+    zoom: 16,
+  );
 
   @override
   void initState() {
     super.initState();
 
-    this.getTasks();
+    this._loadMapStyles();
   }
 
-  void getTasks() {
+  Future _loadMapStyles() async {
+    this._darkMapStyle = await rootBundle.loadString('assets/map/darkMap.json');
+    this._lightMapStyle = await rootBundle.loadString('assets/map/lightMap.json');
+  }
+
+  void _getTasks() {
     tasks = Provider.of<TaskProvider>(context, listen: false).tasksWithLocation;
     this.markers = [];
 
@@ -45,87 +57,69 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
       final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(tasks[i].notificationLocalizationId);
 
       final newMarker = Marker(
-        width: 150.0,
-        height: 150.0,
-        point: LatLng(latitude, longitude),
-        builder: (context) => GestureDetector(
-          onTap: () {
-            LatLng point = LatLng(latitude, longitude);
-            this._animatedMapMove(point, 16.0);
-            setState(() {
-              startLatitude = latitude;
-              startLongitude = longitude;
-            });
+        icon: tasks[i].id == actualMarkerId ? this.selectedIcon : this.defaultIcon,
+        markerId: MarkerId(tasks[i].id.toString()),
+        position: LatLng(latitude, longitude),
+        onTap: () {
+          LatLng point = LatLng(latitude, longitude);
+          this._animatedMapMove(point, 16.0);
 
-            int nextIndex = i;
-            int previousIndex = i;
+          int nextIndex = i;
+          int previousIndex = i;
 
-            if (i > 0) {
-              previousIndex -= 1;
-            } else {
-              previousIndex = tasks.length - 1;
-            }
+          if (i > 0) {
+            previousIndex -= 1;
+          } else {
+            previousIndex = tasks.length - 1;
+          }
 
-            if (i < tasks.length - 1) {
-              nextIndex += 1;
-            } else {
-              nextIndex = 0;
-            }
+          if (i < tasks.length - 1) {
+            nextIndex += 1;
+          } else {
+            nextIndex = 0;
+          }
 
-            return this._onMarkerPressed(tasks[i], previousIndex, nextIndex);
-          },
-          child: Icon(
-            Icons.location_on,
-            color: tasks[i].id == actualMarkerId ? Colors.red : Colors.black,
-          ),
-        ),
+          return this._onMarkerPressed(tasks[i], previousIndex, nextIndex);
+        },
       );
 
       markers.add(newMarker);
     }
   }
 
-  void getUserLocation() async {
-    if (startLatitude == 0.0 && startLongitude == 0.0) {
-      bg.Location location = await bg.BackgroundGeolocation.getCurrentPosition(
-        timeout: 3,
-        maximumAge: 10000,
-        desiredAccuracy: 100,
-        samples: 3,
-      );
+  void _onMapCreated(GoogleMapController _controller) async {
+    bg.Location location = await bg.BackgroundGeolocation.getCurrentPosition(
+      timeout: 3,
+      maximumAge: 10000,
+      desiredAccuracy: 100,
+      samples: 3,
+    );
 
-      setState(() {
-        startLatitude = location.coords.latitude;
-        startLongitude = location.coords.longitude;
-      });
+    this._mapController = _controller;
 
-      LatLng point = LatLng(startLatitude, startLongitude);
-      this._animatedMapMove(point, 16.0);
-    }
+    this._mapController.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: LatLng(
+                location.coords.latitude,
+                location.coords.longitude,
+              ),
+              zoom: 16,
+            ),
+          ),
+        );
+
+    this._mapController.setMapStyle(
+          Theme.of(context).brightness == Brightness.light ? this._lightMapStyle : this._darkMapStyle,
+        );
   }
 
-  void _animatedMapMove(LatLng destLocation, double destZoom) {
-    final _latTween = Tween<double>(begin: _mapController.center.latitude, end: destLocation.latitude);
-    final _lngTween = Tween<double>(begin: _mapController.center.longitude, end: destLocation.longitude);
-    final _zoomTween = Tween<double>(begin: _mapController.zoom, end: destZoom);
-
-    var controller = AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
-
-    Animation<double> animation = CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
-
-    controller.addListener(() {
-      _mapController.move(LatLng(_latTween.evaluate(animation), _lngTween.evaluate(animation)), _zoomTween.evaluate(animation));
-    });
-
-    animation.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        controller.dispose();
-      } else if (status == AnimationStatus.dismissed) {
-        controller.dispose();
-      }
-    });
-
-    controller.forward();
+  void _animatedMapMove(LatLng point, double zoom) {
+    this._mapController.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(target: point, zoom: zoom),
+          ),
+        );
   }
 
   void _onMarkerPressed(Task task, int previousTaskIndex, int nextTaskIndex) {
@@ -140,7 +134,7 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
           topRight: const Radius.circular(30.0),
         ),
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).primaryColorLight,
       context: context,
       builder: (context) {
         return Container(
@@ -168,7 +162,7 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
                 decoration: BoxDecoration(
                   color: Theme.of(context).accentColor,
                   border: Border(
-                    top: BorderSide(color: Theme.of(context).primaryColor, width: 1.2),
+                    top: BorderSide(color: Theme.of(context).primaryColor, width: 1),
                   ),
                 ),
                 child: Row(
@@ -182,10 +176,6 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
 
                         LatLng point = LatLng(latitude, longitude);
                         this._animatedMapMove(point, 16.0);
-                        setState(() {
-                          startLatitude = latitude;
-                          startLongitude = longitude;
-                        });
 
                         int nextIndex = previousTaskIndex;
                         int previousIndex = previousTaskIndex;
@@ -207,42 +197,22 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
                       },
                     ),
                     ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: Theme.of(context).primaryColor,
-                        side: BorderSide(color: Theme.of(context).primaryColor),
-                      ),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: Text(
-                        'Cancel',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Theme.of(context).accentColor,
-                        ),
-                      ),
+                      child: Text('Cancel'),
                     ),
                     ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: Theme.of(context).primaryColor,
-                        side: BorderSide(color: Theme.of(context).primaryColor),
-                      ),
                       onPressed: () {
                         Navigator.of(context).pushNamed(TaskDetailScreen.routeName, arguments: task).then((value) {
                           setState(() {
-                            this.getTasks();
+                            this._getTasks();
                           });
                           Navigator.of(context).pop('nextTask');
                           return this._onMarkerPressed(tasks.firstWhere((element) => element.id == task.id), previousTaskIndex, nextTaskIndex);
                         });
                       },
-                      child: Text(
-                        'Task details',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Theme.of(context).accentColor,
-                        ),
-                      ),
+                      child: Text('Task details'),
                     ),
                     IconButton(
                       icon: Icon(Icons.navigate_next_outlined),
@@ -252,10 +222,6 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
 
                         LatLng point = LatLng(latitude, longitude);
                         this._animatedMapMove(point, 16.0);
-                        setState(() {
-                          startLatitude = latitude;
-                          startLongitude = longitude;
-                        });
 
                         int nextIndex = nextTaskIndex;
                         int previousIndex = nextTaskIndex;
@@ -294,47 +260,21 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    this.getUserLocation();
+    this._getTasks();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Tasks map',
-          style: TextStyle(
-            fontSize: 30,
-            fontWeight: FontWeight.w400,
-            color: Theme.of(context).primaryColor,
-          ),
+      appBar: FiltersAppBar(title: 'Task Map'),
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        width: double.infinity,
+        child: GoogleMap(
+          mapType: MapType.normal,
+          initialCameraPosition: this._startPosition,
+          onMapCreated: (final controller) {
+            this._onMapCreated(controller);
+          },
+          markers: Set<Marker>.of(this.markers),
         ),
-        systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: Colors.black),
-        backgroundColor: Theme.of(context).accentColor,
-        iconTheme: Theme.of(context).iconTheme,
-        brightness: Brightness.dark,
-      ),
-      body: StatefulBuilder(
-        builder: (context, setState) {
-          return Container(
-            height: MediaQuery.of(context).size.height,
-            width: double.infinity,
-            child: FlutterMap(
-              mapController: _mapController,
-              options: MapOptions(
-                onTap: (point) {},
-                center: LatLng(startLatitude, startLongitude),
-                zoom: 15.0,
-              ),
-              layers: [
-                TileLayerOptions(
-                  urlTemplate: "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png",
-                  subdomains: ['a', 'b', 'c'],
-                ),
-                MarkerLayerOptions(
-                  markers: (markers != null && markers.length >= 1) ? markers.toList() : [],
-                ),
-              ],
-            ),
-          );
-        },
       ),
     );
   }

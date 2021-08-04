@@ -56,7 +56,7 @@ class _LocationScreenState extends State<LocationsScreen> {
       floatingActionButton: FloatingActionButton(
         child: Icon(
           Icons.add,
-          color: Theme.of(context).accentColor,
+          color: Colors.white,
           size: 50,
         ),
         onPressed: () async {
@@ -79,7 +79,6 @@ class _LocationScreenState extends State<LocationsScreen> {
 
           this._addNewLocationForm(context, choosenLocation);
         },
-        backgroundColor: Theme.of(context).primaryColor,
       ),
       body: ListView.builder(
         padding: EdgeInsets.only(left: 21, right: 17, top: 10),

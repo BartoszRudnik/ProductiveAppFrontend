@@ -11,8 +11,11 @@
         android:label="Productive App"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/launcher_icon">
-        <activity
 
+        <meta-data android:name="com.google.android.geo.API_KEY"
+               android:value="AIzaSyBZgeqbxuFoIxV9Px6y3VYcwT4Bq4-C8K8"/>
+
+        <activity
         
             android:name=".MainActivity"
             android:launchMode="singleTop"

@@ -1,6 +1,7 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:productive_app/provider/delegate_provider.dart';
+import 'package:productive_app/provider/theme_provider.dart';
 import 'package:productive_app/screen/settings_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -16,11 +17,30 @@ class SettingsTabsScreen extends StatefulWidget {
 class _SettingsTabsScreenState extends State<SettingsTabsScreen> {
   List<Map<String, Object>> _pages;
 
-  final _selectedItemColor = Colors.white;
-  final _unselectedItemColor = Colors.black;
-  final _selectedBgColor = Colors.black;
-  final _unselectedBgColor = Colors.white;
+  Color _selectedItemColor;
+  Color _unselectedItemColor;
+  Color _selectedBgColor;
+  Color _unselectedBgColor;
   int _selectedPageIndex = 0;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    if (isDarkMode) {
+      this._selectedItemColor = Colors.black;
+      this._unselectedItemColor = Colors.white;
+      this._selectedBgColor = Colors.white;
+      this._unselectedBgColor = Colors.grey[700];
+    } else {
+      this._selectedItemColor = Colors.white;
+      this._unselectedItemColor = Colors.black;
+      this._selectedBgColor = Colors.black;
+      this._unselectedBgColor = Colors.white;
+    }
+  }
 
   @override
   void initState() {
@@ -88,17 +108,9 @@ class _SettingsTabsScreenState extends State<SettingsTabsScreen> {
       child: Scaffold(
         body: _pages[this._selectedPageIndex]['page'],
         bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor,
-            border: Border(
-              top: BorderSide(color: Theme.of(context).primaryColor, width: 1.0),
-            ),
-          ),
           child: BottomNavigationBar(
             selectedFontSize: 0,
             currentIndex: _selectedPageIndex,
-            selectedItemColor: this._selectedItemColor,
-            unselectedItemColor: this._unselectedItemColor,
             type: BottomNavigationBarType.fixed,
             items: [
               BottomNavigationBarItem(

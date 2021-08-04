@@ -9,27 +9,30 @@ class LoginGreet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        SizedBox(
-          height: 80,
-        ),
-        Container(
-          height: 130,
-          width: 130,
-          child: Icon(
-            Icons.person_outline_outlined,
-            size: 130,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 30),
+      child: Column(
+        children: [
+          Container(
+            height: 130,
+            width: 130,
+            child: Icon(
+              Icons.person_outline_outlined,
+              size: 130,
+            ),
           ),
-        ),
-        Text(
-          this.greetText,
-          style: Theme.of(context).textTheme.headline3,
-        ),
-        SizedBox(
-          height: 50,
-        ),
-      ],
+          Text(
+            this.greetText,
+            style: TextStyle(
+              fontSize: 36,
+              fontFamily: 'RobotoCondensed',
+            ),
+          ),
+          SizedBox(
+            height: 50,
+          ),
+        ],
+      ),
     );
   }
 }

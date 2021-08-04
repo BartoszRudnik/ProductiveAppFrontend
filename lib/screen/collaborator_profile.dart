@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
+import 'package:productive_app/config/images.dart';
+import 'package:productive_app/widget/switch_list_tile/grant_access_list_tile.dart';
 import 'package:provider/provider.dart';
-import '../config/app_colors.dart';
 import '../model/collaborator.dart';
 import '../provider/delegate_provider.dart';
 import '../widget/appBar/collaborator_profile_appBar.dart';
@@ -51,9 +52,9 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
             Container(
               padding: EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.grayBackground,
+                color: Theme.of(context).primaryColorLight,
                 border: Border.all(
-                  color: AppColors.grayBorder,
+                  color: Theme.of(context).primaryColorDark,
                   width: 2.5,
                 ),
               ),
@@ -64,16 +65,16 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
                   width: 220,
                   height: 220,
                   image: NetworkImage(this._serverUrl + 'userImage/getImage/${this.widget.collaborator.email}'),
-                  placeholder: AssetImage('assets/images/profile_placeholder.jpg'),
+                  placeholder: AssetImage(Images.profilePicturePlacholder),
                 ),
               ),
             ),
             Container(
               padding: EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.grayBackground,
+                color: Theme.of(context).primaryColorLight,
                 border: Border.all(
-                  color: AppColors.grayBorder,
+                  color: Theme.of(context).primaryColorDark,
                   width: 2.5,
                 ),
               ),
@@ -127,9 +128,9 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
             Container(
               padding: EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.grayBackground,
+                color: Theme.of(context).primaryColorLight,
                 border: Border.all(
-                  color: AppColors.grayBorder,
+                  color: Theme.of(context).primaryColorDark,
                   width: 2.5,
                 ),
               ),
@@ -139,7 +140,7 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
                   if (this.widget.collaborator.isAskingForPermission)
                     Container(
                       decoration: BoxDecoration(
-                        color: AppColors.grayButton,
+                        color: Theme.of(context).primaryColorDark,
                         border: Border.all(
                           color: Colors.grey.withOpacity(0.8),
                         ),
@@ -162,30 +163,11 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
                         ],
                       ),
                     ),
-                  Card(
-                    elevation: 8,
-                    child: SwitchListTile(
-                      activeColor: Theme.of(context).primaryColor,
-                      title: Text('Grant access to my activity'),
-                      value: grantAccess,
-                      onChanged: (bool value) {
-                        setState(
-                          () {
-                            grantAccess = value;
-                            Provider.of<DelegateProvider>(context, listen: false).changePermission(this.widget.collaborator.email);
-                          },
-                        );
-                      },
-                    ),
+                  GrantAccessListTile(
+                    email: this.widget.collaborator.email,
+                    grantAccess: this.grantAccess,
                   ),
                   ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      elevation: 5,
-                      primary: AppColors.grayButton,
-                      side: BorderSide(
-                        color: Colors.grey.withOpacity(0.8),
-                      ),
-                    ),
                     onPressed: () {
                       return showDialog(
                         context: context,
@@ -205,38 +187,18 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
                                   ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      primary: Theme.of(context).primaryColor,
-                                      side: BorderSide(color: Theme.of(context).primaryColor),
-                                    ),
                                     onPressed: () async {
                                       await Provider.of<DelegateProvider>(context, listen: false).deleteCollaborator(this.widget.collaborator.id);
                                       Navigator.of(context).pop(true);
                                       Navigator.of(context).pop(true);
                                     },
-                                    child: Text(
-                                      'Yes',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Theme.of(context).accentColor,
-                                      ),
-                                    ),
+                                    child: Text('Yes'),
                                   ),
                                   ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      primary: Theme.of(context).primaryColor,
-                                      side: BorderSide(color: Theme.of(context).primaryColor),
-                                    ),
                                     onPressed: () {
                                       Navigator.of(context).pop(false);
                                     },
-                                    child: Text(
-                                      'No',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Theme.of(context).accentColor,
-                                      ),
-                                    ),
+                                    child: Text('No'),
                                   ),
                                 ],
                               )
@@ -245,13 +207,7 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
                         ),
                       );
                     },
-                    child: Text(
-                      'Delete from collaborators',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
+                    child: Text('Delete from collaborators'),
                   ),
                 ],
               ),

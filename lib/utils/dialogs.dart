@@ -1,102 +1,127 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/provider/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class Dialogs {
+  static void logoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Center(
+          child: Text(
+            'Log out',
+            style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Are you sure you want to log out?'),
+            SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Provider.of<AuthProvider>(context, listen: false).logout();
+                    Navigator.of(context).pop(true);
+                  },
+                  child: Text('Yes'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                  child: Text('No'),
+                ),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   static void showWarningDialog(BuildContext context, String warningText) {
     showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-              title: Center(
-                child: Text(
-                  'Warning',
-                  style: Theme.of(context).textTheme.headline2,
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Center(
+          child: Text(
+            'Warning',
+            style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(warningText),
+            SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: Text('OK'),
                 ),
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(warningText),
-                  SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).primaryColor,
-                          side: BorderSide(color: Theme.of(context).primaryColor),
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).pop(true);
-                        },
-                        child: Text(
-                          'OK',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Theme.of(context).accentColor,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ));
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   static Future<bool> showChoiceDialog(BuildContext context, String text) async {
     bool choice = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-              title: Center(
-                child: Text(
-                  'Warning',
-                  style: Theme.of(context).textTheme.headline2,
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Center(
+          child: Text(
+            'Warning',
+            style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(child: Text(text)),
+            SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: Text('Yes'),
                 ),
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Center(child: Text(text)),
-                  SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).primaryColor,
-                          side: BorderSide(color: Theme.of(context).primaryColor),
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).pop(true);
-                        },
-                        child: Text(
-                          'Yes',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Theme.of(context).accentColor,
-                          ),
-                        ),
-                      ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).primaryColor,
-                          side: BorderSide(color: Theme.of(context).primaryColor),
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).pop(false);
-                        },
-                        child: Text(
-                          'No',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Theme.of(context).accentColor,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ));
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                  child: Text('No'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
     return choice;
   }
 
@@ -112,7 +137,11 @@ class Dialogs {
             title: Center(
               child: Text(
                 title,
-                style: Theme.of(context).textTheme.headline2,
+                style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
             content: Column(
@@ -135,10 +164,6 @@ class Dialogs {
                   ),
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).primaryColor,
-                    side: BorderSide(color: Theme.of(context).primaryColor),
-                  ),
                   onPressed: () {
                     final isValid = _tKey.currentState.validate();
                     if (isValid) {
@@ -147,13 +172,7 @@ class Dialogs {
                       Navigator.of(context).pop(tempVal);
                     }
                   },
-                  child: Text(
-                    'OK',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).accentColor,
-                    ),
-                  ),
+                  child: Text('OK'),
                 ),
               ],
             ),
@@ -173,7 +192,11 @@ class Dialogs {
             title: Center(
               child: Text(
                 title,
-                style: Theme.of(context).textTheme.headline2,
+                style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
             content: Column(
@@ -196,10 +219,6 @@ class Dialogs {
                   ),
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).primaryColor,
-                    side: BorderSide(color: Theme.of(context).primaryColor),
-                  ),
                   onPressed: () {
                     final isValid = _tKey.currentState.validate();
                     if (isValid) {
@@ -208,13 +227,7 @@ class Dialogs {
                       Navigator.of(context).pop(tempVal);
                     }
                   },
-                  child: Text(
-                    'OK',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).accentColor,
-                    ),
-                  ),
+                  child: Text('OK'),
                 ),
               ],
             ),
@@ -230,7 +243,11 @@ class Dialogs {
               title: Center(
                 child: Text(
                   'Warning',
-                  style: Theme.of(context).textTheme.headline2,
+                  style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
               content: Column(
@@ -242,52 +259,22 @@ class Dialogs {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).primaryColor,
-                          side: BorderSide(color: Theme.of(context).primaryColor),
-                        ),
                         onPressed: () {
                           Navigator.of(context).pop('Camera');
                         },
-                        child: Text(
-                          'Camera',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Theme.of(context).accentColor,
-                          ),
-                        ),
+                        child: Text('Camera'),
                       ),
                       ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).primaryColor,
-                          side: BorderSide(color: Theme.of(context).primaryColor),
-                        ),
                         onPressed: () {
                           Navigator.of(context).pop('Gallery');
                         },
-                        child: Text(
-                          'Gallery',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Theme.of(context).accentColor,
-                          ),
-                        ),
+                        child: Text('Gallery'),
                       ),
                       ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).primaryColor,
-                          side: BorderSide(color: Theme.of(context).primaryColor),
-                        ),
                         onPressed: () {
                           Navigator.of(context).pop(null);
                         },
-                        child: Text(
-                          'Cancel',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Theme.of(context).accentColor,
-                          ),
-                        ),
+                        child: Text('Cancel'),
                       ),
                     ],
                   ),

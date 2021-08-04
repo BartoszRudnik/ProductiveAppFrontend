@@ -559,15 +559,15 @@ class TaskProvider with ChangeNotifier {
         }
 
         Task task = Task(
-            id: element['tasks']['id_task'],
-            title: element['tasks']['task_name'],
+            id: element['tasks']['id'],
+            title: element['tasks']['taskName'],
             description: element['tasks']['description'],
             done: element['tasks']['ifDone'],
             priority: element['tasks']['priority'],
             endDate: DateTime.parse(element['tasks']['endDate']),
             startDate: DateTime.parse(element['tasks']['startDate']),
             tags: taskTags,
-            localization: element['tasks']['localization'],
+            localization: element['tasks']['taskList'],
             position: element['tasks']['position'],
             delegatedEmail: element['tasks']['delegatedEmail'],
             isDelegated: element['tasks']['isDelegated'],
@@ -578,7 +578,7 @@ class TaskProvider with ChangeNotifier {
             parentId: element['parentId']);
 
         if (element['tasks']['notificationLocalization'] != null) {
-          task.notificationLocalizationId = element['tasks']['notificationLocalization']['localizationId'];
+          task.notificationLocalizationId = element['tasks']['notificationLocalization']['id'];
           task.notificationLocalizationRadius = element['tasks']['localizationRadius'];
           task.notificationOnEnter = element['tasks']['notificationOnEnter'];
           task.notificationOnExit = element['tasks']['notificationOnExit'];

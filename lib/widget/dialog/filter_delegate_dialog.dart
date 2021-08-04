@@ -81,36 +81,16 @@ class FilterDelegateDialog extends StatelessWidget {
                                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                                       children: [
                                         ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            primary: Theme.of(context).primaryColor,
-                                            side: BorderSide(color: Theme.of(context).primaryColor),
-                                          ),
                                           onPressed: () {
                                             Navigator.of(context).pop(false);
                                           },
-                                          child: Text(
-                                            'Cancel',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: Theme.of(context).accentColor,
-                                            ),
-                                          ),
+                                          child: Text('Cancel'),
                                         ),
                                         ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            primary: Theme.of(context).primaryColor,
-                                            side: BorderSide(color: Theme.of(context).primaryColor),
-                                          ),
                                           onPressed: () {
                                             Navigator.of(context).pop(true);
                                           },
-                                          child: Text(
-                                            'Send invitation',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: Theme.of(context).accentColor,
-                                            ),
-                                          ),
+                                          child: Text('Send invitation'),
                                         ),
                                       ],
                                     ),
@@ -191,42 +171,22 @@ class FilterDelegateDialog extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: Theme.of(context).primaryColor,
-                        side: BorderSide(color: Theme.of(context).primaryColor),
-                      ),
                       onPressed: () {
                         filteredCollaborators.forEach((element) {
                           element.isSelected = false;
                         });
                         Navigator.of(context).pop('cancel');
                       },
-                      child: Text(
-                        'Cancel',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Theme.of(context).accentColor,
-                        ),
-                      ),
+                      child: Text('Cancel'),
                     ),
                     ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: Theme.of(context).primaryColor,
-                        side: BorderSide(color: Theme.of(context).primaryColor),
-                      ),
                       onPressed: () {
                         filteredCollaborators.forEach((element) {
                           element.isSelected = false;
                         });
                         Navigator.of(context).pop(this.choosenCollaborators);
                       },
-                      child: Text(
-                        'Save',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Theme.of(context).accentColor,
-                        ),
-                      ),
+                      child: Text('Save'),
                     ),
                   ],
                 ),

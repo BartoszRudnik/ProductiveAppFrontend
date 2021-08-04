@@ -17,7 +17,7 @@ class _IsDoneButtonState extends State<IsDoneButton> {
   @override
   Widget build(BuildContext context) {
     return RawMaterialButton(
-      fillColor: this.widget.isDone ? Colors.grey : Theme.of(context).accentColor,
+      fillColor: this.widget.isDone ? Colors.grey : Theme.of(context).primaryColorLight,
       focusElevation: 0,
       child: this.widget.isDone
           ? Icon(

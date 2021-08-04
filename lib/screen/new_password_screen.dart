@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:productive_app/widget/button/new_password_button.dart';
 import 'package:provider/provider.dart';
-import '../config/HttpException.dart';
+import '../config/color_themes.dart';
+import '../exception/HttpException.dart';
 import '../provider/auth_provider.dart';
 import '../widget/appBar/login_appbar.dart';
+import '../widget/button/new_password_button.dart';
 import '../widget/login_greet.dart';
 import '../widget/validation_fail_widget.dart';
 import 'login_screen.dart';
@@ -73,9 +74,14 @@ class _NewPasswordState extends State<NewPassword> {
       return showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text(
-            'New password successfuly set',
-            style: Theme.of(context).textTheme.headline2,
+          title: Center(
+            child: Text(
+              'New password successfuly set',
+              style: TextStyle(
+                fontSize: 26,
+                fontFamily: 'RobotoCondensed',
+              ),
+            ),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -84,21 +90,11 @@ class _NewPasswordState extends State<NewPassword> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Theme.of(context).primaryColor,
-                      side: BorderSide(color: Theme.of(context).primaryColor),
-                    ),
                     onPressed: () {
                       Navigator.of(context).pop(true);
                       Navigator.of(context).pop();
                     },
-                    child: Text(
-                      'OK',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).accentColor,
-                      ),
-                    ),
+                    child: Text('OK'),
                   ),
                 ],
               ),
@@ -154,19 +150,10 @@ class _NewPasswordState extends State<NewPassword> {
                     }
                     return null;
                   },
-                  decoration: InputDecoration(
-                    errorStyle: TextStyle(
-                      height: 0,
-                      color: Colors.transparent,
-                    ),
-                    focusedErrorBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Theme.of(context).primaryColor),
-                    ),
-                    errorBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Theme.of(context).primaryColor),
-                    ),
-                    labelText: 'Reset token',
-                    prefixIcon: Icon(Icons.person_outline),
+                  decoration: ColorThemes.loginFormFieldDecoration(
+                    context,
+                    'Token',
+                    Icons.vpn_key_outlined,
                   ),
                 ),
                 SizedBox(
@@ -194,19 +181,10 @@ class _NewPasswordState extends State<NewPassword> {
                     }
                     return null;
                   },
-                  decoration: InputDecoration(
-                    errorStyle: TextStyle(
-                      height: 0,
-                      color: Colors.transparent,
-                    ),
-                    focusedErrorBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Theme.of(context).primaryColor),
-                    ),
-                    errorBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Theme.of(context).primaryColor),
-                    ),
-                    labelText: 'New Password',
-                    prefixIcon: Icon(Icons.lock_outline),
+                  decoration: ColorThemes.loginFormFieldDecoration(
+                    context,
+                    'Password',
+                    Icons.lock_outline,
                   ),
                 ),
                 SizedBox(
@@ -228,19 +206,10 @@ class _NewPasswordState extends State<NewPassword> {
                     }
                     return null;
                   },
-                  decoration: InputDecoration(
-                    errorStyle: TextStyle(
-                      height: 0,
-                      color: Colors.transparent,
-                    ),
-                    focusedErrorBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Theme.of(context).primaryColor),
-                    ),
-                    errorBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Theme.of(context).primaryColor),
-                    ),
-                    labelText: 'Password Confirm',
-                    prefixIcon: Icon(Icons.lock_outline),
+                  decoration: ColorThemes.loginFormFieldDecoration(
+                    context,
+                    'Repeat Password',
+                    Icons.lock_outline,
                   ),
                 ),
                 SizedBox(height: 20),

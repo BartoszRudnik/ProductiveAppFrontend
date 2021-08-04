@@ -19,10 +19,6 @@ class AskForActivityPermission extends StatelessWidget {
         children: [
           Text('You don\'t have permission to see collaborator acitivity!'),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              primary: Theme.of(context).primaryColor,
-              side: BorderSide(color: Theme.of(context).primaryColor),
-            ),
             onPressed: () {
               if (this.collaborator.alreadyAsked) {
                 return Dialogs.showWarningDialog(context, 'You already asked for permission!');
@@ -31,13 +27,7 @@ class AskForActivityPermission extends StatelessWidget {
                 this.collaborator.alreadyAsked = true;
               }
             },
-            child: Text(
-              'Ask for permission',
-              style: TextStyle(
-                fontSize: 14,
-                color: Theme.of(context).accentColor,
-              ),
-            ),
+            child: Text('Ask for permission'),
           ),
         ],
       ),

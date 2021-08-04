@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter/services.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:latlong/latlong.dart';
-import 'package:provider/provider.dart';
+import 'package:productive_app/config/color_themes.dart';
+import 'package:productive_app/widget/task_details_bottom_bar.dart';
 
+import 'package:provider/provider.dart';
 import '../utils/dialogs.dart';
 import '../utils/notifications.dart';
 import '../model/task.dart';
@@ -31,8 +33,15 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
   Task taskToEdit;
   Task originalTask;
 
-  final MapController _mapController = MapController();
-  bool mapControllerReady = false;
+  GoogleMapController _mapController;
+
+  final _startPosition = CameraPosition(
+    target: LatLng(0, 0),
+    zoom: 15,
+  );
+
+  String _darkMapStyle = '';
+  String _lightMapStyle = '';
 
   TimeOfDay startTime;
   TimeOfDay endTime;
@@ -48,12 +57,14 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
   void initState() {
     _descriptionFocus.addListener(onDescriptionFocusChange);
     taskToEdit = null;
-    this._mapController.onReady.then((_) {
-      setState(() {
-        this.mapControllerReady = true;
-      });
-    });
+    this._loadMapStyles();
+
     super.initState();
+  }
+
+  Future _loadMapStyles() async {
+    this._darkMapStyle = await rootBundle.loadString('assets/map/darkMap.json');
+    this._lightMapStyle = await rootBundle.loadString('assets/map/lightMap.json');
   }
 
   void onDescriptionFocusChange() {
@@ -282,37 +293,22 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     }
   }
 
-  void _animatedMapMove(LatLng destLocation, double destZoom) {
-    if (this._locationChanged) {
-      Tween<double> _latTween = Tween<double>(begin: 0, end: destLocation.latitude);
-      Tween<double> _lngTween = Tween<double>(begin: 0, end: destLocation.longitude);
-      Tween<double> _zoomTween = Tween<double>(begin: destZoom, end: destZoom);
+  void _animatedMapMove(LatLng point, double zoom) {
+    this._mapController.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(target: point, zoom: zoom),
+          ),
+        );
+  }
 
-      if (this.mapControllerReady && this._mapController != null && this._mapController.center != null) {
-        _latTween = Tween<double>(begin: this._mapController.center.latitude, end: destLocation.latitude);
-        _lngTween = Tween<double>(begin: this._mapController.center.longitude, end: destLocation.longitude);
-      }
+  void _onMapCreated(GoogleMapController _controller, LatLng point, double zoom) async {
+    this._mapController = _controller;
 
-      var controller = AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
+    this._animatedMapMove(point, zoom);
 
-      Animation<double> animation = CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
-
-      if (this._mapController != null) {
-        controller.addListener(() {
-          this._mapController.move(LatLng(_latTween.evaluate(animation), _lngTween.evaluate(animation)), _zoomTween.evaluate(animation));
-        });
-      }
-
-      animation.addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          controller.dispose();
-        } else if (status == AnimationStatus.dismissed) {
-          controller.dispose();
-        }
-      });
-
-      controller.forward();
-    }
+    this._mapController.setMapStyle(
+          Theme.of(context).brightness == Brightness.light ? this._lightMapStyle : this._darkMapStyle,
+        );
   }
 
   void setLocation() async {
@@ -419,483 +415,427 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     if (this.taskToEdit.notificationLocalizationId != null) {
       latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.taskToEdit.notificationLocalizationId);
       longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.taskToEdit.notificationLocalizationId);
+    }
 
-      if (latitude != null && longitude != null && this.mapControllerReady) {
-        LatLng point = LatLng(latitude, longitude);
-        this._animatedMapMove(point, 15);
-      }
+    if (this._locationChanged && this._mapController != null) {
+      this._animatedMapMove(LatLng(latitude, longitude), 15);
     }
 
     return Scaffold(
-        appBar: DetailsAppBar(
-          title: 'Details',
-          task: originalTask,
-        ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30.0),
-            child: Form(
-              key: this._formKey,
-              child: Column(
-                children: [
-                  TextFormField(
-                    initialValue: taskToEdit.title,
-                    style: TextStyle(fontSize: 25),
-                    maxLines: null,
-                    onSaved: (value) {
-                      taskToEdit.title = value;
-                    },
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return 'Task title cannot be empty';
-                      }
-                      return null;
-                    },
+      appBar: DetailsAppBar(
+        title: 'Details',
+        task: originalTask,
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 30.0),
+          child: Form(
+            key: this._formKey,
+            child: Column(
+              children: [
+                TextFormField(
+                  initialValue: taskToEdit.title,
+                  style: TextStyle(fontSize: 25),
+                  maxLines: null,
+                  onSaved: (value) {
+                    taskToEdit.title = value;
+                  },
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Task title cannot be empty';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                ListTile(
+                  minLeadingWidth: 16,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 0),
+                  leading: Icon(Icons.edit),
+                  title: Align(
+                    alignment: Alignment(-1.1, 0),
+                    child: Text(
+                      "Description",
+                      style: TextStyle(fontSize: 21),
+                    ),
                   ),
-                  SizedBox(
-                    height: 10,
+                ),
+                TextFormField(
+                  initialValue: taskToEdit.description,
+                  maxLines: null,
+                  focusNode: _descriptionFocus,
+                  onChanged: (text) {
+                    onDescriptionChanged(text);
+                  },
+                  onSaved: (value) {
+                    taskToEdit.description = value;
+                  },
+                  style: TextStyle(fontSize: 16),
+                  textAlign: _isDescriptionInitial ? TextAlign.center : TextAlign.left,
+                  decoration: InputDecoration(
+                    hintText: _isFocused ? "" : "Tap to add description",
+                    filled: true,
+                    fillColor: Theme.of(context).primaryColorLight,
+                    enabledBorder: _description.isEmpty
+                        ? OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Theme.of(context).primaryColorDark,
+                            ),
+                          )
+                        : InputBorder.none,
                   ),
-                  ListTile(
-                    minLeadingWidth: 16,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 0),
-                    leading: Icon(Icons.edit),
-                    title: Align(
-                      alignment: Alignment(-1.1, 0),
-                      child: Text(
-                        "Description",
-                        style: TextStyle(fontSize: 21),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      flex: 5,
+                      child: SizedBox(
+                        height: 100,
+                        child: PopupMenuButton(
+                          initialValue: taskToEdit.priority,
+                          onSelected: (value) {
+                            setState(() {
+                              taskToEdit.priority = value;
+                            });
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).primaryColorLight,
+                              borderRadius: BorderRadius.circular(3),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.8),
+                                  offset: Offset(0.0, 1.0),
+                                  blurRadius: 1.0,
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [Icon(Icons.flag), Text("Priority")],
+                            ),
+                          ),
+                          itemBuilder: (context) {
+                            return priorities.reversed.map((e) {
+                              return PopupMenuItem(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  children: <Widget>[
+                                    Text(e),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    if (e == 'LOW') Icon(Icons.arrow_downward_outlined),
+                                    if (e == 'HIGH') Icon(Icons.arrow_upward_outlined),
+                                    if (e == 'HIGHER') Icon(Icons.arrow_upward_outlined),
+                                    if (e == 'HIGHER') Icon(Icons.arrow_upward_outlined),
+                                    if (e == 'CRITICAL') Icon(Icons.warning_amber_sharp),
+                                  ],
+                                ),
+                                value: e,
+                              );
+                            }).toList();
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                  TextFormField(
-                    initialValue: taskToEdit.description,
-                    maxLines: null,
-                    focusNode: _descriptionFocus,
-                    onChanged: (text) {
-                      //taskToEdit.description = text;
-                      onDescriptionChanged(text);
-                    },
-                    onSaved: (value) {
-                      taskToEdit.description = value;
-                    },
-                    style: TextStyle(fontSize: 16),
-                    textAlign: _isDescriptionInitial ? TextAlign.center : TextAlign.left,
-                    decoration: InputDecoration(
-                      hintText: _isFocused ? "" : "Tap to add description",
-                      hintStyle: TextStyle(color: Color.fromRGBO(119, 119, 120, 1)),
-                      filled: true,
-                      fillColor: _isDescriptionInitial ? Color.fromRGBO(237, 237, 240, 1) : Colors.white,
-                      enabledBorder: _description.isEmpty ? OutlineInputBorder(borderSide: BorderSide(color: Color.fromRGBO(221, 221, 226, 1))) : InputBorder.none,
+                    Expanded(flex: 1, child: SizedBox()),
+                    Expanded(
+                      flex: 5,
+                      child: SizedBox(
+                        height: 100,
+                        child: ElevatedButton(
+                          style: ColorThemes.taskDetailsButtonStyle(context),
+                          onPressed: () {
+                            this.setDelegatedEmail();
+                          },
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.person_add),
+                              Text("Assigned"),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        flex: 5,
-                        child: SizedBox(
-                          height: 100,
-                          child: PopupMenuButton(
-                            initialValue: taskToEdit.priority,
-                            onSelected: (value) {
-                              setState(() {
-                                taskToEdit.priority = value;
-                              });
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(color: Color.fromRGBO(221, 221, 226, 1), borderRadius: BorderRadius.circular(3), boxShadow: [
+                    Expanded(flex: 1, child: SizedBox()),
+                    Expanded(
+                      flex: 5,
+                      child: SizedBox(
+                        height: 100,
+                        child: PopupMenuButton(
+                          initialValue: taskToEdit.localization,
+                          onSelected: (value) {
+                            setState(() {
+                              taskToEdit.localization = value;
+                            });
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).primaryColorLight,
+                              borderRadius: BorderRadius.circular(3),
+                              boxShadow: [
                                 BoxShadow(
                                   color: Colors.grey.withOpacity(0.8),
                                   offset: Offset(0.0, 1.0),
                                   blurRadius: 1.0,
                                 )
-                              ]),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [Icon(Icons.flag), Text("Priority")],
-                              ),
-                            ),
-                            itemBuilder: (context) {
-                              return priorities.reversed.map((e) {
-                                return PopupMenuItem(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                    children: <Widget>[
-                                      Text(e),
-                                      SizedBox(
-                                        width: 5,
-                                      ),
-                                      if (e == 'LOW') Icon(Icons.arrow_downward_outlined),
-                                      if (e == 'HIGH') Icon(Icons.arrow_upward_outlined),
-                                      if (e == 'HIGHER') Icon(Icons.arrow_upward_outlined),
-                                      if (e == 'HIGHER') Icon(Icons.arrow_upward_outlined),
-                                      if (e == 'CRITICAL') Icon(Icons.warning_amber_sharp),
-                                    ],
-                                  ),
-                                  value: e,
-                                );
-                              }).toList();
-                            },
-                          ),
-                        ),
-                      ),
-                      Expanded(flex: 1, child: SizedBox()),
-                      Expanded(
-                        flex: 5,
-                        child: SizedBox(
-                          height: 100,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              this.setDelegatedEmail();
-                            },
-                            style: ElevatedButton.styleFrom(
-                              primary: Color.fromRGBO(221, 221, 226, 1),
-                              onPrimary: Colors.black,
+                              ],
                             ),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: [Icon(Icons.person_add), Text("Assigned")],
+                              children: [
+                                Icon(Icons.inbox),
+                                Text(taskToEdit.localization),
+                              ],
+                            ),
+                          ),
+                          itemBuilder: (context) {
+                            return localizations.map((e) {
+                              return PopupMenuItem(
+                                child: Text(e),
+                                value: e,
+                              );
+                            }).toList();
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 15,
+                ),
+                Container(
+                  height: 175,
+                  child: Stack(
+                    children: [
+                      if (this.taskToEdit.notificationLocalizationId != null && latitude != null && longitude != null)
+                        Container(
+                          height: 175,
+                          width: double.infinity,
+                          child: GoogleMap(
+                            compassEnabled: false,
+                            zoomControlsEnabled: false,
+                            mapType: MapType.normal,
+                            initialCameraPosition: this._startPosition,
+                            onMapCreated: (final controller) {
+                              this._onMapCreated(controller, LatLng(latitude, longitude), 15);
+                            },
+                            markers: Set<Marker>.of([
+                              Marker(
+                                markerId: MarkerId(taskToEdit.id.toString()),
+                                position: LatLng(latitude, longitude),
+                              )
+                            ]),
+                            circles: Set<Circle>.of([
+                              Circle(
+                                circleId: CircleId(taskToEdit.id.toString()),
+                                center: LatLng(latitude, longitude),
+                                radius: this.taskToEdit.notificationLocalizationRadius * 1000,
+                                fillColor: Theme.of(context).primaryColorDark.withOpacity(0.8),
+                                strokeColor: Theme.of(context).primaryColor,
+                                strokeWidth: 2,
+                              )
+                            ]),
+                          ),
+                        ),
+                      if (this.taskToEdit.notificationLocalizationId == null || longitude == null || latitude == null)
+                        Expanded(
+                          flex: 5,
+                          child: Container(
+                            height: 175,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).primaryColorLight,
+                              borderRadius: BorderRadius.circular(3),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.8),
+                                  offset: Offset(0.0, 1.0),
+                                  blurRadius: 1.0,
+                                )
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                NewTaskNotificationLocalization(
+                                  bigIcon: true,
+                                  setNotificationLocalization: this.setNotificationLocalization,
+                                  notificationLocalizationId: this.taskToEdit.notificationLocalizationId,
+                                  notificationOnEnter: this.taskToEdit.notificationOnEnter,
+                                  notificationOnExit: this.taskToEdit.notificationOnExit,
+                                  notificationRadius: this.taskToEdit.notificationLocalizationRadius,
+                                  taskId: this.originalTask.id,
+                                ),
+                                Text(
+                                  'Tap to add location',
+                                  style: TextStyle(fontSize: 20),
+                                ),
+                              ],
                             ),
                           ),
                         ),
+                      GestureDetector(
+                        onTap: () {
+                          this.setLocation();
+                        },
                       ),
-                      Expanded(flex: 1, child: SizedBox()),
-                      Expanded(
-                        flex: 5,
-                        child: SizedBox(
-                          height: 100,
-                          child: PopupMenuButton(
-                            initialValue: taskToEdit.localization,
-                            onSelected: (value) {
-                              setState(() {
-                                taskToEdit.localization = value;
-                              });
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Color.fromRGBO(221, 221, 226, 1),
-                                borderRadius: BorderRadius.circular(3),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.8),
-                                    offset: Offset(0.0, 1.0),
-                                    blurRadius: 1.0,
-                                  )
-                                ],
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.inbox),
-                                  Text(taskToEdit.localization),
-                                ],
+                    ],
+                  ),
+                ),
+                ListTile(
+                  minLeadingWidth: 16,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 0),
+                  leading: Icon(Icons.calendar_today),
+                  title: Align(
+                    alignment: Alignment(-1.1, 0),
+                    child: Text(
+                      "Start and due date",
+                      style: TextStyle(fontSize: 21),
+                    ),
+                  ),
+                ),
+                ConstrainedBox(
+                  constraints: BoxConstraints.tightFor(width: double.infinity, height: 50),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Start date: ',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      Container(
+                        child: Row(
+                          children: [
+                            ElevatedButton(
+                              onPressed: () => selectStartDate(),
+                              style: ColorThemes.taskDetailsButtonStyle(context),
+                              child: Center(
+                                child: taskToEdit.startDate.toString() == "null"
+                                    ? Icon(Icons.calendar_today_outlined)
+                                    : Text(
+                                        formatter.format(taskToEdit.startDate),
+                                      ),
                               ),
                             ),
-                            itemBuilder: (context) {
-                              return localizations.map((e) {
-                                return PopupMenuItem(
-                                  child: Text(e),
-                                  value: e,
-                                );
-                              }).toList();
-                            },
-                          ),
+                            SizedBox(width: 10),
+                            ElevatedButton(
+                              style: ColorThemes.taskDetailsButtonStyle(context),
+                              onPressed: () async {
+                                final TimeOfDay pickTime = await DateTimePickers.pickTime(context);
+
+                                setState(() {
+                                  this.startTime = pickTime;
+                                });
+                              },
+                              child: Center(
+                                child: this.startTime.toString() == "null"
+                                    ? Icon(Icons.access_time_outlined)
+                                    : Text(
+                                        this.startTime.format(context),
+                                      ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  Container(
-                    height: 175,
-                    child: Stack(
-                      children: [
-                        if (this.taskToEdit.notificationLocalizationId != null && latitude != null && longitude != null && this._mapController != null)
-                          Container(
-                            height: 175,
-                            width: double.infinity,
-                            child: FlutterMap(
-                              mapController: this._mapController,
-                              options: MapOptions(
-                                interactive: true,
-                                center: this.taskToEdit.notificationLocalizationId != null ? LatLng(latitude, longitude) : LatLng(0, 0),
-                                zoom: 16,
-                              ),
-                              layers: [
-                                TileLayerOptions(
-                                  urlTemplate: "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png",
-                                  subdomains: ['a', 'b', 'c'],
-                                ),
-                                MarkerLayerOptions(
-                                  markers: [
-                                    Marker(
-                                      width: 150.0,
-                                      height: 150.0,
-                                      point: LatLng(latitude, longitude),
-                                      builder: (context) => Icon(
-                                        Icons.location_on,
-                                        color: Colors.black,
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                ConstrainedBox(
+                  constraints: BoxConstraints.tightFor(width: double.infinity, height: 50),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Due date:',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      Container(
+                        child: Row(
+                          children: [
+                            ElevatedButton(
+                              style: ColorThemes.taskDetailsButtonStyle(context),
+                              onPressed: () => selectEndDate(),
+                              child: Center(
+                                child: taskToEdit.endDate.toString() == "null"
+                                    ? Icon(Icons.calendar_today_outlined)
+                                    : Text(
+                                        formatter.format(taskToEdit.endDate),
                                       ),
-                                    )
-                                  ],
-                                ),
-                                if (this.taskToEdit.notificationLocalizationRadius != null)
-                                  CircleLayerOptions(
-                                    circles: [
-                                      CircleMarker(
-                                        point: LatLng(latitude, longitude),
-                                        color: Colors.blueGrey.withOpacity(0.4),
-                                        borderStrokeWidth: 3.0,
-                                        borderColor: Colors.grey,
-                                        useRadiusInMeter: true,
-                                        radius: this.taskToEdit.notificationLocalizationRadius * 1000,
-                                      ),
-                                    ],
-                                  ),
-                              ],
-                            ),
-                          ),
-                        if (this.taskToEdit.notificationLocalizationId == null || longitude == null || latitude == null)
-                          Expanded(
-                            flex: 5,
-                            child: Container(
-                              height: 175,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: Color.fromRGBO(221, 221, 226, 1),
-                                borderRadius: BorderRadius.circular(3),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.8),
-                                    offset: Offset(0.0, 1.0),
-                                    blurRadius: 1.0,
-                                  )
-                                ],
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  NewTaskNotificationLocalization(
-                                    bigIcon: true,
-                                    setNotificationLocalization: this.setNotificationLocalization,
-                                    notificationLocalizationId: this.taskToEdit.notificationLocalizationId,
-                                    notificationOnEnter: this.taskToEdit.notificationOnEnter,
-                                    notificationOnExit: this.taskToEdit.notificationOnExit,
-                                    notificationRadius: this.taskToEdit.notificationLocalizationRadius,
-                                    taskId: this.originalTask.id,
-                                  ),
-                                  Text(
-                                    'Tap to add location',
-                                    style: TextStyle(fontSize: 20),
-                                  ),
-                                ],
                               ),
                             ),
-                          ),
-                        GestureDetector(
-                          onTap: () {
-                            this.setLocation();
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  ListTile(
-                    minLeadingWidth: 16,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 0),
-                    leading: Icon(Icons.calendar_today),
-                    title: Align(
-                      alignment: Alignment(-1.1, 0),
-                      child: Text(
-                        "Start and due date",
-                        style: TextStyle(fontSize: 21),
-                      ),
-                    ),
-                  ),
-                  ConstrainedBox(
-                    constraints: BoxConstraints.tightFor(width: double.infinity, height: 50),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Start date: ',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        Container(
-                          child: Row(
-                            children: [
-                              ElevatedButton(
-                                onPressed: () => selectStartDate(),
-                                style: ElevatedButton.styleFrom(
-                                  primary: Color.fromRGBO(237, 237, 240, 1),
-                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
-                                ),
-                                child: Center(
-                                  child: taskToEdit.startDate.toString() == "null"
-                                      ? Icon(Icons.calendar_today_outlined)
-                                      : Text(
-                                          formatter.format(taskToEdit.startDate),
-                                        ),
-                                ),
-                              ),
-                              SizedBox(width: 10),
-                              ElevatedButton(
-                                onPressed: () async {
-                                  final TimeOfDay pickTime = await DateTimePickers.pickTime(context);
+                            SizedBox(width: 10),
+                            ElevatedButton(
+                              style: ColorThemes.taskDetailsButtonStyle(context),
+                              onPressed: () async {
+                                final TimeOfDay pickTime = await DateTimePickers.pickTime(context);
 
-                                  setState(() {
-                                    this.startTime = pickTime;
-                                  });
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  primary: Color.fromRGBO(237, 237, 240, 1),
-                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
-                                ),
-                                child: Center(
-                                  child: this.startTime.toString() == "null"
-                                      ? Icon(Icons.access_time_outlined)
-                                      : Text(
-                                          this.startTime.format(context),
-                                        ),
-                                ),
+                                setState(() {
+                                  this.endTime = pickTime;
+                                });
+                              },
+                              child: Center(
+                                child: this.endTime.toString() == "null"
+                                    ? Icon(Icons.access_time_outlined)
+                                    : Text(
+                                        this.endTime.format(context),
+                                      ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  ConstrainedBox(
-                    constraints: BoxConstraints.tightFor(width: double.infinity, height: 50),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Due date:',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        Container(
-                          child: Row(
-                            children: [
-                              ElevatedButton(
-                                onPressed: () => selectEndDate(),
-                                style: ElevatedButton.styleFrom(
-                                  primary: Color.fromRGBO(237, 237, 240, 1),
-                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
-                                ),
-                                child: Center(
-                                  child: taskToEdit.endDate.toString() == "null"
-                                      ? Icon(Icons.calendar_today_outlined)
-                                      : Text(
-                                          formatter.format(taskToEdit.endDate),
-                                        ),
-                                ),
-                              ),
-                              SizedBox(width: 10),
-                              ElevatedButton(
-                                onPressed: () async {
-                                  final TimeOfDay pickTime = await DateTimePickers.pickTime(context);
-
-                                  setState(() {
-                                    this.endTime = pickTime;
-                                  });
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  primary: Color.fromRGBO(237, 237, 240, 1),
-                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
-                                ),
-                                child: Center(
-                                  child: this.endTime.toString() == "null"
-                                      ? Icon(Icons.access_time_outlined)
-                                      : Text(
-                                          this.endTime.format(context),
-                                        ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  ListTile(
-                    minLeadingWidth: 16,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 0),
-                    leading: Icon(Icons.tag),
-                    title: Align(
-                      alignment: Alignment(-1.1, 0),
-                      child: Text(
-                        "Tags",
-                        style: TextStyle(fontSize: 21),
                       ),
+                    ],
+                  ),
+                ),
+                ListTile(
+                  minLeadingWidth: 16,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 0),
+                  leading: Icon(Icons.tag),
+                  title: Align(
+                    alignment: Alignment(-1.1, 0),
+                    child: Text(
+                      "Tags",
+                      style: TextStyle(fontSize: 21),
                     ),
                   ),
-                  TextButton(
-                    onPressed: () => editTags(context),
-                    child: TaskTagsEdit(
-                      tags: taskToEdit.tags,
-                    ),
-                  )
-                ],
-              ),
+                ),
+                TextButton(
+                  onPressed: () => editTags(context),
+                  child: TaskTagsEdit(
+                    tags: taskToEdit.tags,
+                  ),
+                )
+              ],
             ),
           ),
         ),
-        bottomNavigationBar: Container(
-          child: Row(
-            children: [
-              Expanded(
-                flex: 4,
-                child: TextButton.icon(
-                  onPressed: () => deleteTask(),
-                  style: ElevatedButton.styleFrom(
-                    onPrimary: Colors.black,
-                  ),
-                  icon: Icon(Icons.delete),
-                  label: Text("Archive"),
-                ),
-              ),
-              Expanded(
-                flex: 6,
-                child: TextButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      taskToEdit.done = !taskToEdit.done;
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    onPrimary: Colors.black,
-                  ),
-                  icon: Icon(taskToEdit.done ? Icons.cancel : Icons.done),
-                  label: Text(taskToEdit.done ? "Unmark as done" : "Mark as done"),
-                ),
-              ),
-              Expanded(
-                  flex: 4,
-                  child: TextButton.icon(
-                    onPressed: () => saveTask(),
-                    style: ElevatedButton.styleFrom(
-                      onPrimary: Colors.black,
-                    ),
-                    icon: Icon(Icons.save),
-                    label: Text("Save"),
-                  )),
-            ],
-          ),
-        ));
+      ),
+      bottomNavigationBar: TaskDetailsBottomBar(
+        deleteTask: this.deleteTask,
+        saveTask: this.saveTask,
+        taskToEdit: taskToEdit,
+      ),
+    );
   }
 }

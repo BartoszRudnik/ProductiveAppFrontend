@@ -37,6 +37,7 @@ class _DetailsAppBarState extends State<DetailsAppBar> {
       backgroundColor: Theme.of(context).accentColor,
       iconTheme: Theme.of(context).iconTheme,
       brightness: Brightness.dark,
+      backwardsCompatibility: false,
       leading: (widget.leadingButton != null) ? widget.leadingButton : null,
       actions: <Widget>[
         PopupMenuButton(

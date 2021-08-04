@@ -45,11 +45,7 @@ class FiltersSortingMode extends StatelessWidget {
                     padding: EdgeInsets.symmetric(horizontal: 4),
                     margin: EdgeInsets.symmetric(horizontal: 8),
                     decoration: BoxDecoration(
-                      color: this.sortingMode == index ? Color.fromRGBO(200, 200, 200, 1) : Theme.of(context).accentColor,
-                      border: Border.all(
-                        color: Color.fromRGBO(191, 191, 196, 1),
-                        width: 2.5,
-                      ),
+                      color: this.sortingMode == index ? Theme.of(context).primaryColor : Theme.of(context).primaryColorLight,
                     ),
                     child: Center(
                       child: Text(

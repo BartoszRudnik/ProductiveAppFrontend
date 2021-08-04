@@ -74,10 +74,6 @@ class ReceivedCollaborator extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).primaryColor,
-                          side: BorderSide(color: Theme.of(context).primaryColor),
-                        ),
                         onPressed: () {
                           Provider.of<DelegateProvider>(context, listen: false).declineInvitation(this.collaborator.id);
                           Navigator.of(context).pop(true);
@@ -91,10 +87,6 @@ class ReceivedCollaborator extends StatelessWidget {
                         ),
                       ),
                       ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).primaryColor,
-                          side: BorderSide(color: Theme.of(context).primaryColor),
-                        ),
                         onPressed: () {
                           Navigator.of(context).pop(false);
                         },

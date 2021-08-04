@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:geocoding/geocoding.dart' as geocoding;
-import 'package:latlong/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../model/location.dart' as models;
 
@@ -65,7 +65,7 @@ class LocationProvider with ChangeNotifier {
 
       for (var element in responseBody) {
         models.Location loc = models.Location(
-          id: element['localizationId'],
+          id: element['id'],
           localizationName: element["localizationName"],
           longitude: element["longitude"],
           latitude: element["latitude"],

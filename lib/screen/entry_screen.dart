@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../config/images.dart';
 import '../widget/appBar/login_appbar.dart';
-import '../widget/appBar/login_button.dart';
+import '../widget/button/login_button.dart';
 import 'login_screen.dart';
 
 class EntryScreen extends StatelessWidget {
@@ -20,6 +20,7 @@ class EntryScreen extends StatelessWidget {
             width: double.infinity,
             height: 100,
             child: Image(
+              color: Theme.of(context).primaryColor,
               image: AssetImage(Images.entryScreenImage),
               fit: BoxFit.fitHeight,
             ),

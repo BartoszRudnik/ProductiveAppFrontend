@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/widget/empty_list.dart';
 import 'package:provider/provider.dart';
-
-import '../model/collaborator.dart';
 import '../provider/delegate_provider.dart';
 import '../widget/accepted_collaborator.dart';
+import '../widget/appBar/task_appBar.dart';
+import '../widget/empty_list.dart';
 import '../widget/new_collaborator.dart';
 import '../widget/received_collaborator.dart';
 import '../widget/send_collaborator.dart';
-import '../widget/appBar/task_appBar.dart';
 
 class CollaboratorsScreen extends StatefulWidget {
   static const routeName = "/collaborators";
@@ -20,7 +18,7 @@ class CollaboratorsScreen extends StatefulWidget {
 class _CollaboratorsScreenState extends State<CollaboratorsScreen> {
   void _addNewCollaboratorForm(BuildContext buildContext) {
     showModalBottomSheet(
-      backgroundColor: Theme.of(context).accentColor,
+      backgroundColor: Theme.of(context).primaryColorLight,
       context: buildContext,
       builder: (_) {
         return GestureDetector(
@@ -43,13 +41,12 @@ class _CollaboratorsScreenState extends State<CollaboratorsScreen> {
       floatingActionButton: FloatingActionButton(
         child: Icon(
           Icons.add,
-          color: Theme.of(context).accentColor,
+          color: Colors.white,
           size: 50,
         ),
         onPressed: () {
           this._addNewCollaboratorForm(context);
         },
-        backgroundColor: Theme.of(context).primaryColor,
       ),
       body: RefreshIndicator(
         backgroundColor: Theme.of(context).primaryColor,

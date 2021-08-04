@@ -57,37 +57,17 @@ class AcceptedCollaborator extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).primaryColor,
-                          side: BorderSide(color: Theme.of(context).primaryColor),
-                        ),
                         onPressed: () async {
                           await Provider.of<DelegateProvider>(context, listen: false).deleteCollaborator(this.collaborator.id);
                           Navigator.of(context).pop(true);
                         },
-                        child: Text(
-                          'Yes',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Theme.of(context).accentColor,
-                          ),
-                        ),
+                        child: Text('Yes'),
                       ),
                       ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).primaryColor,
-                          side: BorderSide(color: Theme.of(context).primaryColor),
-                        ),
                         onPressed: () {
                           Navigator.of(context).pop(false);
                         },
-                        child: Text(
-                          'No',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Theme.of(context).accentColor,
-                          ),
-                        ),
+                        child: Text('No'),
                       ),
                     ],
                   )

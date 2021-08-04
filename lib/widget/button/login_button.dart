@@ -23,7 +23,6 @@ class LoginButton extends StatelessWidget {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           primary: this.backgroundColor,
-          side: BorderSide(color: Theme.of(context).primaryColor),
         ),
         onPressed: () {
           Navigator.of(context).pushNamed(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/config/color_themes.dart';
 import 'package:productive_app/utils/date_time_pickers.dart';
 
 class TaskDate extends StatefulWidget {
@@ -7,7 +8,7 @@ class TaskDate extends StatefulWidget {
   DateTime endValue;
   TimeOfDay startTime;
   TimeOfDay endTime;
-  Function setDate;
+  final Function setDate;
 
   TaskDate({
     @required this.startValue,
@@ -48,7 +49,7 @@ class _TaskDateState extends State<TaskDate> {
                     width: 200,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
+                      children: [
                         Center(
                           child: Text('Start date'),
                         ),
@@ -59,6 +60,7 @@ class _TaskDateState extends State<TaskDate> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               ElevatedButton(
+                                style: ColorThemes.taskDetailsButtonStyle(context),
                                 onPressed: () async {
                                   DateTime initDate = this.widget.startValue;
                                   if (this.widget.startValue == null) {
@@ -70,10 +72,6 @@ class _TaskDateState extends State<TaskDate> {
                                     this._startInitialValue = pick;
                                   });
                                 },
-                                style: ElevatedButton.styleFrom(
-                                  primary: Color.fromRGBO(237, 237, 240, 1),
-                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
-                                ),
                                 child: Center(
                                   child: this._startInitialValue.toString() == "null"
                                       ? Icon(Icons.calendar_today_outlined)
@@ -84,6 +82,7 @@ class _TaskDateState extends State<TaskDate> {
                               ),
                               SizedBox(width: 30),
                               ElevatedButton(
+                                style: ColorThemes.taskDetailsButtonStyle(context),
                                 onPressed: () async {
                                   final TimeOfDay pickTime = await DateTimePickers.pickTime(context);
 
@@ -91,10 +90,6 @@ class _TaskDateState extends State<TaskDate> {
                                     this._startInitialTime = pickTime;
                                   });
                                 },
-                                style: ElevatedButton.styleFrom(
-                                  primary: Color.fromRGBO(237, 237, 240, 1),
-                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
-                                ),
                                 child: Center(
                                   child: this._startInitialTime.toString() == "null"
                                       ? Icon(Icons.access_time_outlined)
@@ -119,6 +114,7 @@ class _TaskDateState extends State<TaskDate> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               ElevatedButton(
+                                style: ColorThemes.taskDetailsButtonStyle(context),
                                 onPressed: () async {
                                   DateTime initDate = this.widget.endValue;
                                   if (this.widget.endValue == null) {
@@ -130,10 +126,6 @@ class _TaskDateState extends State<TaskDate> {
                                     this._endInitialValue = pick;
                                   });
                                 },
-                                style: ElevatedButton.styleFrom(
-                                  primary: Color.fromRGBO(237, 237, 240, 1),
-                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
-                                ),
                                 child: Center(
                                   child: this._endInitialValue.toString() == "null"
                                       ? Icon(Icons.calendar_today_outlined)
@@ -144,6 +136,7 @@ class _TaskDateState extends State<TaskDate> {
                               ),
                               SizedBox(width: 30),
                               ElevatedButton(
+                                style: ColorThemes.taskDetailsButtonStyle(context),
                                 onPressed: () async {
                                   final TimeOfDay pickTime = await DateTimePickers.pickTime(context);
 
@@ -151,10 +144,6 @@ class _TaskDateState extends State<TaskDate> {
                                     this._endInitialTime = pickTime;
                                   });
                                 },
-                                style: ElevatedButton.styleFrom(
-                                  primary: Color.fromRGBO(237, 237, 240, 1),
-                                  onPrimary: Color.fromRGBO(119, 119, 120, 1),
-                                ),
                                 child: Center(
                                   child: this._endInitialTime.toString() == "null"
                                       ? Icon(Icons.access_time_outlined)
@@ -173,10 +162,6 @@ class _TaskDateState extends State<TaskDate> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                primary: Theme.of(context).primaryColor,
-                                side: BorderSide(color: Theme.of(context).primaryColor),
-                              ),
                               onPressed: () {
                                 this._startInitialValue = this.widget.startValue;
                                 this._endInitialValue = this.widget.endValue;
@@ -184,19 +169,9 @@ class _TaskDateState extends State<TaskDate> {
                                 this._endInitialTime = this.widget.endTime;
                                 Navigator.of(context).pop(false);
                               },
-                              child: Text(
-                                'Cancel',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Theme.of(context).accentColor,
-                                ),
-                              ),
+                              child: Text('Cancel'),
                             ),
                             ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                primary: Theme.of(context).primaryColor,
-                                side: BorderSide(color: Theme.of(context).primaryColor),
-                              ),
                               onPressed: () {
                                 if ((this._startInitialTime != null && this._startInitialValue == null) || (this._endInitialTime != null && this._endInitialValue == null)) {
                                   return showDialog(
@@ -217,10 +192,6 @@ class _TaskDateState extends State<TaskDate> {
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
                                               ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                  primary: Theme.of(context).primaryColor,
-                                                  side: BorderSide(color: Theme.of(context).primaryColor),
-                                                ),
                                                 onPressed: () {
                                                   Navigator.of(context).pop(false);
                                                 },
@@ -255,13 +226,7 @@ class _TaskDateState extends State<TaskDate> {
                                 });
                                 Navigator.of(context).pop(true);
                               },
-                              child: Text(
-                                'Save',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Theme.of(context).accentColor,
-                                ),
-                              ),
+                              child: Text('Save'),
                             ),
                           ],
                         ),

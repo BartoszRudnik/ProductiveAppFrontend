@@ -40,11 +40,6 @@ class FiltersLocations extends StatelessWidget {
                 children: [
                   Expanded(
                     child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.all(4),
-                        primary: Theme.of(context).accentColor,
-                        side: BorderSide(color: Theme.of(context).primaryColor),
-                      ),
                       onPressed: () async {
                         final selected = await showDialog(
                           context: context,
@@ -67,10 +62,7 @@ class FiltersLocations extends StatelessWidget {
                       },
                       child: Text(
                         'Choose locations',
-                        style: TextStyle(
-                          fontSize: 24,
-                          color: Theme.of(context).primaryColor,
-                        ),
+                        style: TextStyle(fontSize: 24),
                       ),
                     ),
                   ),
@@ -89,11 +81,7 @@ class FiltersLocations extends StatelessWidget {
                         padding: EdgeInsets.symmetric(horizontal: 4),
                         margin: EdgeInsets.symmetric(horizontal: 8),
                         decoration: BoxDecoration(
-                          color: Color.fromRGBO(200, 200, 200, 1),
-                          border: Border.all(
-                            color: Color.fromRGBO(191, 191, 196, 1),
-                            width: 2.5,
-                          ),
+                          color: Theme.of(context).primaryColorDark,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -103,14 +91,14 @@ class FiltersLocations extends StatelessWidget {
                               child: Text(
                                 Provider.of<LocationProvider>(context, listen: false).getLocationName(this.locations[index]),
                                 style: TextStyle(
-                                  color: Theme.of(context).accentColor,
+                                  color: Theme.of(context).primaryColor,
                                   fontSize: 18,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ),
                             IconButton(
-                              icon: Icon(Icons.cancel_outlined, color: Theme.of(context).accentColor),
+                              icon: Icon(Icons.cancel_outlined, color: Theme.of(context).primaryColor),
                               onPressed: () {
                                 Provider.of<SettingsProvider>(context, listen: false).deleteFilterLocation(this.locations[index]);
                               },

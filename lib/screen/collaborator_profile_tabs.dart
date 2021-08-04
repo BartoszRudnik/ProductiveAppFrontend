@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/model/collaborator.dart';
+import 'package:productive_app/provider/theme_provider.dart';
 import 'package:productive_app/screen/active_tasks_screen.dart';
 import 'package:productive_app/screen/collaborator_profile.dart';
 import 'package:productive_app/screen/recent_tasks.dart';
+import 'package:provider/provider.dart';
 
 class CollaboratorProfileTabs extends StatefulWidget {
   static const routeName = "/collaboratorProfileTabs";
@@ -24,10 +26,19 @@ class _CollaboratorProfileTabsState extends State<CollaboratorProfileTabs> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    this._selectedItemColor = Theme.of(context).accentColor;
-    this._unselectedItemColor = Theme.of(context).primaryColor;
-    this._selectedBgColor = Theme.of(context).primaryColor;
-    this._unselectedBgColor = Theme.of(context).accentColor;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    if (isDarkMode) {
+      this._selectedItemColor = Colors.black;
+      this._unselectedItemColor = Colors.white;
+      this._selectedBgColor = Colors.white;
+      this._unselectedBgColor = Colors.grey[700];
+    } else {
+      this._selectedItemColor = Colors.white;
+      this._unselectedItemColor = Colors.black;
+      this._selectedBgColor = Colors.black;
+      this._unselectedBgColor = Colors.white;
+    }
 
     final collaborator = ModalRoute.of(context).settings.arguments as Collaborator;
 
@@ -93,14 +104,15 @@ class _CollaboratorProfileTabsState extends State<CollaboratorProfileTabs> {
           decoration: BoxDecoration(
             color: Theme.of(context).primaryColor,
             border: Border(
-              top: BorderSide(color: Theme.of(context).primaryColor, width: 1.0),
+              top: BorderSide(
+                color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColorDark : Colors.black,
+                width: 1.0,
+              ),
             ),
           ),
           child: BottomNavigationBar(
             selectedFontSize: 0,
             currentIndex: _selectedPageIndex,
-            selectedItemColor: this._selectedItemColor,
-            unselectedItemColor: this._unselectedItemColor,
             type: BottomNavigationBarType.fixed,
             items: [
               BottomNavigationBarItem(

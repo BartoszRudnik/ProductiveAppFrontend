@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 class FullScreenButton extends StatelessWidget {
-  Function setFullScreen;
+  final Function setFullScreen;
 
-  FullScreenButton({@required this.setFullScreen});
+  FullScreenButton({
+    @required this.setFullScreen,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +13,8 @@ class FullScreenButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         minimumSize: Size(20, 20),
         onPrimary: Theme.of(context).primaryColor,
-        primary: Theme.of(context).accentColor,
+        side: BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColorDark : Theme.of(context).accentColor),
+        primary: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColorDark : Theme.of(context).accentColor,
         elevation: 0,
       ),
       onPressed: () {
