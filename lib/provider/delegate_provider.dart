@@ -42,6 +42,10 @@ class DelegateProvider with ChangeNotifier {
     return [...this._send];
   }
 
+  int get numberOfPermissionRequest {
+    return this.accepted.where((collaborator) => collaborator.isAskingForPermission).length;
+  }
+
   Future<void> askForPermission(String collaboratorEmail) async {
     final requestUrl = this._serverUrl + 'delegate/askForPermission/${this.userEmail}/$collaboratorEmail';
 
@@ -70,6 +74,8 @@ class DelegateProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
+
+      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
@@ -87,6 +93,8 @@ class DelegateProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
+
+      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);

@@ -88,30 +88,27 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
   }
 
   void _onMapCreated(GoogleMapController _controller) async {
-    bg.Location location = await bg.BackgroundGeolocation.getCurrentPosition(
-      timeout: 3,
-      maximumAge: 10000,
-      desiredAccuracy: 100,
-      samples: 3,
-    );
-
     this._mapController = _controller;
-
-    this._mapController.animateCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(
-              target: LatLng(
-                location.coords.latitude,
-                location.coords.longitude,
-              ),
-              zoom: 16,
-            ),
-          ),
-        );
 
     this._mapController.setMapStyle(
           Theme.of(context).brightness == Brightness.light ? this._lightMapStyle : this._darkMapStyle,
         );
+
+    if (this.tasks.length == 0) {
+      bg.Location location = await bg.BackgroundGeolocation.getCurrentPosition(
+        timeout: 3,
+        maximumAge: 10000,
+        desiredAccuracy: 100,
+        samples: 3,
+      );
+
+      this._animatedMapMove(LatLng(location.coords.latitude, location.coords.longitude), 15);
+    } else {
+      final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.tasks[0].notificationLocalizationId);
+      final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.tasks[0].notificationLocalizationId);
+
+      this._animatedMapMove(LatLng(latitude, longitude), 15);
+    }
   }
 
   void _animatedMapMove(LatLng point, double zoom) {

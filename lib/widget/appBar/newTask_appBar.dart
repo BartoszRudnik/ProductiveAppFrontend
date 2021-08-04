@@ -34,7 +34,7 @@ class _NewTaskAppBarState extends State<NewTaskAppBar> {
       backwardsCompatibility: false,
       brightness: Brightness.dark,
       leading: (widget.leadingButton != null) ? widget.leadingButton : null,
-      actions: <Widget>[
+      actions: [
         PopupMenuButton(
           onSelected: (value) {
             if (value == 'filters') {

@@ -70,6 +70,7 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
                   ),
                 ),
               ),
+              SizedBox(height: 10),
               Container(
                 padding: EdgeInsets.all(8),
                 decoration: BoxDecoration(
@@ -126,6 +127,7 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
                   ],
                 ),
               ),
+              SizedBox(height: 10),
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.all(8),
@@ -176,6 +178,7 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
                   ],
                 ),
               ),
+              SizedBox(height: 10),
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.all(8),

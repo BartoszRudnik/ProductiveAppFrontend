@@ -20,9 +20,9 @@ class _GrantAccessListTileState extends State<GrantAccessListTile> {
   Widget build(BuildContext context) {
     return SwitchListTile(
       tileColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColorDark : Colors.black,
-      activeColor: Theme.of(context).primaryColor,
+      activeColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColor : Theme.of(context).primaryColorDark,
       inactiveTrackColor: Theme.of(context).primaryColorLight,
-      activeTrackColor: Theme.of(context).primaryColor,
+      activeTrackColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColor : Theme.of(context).accentColor,
       title: Text(
         'Grant access to my activity',
         style: TextStyle(color: Colors.white),

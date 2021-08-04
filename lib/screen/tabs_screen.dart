@@ -256,7 +256,7 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
               leadingButton: IconButton(
                 icon: Badge(
                   position: BadgePosition.topStart(),
-                  showBadge: Provider.of<DelegateProvider>(context).received.length > 0,
+                  showBadge: Provider.of<DelegateProvider>(context).received.length > 0 || Provider.of<DelegateProvider>(context).numberOfPermissionRequest > 0,
                   badgeColor: Theme.of(context).primaryColor,
                   child: Icon(Icons.menu),
                 ),
