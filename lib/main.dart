@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
-import 'package:productive_app/config/color_themes.dart';
-import 'package:productive_app/provider/theme_provider.dart';
+import 'utils/notifications.dart';
 import 'package:provider/provider.dart';
-
+import 'config/color_themes.dart';
 import 'config/my_routes.dart';
 import 'model/settings.dart';
 import 'model/task.dart';
@@ -13,16 +12,29 @@ import 'provider/location_provider.dart';
 import 'provider/settings_provider.dart';
 import 'provider/tag_provider.dart';
 import 'provider/task_provider.dart';
+import 'provider/theme_provider.dart';
 import 'screen/entry_screen.dart';
 import 'screen/main_screen.dart';
 import 'screen/splash_screen.dart';
-import 'utils/notifications.dart';
+import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
+
+void headlessTask(bg.HeadlessEvent headlessEvent) async {
+  switch (headlessEvent.name) {
+    case bg.Event.GEOFENCE:
+      bg.GeofenceEvent event = headlessEvent.event;
+      Notifications.onGeofence(event);
+      break;
+  }
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await GlobalConfiguration().loadFromAsset("properties");
-  Notifications.initializeLocalization();
+
   runApp(MyApp());
+
+  bg.BackgroundGeolocation.registerHeadlessTask(headlessTask);
 }
 
 class MyApp extends StatelessWidget {
@@ -87,19 +99,21 @@ class MyApp extends StatelessWidget {
               LocationProvider(userMail: auth.email, authToken: auth.token, locationList: previousTasks == null ? [] : previousTasks.locationList, placemarks: previousTasks == null ? [] : previousTasks.placemarks),
         ),
       ],
-      builder: (context, _) => MaterialApp(
-        title: 'Productive app',
-        themeMode: Provider.of<ThemeProvider>(context).themeMode,
-        theme: ColorThemes.lightTheme,
-        darkTheme: ColorThemes.darkTheme,
-        home: Provider.of<AuthProvider>(context).isAuth
-            ? MainScreen()
-            : FutureBuilder(
-                future: Provider.of<AuthProvider>(context, listen: false).tryAutoLogin(),
-                builder: (ctx, authResult) => authResult.connectionState == ConnectionState.waiting ? SplashScreen() : EntryScreen(),
-              ),
-        routes: MyRoutes.routes,
-      ),
+      builder: (context, _) {
+        return MaterialApp(
+          title: 'Productive app',
+          themeMode: Provider.of<ThemeProvider>(context).themeMode,
+          theme: ColorThemes.lightTheme,
+          darkTheme: ColorThemes.darkTheme,
+          home: Provider.of<AuthProvider>(context).isAuth
+              ? MainScreen()
+              : FutureBuilder(
+                  future: Provider.of<AuthProvider>(context, listen: false).tryAutoLogin(),
+                  builder: (ctx, authResult) => authResult.connectionState == ConnectionState.waiting ? SplashScreen() : EntryScreen(),
+                ),
+          routes: MyRoutes.routes,
+        );
+      },
     );
   }
 }

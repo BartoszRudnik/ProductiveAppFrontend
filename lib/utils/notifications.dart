@@ -1,9 +1,13 @@
 import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:rxdart/rxdart.dart';
 
 class Notifications {
-  static void initializeLocalization() {
-    bg.BackgroundGeolocation.onGeofence(_onGeofence);
+  static final onNotifications = BehaviorSubject<String>();
+  static final _notifications = FlutterLocalNotificationsPlugin();
+
+  static void initLocalization() {
+    bg.BackgroundGeolocation.onGeofence(onGeofence);
 
     bg.BackgroundGeolocation.ready(
       bg.Config(
@@ -11,8 +15,10 @@ class Notifications {
         distanceFilter: 10.0,
         stopOnTerminate: false,
         startOnBoot: true,
-        debug: false,
-        logLevel: bg.Config.LOG_LEVEL_OFF,
+        debug: true,
+        logLevel: bg.Config.LOG_LEVEL_DEBUG,
+        allowIdenticalLocations: true,
+        enableHeadless: true,
       ),
     ).then((bg.State state) {
       if (!state.enabled) {
@@ -21,21 +27,28 @@ class Notifications {
     });
   }
 
-  static Future<void> _onGeofence(bg.GeofenceEvent event) async {
-    final eventTitle = event.extras['title'];
-    final eventDescription = event.extras['description'];
+  static Future initNotification() async {
+    final android = AndroidInitializationSettings('@mipmap/ic_launcher');
+    final ios = IOSInitializationSettings();
 
-    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
-    final AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    final InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: null,
-      macOS: null,
+    final initializationSettings = InitializationSettings(
+      android: android,
+      iOS: ios,
     );
 
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings, onSelectNotification: _selectNotification);
+    final details = await _notifications.getNotificationAppLaunchDetails();
+
+    if (details != null && details.didNotificationLaunchApp) {
+      onNotifications.add(details.payload);
+    }
+
+    await _notifications.initialize(initializationSettings, onSelectNotification: _selectNotification);
+  }
+
+  static Future<void> onGeofence(bg.GeofenceEvent event) async {
+    final taskId = event.extras['id'];
+    final taskTitle = event.extras['title'];
+    final taskDescription = event.extras['description'];
 
     const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
       'your channel id',
@@ -43,13 +56,15 @@ class Notifications {
       'Geofence notification',
       importance: Importance.max,
       priority: Priority.high,
-      showWhen: false,
     );
+
     const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin.show(0, eventTitle, eventDescription, platformChannelSpecifics, payload: 'item x');
+    await _notifications.show(0, taskTitle, taskDescription, platformChannelSpecifics, payload: taskId);
   }
 
-  static Future _selectNotification(String payload) async {}
+  static Future _selectNotification(String payload) async {
+    onNotifications.add(payload);
+  }
 
   static Future<bool> checkIfGeofenceExists(int identifier) async {
     bool result = false;
@@ -73,16 +88,7 @@ class Notifications {
     });
   }
 
-  static void addGeofence(
-    int identifier,
-    double latitude,
-    double longitude,
-    double radius,
-    bool onEnter,
-    bool onExit,
-    String title,
-    String description,
-  ) {
+  static void addGeofence(int identifier, double latitude, double longitude, double radius, bool onEnter, bool onExit, String title, String description) {
     bg.BackgroundGeolocation.addGeofence(bg.Geofence(
       identifier: identifier.toString(),
       radius: radius * 1000,
@@ -93,6 +99,7 @@ class Notifications {
       notifyOnDwell: true,
       loiteringDelay: 30000,
       extras: {
+        'id': identifier.toString(),
         'description': description,
         'title': title,
       },

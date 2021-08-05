@@ -122,7 +122,6 @@ class _NewPasswordState extends State<NewPassword> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: LoginAppBar(),
-      backgroundColor: Theme.of(context).accentColor,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 45),
@@ -156,9 +155,7 @@ class _NewPasswordState extends State<NewPassword> {
                     Icons.vpn_key_outlined,
                   ),
                 ),
-                SizedBox(
-                  height: 10,
-                ),
+                SizedBox(height: 10),
                 TextFormField(
                   obscureText: true,
                   key: ValueKey('newPassword'),
@@ -187,9 +184,7 @@ class _NewPasswordState extends State<NewPassword> {
                     Icons.lock_outline,
                   ),
                 ),
-                SizedBox(
-                  height: 10,
-                ),
+                SizedBox(height: 10),
                 TextFormField(
                   obscureText: true,
                   key: this._passwordConfirmKey,
@@ -219,9 +214,7 @@ class _NewPasswordState extends State<NewPassword> {
                   NewPasswordButton(
                     setNewPassword: this._setNewPassword,
                   ),
-                SizedBox(
-                  height: 10,
-                ),
+                SizedBox(height: 10),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,

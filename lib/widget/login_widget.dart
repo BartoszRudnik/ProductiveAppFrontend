@@ -155,9 +155,7 @@ class _LoginWidgetState extends State<LoginWidget> {
             children: [
               LoginGreet(greetText: this._isLogin ? 'Welcome back' : 'Create account'),
               if (!this._isValid) ValidationFailWidget(message: this._authenticationFailedMessage),
-              SizedBox(
-                height: this._isValid ? 0 : 10,
-              ),
+              SizedBox(height: this._isValid ? 0 : 10),
               TextFormField(
                 key: ValueKey('email'),
                 onSaved: (value) {
@@ -179,9 +177,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                   Icons.email_outlined,
                 ),
               ),
-              SizedBox(
-                height: 20,
-              ),
+              SizedBox(height: 20),
               TextFormField(
                 key: ValueKey('password'),
                 validator: (value) {
@@ -238,9 +234,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                           ),
                         ),
                 ),
-              SizedBox(
-                height: 20,
-              ),
+              SizedBox(height: 20),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
