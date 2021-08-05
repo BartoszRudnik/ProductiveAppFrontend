@@ -463,8 +463,76 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
+  Future<void> fetchSingleTaskFull(int taskId) async {
+    String url = this._serverUrl + 'task/getSingleTaskFull/${this.userMail}/$taskId';
+
+    try {
+      final response = await http.get(url);
+      final responseBody = json.decode(utf8.decode(response.bodyBytes));
+
+      List<Tag> taskTags = [];
+      String taskStatus;
+      String supervisorEmail;
+
+      for (var tagElement in responseBody['tags']) {
+        taskTags.add(Tag(
+          id: tagElement['id'],
+          name: tagElement['name'],
+        ));
+      }
+
+      supervisorEmail = responseBody['supervisorEmail'];
+
+      if (responseBody['tasks']['taskStatus'] != null) {
+        taskStatus = responseBody['tasks']['taskStatus'];
+      }
+
+      Task task = Task(
+          id: responseBody['tasks']['id'],
+          title: responseBody['tasks']['taskName'],
+          description: responseBody['tasks']['description'],
+          done: responseBody['tasks']['ifDone'],
+          priority: responseBody['tasks']['priority'],
+          endDate: DateTime.parse(responseBody['tasks']['endDate']),
+          startDate: DateTime.parse(responseBody['tasks']['startDate']),
+          tags: taskTags,
+          localization: responseBody['tasks']['taskList'],
+          position: responseBody['tasks']['position'],
+          delegatedEmail: responseBody['tasks']['delegatedEmail'],
+          isDelegated: responseBody['tasks']['isDelegated'],
+          taskStatus: taskStatus,
+          isCanceled: responseBody['tasks']['isCanceled'],
+          supervisorEmail: supervisorEmail,
+          childId: responseBody['childId'],
+          parentId: responseBody['parentId']);
+
+      if (responseBody['tasks']['notificationLocalization'] != null) {
+        task.notificationLocalizationId = responseBody['tasks']['notificationLocalization']['id'];
+        task.notificationLocalizationRadius = responseBody['tasks']['localizationRadius'];
+        task.notificationOnEnter = responseBody['tasks']['notificationOnEnter'];
+        task.notificationOnExit = responseBody['tasks']['notificationOnExit'];
+      } else {
+        task.notificationLocalizationId = null;
+      }
+
+      if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+        task.endDate = null;
+      }
+
+      if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+        task.startDate = null;
+      }
+
+      this.taskList.add(task);
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
   Future<void> fetchSingleTask(int taskId) async {
-    notifyListeners();
     String url = this._serverUrl + 'task/getSingleTask/${this.userMail}/$taskId';
     String supervisorEmail;
     Task mockTask = Task(
