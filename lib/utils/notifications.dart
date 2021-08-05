@@ -7,7 +7,7 @@ class Notifications {
   static final _notifications = FlutterLocalNotificationsPlugin();
 
   static void initLocalization() {
-    bg.BackgroundGeolocation.onGeofence(_onGeofence);
+    bg.BackgroundGeolocation.onGeofence(onGeofence);
 
     bg.BackgroundGeolocation.ready(
       bg.Config(
@@ -15,8 +15,10 @@ class Notifications {
         distanceFilter: 10.0,
         stopOnTerminate: false,
         startOnBoot: true,
-        debug: false,
-        logLevel: bg.Config.LOG_LEVEL_OFF,
+        debug: true,
+        logLevel: bg.Config.LOG_LEVEL_DEBUG,
+        allowIdenticalLocations: true,
+        enableHeadless: true,
       ),
     ).then((bg.State state) {
       if (!state.enabled) {
@@ -37,7 +39,7 @@ class Notifications {
     await _notifications.initialize(initializationSettings, onSelectNotification: _selectNotification);
   }
 
-  static Future<void> _onGeofence(bg.GeofenceEvent event) async {
+  static Future<void> onGeofence(bg.GeofenceEvent event) async {
     final taskId = event.extras['id'];
     final taskTitle = event.extras['title'];
     final taskDescription = event.extras['description'];

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
+import 'utils/notifications.dart';
 import 'package:provider/provider.dart';
 import 'config/color_themes.dart';
 import 'config/my_routes.dart';
@@ -15,6 +16,16 @@ import 'provider/theme_provider.dart';
 import 'screen/entry_screen.dart';
 import 'screen/main_screen.dart';
 import 'screen/splash_screen.dart';
+import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
+
+void headlessTask(bg.HeadlessEvent headlessEvent) async {
+  switch (headlessEvent.name) {
+    case bg.Event.GEOFENCE:
+      bg.GeofenceEvent event = headlessEvent.event;
+      Notifications.onGeofence(event);
+      break;
+  }
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +33,8 @@ void main() async {
   await GlobalConfiguration().loadFromAsset("properties");
 
   runApp(MyApp());
+
+  bg.BackgroundGeolocation.registerHeadlessTask(headlessTask);
 }
 
 class MyApp extends StatelessWidget {
