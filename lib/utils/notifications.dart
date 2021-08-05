@@ -36,6 +36,12 @@ class Notifications {
       iOS: ios,
     );
 
+    final details = await _notifications.getNotificationAppLaunchDetails();
+
+    if (details != null && details.didNotificationLaunchApp) {
+      onNotifications.add(details.payload);
+    }
+
     await _notifications.initialize(initializationSettings, onSelectNotification: _selectNotification);
   }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/provider/location_provider.dart';
 import 'package:provider/provider.dart';
 import '../model/task.dart';
 import '../provider/auth_provider.dart';
@@ -21,6 +22,7 @@ class _MainScreenState extends State<MainScreen> {
     Task task = Provider.of<TaskProvider>(context, listen: false).taskList.firstWhere((element) => element.id == int.parse(payload), orElse: () => null);
 
     if (task == null) {
+      await Provider.of<LocationProvider>(context, listen: false).getLocations();
       await Provider.of<TaskProvider>(context, listen: false).fetchSingleTaskFull(int.parse(payload));
 
       task = Provider.of<TaskProvider>(context, listen: false).taskList.firstWhere((element) => element.id == int.parse(payload));
