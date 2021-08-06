@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
+import 'package:productive_app/utils/google_sign_in_api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/painting.dart';
 import '../exception/HttpException.dart';
@@ -119,18 +120,24 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<void> _authenticate(String email, String password, String urlSegment) async {
-    String url = this._serverUrl + '$urlSegment';
+  Future<void> googleAuthenticate() async {
+    final googleUser = await GoogleSignInApi.login();
+
+    final url = this._serverUrl + 'login/googleLogin';
 
     try {
+      final firstName = googleUser.displayName.split(" ")[0];
+      final lastName = googleUser.displayName.split(" ")[1];
+
       final response = await http.post(
         url,
         body: json.encode(
           {
-            'firstName': '',
-            'lastName': '',
-            'password': password,
-            'email': email,
+            'firstName': firstName,
+            'lastName': lastName,
+            'password': '',
+            'email': googleUser.email,
+            'userType': 'google',
           },
         ),
         headers: {
@@ -146,7 +153,61 @@ class AuthProvider with ChangeNotifier {
         throw HttpException(responseData['message']);
       }
 
-      this._user = new User(email: email);
+      this._user = new User(
+        email: googleUser.email,
+        userType: 'google',
+      );
+
+      this._email = googleUser.email;
+      this._token = responseData['token'];
+      this._expiryDate = DateTime.now().add(
+        Duration(
+          milliseconds: responseData['tokenDuration'],
+        ),
+      );
+
+      this._autoLogout();
+      notifyListeners();
+
+      this._saveLocalData();
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<void> _authenticate(String email, String password, String urlSegment) async {
+    String url = this._serverUrl + '$urlSegment';
+
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode(
+          {
+            'firstName': '',
+            'lastName': '',
+            'password': password,
+            'email': email,
+            'userType': 'mail',
+          },
+        ),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      final responseData = json.decode(response.body);
+
+      if (responseData['error']?.isNotEmpty == true) {
+        print(responseData['message']);
+        throw HttpException(responseData['message']);
+      }
+
+      this._user = new User(
+        email: email,
+        userType: 'mail',
+      );
 
       this._email = email;
       this._token = responseData['token'];
@@ -333,6 +394,7 @@ class AuthProvider with ChangeNotifier {
         'email': this._email,
         'token': this._token,
         'expiryDate': this._expiryDate.toIso8601String(),
+        'userType': this._user.userType,
       },
     );
     preferences.setString('userData', userData);
@@ -365,6 +427,23 @@ class AuthProvider with ChangeNotifier {
     userPreferences.clear();
   }
 
+  Future<void> googleLogout() async {
+    await GoogleSignInApi.logout();
+
+    this._token = null;
+    this._expiryDate = null;
+
+    if (this._authTimer != null) {
+      this._authTimer.cancel();
+      this._authTimer = null;
+    }
+
+    notifyListeners();
+
+    final userPreferences = await SharedPreferences.getInstance();
+    userPreferences.clear();
+  }
+
   Future<bool> tryAutoLogin() async {
     final getPreferences = await SharedPreferences.getInstance();
 
@@ -381,10 +460,14 @@ class AuthProvider with ChangeNotifier {
 
     this._email = extractedUserData['email'];
     this._token = extractedUserData['token'];
+    final userType = extractedUserData['userType'];
     this._expiryDate = expiryDate;
 
     if (this._user == null) {
-      this._user = User(email: this._email);
+      this._user = User(
+        email: this._email,
+        userType: userType,
+      );
     }
 
     notifyListeners();

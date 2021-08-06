@@ -55,7 +55,7 @@ class _MainScreenState extends State<MainScreen> {
           : Scaffold(
               body: Stack(
                 children: [
-                  MainDrawer(username: Provider.of<AuthProvider>(context, listen: false).email),
+                  MainDrawer(),
                   TabsScreen(),
                 ],
               ),

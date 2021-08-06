@@ -27,7 +27,11 @@ class Dialogs {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    Provider.of<AuthProvider>(context, listen: false).logout();
+                    if (Provider.of<AuthProvider>(context, listen: false).user.userType == 'mail') {
+                      Provider.of<AuthProvider>(context, listen: false).logout();
+                    } else {
+                      Provider.of<AuthProvider>(context, listen: false).googleLogout();
+                    }
                     Navigator.of(context).pop(true);
                   },
                   child: Text('Yes'),
