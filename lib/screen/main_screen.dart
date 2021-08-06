@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/provider/location_provider.dart';
+import 'package:productive_app/screen/loading_screen.dart';
+import 'package:productive_app/utils/data.dart';
 import 'package:provider/provider.dart';
 import '../model/task.dart';
 import '../provider/auth_provider.dart';
@@ -46,13 +48,18 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          MainDrawer(username: Provider.of<AuthProvider>(context, listen: false).email),
-          TabsScreen(),
-        ],
-      ),
+    return FutureBuilder(
+      future: Data.loadData(context),
+      builder: (ctx, loadResult) => loadResult.connectionState == ConnectionState.waiting
+          ? LoadingScreen()
+          : Scaffold(
+              body: Stack(
+                children: [
+                  MainDrawer(username: Provider.of<AuthProvider>(context, listen: false).email),
+                  TabsScreen(),
+                ],
+              ),
+            ),
     );
   }
 }

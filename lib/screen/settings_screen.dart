@@ -279,8 +279,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<AuthProvider>(context, listen: false).getUserData();
-    Provider.of<AuthProvider>(context, listen: false).checkIfAvatarExists();
     final user = Provider.of<AuthProvider>(context).user;
 
     if (!user.removed) {
