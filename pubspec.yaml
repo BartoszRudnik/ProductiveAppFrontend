@@ -71,6 +71,8 @@ flutter:
   assets:
     - assets/cfg/
     - assets/images/clipboard.png
+    - assets/images/loading_screen_image_light.png
+    - assets/images/loading_screen_image_dark.png
     - assets/images/profile_placeholder.jpg
     - assets/map/
 

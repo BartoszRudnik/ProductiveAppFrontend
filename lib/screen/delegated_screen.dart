@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../model/task.dart';
-import '../provider/location_provider.dart';
 import '../provider/settings_provider.dart';
-import '../provider/tag_provider.dart';
 import '../provider/task_provider.dart';
 import '../utils/manage_filters.dart';
 import '../widget/empty_list.dart';
@@ -15,20 +13,6 @@ class DelegatedScreen extends StatefulWidget {
 }
 
 class _DelegatedScreenState extends State<DelegatedScreen> {
-  Future<void> _loadData() async {
-    await Provider.of<TaskProvider>(context, listen: false).fetchTasks();
-    await Provider.of<TaskProvider>(context, listen: false).getPriorities();
-    await Provider.of<TagProvider>(context, listen: false).getTags();
-    await Provider.of<LocationProvider>(context, listen: false).getLocations();
-    await Provider.of<SettingsProvider>(context, listen: false).getFilterSettings();
-  }
-
-  @override
-  void initState() {
-    this._loadData();
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     List<Task> tasks = Provider.of<TaskProvider>(context).delegatedTasks;
