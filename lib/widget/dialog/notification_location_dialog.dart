@@ -72,12 +72,12 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
     }
 
     return AlertDialog(
-      content: SingleChildScrollView(
-        child: AnimatedContainer(
-          duration: Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-          height: this.location != null ? 462 : 410,
-          width: 450,
+      content: AnimatedContainer(
+        duration: Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+        height: this.location != null ? MediaQuery.of(context).size.height * 0.65 : MediaQuery.of(context).size.height * 0.6,
+        width: 450,
+        child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
