@@ -25,12 +25,6 @@ class TaskAppBar extends StatelessWidget with PreferredSizeWidget {
       iconTheme: Theme.of(context).iconTheme,
       brightness: Brightness.dark,
       leading: (leadingButton != null) ? leadingButton : null,
-      actions: [
-        PopupMenuButton(
-          icon: Icon(Icons.more_vert),
-          itemBuilder: (_) => [],
-        ),
-      ],
     );
   }
 

@@ -207,6 +207,7 @@ class _NewTaskState extends State<NewTask> {
         this._notificationLocalizationRadius = null;
         this._notificationOnEnter = null;
         this._notificationOnExit = null;
+        this._delegatedEmail = null;
       });
     } catch (error) {
       print(error);

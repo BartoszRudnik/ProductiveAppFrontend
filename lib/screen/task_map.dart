@@ -135,7 +135,7 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
       context: context,
       builder: (context) {
         return Container(
-          height: task.description != null && task.description.length > 0 ? 160 : 135,
+          height: task.description != null && task.description.length > 0 ? 190 : 165,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -154,8 +154,8 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
                 ),
               ),
               Container(
-                height: 40,
-                padding: EdgeInsets.only(top: 3),
+                height: 70,
+                padding: EdgeInsets.only(top: 3, bottom: 12),
                 decoration: BoxDecoration(
                   color: Theme.of(context).accentColor,
                   border: Border(
@@ -164,6 +164,7 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     IconButton(
                       icon: Icon(Icons.navigate_before_outlined),

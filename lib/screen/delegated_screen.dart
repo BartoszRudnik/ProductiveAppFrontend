@@ -1,18 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../model/task.dart';
 import '../provider/settings_provider.dart';
 import '../provider/task_provider.dart';
 import '../utils/manage_filters.dart';
 import '../widget/empty_list.dart';
-import '../widget/task_widget.dart';
+import '../widget/reorderable_task_list.dart';
+import '../widget/tasks_list.dart';
 
-class DelegatedScreen extends StatefulWidget {
-  @override
-  _DelegatedScreenState createState() => _DelegatedScreenState();
-}
+class DelegatedScreen extends StatelessWidget {
+  void onReorder(int newIndex, int oldIndex, List<Task> tasks, BuildContext context) {
+    if (newIndex > tasks.length) newIndex = tasks.length;
+    if (oldIndex < newIndex) newIndex -= 1;
 
-class _DelegatedScreenState extends State<DelegatedScreen> {
+    final item = tasks.elementAt(oldIndex);
+    double newPosition = item.position;
+
+    if (newIndex < oldIndex) {
+      if (newIndex != 0) {
+        newPosition = (tasks.elementAt(newIndex).position + tasks.elementAt(newIndex - 1).position) / 2;
+      } else {
+        newPosition = tasks.elementAt(newIndex).position / 2;
+      }
+    } else {
+      if (newIndex != tasks.length - 1) {
+        newPosition = (tasks.elementAt(newIndex).position + tasks.elementAt(newIndex + 1).position) / 2;
+      } else {
+        newPosition = tasks.elementAt(newIndex).position * 2;
+      }
+    }
+
+    final task = tasks.removeAt(oldIndex);
+    tasks.insert(newIndex, task);
+    Provider.of<TaskProvider>(context, listen: false).setDelegatedTasks(tasks);
+
+    Provider.of<TaskProvider>(context, listen: false).updateTaskPosition(item, newPosition);
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Task> tasks = Provider.of<TaskProvider>(context).delegatedTasks;
@@ -31,47 +56,9 @@ class _DelegatedScreenState extends State<DelegatedScreen> {
               onRefresh: () => Provider.of<TaskProvider>(context, listen: false).fetchTasks(),
               child: tasks.length == 0
                   ? EmptyList(message: 'Your delegated list is empty')
-                  : ReorderableListView.builder(
-                      shrinkWrap: true,
-                      itemCount: tasks.length,
-                      itemBuilder: (ctx, index) => ChangeNotifierProvider.value(
-                        key: ValueKey(tasks[index]),
-                        value: tasks[index],
-                        child: TaskWidget(
-                          task: tasks[index],
-                          key: ValueKey(tasks[index]),
-                        ),
-                      ),
-                      onReorder: (int oldIndex, int newIndex) {
-                        if (newIndex > tasks.length) newIndex = tasks.length;
-                        if (oldIndex < newIndex) newIndex -= 1;
-
-                        setState(() {
-                          final item = tasks.elementAt(oldIndex);
-                          double newPosition = item.position;
-
-                          if (newIndex < oldIndex) {
-                            if (newIndex != 0) {
-                              newPosition = (tasks.elementAt(newIndex).position + tasks.elementAt(newIndex - 1).position) / 2;
-                            } else {
-                              newPosition = tasks.elementAt(newIndex).position / 2;
-                            }
-                          } else {
-                            if (newIndex != tasks.length - 1) {
-                              newPosition = (tasks.elementAt(newIndex).position + tasks.elementAt(newIndex + 1).position) / 2;
-                            } else {
-                              newPosition = tasks.elementAt(newIndex).position * 2;
-                            }
-                          }
-
-                          final task = tasks.removeAt(oldIndex);
-                          tasks.insert(newIndex, task);
-                          Provider.of<TaskProvider>(context, listen: false).setAnytimeTasks(tasks);
-
-                          Provider.of<TaskProvider>(context, listen: false).updateTaskPosition(item, newPosition);
-                        });
-                      },
-                    ),
+                  : userSettings.sortingMode == 6
+                      ? ReorderableTaskList(tasks: tasks, onReorder: onReorder)
+                      : TasksList(tasks: tasks),
             ),
           ),
         ],

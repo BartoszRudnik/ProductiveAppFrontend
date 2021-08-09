@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/provider/task_provider.dart';
 import 'package:provider/provider.dart';
 import '../model/location.dart';
 import '../provider/location_provider.dart';
@@ -127,6 +128,7 @@ class _LocationScreenState extends State<LocationsScreen> {
             if (direction == DismissDirection.endToStart) {
               bool hasAgreed = await Dialogs.showChoiceDialog(context, "Are you sure you want to delete this location?");
               if (hasAgreed) {
+                Provider.of<TaskProvider>(context, listen: false).clearLocationFromTasks(locations[index].id);
                 Provider.of<LocationProvider>(context, listen: false).deleteLocation(locations[index].id);
               }
             }
