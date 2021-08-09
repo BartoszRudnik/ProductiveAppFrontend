@@ -33,6 +33,10 @@ class _TaskDateState extends State<TaskDate> {
 
   @override
   Widget build(BuildContext context) {
+    this._startInitialTime = this.widget.startTime;
+    this._startInitialValue = this.widget.startValue;
+    this._endInitialTime = this.widget.endTime;
+    this._endInitialValue = this.widget.endValue;
     return IconButton(
       icon: Icon(
         Icons.calendar_today_outlined,
@@ -73,7 +77,7 @@ class _TaskDateState extends State<TaskDate> {
                                   });
                                 },
                                 child: Center(
-                                  child: this._startInitialValue.toString() == "null"
+                                  child: this._startInitialValue == null
                                       ? Icon(Icons.calendar_today_outlined)
                                       : Text(
                                           formatter.format(this._startInitialValue),
@@ -91,7 +95,7 @@ class _TaskDateState extends State<TaskDate> {
                                   });
                                 },
                                 child: Center(
-                                  child: this._startInitialTime.toString() == "null"
+                                  child: this._startInitialTime == null
                                       ? Icon(Icons.access_time_outlined)
                                       : Text(
                                           this._startInitialTime.format(context),
@@ -127,7 +131,7 @@ class _TaskDateState extends State<TaskDate> {
                                   });
                                 },
                                 child: Center(
-                                  child: this._endInitialValue.toString() == "null"
+                                  child: this._endInitialValue == null
                                       ? Icon(Icons.calendar_today_outlined)
                                       : Text(
                                           formatter.format(this._endInitialValue),
@@ -145,7 +149,7 @@ class _TaskDateState extends State<TaskDate> {
                                   });
                                 },
                                 child: Center(
-                                  child: this._endInitialTime.toString() == "null"
+                                  child: this._endInitialTime == null
                                       ? Icon(Icons.access_time_outlined)
                                       : Text(
                                           this._endInitialTime.format(context),
