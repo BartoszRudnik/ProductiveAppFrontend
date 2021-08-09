@@ -31,8 +31,8 @@ class ColorThemes {
     scaffoldBackgroundColor: Colors.black,
     primaryColor: Colors.white,
     accentColor: Colors.black,
-    primaryColorDark: Colors.grey[700],
-    primaryColorLight: Colors.grey[600],
+    primaryColorDark: Colors.grey[900],
+    primaryColorLight: Colors.grey[800],
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
       selectedItemColor: Colors.black,
       unselectedItemColor: Colors.white,
@@ -92,9 +92,9 @@ class ColorThemes {
 
   static ButtonStyle loginButtonStyle(BuildContext context) {
     return ElevatedButton.styleFrom(
-      primary: Theme.of(context).brightness == Brightness.light ? Theme.of(context).primaryColor : Theme.of(context).accentColor,
+      primary: Colors.black,
       side: BorderSide(
-        color: Theme.of(context).primaryColor,
+        color: Colors.white,
       ),
     );
   }

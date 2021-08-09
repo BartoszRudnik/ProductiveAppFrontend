@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/provider/location_provider.dart';
-import 'package:productive_app/screen/loading_screen.dart';
-import 'package:productive_app/utils/data.dart';
 import 'package:provider/provider.dart';
 import '../model/task.dart';
-import '../provider/auth_provider.dart';
+import '../provider/location_provider.dart';
 import '../provider/task_provider.dart';
 import '../provider/theme_provider.dart';
+import '../utils/data.dart';
 import '../utils/notifications.dart';
 import '../widget/drawer/main_drawer.dart';
+import 'loading_screen.dart';
 import 'tabs_screen.dart';
 import 'task_details_screen.dart';
 
@@ -35,8 +34,11 @@ class _MainScreenState extends State<MainScreen> {
 
   void listenNotifications() => Notifications.onNotifications.stream.listen(onClickedNotification);
 
+  Future<void> future;
+
   @override
   void initState() {
+    future = Data.loadData(context);
     Provider.of<ThemeProvider>(context, listen: false).getUserMode();
 
     Notifications.initLocalization();
@@ -49,7 +51,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Data.loadData(context),
+      future: this.future,
       builder: (ctx, loadResult) => loadResult.connectionState == ConnectionState.waiting
           ? LoadingScreen()
           : Scaffold(
