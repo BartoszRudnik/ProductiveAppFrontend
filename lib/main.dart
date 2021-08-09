@@ -15,7 +15,7 @@ import 'provider/task_provider.dart';
 import 'provider/theme_provider.dart';
 import 'screen/entry_screen.dart';
 import 'screen/main_screen.dart';
-import 'screen/loading_screen.dart';
+import 'screen/loading_auth_screen.dart';
 import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
 
 void headlessTask(bg.HeadlessEvent headlessEvent) async {
@@ -109,7 +109,7 @@ class MyApp extends StatelessWidget {
               ? MainScreen()
               : FutureBuilder(
                   future: Provider.of<AuthProvider>(context, listen: false).tryAutoLogin(),
-                  builder: (ctx, authResult) => authResult.connectionState == ConnectionState.waiting ? LoadingScreen() : EntryScreen(),
+                  builder: (ctx, authResult) => authResult.connectionState == ConnectionState.waiting ? LoadingAuthScreen() : EntryScreen(),
                 ),
           routes: MyRoutes.routes,
         );
