@@ -1,10 +1,10 @@
 import 'package:flutter/widgets.dart';
-import 'package:productive_app/provider/auth_provider.dart';
-import 'package:productive_app/provider/delegate_provider.dart';
-import 'package:productive_app/provider/location_provider.dart';
-import 'package:productive_app/provider/settings_provider.dart';
-import 'package:productive_app/provider/tag_provider.dart';
-import 'package:productive_app/provider/task_provider.dart';
+import '../provider/auth_provider.dart';
+import '../provider/delegate_provider.dart';
+import '../provider/location_provider.dart';
+import '../provider/settings_provider.dart';
+import '../provider/tag_provider.dart';
+import '../provider/task_provider.dart';
 import 'package:provider/provider.dart';
 
 class Data {

@@ -18,7 +18,7 @@ class LoginButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 304,
+      width: 300,
       height: 47,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(

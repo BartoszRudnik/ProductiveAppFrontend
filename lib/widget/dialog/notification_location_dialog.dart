@@ -79,6 +79,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
         width: 450,
         child: SingleChildScrollView(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             mainAxisSize: MainAxisSize.min,
             children: [
               Padding(

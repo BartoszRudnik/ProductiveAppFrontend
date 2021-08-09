@@ -12,18 +12,7 @@ import '../../screen/tags_screen.dart';
 import '../../screen/trash_screen.dart';
 import '../drawerListTile.dart';
 
-class MainDrawer extends StatefulWidget {
-  final String username;
-
-  MainDrawer({
-    @required this.username,
-  });
-
-  @override
-  _MainDrawerState createState() => _MainDrawerState();
-}
-
-class _MainDrawerState extends State<MainDrawer> {
+class MainDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<AuthProvider>(context).user;
@@ -42,7 +31,7 @@ class _MainDrawerState extends State<MainDrawer> {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
+          children: [
             if (!user.removed)
               Container(
                 width: 100,
@@ -75,17 +64,12 @@ class _MainDrawerState extends State<MainDrawer> {
                       softWrap: true,
                       maxLines: 3,
                     )
-                  : ListView(
-                      children: widget.username
-                          .split(' ')
-                          .map((e) => Text(
-                                e,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 21,
-                                ),
-                              ))
-                          .toList(),
+                  : Text(
+                      user.email,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 21,
+                      ),
                     ),
             ),
             SizedBox(

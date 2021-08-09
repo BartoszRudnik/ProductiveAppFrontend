@@ -1,9 +1,7 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:productive_app/provider/theme_provider.dart';
 import 'package:provider/provider.dart';
-
 import '../provider/delegate_provider.dart';
 import '../provider/task_provider.dart';
 import '../widget/appBar/newTask_appBar.dart';
