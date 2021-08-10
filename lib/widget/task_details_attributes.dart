@@ -30,7 +30,7 @@ class TaskDetailsAttributes extends StatelessWidget {
           child: SizedBox(
             height: 100,
             child: PopupMenuButton(
-              initialValue: taskToEdit.priority,
+              initialValue: this.taskToEdit.priority,
               onSelected: (value) {
                 this.setPriority(value);
               },
@@ -48,7 +48,21 @@ class TaskDetailsAttributes extends StatelessWidget {
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [Icon(Icons.flag), Text("Priority")],
+                  children: [
+                    if (this.taskToEdit.priority == 'NORMAL') Icon(Icons.flag),
+                    if (this.taskToEdit.priority == 'LOW') Icon(Icons.arrow_downward_outlined),
+                    if (this.taskToEdit.priority == 'HIGH') Icon(Icons.arrow_upward_outlined),
+                    if (this.taskToEdit.priority == 'HIGHER')
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.arrow_upward_outlined),
+                          Icon(Icons.arrow_upward_outlined),
+                        ],
+                      ),
+                    if (this.taskToEdit.priority == 'CRITICAL') Icon(Icons.warning_amber_sharp),
+                    Text("Priority"),
+                  ],
                 ),
               ),
               itemBuilder: (context) {
@@ -89,7 +103,7 @@ class TaskDetailsAttributes extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.person_add),
-                  Text("Assigned"),
+                  Text(this.taskToEdit.delegatedEmail == null ? "Assigned" : this.taskToEdit.delegatedEmail),
                 ],
               ),
             ),

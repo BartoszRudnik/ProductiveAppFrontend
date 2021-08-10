@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:productive_app/widget/task_details_attributes.dart';
 import 'package:provider/provider.dart';
 import '../config/color_themes.dart';
 import '../model/task.dart';
@@ -14,10 +13,11 @@ import '../widget/appBar/details_appBar.dart';
 import '../widget/dialog/delegate_dialog.dart';
 import '../widget/dialog/notification_location_dialog.dart';
 import '../widget/dialog/tags_dialog.dart';
+import '../widget/task_details_attributes.dart';
 import '../widget/task_details_bottom_bar.dart';
+import '../widget/task_details_dates.dart';
 import '../widget/task_details_map.dart';
 import '../widget/task_tags_edit.dart';
-import '../widget/task_details_dates.dart';
 
 class TaskDetailScreen extends StatefulWidget {
   static const routeName = "/task-details";
