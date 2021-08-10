@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/screen/loading_task_screen.dart';
 import 'package:provider/provider.dart';
 import '../model/task.dart';
 import '../provider/location_provider.dart';
@@ -7,7 +8,7 @@ import '../provider/theme_provider.dart';
 import '../utils/data.dart';
 import '../utils/notifications.dart';
 import '../widget/drawer/main_drawer.dart';
-import 'loading_screen.dart';
+import 'loading_auth_screen.dart';
 import 'tabs_screen.dart';
 import 'task_details_screen.dart';
 
@@ -53,7 +54,7 @@ class _MainScreenState extends State<MainScreen> {
     return FutureBuilder(
       future: this.future,
       builder: (ctx, loadResult) => loadResult.connectionState == ConnectionState.waiting
-          ? LoadingScreen()
+          ? LoadingTaskScreen()
           : Scaffold(
               body: Stack(
                 children: [

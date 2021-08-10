@@ -117,6 +117,30 @@ class TaskProvider with ChangeNotifier {
     return [...this._localizations];
   }
 
+  void clearLocationFromTasks(int locationId) {
+    this._inboxTasks.forEach((element) {
+      if (element.notificationLocalizationId != null && element.notificationLocalizationId == locationId) {
+        element.notificationLocalizationId = null;
+      }
+    });
+    this._anytimeTasks.forEach((element) {
+      if (element.notificationLocalizationId != null && element.notificationLocalizationId == locationId) {
+        element.notificationLocalizationId = null;
+      }
+    });
+    this._scheduledTasks.forEach((element) {
+      if (element.notificationLocalizationId != null && element.notificationLocalizationId == locationId) {
+        element.notificationLocalizationId = null;
+      }
+    });
+    this._delegatedTasks.forEach((element) {
+      if (element.notificationLocalizationId != null && element.notificationLocalizationId == locationId) {
+        element.notificationLocalizationId = null;
+      }
+    });
+    notifyListeners();
+  }
+
   Future<void> addTaskWithGeolocation(Task task, double latitude, double longitude) async {
     String url = this._serverUrl + 'task/add';
 

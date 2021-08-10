@@ -102,17 +102,25 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
         samples: 3,
       );
 
-      this._animatedMapMove(LatLng(location.coords.latitude, location.coords.longitude), 15);
+      this._mapMove(LatLng(location.coords.latitude, location.coords.longitude), 15);
     } else {
       final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.tasks[0].notificationLocalizationId);
       final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.tasks[0].notificationLocalizationId);
 
-      this._animatedMapMove(LatLng(latitude, longitude), 15);
+      this._mapMove(LatLng(latitude, longitude), 15);
     }
   }
 
   void _animatedMapMove(LatLng point, double zoom) {
     this._mapController.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(target: point, zoom: zoom),
+          ),
+        );
+  }
+
+  void _mapMove(LatLng point, double zoom) {
+    this._mapController.moveCamera(
           CameraUpdate.newCameraPosition(
             CameraPosition(target: point, zoom: zoom),
           ),
@@ -135,7 +143,7 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
       context: context,
       builder: (context) {
         return Container(
-          height: task.description != null && task.description.length > 0 ? 160 : 135,
+          height: task.description != null && task.description.length > 0 ? 190 : 165,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -154,8 +162,8 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
                 ),
               ),
               Container(
-                height: 40,
-                padding: EdgeInsets.only(top: 3),
+                height: 70,
+                padding: EdgeInsets.only(top: 3, bottom: 12),
                 decoration: BoxDecoration(
                   color: Theme.of(context).accentColor,
                   border: Border(
@@ -164,6 +172,7 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     IconButton(
                       icon: Icon(Icons.navigate_before_outlined),

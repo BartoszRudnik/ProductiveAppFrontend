@@ -99,6 +99,15 @@ class ColorThemes {
     );
   }
 
+  static ButtonStyle addTaskButtonStyle(BuildContext context) {
+    return ElevatedButton.styleFrom(
+      onPrimary: Theme.of(context).primaryColor,
+      side: BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[700] : Theme.of(context).accentColor),
+      primary: Theme.of(context).brightness == Brightness.dark ? Colors.grey[700] : Theme.of(context).accentColor,
+      elevation: 0,
+    );
+  }
+
   static ThemeData lightDateTimePicker(BuildContext context) {
     return Theme.of(context).copyWith(
       colorScheme: ColorScheme.light(

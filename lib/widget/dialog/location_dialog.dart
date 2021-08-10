@@ -62,6 +62,14 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
         );
   }
 
+  void _mapMove(LatLng point, double zoom) {
+    this._mapController.moveCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(target: point, zoom: zoom),
+          ),
+        );
+  }
+
   void getUserLocation() async {
     if (this.widget.choosenLocation.latitude == 0.0 && this.widget.choosenLocation.longitude == 0.0) {
       bg.Location location = await bg.BackgroundGeolocation.getCurrentPosition(
@@ -78,7 +86,7 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
       });
 
       LatLng point = LatLng(this.widget.choosenLocation.latitude, this.widget.choosenLocation.longitude);
-      this._animatedMapMove(point, 15);
+      this._mapMove(point, 15);
     }
   }
 
@@ -86,7 +94,7 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
     this._mapController = _controller;
 
     if (longitude != null && latitude != null) {
-      this._animatedMapMove(LatLng(latitude, longitude), 15);
+      this._mapMove(LatLng(latitude, longitude), 15);
     }
 
     this._mapController.setMapStyle(
@@ -97,10 +105,6 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
   @override
   Widget build(BuildContext context) {
     this.getUserLocation();
-
-    if (this.widget.choosenLocation.latitude != null && this.widget.choosenLocation.longitude != null && this._mapController != null) {
-      this._animatedMapMove(LatLng(this.widget.choosenLocation.latitude, this.widget.choosenLocation.longitude), 15);
-    }
 
     return StatefulBuilder(
       builder: (context, setState) {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widget/animated_image.dart';
 
-class LoadingScreen extends StatelessWidget {
+class LoadingAuthScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
