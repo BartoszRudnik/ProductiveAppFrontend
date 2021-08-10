@@ -6,6 +6,7 @@ import 'package:productive_app/config/color_themes.dart';
 import 'package:productive_app/widget/task_details_bottom_bar.dart';
 
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 import '../utils/dialogs.dart';
 import '../utils/notifications.dart';
 import '../model/task.dart';
@@ -293,8 +294,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     }
   }
 
-  void _animatedMapMove(LatLng point, double zoom) {
-    this._mapController.animateCamera(
+  Future<void> _mapMove(LatLng point, double zoom) async {
+    await this._mapController.moveCamera(
           CameraUpdate.newCameraPosition(
             CameraPosition(target: point, zoom: zoom),
           ),
@@ -304,11 +305,11 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
   void _onMapCreated(GoogleMapController _controller, LatLng point, double zoom) async {
     this._mapController = _controller;
 
-    this._animatedMapMove(point, zoom);
-
-    this._mapController.setMapStyle(
+    await this._mapController.setMapStyle(
           Theme.of(context).brightness == Brightness.light ? this._lightMapStyle : this._darkMapStyle,
         );
+
+    await this._mapMove(point, zoom);
   }
 
   void setLocation() async {
@@ -418,7 +419,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     }
 
     if (this._locationChanged && this._mapController != null) {
-      this._animatedMapMove(LatLng(latitude, longitude), 15);
+      this._mapMove(LatLng(latitude, longitude), 15);
     }
 
     return Scaffold(

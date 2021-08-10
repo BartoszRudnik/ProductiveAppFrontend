@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/config/color_themes.dart';
 
 class AddTaskButton extends StatelessWidget {
   final Function addNewTask;
@@ -10,12 +11,7 @@ class AddTaskButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton.icon(
-      style: ElevatedButton.styleFrom(
-        onPrimary: Theme.of(context).primaryColor,
-        side: BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColorDark : Theme.of(context).accentColor),
-        primary: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColorDark : Theme.of(context).accentColor,
-        elevation: 0,
-      ),
+      style: ColorThemes.addTaskButtonStyle(context),
       onPressed: () {
         this.addNewTask();
       },
