@@ -81,6 +81,21 @@ class ColorThemes {
     );
   }
 
+  static InputDecoration taskDetailsFieldDecoration(isFocused, description, BuildContext context) {
+    return InputDecoration(
+      hintText: isFocused ? "" : "Tap to add description",
+      filled: true,
+      fillColor: Theme.of(context).primaryColorLight,
+      enabledBorder: description.isEmpty
+          ? OutlineInputBorder(
+              borderSide: BorderSide(
+                color: Theme.of(context).primaryColorDark,
+              ),
+            )
+          : InputBorder.none,
+    );
+  }
+
   static ButtonStyle taskDetailsButtonStyle(BuildContext context) {
     return ElevatedButton.styleFrom(
       elevation: 3,
