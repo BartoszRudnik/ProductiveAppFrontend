@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/config/color_themes.dart';
 import 'package:productive_app/model/task.dart';
+import 'package:productive_app/provider/delegate_provider.dart';
+import 'package:provider/provider.dart';
 
 class TaskDetailsAttributes extends StatelessWidget {
   final Task taskToEdit;
@@ -21,6 +23,12 @@ class TaskDetailsAttributes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String collaboratorName = '';
+
+    if (this.taskToEdit.delegatedEmail != null) {
+      collaboratorName = Provider.of<DelegateProvider>(context).collaborators.firstWhere((element) => element.email == this.taskToEdit.delegatedEmail).collaboratorName;
+    }
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -103,7 +111,14 @@ class TaskDetailsAttributes extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.person_add),
-                  Text(this.taskToEdit.delegatedEmail == null ? "Assigned" : this.taskToEdit.delegatedEmail),
+                  Text(
+                    this.taskToEdit.delegatedEmail == null
+                        ? "Assigned"
+                        : collaboratorName.length > 1
+                            ? collaboratorName
+                            : this.taskToEdit.delegatedEmail,
+                    textAlign: TextAlign.center,
+                  ),
                 ],
               ),
             ),
