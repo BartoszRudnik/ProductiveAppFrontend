@@ -150,4 +150,27 @@ class ColorThemes {
       ),
     );
   }
+
+  static InputDecoration searchFormFieldDecoration(BuildContext context, String labelText, Function onPressed) {
+    return InputDecoration(
+      focusedBorder: InputBorder.none,
+      enabledBorder: InputBorder.none,
+      border: InputBorder.none,
+      focusedErrorBorder: InputBorder.none,
+      errorBorder: InputBorder.none,
+      errorStyle: TextStyle(
+        height: 0,
+        color: Colors.transparent,
+      ),
+      labelStyle: TextStyle(color: Colors.grey[700]),
+      labelText: labelText,
+      suffixIcon: IconButton(
+        color: Theme.of(context).primaryColor,
+        icon: Icon(Icons.close_outlined),
+        onPressed: () {
+          onPressed();
+        },
+      ),
+    );
+  }
 }
