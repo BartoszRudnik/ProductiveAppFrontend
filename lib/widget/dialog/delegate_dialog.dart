@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
-import 'package:productive_app/model/collaborator.dart';
-import 'package:productive_app/provider/delegate_provider.dart';
 import 'package:provider/provider.dart';
+import '../../model/collaborator.dart';
+import '../../provider/delegate_provider.dart';
 
 class DelegateDialog extends StatelessWidget {
   final _collaboratorKey = GlobalKey<FormState>();
