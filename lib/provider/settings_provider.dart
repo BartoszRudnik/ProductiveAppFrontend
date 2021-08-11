@@ -71,6 +71,18 @@ class SettingsProvider with ChangeNotifier {
     }
   }
 
+  void clearTaskName() {
+    this.userSettings.taskName = ' ';
+
+    notifyListeners();
+  }
+
+  void setTaskName(String name) {
+    this.userSettings.taskName = name;
+
+    notifyListeners();
+  }
+
   Future<void> addFilterLocations(List<int> locations) async {
     final finalUrl = this._serverUrl + 'filterSettings/addFilterLocations/${this.userMail}';
 

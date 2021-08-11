@@ -42,6 +42,10 @@ class ManageFilters {
       Provider.of<TaskProvider>(context, listen: false).sortByPriorityAscending(tasks);
     }
 
+    if (userSettings.taskName != null && userSettings.taskName.length >= 2) {
+      tasks = tasks.where((task) => task.title.contains(userSettings.taskName)).toList();
+    }
+
     return tasks;
   }
 }

@@ -9,6 +9,7 @@ class Settings {
   List<String> tags;
   List<int> locations;
   int sortingMode;
+  String taskName;
 
   Settings({
     @required this.showOnlyUnfinished,
@@ -19,5 +20,6 @@ class Settings {
     this.priorities,
     this.tags,
     this.sortingMode,
+    this.taskName,
   });
 }
