@@ -1,14 +1,12 @@
-import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
-import 'package:global_configuration/global_configuration.dart';
-import 'package:productive_app/model/collaborator.dart';
-import 'package:productive_app/provider/delegate_provider.dart';
-import 'package:productive_app/screen/collaborator_profile_tabs.dart';
 import 'package:provider/provider.dart';
+import '../model/collaborator.dart';
+import '../provider/delegate_provider.dart';
+import '../screen/collaborator_profile_tabs.dart';
+import 'collaborator_list_element.dart';
 
 class AcceptedCollaborator extends StatelessWidget {
   Collaborator collaborator;
-  String _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
   AcceptedCollaborator({
     @required this.collaborator,
@@ -38,6 +36,7 @@ class AcceptedCollaborator extends StatelessWidget {
           ],
         ),
       ),
+      // ignore: missing_return
       confirmDismiss: (direction) {
         if (direction == DismissDirection.endToStart) {
           return showDialog(
@@ -82,29 +81,7 @@ class AcceptedCollaborator extends StatelessWidget {
         onTap: () {
           Navigator.of(context).pushNamed(CollaboratorProfileTabs.routeName, arguments: this.collaborator);
         },
-        child: Card(
-          child: ListTile(
-            leading: Badge(
-              padding: EdgeInsets.all(8.5),
-              position: BadgePosition.topStart(),
-              showBadge: this.collaborator.isAskingForPermission,
-              badgeColor: Theme.of(context).primaryColor,
-              child: Container(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(25),
-                  child: FadeInImage(
-                    image: NetworkImage(this._serverUrl + 'userImage/getImage/${this.collaborator.email}'),
-                    placeholder: AssetImage('assets/images/profile_placeholder.jpg'),
-                  ),
-                ),
-              ),
-            ),
-            title: Text(
-              this.collaborator.email,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
-            ),
-          ),
-        ),
+        child: CollaboratorListElement(collaborator: this.collaborator),
       ),
     );
   }

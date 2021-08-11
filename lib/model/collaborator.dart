@@ -4,6 +4,7 @@ class Collaborator {
   int id;
   String email;
   String relationState;
+  String collaboratorName;
   bool alreadyAsked;
   bool isAskingForPermission;
   bool sentPermission;
@@ -15,6 +16,7 @@ class Collaborator {
     this.id,
     this.sentPermission,
     this.receivedPermission,
+    this.collaboratorName,
     @required this.email,
     @required this.relationState,
     this.isSelected,

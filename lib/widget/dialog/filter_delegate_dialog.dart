@@ -155,7 +155,7 @@ class FilterDelegateDialog extends StatelessWidget {
                                 ),
                               ),
                               title: Text(
-                                filteredCollaborators[collaboratorIndex].email,
+                                filteredCollaborators[collaboratorIndex].collaboratorName.length > 1 ? filteredCollaborators[collaboratorIndex].collaboratorName : filteredCollaborators[collaboratorIndex].email,
                                 style: TextStyle(
                                   color: filteredCollaborators[collaboratorIndex].isSelected ? Theme.of(context).accentColor : Theme.of(context).primaryColor,
                                 ),

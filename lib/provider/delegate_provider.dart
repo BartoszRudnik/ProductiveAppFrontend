@@ -122,31 +122,6 @@ class DelegateProvider with ChangeNotifier {
     }
   }
 
-  Future<String> getCollaboratorName(String collaboratorEmail) async {
-    final requestUrl = this._serverUrl + 'delegate/getCollaboratorName/${this.userEmail}/$collaboratorEmail';
-
-    try {
-      final response = await http.get(
-        requestUrl,
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-
-      final responseBody = json.decode(utf8.decode(response.bodyBytes));
-
-      if (responseBody['collaboratorName'] != null) {
-        return responseBody['collaboratorName'];
-      } else {
-        return '';
-      }
-    } catch (error) {
-      print(error);
-      throw (error);
-    }
-  }
-
   Future<int> getNumberOfCollaboratorActiveTasks(String collaboratorEmail) async {
     final requestUrl = this._serverUrl + 'delegate/getNumberOfCollaboratorActiveTasks/${this.userEmail}/$collaboratorEmail';
 
@@ -260,9 +235,11 @@ class DelegateProvider with ChangeNotifier {
         bool sentPermission = false;
         bool isReceived = false;
         String collaboratorEmail = '';
+        String collaboratorName = '';
 
         if (element['invitationSender'] == this.userEmail) {
           collaboratorEmail = element['invitationReceiver'];
+          collaboratorName = element['invitationReceiverName'];
           sentPermission = element['user2Permission'];
           receivedPermission = element['user1Permission'];
           isAskingForPermission = element['user2AskForPermission'];
@@ -270,6 +247,7 @@ class DelegateProvider with ChangeNotifier {
         } else {
           isReceived = true;
           collaboratorEmail = element['invitationSender'];
+          collaboratorName = element['invitationSenderName'];
           sentPermission = element['user1Permission'];
           receivedPermission = element['user2Permission'];
           isAskingForPermission = element['user1AskForPermission'];
@@ -279,6 +257,7 @@ class DelegateProvider with ChangeNotifier {
         Collaborator newCollaborator = Collaborator(
           id: element['id'],
           email: collaboratorEmail,
+          collaboratorName: collaboratorName,
           relationState: element['relationState'],
           isSelected: false,
           received: isReceived,
