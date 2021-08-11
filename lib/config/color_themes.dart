@@ -162,8 +162,10 @@ class ColorThemes {
         height: 0,
         color: Colors.transparent,
       ),
+      labelStyle: TextStyle(color: Colors.grey[700]),
       labelText: labelText,
       suffixIcon: IconButton(
+        color: Theme.of(context).primaryColor,
         icon: Icon(Icons.close_outlined),
         onPressed: () {
           onPressed();
