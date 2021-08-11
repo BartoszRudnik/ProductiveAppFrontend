@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../provider/delegate_provider.dart';
-import '../widget/accepted_collaborator.dart';
 import '../widget/appBar/task_appBar.dart';
+import '../widget/collaborators_list.dart';
 import '../widget/empty_list.dart';
 import '../widget/new_collaborator.dart';
-import '../widget/received_collaborator.dart';
-import '../widget/send_collaborator.dart';
 
 class CollaboratorsScreen extends StatefulWidget {
   static const routeName = "/collaborators";
@@ -60,81 +58,24 @@ class _CollaboratorsScreenState extends State<CollaboratorsScreen> {
                   height: MediaQuery.of(context).size.height,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
+                    children: [
                       if (provider.accepted.length > 0)
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Accepted invitations',
-                              style: TextStyle(
-                                fontSize: 27,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                            Divider(
-                              thickness: 1.5,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                            ListView.builder(
-                              physics: const NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount: provider.accepted.length,
-                              itemBuilder: (ctx, index) => AcceptedCollaborator(collaborator: provider.accepted[index]),
-                            ),
-                          ],
+                        CollaboratorsList(
+                          collaboratorType: 'accepted',
+                          collaborators: provider.accepted,
+                          listTitle: 'Accepted Invitations',
                         ),
                       if (provider.received.length > 0)
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Received invitations',
-                              style: TextStyle(
-                                fontSize: 27,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                            Divider(
-                              thickness: 1.5,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                            ListView.builder(
-                              physics: const NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount: provider.received.length,
-                              itemBuilder: (ctx, index) => ReceivedCollaborator(collaborator: provider.received[index]),
-                            ),
-                          ],
+                        CollaboratorsList(
+                          collaboratorType: 'received',
+                          collaborators: provider.received,
+                          listTitle: 'Received Invitations',
                         ),
                       if (provider.send.length > 0)
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Sent invitations',
-                              style: TextStyle(
-                                fontSize: 27,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                            Divider(
-                              thickness: 1.5,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                            ListView.builder(
-                              physics: const NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount: provider.send.length,
-                              itemBuilder: (ctx, index) => SendCollaborator(collaborator: provider.send[index]),
-                            ),
-                          ],
+                        CollaboratorsList(
+                          collaboratorType: 'send',
+                          collaborators: provider.send,
+                          listTitle: 'Sent Invitations',
                         ),
                     ],
                   ),

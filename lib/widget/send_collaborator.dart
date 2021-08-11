@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:global_configuration/global_configuration.dart';
-import 'package:productive_app/model/collaborator.dart';
-import 'package:productive_app/provider/delegate_provider.dart';
 import 'package:provider/provider.dart';
+import '../model/collaborator.dart';
+import '../provider/delegate_provider.dart';
+import 'collaborator_list_element.dart';
 
 class SendCollaborator extends StatelessWidget {
   Collaborator collaborator;
-  String _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
   SendCollaborator({
     @required this.collaborator,
@@ -36,6 +35,7 @@ class SendCollaborator extends StatelessWidget {
           ],
         ),
       ),
+      // ignore: missing_return
       confirmDismiss: (direction) {
         if (direction == DismissDirection.endToStart) {
           return showDialog(
@@ -88,22 +88,8 @@ class SendCollaborator extends StatelessWidget {
           );
         }
       },
-      child: Card(
-        child: ListTile(
-          leading: Container(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(25),
-              child: FadeInImage(
-                image: NetworkImage(this._serverUrl + 'userImage/getImage/${this.collaborator.email}'),
-                placeholder: AssetImage('assets/images/profile_placeholder.jpg'),
-              ),
-            ),
-          ),
-          title: Text(
-            this.collaborator.email,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
-          ),
-        ),
+      child: CollaboratorListElement(
+        collaborator: this.collaborator,
       ),
     );
   }

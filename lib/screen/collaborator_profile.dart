@@ -21,23 +21,12 @@ class CollaboratorProfile extends StatefulWidget {
 class _CollaboratorProfileState extends State<CollaboratorProfile> {
   String _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
-  String collaboratorName;
   bool grantAccess;
 
   @override
   void initState() {
     grantAccess = this.widget.collaborator.sentPermission;
     super.initState();
-  }
-
-  @override
-  void didChangeDependencies() async {
-    await Provider.of<DelegateProvider>(context, listen: false).getCollaboratorName(this.widget.collaborator.email).then((value) {
-      setState(() {
-        collaboratorName = value;
-      });
-    });
-    super.didChangeDependencies();
   }
 
   @override
@@ -114,9 +103,9 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
                         Expanded(
                           flex: 8,
                           child: TextFormField(
-                            key: ObjectKey(collaboratorName),
+                            key: ObjectKey(this.widget.collaborator.collaboratorName),
                             enabled: false,
-                            initialValue: collaboratorName,
+                            initialValue: this.widget.collaborator.collaboratorName,
                             style: TextStyle(fontSize: 18),
                             maxLines: 1,
                             decoration: InputDecoration(hintText: "Name"),
