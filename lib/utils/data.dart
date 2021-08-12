@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:productive_app/provider/attachment_provider.dart';
 import '../provider/auth_provider.dart';
 import '../provider/delegate_provider.dart';
 import '../provider/location_provider.dart';
@@ -17,5 +18,6 @@ class Data {
     await Provider.of<SettingsProvider>(context, listen: false).getFilterSettings();
     await Provider.of<AuthProvider>(context, listen: false).getUserData();
     await Provider.of<AuthProvider>(context, listen: false).checkIfAvatarExists();
+    await Provider.of<AttachmentProvider>(context, listen: false).getAttachments();
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
+import 'package:productive_app/provider/attachment_provider.dart';
 import 'utils/notifications.dart';
 import 'package:provider/provider.dart';
 import 'config/color_themes.dart';
@@ -44,6 +45,14 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
           create: (context) => AuthProvider(),
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, AttachmentProvider>(
+          create: null,
+          update: (ctx, auth, previousAttachments) => AttachmentProvider(
+            attachments: previousAttachments == null ? [] : previousAttachments.attachments,
+            authToken: auth.token,
+            userMail: auth.email,
+          ),
         ),
         ChangeNotifierProxyProvider<AuthProvider, ThemeProvider>(
           create: null,

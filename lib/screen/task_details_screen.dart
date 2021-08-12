@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../config/color_themes.dart';
 import '../model/task.dart';
 import '../model/taskLocation.dart';
+import '../provider/attachment_provider.dart';
 import '../provider/location_provider.dart';
 import '../provider/task_provider.dart';
 import '../utils/date_time_pickers.dart';
@@ -13,6 +16,7 @@ import '../widget/appBar/details_appBar.dart';
 import '../widget/dialog/delegate_dialog.dart';
 import '../widget/dialog/notification_location_dialog.dart';
 import '../widget/dialog/tags_dialog.dart';
+import '../widget/task_details_attachments.dart';
 import '../widget/task_details_attributes.dart';
 import '../widget/task_details_bottom_bar.dart';
 import '../widget/task_details_dates.dart';
@@ -35,6 +39,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
   TimeOfDay startTime;
   TimeOfDay endTime;
 
+  List<File> newAttachments = [];
+
   bool _locationChanged = false;
   bool _isValid = true;
   bool _isFocused = false;
@@ -47,7 +53,13 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     _descriptionFocus.addListener(onDescriptionFocusChange);
     taskToEdit = null;
 
+    Provider.of<AttachmentProvider>(context, listen: false).prepare();
+
     super.initState();
+  }
+
+  void setNewAttachments(List<File> newAttachments) {
+    this.newAttachments.addAll(newAttachments);
   }
 
   void onDescriptionFocusChange() {
@@ -229,6 +241,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, newLocalization);
       }
 
+      await Provider.of<AttachmentProvider>(context, listen: false).deleteFlaggedAttachments();
       Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);
     } catch (error) {
       print(error);
@@ -248,6 +261,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         taskToEdit.localization = "TRASH";
       }
       try {
+        await Provider.of<AttachmentProvider>(context, listen: false).deleteFlaggedAttachments();
         await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, taskToEdit.localization);
         Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);
       } catch (error) {
@@ -410,6 +424,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.taskToEdit.notificationLocalizationId);
     }
 
+    final attachments = Provider.of<AttachmentProvider>(context).taskAttachments(taskToEdit.id);
+
     return Scaffold(
       appBar: DetailsAppBar(
         title: 'Details',
@@ -514,7 +530,22 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                   child: TaskTagsEdit(
                     tags: taskToEdit.tags,
                   ),
-                )
+                ),
+                ListTile(
+                  minLeadingWidth: 16,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 0),
+                  leading: Icon(Icons.attach_file_outlined),
+                  title: Align(
+                    alignment: Alignment(-1.1, 0),
+                    child: Text(
+                      "Attachments",
+                      style: TextStyle(fontSize: 21),
+                    ),
+                  ),
+                ),
+                TaskDetailsAttachments(
+                  attachments: attachments,
+                ),
               ],
             ),
           ),
