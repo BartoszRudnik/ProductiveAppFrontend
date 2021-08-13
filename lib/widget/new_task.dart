@@ -207,14 +207,14 @@ class _NewTaskState extends State<NewTask> {
       if (this._notificationLocalizationId == null) {
         final taskId = await Provider.of<TaskProvider>(context, listen: false).addTask(newTask);
 
-        await Provider.of<AttachmentProvider>(context, listen: false).setAttachments(this._files, taskId);
+        await Provider.of<AttachmentProvider>(context, listen: false).setAttachments(this._files, taskId, false);
       } else {
         final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this._notificationLocalizationId);
         final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this._notificationLocalizationId);
 
         final taskId = await Provider.of<TaskProvider>(context, listen: false).addTaskWithGeolocation(newTask, latitude, longitude);
 
-        await Provider.of<AttachmentProvider>(context, listen: false).setAttachments(this._files, taskId);
+        await Provider.of<AttachmentProvider>(context, listen: false).setAttachments(this._files, taskId, false);
       }
 
       this._formKey.currentState.reset();

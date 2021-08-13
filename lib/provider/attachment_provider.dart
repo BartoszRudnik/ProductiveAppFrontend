@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 
 class AttachmentProvider with ChangeNotifier {
   List<Attachment> attachments;
+  List<Attachment> notSavedAttachments = [];
   String userMail;
   String authToken;
 
@@ -26,6 +27,19 @@ class AttachmentProvider with ChangeNotifier {
       this._deleteAttachment(element.id);
       this.attachments.remove(element);
     });
+
+    this.notSavedAttachments = [];
+
+    notifyListeners();
+  }
+
+  Future<void> deleteNotSavedAttachments() async {
+    this.notSavedAttachments.forEach((attachment) {
+      this._deleteAttachment(attachment.id);
+      this.attachments.remove(attachment);
+    });
+
+    this.notSavedAttachments = [];
 
     notifyListeners();
   }
@@ -96,7 +110,7 @@ class AttachmentProvider with ChangeNotifier {
     }
   }
 
-  Future<void> setAttachments(List<File> attachments, int taskId) {
+  Future<void> setAttachments(List<File> attachments, int taskId, bool editMode) {
     try {
       attachments.forEach((attachment) async {
         final fileName = basename(attachment.path);
@@ -111,18 +125,20 @@ class AttachmentProvider with ChangeNotifier {
         final response = await request.send();
         final respStr = await response.stream.bytesToString();
 
-        print(respStr);
+        final newAttachment = Attachment(
+          id: int.parse(respStr),
+          taskId: taskId,
+          fileName: basename(attachment.path),
+        );
 
-        this.attachments.add(
-              Attachment(
-                id: int.parse(respStr),
-                taskId: taskId,
-                fileName: basename(attachment.path),
-              ),
-            );
+        this.attachments.add(newAttachment);
+
+        if (editMode) {
+          this.notSavedAttachments.add(newAttachment);
+        }
+
+        notifyListeners();
       });
-
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);

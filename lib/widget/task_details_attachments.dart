@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/model/attachment.dart';
-import 'package:productive_app/provider/attachment_provider.dart';
-import 'package:productive_app/widget/pdf_viewer.dart';
 import 'package:provider/provider.dart';
+
+import '../model/attachment.dart';
+import '../provider/attachment_provider.dart';
+import 'dialog/attachment_dialog.dart';
+import 'pdf_viewer.dart';
 
 class TaskDetailsAttachments extends StatelessWidget {
   final List<Attachment> attachments;
+  final int taskId;
 
   TaskDetailsAttachments({
     @required this.attachments,
+    @required this.taskId,
   });
 
   @override
@@ -82,10 +86,18 @@ class TaskDetailsAttachments extends StatelessWidget {
             margin: EdgeInsets.symmetric(horizontal: 4),
             decoration: BoxDecoration(color: Color.fromRGBO(237, 237, 240, 1), borderRadius: BorderRadius.all(Radius.circular(5))),
             child: TextButton(
-              onPressed: () {},
+              onPressed: () async {
+                final newAttachments = await showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AttachmentDialog(files: []);
+                    });
+
+                Provider.of<AttachmentProvider>(context, listen: false).setAttachments(newAttachments, taskId, true);
+              },
               child: Center(
                 child: Text(
-                  "Add attachments",
+                  "Add new attachments",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Color.fromRGBO(119, 119, 120, 1),
