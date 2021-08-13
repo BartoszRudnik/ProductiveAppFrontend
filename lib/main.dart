@@ -50,6 +50,7 @@ class MyApp extends StatelessWidget {
           create: null,
           update: (ctx, auth, previousAttachments) => AttachmentProvider(
             attachments: previousAttachments == null ? [] : previousAttachments.attachments,
+            delegatedAttachments: previousAttachments == null ? [] : previousAttachments.delegatedAttachments,
             authToken: auth.token,
             userMail: auth.email,
           ),

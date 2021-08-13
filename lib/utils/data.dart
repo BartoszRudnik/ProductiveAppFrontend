@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:productive_app/model/task.dart';
 import 'package:productive_app/provider/attachment_provider.dart';
 import '../provider/auth_provider.dart';
 import '../provider/delegate_provider.dart';
@@ -19,5 +20,17 @@ class Data {
     await Provider.of<AuthProvider>(context, listen: false).getUserData();
     await Provider.of<AuthProvider>(context, listen: false).checkIfAvatarExists();
     await Provider.of<AttachmentProvider>(context, listen: false).getAttachments();
+
+    final List<Task> delegatedTasks = Provider.of<TaskProvider>(context, listen: false).taskList.where((element) => element.parentId != null).toList();
+
+    if (delegatedTasks != null && delegatedTasks.length > 0) {
+      List<int> delegatedTasksId = [];
+
+      delegatedTasks.forEach((task) {
+        delegatedTasksId.add(task.parentId);
+      });
+
+      await Provider.of<AttachmentProvider>(context, listen: false).getDelegatedAttachments(delegatedTasksId);
+    }
   }
 }

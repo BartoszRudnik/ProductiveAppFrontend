@@ -277,7 +277,6 @@ class TaskProvider with ChangeNotifier {
   }
 
   Future<void> updateTaskPosition(Task task, double newPosition) async {
-    print(newPosition);
     String url = this._serverUrl + 'task/updatePosition/${task.id}';
 
     try {

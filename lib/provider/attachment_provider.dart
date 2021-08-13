@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 
 class AttachmentProvider with ChangeNotifier {
   List<Attachment> attachments;
+  List<Attachment> delegatedAttachments;
   List<Attachment> notSavedAttachments = [];
   String userMail;
   String authToken;
@@ -18,6 +19,7 @@ class AttachmentProvider with ChangeNotifier {
 
   AttachmentProvider({
     @required this.attachments,
+    @required this.delegatedAttachments,
     @required this.userMail,
     @required this.authToken,
   });
@@ -60,6 +62,46 @@ class AttachmentProvider with ChangeNotifier {
 
   List<Attachment> taskAttachments(int taskId) {
     return this.attachments.where((attachment) => attachment.taskId == taskId && !attachment.toDelete).toList();
+  }
+
+  Future<void> getDelegatedAttachments(List<int> delegatedTasksId) async {
+    final finalUrl = this._serverUrl + 'attachment/getDelegatedAttachments';
+
+    List<Attachment> loadedAttachments = [];
+
+    try {
+      final response = await http.post(
+        finalUrl,
+        body: json.encode({
+          "tasksId": delegatedTasksId,
+        }),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      final responseBody = json.decode(response.body);
+
+      for (var element in responseBody) {
+        final newAttachment = Attachment(
+          fileName: element['fileName'],
+          id: element['id'],
+          taskId: element['taskId'],
+        );
+
+        loadedAttachments.add(newAttachment);
+      }
+
+      if (loadedAttachments.length > 0) {
+        this.delegatedAttachments = loadedAttachments;
+      }
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
   }
 
   Future<void> getAttachments() async {
@@ -161,7 +203,10 @@ class AttachmentProvider with ChangeNotifier {
   }
 
   Future<File> _storeFile(String url, List<int> bytes, int attachmentId) async {
-    final fileName = this.attachments.firstWhere((element) => element.id == attachmentId).fileName;
+    final allAttachments = this.attachments + this.delegatedAttachments;
+
+    String fileName = allAttachments.firstWhere((element) => element.id == attachmentId).fileName;
+
     final dir = await getApplicationDocumentsDirectory();
 
     final file = File('${dir.path}/$fileName');

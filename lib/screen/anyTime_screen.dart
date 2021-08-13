@@ -13,9 +13,6 @@ class AnytimeScreen extends StatelessWidget {
     if (newIndex > tasks.length) newIndex = tasks.length;
     if (oldIndex < newIndex) newIndex -= 1;
 
-    print(newIndex);
-    print(oldIndex);
-
     final item = tasks.elementAt(oldIndex);
     double newPosition = item.position;
 

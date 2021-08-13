@@ -73,10 +73,6 @@ class _NewTaskState extends State<NewTask> {
     setState(() {
       this._files = result;
     });
-
-    this._files.forEach((element) {
-      print(element.path);
-    });
   }
 
   void setNotificationLocalization(TaskLocation taskLocation) {

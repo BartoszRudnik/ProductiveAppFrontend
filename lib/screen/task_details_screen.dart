@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/model/attachment.dart';
 import 'package:provider/provider.dart';
 import '../config/color_themes.dart';
 import '../model/task.dart';
@@ -424,7 +425,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.taskToEdit.notificationLocalizationId);
     }
 
-    final attachments = Provider.of<AttachmentProvider>(context).attachments.where((attachment) => attachment.taskId == taskToEdit.id && !attachment.toDelete).toList();
+    List<Attachment> attachments = Provider.of<AttachmentProvider>(context).attachments.where((attachment) => attachment.taskId == taskToEdit.id && !attachment.toDelete).toList();
+    attachments.addAll(Provider.of<AttachmentProvider>(context).delegatedAttachments.where((attachment) => attachment.taskId == taskToEdit.parentId && !attachment.toDelete).toList());
 
     return WillPopScope(
       onWillPop: () async {
