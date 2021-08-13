@@ -153,15 +153,15 @@ class AttachmentProvider with ChangeNotifier {
 
       final bytes = response.bodyBytes;
 
-      return this._storeFile(finalUrl, bytes);
+      return this._storeFile(finalUrl, bytes, attachmentId);
     } catch (error) {
       print(error);
       throw (error);
     }
   }
 
-  Future<File> _storeFile(String url, List<int> bytes) async {
-    final fileName = basename(url);
+  Future<File> _storeFile(String url, List<int> bytes, int attachmentId) async {
+    final fileName = this.attachments.firstWhere((element) => element.id == attachmentId).fileName;
     final dir = await getApplicationDocumentsDirectory();
 
     final file = File('${dir.path}/$fileName');

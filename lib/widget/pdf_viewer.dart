@@ -30,6 +30,7 @@ class _PDFViewerState extends State<PDFViewer> {
         fileName: fileName,
         indexPage: this.indexPage,
         pages: this.pages,
+        filePath: file.path,
       ),
       body: PDFView(
         nightMode: Theme.of(context).brightness == Brightness.dark,

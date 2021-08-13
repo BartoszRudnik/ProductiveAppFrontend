@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ImageViewer extends StatelessWidget {
   static const routeName = "/imageViewer";
@@ -23,9 +24,17 @@ class ImageViewer extends StatelessWidget {
           fileName,
           style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.share_outlined),
+            onPressed: () {
+              Share.shareFiles([file.path]);
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
-        child: Image.asset(file.path),
+        child: Image.file(file),
       ),
     );
   }

@@ -39,10 +39,10 @@ class TaskDetailsAttachments extends StatelessWidget {
 
                         String routeName = '';
 
-                        if (FileTypeHelper.isImage(this.attachments[index].fileName)) {
+                        if (FileTypeHelper.isImage(file.path)) {
                           routeName = ImageViewer.routeName;
                         }
-                        if (FileTypeHelper.isPDF(this.attachments[index].fileName)) {
+                        if (FileTypeHelper.isPDF(file.path)) {
                           routeName = PDFViewer.routeName;
                         }
 

@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 
 class PDFAppBar extends StatelessWidget with PreferredSizeWidget {
   final controller;
   final fileName;
   final indexPage;
   final pages;
+  final filePath;
 
   PDFAppBar({
     @required this.controller,
     @required this.fileName,
     @required this.indexPage,
     @required this.pages,
+    @required this.filePath,
   });
 
   @override
@@ -49,7 +52,13 @@ class PDFAppBar extends StatelessWidget with PreferredSizeWidget {
               this.controller.setPage(this.indexPage + 1);
             }
           },
-        )
+        ),
+        IconButton(
+          icon: Icon(Icons.share_outlined),
+          onPressed: () {
+            Share.shareFiles([this.filePath]);
+          },
+        ),
       ],
     );
   }

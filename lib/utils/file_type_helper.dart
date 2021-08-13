@@ -4,9 +4,6 @@ class FileTypeHelper {
   static bool isImage(String filePath) {
     final mimeType = lookupMimeType(filePath);
 
-    print(filePath);
-    print(mimeType);
-
     return mimeType.startsWith('image/');
   }
 
