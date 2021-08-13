@@ -15,6 +15,7 @@ import 'package:productive_app/screen/tags_screen.dart';
 import 'package:productive_app/screen/task_details_screen.dart';
 import 'package:productive_app/screen/task_map.dart';
 import 'package:productive_app/screen/trash_screen.dart';
+import 'package:productive_app/widget/image_viewer.dart';
 import 'package:productive_app/widget/pdf_viewer.dart';
 
 class MyRoutes {
@@ -37,5 +38,6 @@ class MyRoutes {
     TaskMap.routeName: (ctx) => TaskMap(),
     CollaboratorProfileTabs.routeName: (ctx) => CollaboratorProfileTabs(),
     PDFViewer.routeName: (ctx) => PDFViewer(),
+    ImageViewer.routeName: (ctx) => ImageViewer(),
   };
 }

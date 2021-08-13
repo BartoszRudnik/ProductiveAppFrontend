@@ -72,7 +72,7 @@ class _AttachmentDialogState extends State<AttachmentDialog> {
                   onPressed: () async {
                     final result = await FilePicker.platform.pickFiles(
                       allowMultiple: true,
-                      allowedExtensions: ['pdf', 'png', 'jpg', 'jpeg', 'svg'],
+                      allowedExtensions: ['pdf', 'png', 'jpg', 'jpeg'],
                       type: FileType.custom,
                     );
 

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/utils/file_type_helper.dart';
+import 'package:productive_app/widget/image_viewer.dart';
 import 'package:provider/provider.dart';
 
 import '../model/attachment.dart';
@@ -35,8 +37,17 @@ class TaskDetailsAttachments extends StatelessWidget {
                       onPressed: () async {
                         final file = await Provider.of<AttachmentProvider>(context, listen: false).loadAttachments(this.attachments[index].id);
 
+                        String routeName = '';
+
+                        if (FileTypeHelper.isImage(this.attachments[index].fileName)) {
+                          routeName = ImageViewer.routeName;
+                        }
+                        if (FileTypeHelper.isPDF(this.attachments[index].fileName)) {
+                          routeName = PDFViewer.routeName;
+                        }
+
                         Navigator.of(context).pushNamed(
-                          PDFViewer.routeName,
+                          routeName,
                           arguments: {
                             'file': file,
                             'fileName': this.attachments[index].fileName,

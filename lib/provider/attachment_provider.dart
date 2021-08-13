@@ -153,8 +153,6 @@ class AttachmentProvider with ChangeNotifier {
 
       final bytes = response.bodyBytes;
 
-      print(response);
-
       return this._storeFile(finalUrl, bytes);
     } catch (error) {
       print(error);
@@ -166,7 +164,7 @@ class AttachmentProvider with ChangeNotifier {
     final fileName = basename(url);
     final dir = await getApplicationDocumentsDirectory();
 
-    final file = File('${dir.path}/$fileName' + '.pdf');
+    final file = File('${dir.path}/$fileName');
 
     await file.writeAsBytes(bytes, flush: true);
 
