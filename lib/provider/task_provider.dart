@@ -141,7 +141,7 @@ class TaskProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addTaskWithGeolocation(Task task, double latitude, double longitude) async {
+  Future<int> addTaskWithGeolocation(Task task, double latitude, double longitude) async {
     String url = this._serverUrl + 'task/add';
 
     if (task.startDate == null) {
@@ -204,16 +204,19 @@ class TaskProvider with ChangeNotifier {
         );
       }
 
+      this.taskList.add(task);
       this.addToLocalication(task);
 
       notifyListeners();
+
+      return task.id;
     } catch (error) {
       print(error);
       throw error;
     }
   }
 
-  Future<void> addTask(Task task) async {
+  Future<int> addTask(Task task) async {
     String url = this._serverUrl + 'task/add';
 
     if (task.startDate == null) {
@@ -263,9 +266,12 @@ class TaskProvider with ChangeNotifier {
         task.startDate = null;
       }
 
+      this.taskList.add(task);
       this.addToLocalication(task);
 
       notifyListeners();
+
+      return task.id;
     } catch (error) {
       print(error);
       throw error;
@@ -273,7 +279,6 @@ class TaskProvider with ChangeNotifier {
   }
 
   Future<void> updateTaskPosition(Task task, double newPosition) async {
-    print(newPosition);
     String url = this._serverUrl + 'task/updatePosition/${task.id}';
 
     try {

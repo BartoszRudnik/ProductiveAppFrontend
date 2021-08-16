@@ -49,7 +49,7 @@ class _TagsDialogState extends State<TagsDialog> {
         Tag t = filteredTags.firstWhere((element) => element.name == taskTags[i].name, orElse: () => null);
         if (t != null) {
           int index = filteredTags.indexOf(t);
-          print(filteredTags.indexOf(t));
+
           if (index != -1) {
             filteredTags[index].isSelected = true;
           }

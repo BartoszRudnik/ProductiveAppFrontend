@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/model/attachment.dart';
 import 'package:provider/provider.dart';
 import '../config/color_themes.dart';
 import '../model/task.dart';
 import '../model/taskLocation.dart';
+import '../provider/attachment_provider.dart';
 import '../provider/location_provider.dart';
 import '../provider/task_provider.dart';
 import '../utils/date_time_pickers.dart';
@@ -13,6 +17,7 @@ import '../widget/appBar/details_appBar.dart';
 import '../widget/dialog/delegate_dialog.dart';
 import '../widget/dialog/notification_location_dialog.dart';
 import '../widget/dialog/tags_dialog.dart';
+import '../widget/task_details_attachments.dart';
 import '../widget/task_details_attributes.dart';
 import '../widget/task_details_bottom_bar.dart';
 import '../widget/task_details_dates.dart';
@@ -35,6 +40,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
   TimeOfDay startTime;
   TimeOfDay endTime;
 
+  List<int> newAttachments = [];
+
   bool _locationChanged = false;
   bool _isValid = true;
   bool _isFocused = false;
@@ -47,7 +54,13 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     _descriptionFocus.addListener(onDescriptionFocusChange);
     taskToEdit = null;
 
+    Provider.of<AttachmentProvider>(context, listen: false).prepare();
+
     super.initState();
+  }
+
+  void setNewAttachments(List<int> newAttachments) {
+    this.newAttachments = newAttachments;
   }
 
   void onDescriptionFocusChange() {
@@ -229,6 +242,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, newLocalization);
       }
 
+      await Provider.of<AttachmentProvider>(context, listen: false).deleteFlaggedAttachments();
       Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);
     } catch (error) {
       print(error);
@@ -248,6 +262,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         taskToEdit.localization = "TRASH";
       }
       try {
+        await Provider.of<AttachmentProvider>(context, listen: false).deleteFlaggedAttachments();
         await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, taskToEdit.localization);
         Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);
       } catch (error) {
@@ -410,120 +425,146 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.taskToEdit.notificationLocalizationId);
     }
 
-    return Scaffold(
-      appBar: DetailsAppBar(
-        title: 'Details',
-        task: originalTask,
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30.0),
-          child: Form(
-            key: this._formKey,
-            child: Column(
-              children: [
-                TextFormField(
-                  initialValue: taskToEdit.title,
-                  style: TextStyle(fontSize: 25),
-                  maxLines: null,
-                  onSaved: (value) {
-                    taskToEdit.title = value;
-                  },
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return 'Task title cannot be empty';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                ListTile(
-                  minLeadingWidth: 16,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 0),
-                  leading: Icon(Icons.edit),
-                  title: Align(
-                    alignment: Alignment(-1.1, 0),
-                    child: Text(
-                      "Description",
-                      style: TextStyle(fontSize: 21),
+    List<Attachment> attachments = Provider.of<AttachmentProvider>(context).attachments.where((attachment) => attachment.taskId == taskToEdit.id && !attachment.toDelete).toList();
+    attachments.addAll(Provider.of<AttachmentProvider>(context).delegatedAttachments.where((attachment) => attachment.taskId == taskToEdit.parentId && !attachment.toDelete).toList());
+
+    return WillPopScope(
+      onWillPop: () async {
+        await Provider.of<AttachmentProvider>(context, listen: false).deleteNotSavedAttachments();
+        Navigator.of(context).pop();
+        return false;
+      },
+      child: Scaffold(
+        appBar: DetailsAppBar(
+          title: 'Details',
+          task: originalTask,
+        ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30.0),
+            child: Form(
+              key: this._formKey,
+              child: Column(
+                children: [
+                  TextFormField(
+                    initialValue: taskToEdit.title,
+                    style: TextStyle(fontSize: 25),
+                    maxLines: null,
+                    onSaved: (value) {
+                      taskToEdit.title = value;
+                    },
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Task title cannot be empty';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  ListTile(
+                    minLeadingWidth: 16,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 0),
+                    leading: Icon(Icons.edit),
+                    title: Align(
+                      alignment: Alignment(-1.1, 0),
+                      child: Text(
+                        "Description",
+                        style: TextStyle(fontSize: 21),
+                      ),
                     ),
                   ),
-                ),
-                TextFormField(
-                  initialValue: taskToEdit.description,
-                  maxLines: null,
-                  focusNode: this._descriptionFocus,
-                  onChanged: (text) {
-                    onDescriptionChanged(text);
-                  },
-                  onSaved: (value) {
-                    taskToEdit.description = value;
-                  },
-                  style: TextStyle(fontSize: 16),
-                  textAlign: this._isDescriptionInitial ? TextAlign.center : TextAlign.left,
-                  decoration: ColorThemes.taskDetailsFieldDecoration(this._isFocused, this._description, context),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                TaskDetailsAttributes(
-                  taskToEdit: taskToEdit,
-                  priorities: priorities,
-                  setDelegatedEmail: setDelegatedEmail,
-                  localizations: localizations,
-                  setPriority: setPriority,
-                  setLocalization: setTaskList,
-                ),
-                SizedBox(
-                  height: 15,
-                ),
-                TaskDetailsMap(
-                  setLocation: this.setLocation,
-                  setNotificationLocalization: this.setNotificationLocalization,
-                  taskToEdit: taskToEdit,
-                  originalTask: originalTask,
-                  latitude: latitude,
-                  longitude: longitude,
-                  locationChanged: this._locationChanged,
-                ),
-                TaskDetailsDates(
-                  selectEndDate: this.selectEndDate,
-                  selectStartDate: this.selectStartDate,
-                  taskToEdit: taskToEdit,
-                  endTime: endTime,
-                  startTime: startTime,
-                  selectEndTime: this.selectEndTime,
-                  selectStartTime: this.selectStartTime,
-                ),
-                ListTile(
-                  minLeadingWidth: 16,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 0),
-                  leading: Icon(Icons.tag),
-                  title: Align(
-                    alignment: Alignment(-1.1, 0),
-                    child: Text(
-                      "Tags",
-                      style: TextStyle(fontSize: 21),
+                  TextFormField(
+                    initialValue: taskToEdit.description,
+                    maxLines: null,
+                    focusNode: this._descriptionFocus,
+                    onChanged: (text) {
+                      onDescriptionChanged(text);
+                    },
+                    onSaved: (value) {
+                      taskToEdit.description = value;
+                    },
+                    style: TextStyle(fontSize: 16),
+                    textAlign: this._isDescriptionInitial ? TextAlign.center : TextAlign.left,
+                    decoration: ColorThemes.taskDetailsFieldDecoration(this._isFocused, this._description, context),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  TaskDetailsAttributes(
+                    taskToEdit: taskToEdit,
+                    priorities: priorities,
+                    setDelegatedEmail: setDelegatedEmail,
+                    localizations: localizations,
+                    setPriority: setPriority,
+                    setLocalization: setTaskList,
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  TaskDetailsMap(
+                    setLocation: this.setLocation,
+                    setNotificationLocalization: this.setNotificationLocalization,
+                    taskToEdit: taskToEdit,
+                    originalTask: originalTask,
+                    latitude: latitude,
+                    longitude: longitude,
+                    locationChanged: this._locationChanged,
+                  ),
+                  TaskDetailsDates(
+                    selectEndDate: this.selectEndDate,
+                    selectStartDate: this.selectStartDate,
+                    taskToEdit: taskToEdit,
+                    endTime: endTime,
+                    startTime: startTime,
+                    selectEndTime: this.selectEndTime,
+                    selectStartTime: this.selectStartTime,
+                  ),
+                  ListTile(
+                    minLeadingWidth: 16,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 0),
+                    leading: Icon(Icons.tag),
+                    title: Align(
+                      alignment: Alignment(-1.1, 0),
+                      child: Text(
+                        "Tags",
+                        style: TextStyle(fontSize: 21),
+                      ),
                     ),
                   ),
-                ),
-                TextButton(
-                  onPressed: () => editTags(context),
-                  child: TaskTagsEdit(
-                    tags: taskToEdit.tags,
+                  TextButton(
+                    onPressed: () => editTags(context),
+                    child: TaskTagsEdit(
+                      tags: taskToEdit.tags,
+                    ),
                   ),
-                )
-              ],
+                  ListTile(
+                    minLeadingWidth: 16,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 0),
+                    leading: Icon(Icons.attach_file_outlined),
+                    title: Align(
+                      alignment: Alignment(-1.1, 0),
+                      child: Text(
+                        "Attachments",
+                        style: TextStyle(fontSize: 21),
+                      ),
+                    ),
+                  ),
+                  TaskDetailsAttachments(
+                    attachments: attachments,
+                    taskId: taskToEdit.id,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-      bottomNavigationBar: TaskDetailsBottomBar(
-        deleteTask: this.deleteTask,
-        saveTask: this.saveTask,
-        taskToEdit: taskToEdit,
+        bottomNavigationBar: TaskDetailsBottomBar(
+          deleteTask: this.deleteTask,
+          saveTask: this.saveTask,
+          taskToEdit: taskToEdit,
+        ),
       ),
     );
   }

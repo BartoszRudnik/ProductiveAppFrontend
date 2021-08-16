@@ -64,7 +64,7 @@ class _TaskDateState extends State<TaskDate> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               ElevatedButton(
-                                style: ColorThemes.taskDetailsButtonStyle(context),
+                                style: ColorThemes.newTaskDateButtonStyle(context),
                                 onPressed: () async {
                                   DateTime initDate = this.widget.startValue;
                                   if (this.widget.startValue == null) {
@@ -86,7 +86,7 @@ class _TaskDateState extends State<TaskDate> {
                               ),
                               SizedBox(width: 30),
                               ElevatedButton(
-                                style: ColorThemes.taskDetailsButtonStyle(context),
+                                style: ColorThemes.newTaskDateButtonStyle(context),
                                 onPressed: () async {
                                   final TimeOfDay pickTime = await DateTimePickers.pickTime(context);
 
@@ -118,7 +118,7 @@ class _TaskDateState extends State<TaskDate> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               ElevatedButton(
-                                style: ColorThemes.taskDetailsButtonStyle(context),
+                                style: ColorThemes.newTaskDateButtonStyle(context),
                                 onPressed: () async {
                                   DateTime initDate = this.widget.endValue;
                                   if (this.widget.endValue == null) {
@@ -140,7 +140,7 @@ class _TaskDateState extends State<TaskDate> {
                               ),
                               SizedBox(width: 30),
                               ElevatedButton(
-                                style: ColorThemes.taskDetailsButtonStyle(context),
+                                style: ColorThemes.newTaskDateButtonStyle(context),
                                 onPressed: () async {
                                   final TimeOfDay pickTime = await DateTimePickers.pickTime(context);
 
@@ -163,7 +163,7 @@ class _TaskDateState extends State<TaskDate> {
                           height: 20,
                         ),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             ElevatedButton(
                               onPressed: () {

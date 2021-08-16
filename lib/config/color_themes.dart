@@ -22,6 +22,9 @@ class ColorThemes {
         primary: Colors.black,
       ),
     ),
+    buttonBarTheme: ButtonBarThemeData(
+      alignment: MainAxisAlignment.spaceEvenly,
+    ),
     colorScheme: ColorScheme.light(),
     fontFamily: 'Lato',
     textTheme: TextThemes.textTheme,
@@ -46,6 +49,9 @@ class ColorThemes {
         side: BorderSide(color: Colors.white),
         primary: Colors.grey[700],
       ),
+    ),
+    buttonBarTheme: ButtonBarThemeData(
+      alignment: MainAxisAlignment.spaceEvenly,
     ),
     colorScheme: ColorScheme.dark(),
     fontFamily: 'Lato',
@@ -101,6 +107,15 @@ class ColorThemes {
       elevation: 3,
       primary: Theme.of(context).primaryColorLight,
       side: BorderSide(color: Theme.of(context).primaryColorLight),
+      onPrimary: Theme.of(context).primaryColor,
+    );
+  }
+
+  static ButtonStyle newTaskDateButtonStyle(BuildContext context) {
+    return ElevatedButton.styleFrom(
+      elevation: 3,
+      primary: Theme.of(context).primaryColorDark,
+      side: BorderSide(color: Theme.of(context).primaryColorDark),
       onPrimary: Theme.of(context).primaryColor,
     );
   }

@@ -1,4 +1,9 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:productive_app/provider/attachment_provider.dart';
+import 'package:productive_app/widget/new_task_attachment.dart';
 import 'package:provider/provider.dart';
 import '../model/tag.dart';
 import '../model/task.dart';
@@ -37,6 +42,7 @@ class _NewTaskState extends State<NewTask> {
   final _formKey = GlobalKey<FormState>();
 
   List<Tag> _finalTags = [];
+  List<File> _files = [];
 
   String _delegatedEmail;
   String _localization;
@@ -61,6 +67,14 @@ class _NewTaskState extends State<NewTask> {
     this._localization = this.widget.localization;
   }
 
+  void _setAttachment(List<File> result) {
+    if (result == null) return;
+
+    setState(() {
+      this._files = result;
+    });
+  }
+
   void setNotificationLocalization(TaskLocation taskLocation) {
     setState(() {
       if (taskLocation.location != null) {
@@ -80,6 +94,8 @@ class _NewTaskState extends State<NewTask> {
   }
 
   void setDelegatedEmail(String value) {
+    if (value == null) return;
+
     this._delegatedEmail = value;
   }
 
@@ -118,6 +134,8 @@ class _NewTaskState extends State<NewTask> {
   }
 
   void setTags(List<Tag> newTags) {
+    if (newTags == null) return;
+
     this._finalTags = newTags;
   }
 
@@ -183,12 +201,16 @@ class _NewTaskState extends State<NewTask> {
 
     try {
       if (this._notificationLocalizationId == null) {
-        await Provider.of<TaskProvider>(context, listen: false).addTask(newTask);
+        final taskId = await Provider.of<TaskProvider>(context, listen: false).addTask(newTask);
+
+        await Provider.of<AttachmentProvider>(context, listen: false).setAttachments(this._files, taskId, false);
       } else {
         final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this._notificationLocalizationId);
         final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this._notificationLocalizationId);
 
-        await Provider.of<TaskProvider>(context, listen: false).addTaskWithGeolocation(newTask, latitude, longitude);
+        final taskId = await Provider.of<TaskProvider>(context, listen: false).addTaskWithGeolocation(newTask, latitude, longitude);
+
+        await Provider.of<AttachmentProvider>(context, listen: false).setAttachments(this._files, taskId, false);
       }
 
       this._formKey.currentState.reset();
@@ -281,9 +303,9 @@ class _NewTaskState extends State<NewTask> {
                       setDelegatedEmail: this.setDelegatedEmail,
                       collaboratorEmail: this._delegatedEmail,
                     ),
-                    IconButton(
-                      icon: Icon(Icons.attach_file_outlined),
-                      onPressed: () {},
+                    NewTaskAttachment(
+                      setAttachments: this._setAttachment,
+                      files: this._files,
                     ),
                   ],
                 ),
