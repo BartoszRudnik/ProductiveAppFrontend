@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/screen/loading_task_screen.dart';
 import 'package:provider/provider.dart';
 import '../model/task.dart';
 import '../provider/location_provider.dart';
@@ -8,7 +7,7 @@ import '../provider/theme_provider.dart';
 import '../utils/data.dart';
 import '../utils/notifications.dart';
 import '../widget/drawer/main_drawer.dart';
-import 'loading_auth_screen.dart';
+import 'loading_task_screen.dart';
 import 'tabs_screen.dart';
 import 'task_details_screen.dart';
 
