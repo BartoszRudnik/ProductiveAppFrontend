@@ -25,6 +25,13 @@ class ColorThemes {
     buttonBarTheme: ButtonBarThemeData(
       alignment: MainAxisAlignment.spaceEvenly,
     ),
+    snackBarTheme: SnackBarThemeData(
+      backgroundColor: Color.fromRGBO(237, 237, 240, 1),
+      contentTextStyle: TextStyle(
+        color: Colors.black,
+        fontSize: 18,
+      ),
+    ),
     colorScheme: ColorScheme.light(),
     fontFamily: 'Lato',
     textTheme: TextThemes.textTheme,
@@ -52,6 +59,13 @@ class ColorThemes {
     ),
     buttonBarTheme: ButtonBarThemeData(
       alignment: MainAxisAlignment.spaceEvenly,
+    ),
+    snackBarTheme: SnackBarThemeData(
+      backgroundColor: Colors.grey[900],
+      contentTextStyle: TextStyle(
+        color: Colors.white,
+        fontSize: 18,
+      ),
     ),
     colorScheme: ColorScheme.dark(),
     fontFamily: 'Lato',

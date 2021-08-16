@@ -26,7 +26,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> updateUserInfo(String firstName, String lastName) async {
     bool hasAgreed = await Dialogs.showChoiceDialog(context, "Are you sure you want to update your account information?");
     if (hasAgreed) {
-      Provider.of<AuthProvider>(context, listen: false).updateUserData(firstName, lastName);
+      await Provider.of<AuthProvider>(context, listen: false).updateUserData(firstName, lastName);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Your data has been saved', textAlign: TextAlign.center),
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
   }
 

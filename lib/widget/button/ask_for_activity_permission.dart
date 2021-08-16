@@ -31,12 +31,7 @@ class AskForActivityPermission extends StatelessWidget {
                     content: Text(
                       'Request has been sent',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Theme.of(context).primaryColor,
-                      ),
                     ),
-                    backgroundColor: Theme.of(context).primaryColorDark,
                     duration: Duration(seconds: 2),
                   ),
                 );

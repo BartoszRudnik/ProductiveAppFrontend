@@ -1,19 +1,17 @@
 import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:productive_app/provider/attachment_provider.dart';
-import 'package:productive_app/widget/new_task_attachment.dart';
 import 'package:provider/provider.dart';
 import '../model/tag.dart';
 import '../model/task.dart';
 import '../model/taskLocation.dart';
+import '../provider/attachment_provider.dart';
 import '../provider/location_provider.dart';
 import '../provider/task_provider.dart';
 import '../utils/dialogs.dart';
 import 'button/add_task_button.dart';
 import 'button/full_screen_button.dart';
 import 'button/is_done_button.dart';
+import 'new_task_attachment.dart';
 import 'new_task_notification_localization.dart';
 import 'new_task_tags.dart';
 import 'task_date.dart';
