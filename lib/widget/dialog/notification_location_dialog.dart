@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/config/color_themes.dart';
 import 'package:provider/provider.dart';
 import '../../model/location.dart';
 import '../../model/taskLocation.dart';
@@ -121,6 +122,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                               child: Container(
                                 height: 40,
                                 child: ElevatedButton(
+                                  style: ColorThemes.newTaskDateButtonStyle(context),
                                   onPressed: () async {
                                     Location choosenLocation = await showDialog(
                                       context: context,
@@ -151,10 +153,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                                 height: 40,
                                 width: 102,
                                 decoration: BoxDecoration(
-                                  color: Theme.of(context).brightness == Brightness.light ? Theme.of(context).primaryColor : Theme.of(context).primaryColorDark,
-                                  border: Border.all(
-                                    color: Theme.of(context).primaryColor,
-                                  ),
+                                  color: Theme.of(context).primaryColorDark,
                                   borderRadius: BorderRadius.all(
                                     Radius.circular(5),
                                   ),
@@ -168,10 +167,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                                         hint: Text(
                                           'Saved',
                                           textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 14,
-                                          ),
+                                          style: TextStyle(color: Theme.of(context).primaryColor),
                                         ),
                                         items: locationsList.map(
                                           (currentLocation) {

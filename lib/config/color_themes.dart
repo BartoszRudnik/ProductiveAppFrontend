@@ -105,6 +105,15 @@ class ColorThemes {
     );
   }
 
+  static ButtonStyle newTaskDateButtonStyle(BuildContext context) {
+    return ElevatedButton.styleFrom(
+      elevation: 3,
+      primary: Theme.of(context).primaryColorDark,
+      side: BorderSide(color: Theme.of(context).primaryColorDark),
+      onPrimary: Theme.of(context).primaryColor,
+    );
+  }
+
   static ButtonStyle loginButtonStyle(BuildContext context) {
     return ElevatedButton.styleFrom(
       primary: Colors.black,
