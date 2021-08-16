@@ -12,10 +12,29 @@ class PDFViewer extends StatefulWidget {
 }
 
 class _PDFViewerState extends State<PDFViewer> {
+  Orientation _lastScreenOrientation;
   PDFViewController _controller;
 
   int pages = 0;
   int indexPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      this._lastScreenOrientation = MediaQuery.of(context).orientation;
+    });
+  }
+
+  void _repushViewer(File file, String fileName) {
+    Navigator.of(context).pushReplacementNamed(
+      PDFViewer.routeName,
+      arguments: {
+        'file': file,
+        'fileName': fileName,
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +43,12 @@ class _PDFViewerState extends State<PDFViewer> {
     final file = arguments['file'] as File;
     final fileName = arguments['fileName'] as String;
 
+    if (_lastScreenOrientation != null && _lastScreenOrientation != MediaQuery.of(context).orientation) {
+      Future.delayed(Duration(microseconds: 100), () => _repushViewer(file, fileName));
+    }
+
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: PDFAppBar(
         controller: this._controller,
         fileName: fileName,
