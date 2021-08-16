@@ -204,6 +204,7 @@ class TaskProvider with ChangeNotifier {
         );
       }
 
+      this.taskList.add(task);
       this.addToLocalication(task);
 
       notifyListeners();
@@ -265,6 +266,7 @@ class TaskProvider with ChangeNotifier {
         task.startDate = null;
       }
 
+      this.taskList.add(task);
       this.addToLocalication(task);
 
       notifyListeners();
