@@ -37,17 +37,17 @@ class FiltersScreen extends StatelessWidget {
               FilterPriorities(priorities: userSettings.priorities),
               FilterSwitchListTile(
                 func: Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyUnfinished,
-                message: 'Show only unfinished tasks',
+                message: 'Show unfinished tasks',
                 value: userSettings.showOnlyUnfinished,
               ),
               FilterSwitchListTile(
                 func: Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyDelegated,
-                message: 'Show only received tasks',
+                message: 'Show received tasks',
                 value: userSettings.showOnlyDelegated,
               ),
               FilterSwitchListTile(
                 func: Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyWithLocalization,
-                message: 'Show only tasks with localization',
+                message: 'Show tasks with localization',
                 value: userSettings.showOnlyWithLocalization,
               ),
             ],

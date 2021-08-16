@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/widget/tasks_list.dart';
 import 'package:provider/provider.dart';
 import '../model/task.dart';
 import '../provider/settings_provider.dart';

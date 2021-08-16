@@ -1,11 +1,9 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
-import 'package:productive_app/provider/delegate_provider.dart';
-import 'package:productive_app/provider/theme_provider.dart';
-import 'package:productive_app/screen/settings_screen.dart';
 import 'package:provider/provider.dart';
-
+import '../provider/delegate_provider.dart';
 import 'collaborators_screen.dart';
+import 'settings_screen.dart';
 
 class SettingsTabsScreen extends StatefulWidget {
   static const routeName = "/settingTabsScreen";

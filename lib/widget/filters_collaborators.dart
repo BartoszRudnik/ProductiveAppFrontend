@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/provider/delegate_provider.dart';
 import 'package:productive_app/provider/settings_provider.dart';
 import 'package:productive_app/widget/dialog/filter_delegate_dialog.dart';
 import 'package:provider/provider.dart';
@@ -73,39 +74,43 @@ class FiltersCollaborators extends StatelessWidget {
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: this.collaborators.length,
-                    itemBuilder: (context, index) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Container(
-                        alignment: Alignment.center,
-                        padding: EdgeInsets.symmetric(horizontal: 4),
-                        margin: EdgeInsets.symmetric(horizontal: 8),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColorDark,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 16.0),
-                              child: Text(
-                                this.collaborators[index],
-                                style: TextStyle(
-                                  color: Theme.of(context).primaryColor,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,
+                    itemBuilder: (context, index) {
+                      final collaboratorName = Provider.of<DelegateProvider>(context, listen: false).collaborators.firstWhere((element) => element.email == this.collaborators[index]).collaboratorName;
+
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Container(
+                          alignment: Alignment.center,
+                          padding: EdgeInsets.symmetric(horizontal: 4),
+                          margin: EdgeInsets.symmetric(horizontal: 8),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColorDark,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 16.0),
+                                child: Text(
+                                  collaboratorName != null && collaboratorName.length > 1 ? collaboratorName : this.collaborators[index],
+                                  style: TextStyle(
+                                    color: Theme.of(context).primaryColor,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.cancel_outlined, color: Theme.of(context).primaryColor),
-                              onPressed: () {
-                                Provider.of<SettingsProvider>(context, listen: false).deleteFilterCollaboratorEmail(this.collaborators[index]);
-                              },
-                            ),
-                          ],
+                              IconButton(
+                                icon: Icon(Icons.cancel_outlined, color: Theme.of(context).primaryColor),
+                                onPressed: () {
+                                  Provider.of<SettingsProvider>(context, listen: false).deleteFilterCollaboratorEmail(this.collaborators[index]);
+                                },
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
                 ),
             ],

@@ -1,10 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:productive_app/model/attachment.dart';
 import 'package:provider/provider.dart';
 import '../config/color_themes.dart';
+import '../model/attachment.dart';
 import '../model/task.dart';
 import '../model/taskLocation.dart';
 import '../provider/attachment_provider.dart';
