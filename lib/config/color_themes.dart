@@ -22,6 +22,9 @@ class ColorThemes {
         primary: Colors.black,
       ),
     ),
+    buttonBarTheme: ButtonBarThemeData(
+      alignment: MainAxisAlignment.spaceEvenly,
+    ),
     colorScheme: ColorScheme.light(),
     fontFamily: 'Lato',
     textTheme: TextThemes.textTheme,
@@ -46,6 +49,9 @@ class ColorThemes {
         side: BorderSide(color: Colors.white),
         primary: Colors.grey[700],
       ),
+    ),
+    buttonBarTheme: ButtonBarThemeData(
+      alignment: MainAxisAlignment.spaceEvenly,
     ),
     colorScheme: ColorScheme.dark(),
     fontFamily: 'Lato',

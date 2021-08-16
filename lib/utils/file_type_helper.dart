@@ -10,6 +10,6 @@ class FileTypeHelper {
   static bool isPDF(String filePath) {
     final mimeType = lookupMimeType(filePath);
 
-    return mimeType.startsWith('application/');
+    return mimeType.startsWith('application/pdf');
   }
 }

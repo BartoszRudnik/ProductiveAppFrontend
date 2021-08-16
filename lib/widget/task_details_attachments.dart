@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:productive_app/utils/file_type_helper.dart';
 import 'package:productive_app/widget/image_viewer.dart';
 import 'package:provider/provider.dart';
-
+import 'package:open_file/open_file.dart';
 import '../model/attachment.dart';
 import '../provider/attachment_provider.dart';
 import 'dialog/attachment_dialog.dart';
@@ -37,22 +37,26 @@ class TaskDetailsAttachments extends StatelessWidget {
                       onPressed: () async {
                         final file = await Provider.of<AttachmentProvider>(context, listen: false).loadAttachments(this.attachments[index].id);
 
-                        String routeName = '';
+                        if (FileTypeHelper.isImage(file.path) || FileTypeHelper.isPDF(file.path)) {
+                          String routeName = '';
 
-                        if (FileTypeHelper.isImage(file.path)) {
-                          routeName = ImageViewer.routeName;
-                        }
-                        if (FileTypeHelper.isPDF(file.path)) {
-                          routeName = PDFViewer.routeName;
-                        }
+                          if (FileTypeHelper.isImage(file.path)) {
+                            routeName = ImageViewer.routeName;
+                          }
+                          if (FileTypeHelper.isPDF(file.path)) {
+                            routeName = PDFViewer.routeName;
+                          }
 
-                        Navigator.of(context).pushNamed(
-                          routeName,
-                          arguments: {
-                            'file': file,
-                            'fileName': this.attachments[index].fileName,
-                          },
-                        );
+                          Navigator.of(context).pushNamed(
+                            routeName,
+                            arguments: {
+                              'file': file,
+                              'fileName': this.attachments[index].fileName,
+                            },
+                          );
+                        } else {
+                          OpenFile.open(file.path);
+                        }
                       },
                       child: Container(
                         height: 50,
