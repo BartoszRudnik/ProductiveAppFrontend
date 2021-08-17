@@ -41,7 +41,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
   List<int> newAttachments = [];
 
   bool _locationChanged = false;
-  bool _isValid = true;
   bool _isFocused = false;
   bool _isDescriptionInitial = true;
   String _description = "";
@@ -126,9 +125,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       initDate = DateTime.now();
     }
     final DateTime pick = await DateTimePickers.pickDate(initDate, context);
-    setState(() {
-      taskToEdit.startDate = pick;
-    });
+
+    taskToEdit.startDate = pick;
+    this.setTaskListAutomatically();
   }
 
   Future<void> selectEndDate() async {
@@ -137,9 +136,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       initDate = DateTime.now();
     }
     final DateTime pick = await DateTimePickers.pickDate(initDate, context);
-    setState(() {
-      taskToEdit.endDate = pick;
-    });
+
+    taskToEdit.endDate = pick;
+
+    this.setTaskListAutomatically();
   }
 
   Future<void> saveTask() async {
@@ -180,11 +180,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       Dialogs.showWarningDialog(context, 'Cannot delegate task to principal');
     }
 
-    setState(() {
-      this._isValid = isValid;
-    });
-
-    if (!this._isValid) {
+    if (!isValid) {
       return;
     }
 
@@ -240,13 +236,21 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, newLocalization);
       }
 
+      if (this.originalTask.localization != newLocalization) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Your task has been moved to $newLocalization.'),
+          ),
+        );
+      }
+
       await Provider.of<AttachmentProvider>(context, listen: false).deleteFlaggedAttachments();
       Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);
     } catch (error) {
       print(error);
       Dialogs.showWarningDialog(context, "An error has occured");
     }
-    Navigator.pop(context);
+    Navigator.of(context).pop();
   }
 
   Future<void> deleteTask() async {
@@ -339,6 +343,24 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     });
   }
 
+  void setTaskListAutomatically() {
+    String newLocation;
+
+    if (this.taskToEdit.delegatedEmail == null) {
+      if (this.taskToEdit.startDate != null) {
+        newLocation = 'SCHEDULED';
+      } else {
+        newLocation = 'ANYTIME';
+      }
+    } else {
+      newLocation = 'DELEGATED';
+    }
+
+    setState(() {
+      this.taskToEdit.localization = newLocation;
+    });
+  }
+
   void setDelegatedEmail() async {
     String value = await showDialog(
       context: context,
@@ -347,21 +369,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       },
     );
 
-    if (value != null) {
-      this.taskToEdit.delegatedEmail = value;
-      setState(() {
-        this.taskToEdit.localization = 'DELEGATED';
-      });
-    } else {
-      this.taskToEdit.delegatedEmail = null;
-      setState(() {
-        if (this.taskToEdit.startDate != null) {
-          this.taskToEdit.localization = 'SCHEDULED';
-        } else {
-          this.taskToEdit.localization = 'ANYTIME';
-        }
-      });
-    }
+    this.taskToEdit.delegatedEmail = value;
+
+    this.setTaskListAutomatically();
   }
 
   void setTaskToEdit(Task argTask) {

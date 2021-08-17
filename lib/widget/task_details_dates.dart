@@ -64,7 +64,7 @@ class _TaskDetailsDatesState extends State<TaskDetailsDates> {
                       onPressed: () => this.widget.selectStartDate(),
                       style: ColorThemes.taskDetailsButtonStyle(context),
                       child: Center(
-                        child: this.widget.taskToEdit.startDate.toString() == "null"
+                        child: this.widget.taskToEdit.startDate.toString() == "null" || this.widget.taskToEdit.startDate.year == 1970
                             ? Icon(Icons.calendar_today_outlined)
                             : Text(
                                 formatter.format(this.widget.taskToEdit.startDate),
@@ -111,7 +111,7 @@ class _TaskDetailsDatesState extends State<TaskDetailsDates> {
                       style: ColorThemes.taskDetailsButtonStyle(context),
                       onPressed: () => this.widget.selectEndDate(),
                       child: Center(
-                        child: this.widget.taskToEdit.endDate.toString() == "null"
+                        child: this.widget.taskToEdit.endDate.toString() == "null" || this.widget.taskToEdit.endDate.year == 1970
                             ? Icon(Icons.calendar_today_outlined)
                             : Text(
                                 formatter.format(this.widget.taskToEdit.endDate),
