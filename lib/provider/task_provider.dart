@@ -715,8 +715,50 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
+  Future<void> deleteAllTasks(String listName) async {
+    final url = this._serverUrl + 'task/deleteAllFromList';
+
+    List<int> toDelete = [];
+
+    if (listName == 'Completed') {
+      this._completedTasks.forEach((element) {
+        toDelete.add(element.id);
+      });
+    } else if (listName == 'Trash') {
+      this._trashTasks.forEach((element) {
+        toDelete.add(element.id);
+      });
+    }
+
+    try {
+      await http.post(
+        url,
+        body: json.encode(
+          {
+            'tasks': toDelete,
+          },
+        ),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+
+      if (listName == 'Completed') {
+        this._completedTasks = [];
+      } else if (listName == 'Trash') {
+        this._trashTasks = [];
+      }
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
   Future<void> deleteTask(int id) async {
-    String url = this._serverUrl + 'task/delete/$id';
+    final url = this._serverUrl + 'task/delete/$id';
 
     var tmpProduct = this.taskList.firstWhere((element) => element.id == id);
 

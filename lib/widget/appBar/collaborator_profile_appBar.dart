@@ -5,6 +5,7 @@ class CollaboratorProfileAppBar extends StatelessWidget with PreferredSizeWidget
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      elevation: 0,
       toolbarHeight: 40,
       systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: Colors.black),
       backgroundColor: Theme.of(context).accentColor,

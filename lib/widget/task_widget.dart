@@ -96,6 +96,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                 ],
               ),
             ),
+            // ignore: missing_return
             confirmDismiss: (direction) {
               if (direction == DismissDirection.endToStart) {
                 return showDialog(

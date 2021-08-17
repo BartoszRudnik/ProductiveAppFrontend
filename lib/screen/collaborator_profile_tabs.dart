@@ -43,7 +43,7 @@ class _CollaboratorProfileTabsState extends State<CollaboratorProfileTabs> {
     _pages = [
       {
         'page': CollaboratorProfile(
-          collaborator: collaborator,
+          collaboratorId: collaborator.id,
         ),
         'title': 'Collaborator profile',
       },

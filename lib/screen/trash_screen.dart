@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../provider/task_provider.dart';
-import '../widget/appBar/task_appBar.dart';
+import '../widget/appBar/delete_appBar.dart';
 import '../widget/task_widget.dart';
 
 class TrashScreen extends StatelessWidget {
@@ -13,7 +12,7 @@ class TrashScreen extends StatelessWidget {
     final trashTasks = Provider.of<TaskProvider>(context).trashTasks;
 
     return Scaffold(
-      appBar: TaskAppBar(title: 'Trash'),
+      appBar: DeleteAppBar(title: 'Trash'),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(

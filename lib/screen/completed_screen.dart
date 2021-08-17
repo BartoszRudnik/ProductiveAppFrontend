@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../provider/task_provider.dart';
-import '../widget/appBar/task_appBar.dart';
+import '../widget/appBar/delete_appBar.dart';
 import '../widget/task_widget.dart';
 
 class CompletedScreen extends StatelessWidget {
@@ -13,7 +12,7 @@ class CompletedScreen extends StatelessWidget {
     final completedTasks = Provider.of<TaskProvider>(context).completedTasks;
 
     return Scaffold(
-      appBar: TaskAppBar(title: 'Completed'),
+      appBar: DeleteAppBar(title: 'Completed'),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(

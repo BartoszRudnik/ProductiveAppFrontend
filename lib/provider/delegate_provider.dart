@@ -43,7 +43,7 @@ class DelegateProvider with ChangeNotifier {
   }
 
   int get numberOfPermissionRequest {
-    return this.accepted.where((collaborator) => collaborator.isAskingForPermission).length;
+    return this.accepted.where((collaborator) => collaborator.isAskingForPermission && !collaborator.sentPermission).length;
   }
 
   Future<void> askForPermission(String collaboratorEmail) async {

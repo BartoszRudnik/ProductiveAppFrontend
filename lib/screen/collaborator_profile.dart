@@ -1,36 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
-import 'package:productive_app/config/images.dart';
-import 'package:productive_app/widget/switch_list_tile/grant_access_list_tile.dart';
+import '../config/images.dart';
+import '../widget/switch_list_tile/grant_access_list_tile.dart';
 import 'package:provider/provider.dart';
 import '../model/collaborator.dart';
 import '../provider/delegate_provider.dart';
 import '../widget/appBar/collaborator_profile_appBar.dart';
 
-class CollaboratorProfile extends StatefulWidget {
-  Collaborator collaborator;
+class CollaboratorProfile extends StatelessWidget {
+  final int collaboratorId;
 
   CollaboratorProfile({
-    @required this.collaborator,
+    @required this.collaboratorId,
   });
 
-  @override
-  _CollaboratorProfileState createState() => _CollaboratorProfileState();
-}
-
-class _CollaboratorProfileState extends State<CollaboratorProfile> {
   String _serverUrl = GlobalConfiguration().getValue("serverUrl");
-
-  bool grantAccess;
-
-  @override
-  void initState() {
-    grantAccess = this.widget.collaborator.sentPermission;
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
+    final Collaborator collaborator = Provider.of<DelegateProvider>(context).accepted.firstWhere((element) => element.id == this.collaboratorId);
+
     return Scaffold(
       appBar: CollaboratorProfileAppBar(),
       body: SingleChildScrollView(
@@ -54,7 +43,7 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
                     fit: BoxFit.cover,
                     width: 220,
                     height: 220,
-                    image: NetworkImage(this._serverUrl + 'userImage/getImage/${this.widget.collaborator.email}'),
+                    image: NetworkImage(this._serverUrl + 'userImage/getImage/${collaborator.email}'),
                     placeholder: AssetImage(Images.profilePicturePlacholder),
                   ),
                 ),
@@ -84,7 +73,7 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
                           flex: 8,
                           child: TextFormField(
                             enabled: false,
-                            initialValue: this.widget.collaborator.email,
+                            initialValue: collaborator.email,
                             style: TextStyle(fontSize: 18),
                             maxLines: 1,
                           ),
@@ -103,9 +92,9 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
                         Expanded(
                           flex: 8,
                           child: TextFormField(
-                            key: ObjectKey(this.widget.collaborator.collaboratorName),
+                            key: ObjectKey(collaborator.collaboratorName),
                             enabled: false,
-                            initialValue: this.widget.collaborator.collaboratorName,
+                            initialValue: collaborator.collaboratorName,
                             style: TextStyle(fontSize: 18),
                             maxLines: 1,
                             decoration: InputDecoration(hintText: "Name"),
@@ -130,7 +119,7 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    if (this.widget.collaborator.isAskingForPermission)
+                    if (collaborator.isAskingForPermission && !collaborator.sentPermission)
                       Container(
                         decoration: BoxDecoration(
                           color: Theme.of(context).primaryColorDark,
@@ -147,22 +136,19 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
                             IconButton(
                               icon: Icon(Icons.cancel_outlined),
                               onPressed: () {
-                                Provider.of<DelegateProvider>(context, listen: false).declineAskForPermission(this.widget.collaborator.email);
-                                setState(() {
-                                  this.widget.collaborator.isAskingForPermission = false;
-                                });
+                                Provider.of<DelegateProvider>(context, listen: false).declineAskForPermission(collaborator.email);
                               },
                             )
                           ],
                         ),
                       ),
-                    if (this.widget.collaborator.isAskingForPermission)
+                    if (collaborator.isAskingForPermission)
                       SizedBox(
                         height: 10,
                       ),
                     GrantAccessListTile(
-                      email: this.widget.collaborator.email,
-                      grantAccess: this.grantAccess,
+                      email: collaborator.email,
+                      grantAccess: collaborator.sentPermission,
                     ),
                   ],
                 ),
@@ -202,7 +188,7 @@ class _CollaboratorProfileState extends State<CollaboratorProfile> {
                                   children: [
                                     ElevatedButton(
                                       onPressed: () async {
-                                        await Provider.of<DelegateProvider>(context, listen: false).deleteCollaborator(this.widget.collaborator.id);
+                                        await Provider.of<DelegateProvider>(context, listen: false).deleteCollaborator(collaborator.id);
                                         Navigator.of(context).pop(true);
                                         Navigator.of(context).pop(true);
                                       },

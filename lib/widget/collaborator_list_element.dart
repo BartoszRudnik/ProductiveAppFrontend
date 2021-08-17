@@ -20,7 +20,7 @@ class CollaboratorListElement extends StatelessWidget {
         leading: Badge(
           padding: EdgeInsets.all(8.5),
           position: BadgePosition.topStart(),
-          showBadge: this.collaborator.isAskingForPermission != null ? this.collaborator.isAskingForPermission : false,
+          showBadge: this.collaborator.isAskingForPermission != null && this.collaborator.sentPermission != null && this.collaborator.isAskingForPermission && !this.collaborator.sentPermission ? true : false,
           badgeColor: Theme.of(context).primaryColor,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(25),

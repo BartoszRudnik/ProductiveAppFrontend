@@ -29,19 +29,18 @@ class _ActiveTasksState extends State<ActiveTasks> {
 
   @override
   void initState() {
+    super.initState();
     this._fetchAllTasksNumber();
 
     this._pagingController.addPageRequestListener((pageKey) {
       this._fetchPage(pageKey);
     });
-
-    super.initState();
   }
 
   @override
   void dispose() {
-    this._pagingController.dispose();
     super.dispose();
+    this._pagingController.dispose();
   }
 
   Future<void> _fetchAllTasksNumber() async {
@@ -78,6 +77,8 @@ class _ActiveTasksState extends State<ActiveTasks> {
         final nextPage = page + 1;
         this._pagingController.appendPage(newPage, nextPage);
       }
+
+      setState(() {});
     } catch (error) {
       this._pagingController.error = error;
     }
@@ -89,6 +90,7 @@ class _ActiveTasksState extends State<ActiveTasks> {
 
   List<CollaboratorTask> get _recentTasks {
     return this._pagingController.itemList != null
+        // ignore: missing_return
         ? this._pagingController.itemList.where((task) {
             if (task.endDate != null) {
               return _dayDifference(DateTime.now(), task.endDate) <= 7;

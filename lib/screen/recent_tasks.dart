@@ -11,7 +11,7 @@ import '../widget/appBar/active_tasks_appBar.dart';
 import '../widget/button/ask_for_activity_permission.dart';
 
 class RecentTasks extends StatefulWidget {
-  Collaborator collaborator;
+  final Collaborator collaborator;
 
   RecentTasks({
     @required this.collaborator,
