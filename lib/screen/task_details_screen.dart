@@ -179,6 +179,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       isValid = false;
       Dialogs.showWarningDialog(context, 'Cannot delegate task to principal');
     }
+    if (taskToEdit.endDate.isBefore(taskToEdit.startDate)) {
+      isValid = false;
+      Dialogs.showWarningDialog(context, 'End date must be later than start date');
+    }
 
     if (!isValid) {
       return;
@@ -240,6 +244,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Your task has been moved to $newLocalization.'),
+            duration: Duration(seconds: 2),
           ),
         );
       }
