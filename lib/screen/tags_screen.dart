@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../model/tag.dart';
 import '../provider/tag_provider.dart';
-import '../provider/task_provider.dart';
-import '../widget/new_tag.dart';
 import '../widget/appBar/task_appBar.dart';
+import '../widget/new_tag.dart';
+import '../widget/single_tag.dart';
 
 class TagsScreen extends StatefulWidget {
   static const routeName = '/tags-screen';
@@ -70,97 +70,10 @@ class _TagsScreenState extends State<TagsScreen> {
         padding: EdgeInsets.symmetric(vertical: 12),
         shrinkWrap: true,
         itemCount: tags.length,
-        itemBuilder: (context, tagIndex) => Dismissible(
-          key: ValueKey(tags[tagIndex]),
-          background: Container(
-            padding: EdgeInsets.symmetric(horizontal: 10),
-            alignment: Alignment.centerLeft,
-            color: Theme.of(context).primaryColor,
-            child: Row(
-              children: [
-                Icon(
-                  Icons.edit,
-                  color: Theme.of(context).accentColor,
-                  size: 50,
-                ),
-                Text(
-                  'Edit tag',
-                  style: TextStyle(color: Theme.of(context).accentColor, fontSize: 20, fontWeight: FontWeight.w400),
-                ),
-              ],
-            ),
-          ),
-          secondaryBackground: Container(
-            padding: EdgeInsets.symmetric(horizontal: 10),
-            alignment: Alignment.centerRight,
-            color: Theme.of(context).primaryColor,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  'Delete tag',
-                  style: TextStyle(color: Theme.of(context).accentColor, fontSize: 20, fontWeight: FontWeight.w400),
-                ),
-                Icon(
-                  Icons.delete_outline,
-                  color: Theme.of(context).accentColor,
-                  size: 40,
-                ),
-              ],
-            ),
-          ),
-          confirmDismiss: (direction) {
-            if (direction == DismissDirection.endToStart) {
-              return showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Center(
-                    child: Text(
-                      'Delete',
-                      style: Theme.of(context).textTheme.headline3,
-                    ),
-                  ),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('Are you sure you want to delete this tag?'),
-                      SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              Provider.of<TaskProvider>(context, listen: false).clearTagFromTasks(tags[tagIndex].name);
-                              Provider.of<TagProvider>(context, listen: false).deleteTagPermanently(tags[tagIndex].name);
-                              Navigator.of(context).pop(true);
-                            },
-                            child: Text('Yes'),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.of(context).pop(false);
-                            },
-                            child: Text('No'),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              );
-            }
-            if (direction == DismissDirection.startToEnd) {
-              this._editTagForm(context, tags.length, tags[tagIndex].name);
-            }
-          },
-          child: Card(
-            child: ListTile(
-              title: Text(
-                tags[tagIndex].name,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
-              ),
-            ),
-          ),
+        itemBuilder: (context, index) => SingleTag(
+          tag: tags[index],
+          editTagForm: this._editTagForm,
+          length: tags.length,
         ),
       ),
     );

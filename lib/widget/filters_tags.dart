@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/provider/settings_provider.dart';
+import 'package:productive_app/widget/single_selected_filter.dart';
 import 'package:provider/provider.dart';
 
 import 'dialog/filter_tags_dialog.dart';
@@ -73,39 +74,13 @@ class FiltersTags extends StatelessWidget {
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: this.tags.length,
-                    itemBuilder: (context, index) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Container(
-                        alignment: Alignment.center,
-                        padding: EdgeInsets.symmetric(horizontal: 4),
-                        margin: EdgeInsets.symmetric(horizontal: 8),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColorDark,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 16.0),
-                              child: Text(
-                                this.tags[index],
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  color: Theme.of(context).primaryColor,
-                                  fontSize: 18,
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.cancel_outlined, color: Theme.of(context).primaryColor),
-                              onPressed: () {
-                                Provider.of<SettingsProvider>(context, listen: false).deleteFilterTag(this.tags[index]);
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    itemBuilder: (context, index) {
+                      Future<void> onPressed() async {
+                        await Provider.of<SettingsProvider>(context, listen: false).deleteFilterTag(this.tags[index]);
+                      }
+
+                      return SingleSelectedFilter(text: this.tags[index], onPressed: onPressed);
+                    },
                   ),
                 ),
             ],

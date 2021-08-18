@@ -70,7 +70,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                           size: 50,
                         ),
                         Text(
-                          isArchived ? 'Restore task' : 'Move task',
+                          isArchived ? 'Restore' : 'Organize',
                           style: TextStyle(color: Theme.of(context).accentColor, fontSize: 20, fontWeight: FontWeight.w400),
                         ),
                       ],
