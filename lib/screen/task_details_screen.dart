@@ -40,6 +40,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
 
   List<int> newAttachments = [];
 
+  bool changesSaved = false;
   bool _locationChanged = false;
   bool _isFocused = false;
   bool _isDescriptionInitial = true;
@@ -147,41 +148,41 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
 
     if (taskToEdit.startDate == null && taskToEdit.localization == "SCHEDULED") {
       isValid = false;
-      Dialogs.showWarningDialog(context, "Scheduled tasks have to specify start date");
+      await Dialogs.showWarningDialog(context, "Scheduled tasks have to specify start date");
     }
 
     if (taskToEdit.startDate != null && taskToEdit.localization == "ANYTIME") {
       isValid = false;
-      Dialogs.showWarningDialog(context, "Tasks with start date should be scheduled");
+      await Dialogs.showWarningDialog(context, "Tasks with start date should be scheduled");
     }
 
     if (taskToEdit.localization == "COMPLETED" && !taskToEdit.done) {
       isValid = false;
-      Dialogs.showWarningDialog(context, "Completed tasks have to be marked as done");
+      await Dialogs.showWarningDialog(context, "Completed tasks have to be marked as done");
     }
 
     if (originalTask.localization != "INBOX" && taskToEdit.localization == "INBOX") {
       isValid = false;
-      Dialogs.showWarningDialog(context, "Task cannot return to inbox");
+      await Dialogs.showWarningDialog(context, "Task cannot return to inbox");
     }
 
     if (taskToEdit.localization == 'DELEGATED' && (taskToEdit.delegatedEmail == null || taskToEdit.delegatedEmail.length <= 1)) {
       isValid = false;
-      Dialogs.showWarningDialog(context, "Delegated task must have delegated person");
+      await Dialogs.showWarningDialog(context, "Delegated task must have delegated person");
     }
 
     if (originalTask.localization == 'DELEGATED' && taskToEdit.localization != 'DELEGATED' && taskToEdit.delegatedEmail != null) {
       isValid = false;
-      Dialogs.showWarningDialog(context, "Task with specified delegated person must be on delegated list");
+      await Dialogs.showWarningDialog(context, "Task with specified delegated person must be on delegated list");
     }
 
     if (originalTask.supervisorEmail != null && originalTask.supervisorEmail == taskToEdit.delegatedEmail) {
       isValid = false;
-      Dialogs.showWarningDialog(context, 'Cannot delegate task to principal');
+      await Dialogs.showWarningDialog(context, 'Cannot delegate task to principal');
     }
-    if (taskToEdit.endDate.isBefore(taskToEdit.startDate)) {
+    if (taskToEdit.endDate != null && taskToEdit.startDate != null && taskToEdit.endDate.isBefore(taskToEdit.startDate)) {
       isValid = false;
-      Dialogs.showWarningDialog(context, 'End date must be later than start date');
+      await Dialogs.showWarningDialog(context, 'End date must be later than start date');
     }
 
     if (!isValid) {
@@ -230,6 +231,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
             );
           }
         }
+
         await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, newLocalization);
       } else if (this.differentNotification(taskToEdit, originalTask)) {
         final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(taskToEdit.notificationLocalizationId);
@@ -251,6 +253,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
 
       await Provider.of<AttachmentProvider>(context, listen: false).deleteFlaggedAttachments();
       Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);
+      this.changesSaved = true;
     } catch (error) {
       print(error);
       Dialogs.showWarningDialog(context, "An error has occured");
@@ -379,6 +382,25 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     this.setTaskListAutomatically();
   }
 
+  bool checkEquals(Task a, Task b) {
+    return a.id == b.id &&
+        a.title == b.title &&
+        a.description == b.description &&
+        a.priority == b.priority &&
+        a.localization == b.localization &&
+        a.delegatedEmail == b.delegatedEmail &&
+        a.taskStatus == b.taskStatus &&
+        a.supervisorEmail == b.supervisorEmail &&
+        a.startDate == b.startDate &&
+        a.endDate == b.endDate &&
+        a.tags == b.tags &&
+        a.done == b.done &&
+        a.notificationLocalizationId == b.notificationLocalizationId &&
+        a.notificationLocalizationRadius == b.notificationLocalizationRadius &&
+        a.notificationOnEnter == b.notificationOnEnter &&
+        a.notificationOnExit == b.notificationOnExit;
+  }
+
   void setTaskToEdit(Task argTask) {
     if (argTask.startDate != null && argTask.startDate.hour != 0 && argTask.startDate.minute != 0) {
       setState(() {
@@ -442,10 +464,24 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     attachments.addAll(Provider.of<AttachmentProvider>(context).delegatedAttachments.where((attachment) => attachment.taskId == taskToEdit.parentId && !attachment.toDelete).toList());
 
     return WillPopScope(
+      // ignore: missing_return
       onWillPop: () async {
+        this._formKey.currentState.save();
+        bool result = false;
+
+        if ((!this.checkEquals(this.originalTask, this.taskToEdit) || Provider.of<AttachmentProvider>(context, listen: false).notSavedAttachments.length > 0) && !this.changesSaved) {
+          result = await Dialogs.showActionDialog(
+            context,
+            'You have made changes, Do you want to save?',
+            this.saveTask,
+            () {},
+          );
+        }
+
         await Provider.of<AttachmentProvider>(context, listen: false).deleteNotSavedAttachments();
-        Navigator.of(context).pop();
-        return false;
+        if (!result) {
+          Navigator.of(context).pop();
+        }
       },
       child: Scaffold(
         appBar: DetailsAppBar(

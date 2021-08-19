@@ -50,10 +50,48 @@ class Dialogs {
     );
   }
 
-  static void showWarningDialog(BuildContext context, String warningText) {
-    showDialog(
+  static Future<void> showWarningDialog(BuildContext context, String warningText) async {
+    await showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (_) {
+        return AlertDialog(
+          title: Center(
+            child: Text(
+              'Warning',
+              style: TextStyle(
+                color: Theme.of(context).primaryColor,
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(warningText),
+              SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  static Future<bool> showActionDialog(BuildContext context, String text, Future<void> Function() yesAction, Function noAction) async {
+    bool choice = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
         title: Center(
           child: Text(
             'Warning',
@@ -67,16 +105,24 @@ class Dialogs {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(warningText),
+            Center(child: Text(text)),
             SizedBox(height: 10),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    await yesAction();
                     Navigator.of(context).pop(true);
                   },
-                  child: Text('OK'),
+                  child: Text('Yes'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    noAction();
+                    Navigator.of(context).pop(false);
+                  },
+                  child: Text('No'),
                 ),
               ],
             ),
@@ -84,6 +130,7 @@ class Dialogs {
         ),
       ),
     );
+    return choice;
   }
 
   static Future<bool> showChoiceDialog(BuildContext context, String text) async {

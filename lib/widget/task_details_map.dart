@@ -117,41 +117,45 @@ class _TaskDetailsMapState extends State<TaskDetailsMap> {
               ),
             ),
           if (this.widget.taskToEdit.notificationLocalizationId == null || this.widget.longitude == null || this.widget.latitude == null)
-            Expanded(
-              flex: 5,
-              child: Container(
-                height: 175,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColorLight,
-                  borderRadius: BorderRadius.circular(3),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.8),
-                      offset: Offset(0.0, 1.0),
-                      blurRadius: 1.0,
-                    )
-                  ],
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    NewTaskNotificationLocalization(
-                      bigIcon: true,
-                      setNotificationLocalization: this.widget.setNotificationLocalization,
-                      notificationLocalizationId: this.widget.taskToEdit.notificationLocalizationId,
-                      notificationOnEnter: this.widget.taskToEdit.notificationOnEnter,
-                      notificationOnExit: this.widget.taskToEdit.notificationOnExit,
-                      notificationRadius: this.widget.taskToEdit.notificationLocalizationRadius,
-                      taskId: this.widget.originalTask.id,
+            Column(
+              children: [
+                Expanded(
+                  flex: 5,
+                  child: Container(
+                    height: 175,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColorLight,
+                      borderRadius: BorderRadius.circular(3),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.8),
+                          offset: Offset(0.0, 1.0),
+                          blurRadius: 1.0,
+                        )
+                      ],
                     ),
-                    Text(
-                      'Tap to add location',
-                      style: TextStyle(fontSize: 20),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        NewTaskNotificationLocalization(
+                          bigIcon: true,
+                          setNotificationLocalization: this.widget.setNotificationLocalization,
+                          notificationLocalizationId: this.widget.taskToEdit.notificationLocalizationId,
+                          notificationOnEnter: this.widget.taskToEdit.notificationOnEnter,
+                          notificationOnExit: this.widget.taskToEdit.notificationOnExit,
+                          notificationRadius: this.widget.taskToEdit.notificationLocalizationRadius,
+                          taskId: this.widget.originalTask.id,
+                        ),
+                        Text(
+                          'Tap to add location',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
           GestureDetector(
             onTap: () {
