@@ -24,6 +24,16 @@ class TagProvider with ChangeNotifier {
     return [...this.tagList];
   }
 
+  List<String> get tagNames {
+    List<String> result = [];
+
+    this.tagList.forEach((element) {
+      result.add(element.name);
+    });
+
+    return result;
+  }
+
   Future<void> getTags() async {
     final url = this._serverUrl + "tag/getAll/${this.userMail}";
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:productive_app/model/tag.dart';
 import 'package:productive_app/provider/tag_provider.dart';
 import 'package:productive_app/provider/task_provider.dart';
+import 'package:productive_app/utils/dialogs.dart';
 import 'package:provider/provider.dart';
 
 class NewTag extends StatefulWidget {
@@ -30,13 +31,18 @@ class _NewTagState extends State<NewTag> {
         key: this._formKey,
         child: ListTile(
           title: TextFormField(
-            initialValue: widget.editMode ? widget.initialValue : '',
+            initialValue: this.widget.editMode ? this.widget.initialValue : '',
             autofocus: true,
             key: ValueKey('TagName'),
             onSaved: (value) {
-              if (!widget.editMode) {
-                Tag newTag = Tag(id: widget.tagsLength + 1, name: value);
-                Provider.of<TagProvider>(context, listen: false).addTag(newTag);
+              if (!this.widget.editMode) {
+                Tag newTag = Tag(id: this.widget.tagsLength + 1, name: value);
+
+                if (!Provider.of<TagProvider>(context, listen: false).tagNames.contains(newTag.name)) {
+                  Provider.of<TagProvider>(context, listen: false).addTag(newTag);
+                } else {
+                  Dialogs.showWarningDialog(context, 'Tag already exists');
+                }
               } else {
                 Provider.of<TagProvider>(context, listen: false).updateTag(value, widget.initialValue);
                 Provider.of<TaskProvider>(context, listen: false).editTag(widget.initialValue, value);
