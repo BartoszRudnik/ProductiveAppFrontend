@@ -17,12 +17,22 @@ class LocationProvider with ChangeNotifier {
 
   String _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
+  String searchingText;
+
   LocationProvider({
     @required this.userMail,
     @required this.authToken,
     @required this.locationList,
     @required this.placemarks,
   });
+
+  List<models.Location> get locations {
+    if (this.searchingText == null || this.searchingText.length < 1) {
+      return [...this.locationList];
+    } else {
+      return this.locationList.where((element) => element.localizationName.contains(this.searchingText)).toList();
+    }
+  }
 
   double getLongitude(int id) {
     final location = this.locationList.firstWhere((element) => element.id == id, orElse: () => null);
@@ -48,12 +58,20 @@ class LocationProvider with ChangeNotifier {
     return this.locationList.firstWhere((element) => element.id == id).localizationName;
   }
 
-  List<models.Location> get locations {
-    return [...locationList];
-  }
-
   List<MapEntry<geocoding.Placemark, LatLng>> get marks {
     return [...placemarks];
+  }
+
+  void setSearchingText(String text) {
+    this.searchingText = text;
+
+    notifyListeners();
+  }
+
+  void clearSearchingText() {
+    this.searchingText = '';
+
+    notifyListeners();
   }
 
   Future<void> getLocations() async {

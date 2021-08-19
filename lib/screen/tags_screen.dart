@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/widget/appBar/search_appBar.dart';
 import 'package:provider/provider.dart';
 import '../model/tag.dart';
 import '../provider/tag_provider.dart';
@@ -51,29 +52,38 @@ class _TagsScreenState extends State<TagsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<Tag> tags = Provider.of<TagProvider>(context).tagList;
-    return Scaffold(
-      appBar: TaskAppBar(
-        title: 'Tags',
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(
-          Icons.add,
-          color: Colors.white,
-          size: 50,
+    List<Tag> tags = Provider.of<TagProvider>(context).tags;
+
+    return WillPopScope(
+      // ignore: missing_return
+      onWillPop: () {
+        Navigator.of(context).pop();
+        Provider.of<TagProvider>(context, listen: false).clearSearchingText();
+      },
+      child: Scaffold(
+        appBar: SearchAppBar(
+          title: 'Tags',
+          searchingName: 'tag',
         ),
-        onPressed: () {
-          this._addNewTagForm(context, tags.length);
-        },
-      ),
-      body: ListView.builder(
-        padding: EdgeInsets.symmetric(vertical: 12),
-        shrinkWrap: true,
-        itemCount: tags.length,
-        itemBuilder: (context, index) => SingleTag(
-          tag: tags[index],
-          editTagForm: this._editTagForm,
-          length: tags.length,
+        floatingActionButton: FloatingActionButton(
+          child: Icon(
+            Icons.add,
+            color: Colors.white,
+            size: 50,
+          ),
+          onPressed: () {
+            this._addNewTagForm(context, tags.length);
+          },
+        ),
+        body: ListView.builder(
+          padding: EdgeInsets.symmetric(vertical: 12),
+          shrinkWrap: true,
+          itemCount: tags.length,
+          itemBuilder: (context, index) => SingleTag(
+            tag: tags[index],
+            editTagForm: this._editTagForm,
+            length: tags.length,
+          ),
         ),
       ),
     );

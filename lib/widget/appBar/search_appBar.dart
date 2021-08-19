@@ -1,24 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:productive_app/config/color_themes.dart';
-import 'package:productive_app/provider/settings_provider.dart';
+import 'package:productive_app/provider/location_provider.dart';
 import 'package:provider/provider.dart';
-import '../../screen/filters_screen.dart';
-import '../../screen/task_map.dart';
+import '../../config/color_themes.dart';
+import '../../provider/tag_provider.dart';
 
-class NewTaskAppBar extends StatefulWidget with PreferredSizeWidget {
+class SearchAppBar extends StatefulWidget with PreferredSizeWidget {
   final String title;
-  final IconButton leadingButton;
-  NewTaskAppBar({@required this.title, this.leadingButton});
+  final String searchingName;
+
+  SearchAppBar({
+    @required this.title,
+    @required this.searchingName,
+  });
 
   @override
   Size get preferredSize => Size.fromHeight(50);
 
   @override
-  _NewTaskAppBarState createState() => _NewTaskAppBarState();
+  _SearchAppBarState createState() => _SearchAppBarState();
 }
 
-class _NewTaskAppBarState extends State<NewTaskAppBar> {
+class _SearchAppBarState extends State<SearchAppBar> {
   final _formKey = GlobalKey<FormFieldState>();
   bool searchBarActive = false;
 
@@ -31,14 +34,14 @@ class _NewTaskAppBarState extends State<NewTaskAppBar> {
               autofocus: true,
               key: this._formKey,
               onChanged: (value) {
-                Provider.of<SettingsProvider>(context, listen: false).setTaskName(value);
+                this.widget.searchingName == 'tag' ? Provider.of<TagProvider>(context, listen: false).setSearchingText(value) : Provider.of<LocationProvider>(context, listen: false).setSearchingText(value);
               },
               decoration: ColorThemes.searchFormFieldDecoration(
                 context,
-                'Enter task name',
+                'Enter ${this.widget.searchingName} name',
                 () {
                   this._formKey.currentState.reset();
-                  Provider.of<SettingsProvider>(context, listen: false).clearTaskName();
+                  this.widget.searchingName == 'tag' ? Provider.of<TagProvider>(context, listen: false).clearSearchingText() : Provider.of<LocationProvider>(context, listen: false).clearSearchingText();
                 },
               ),
             )
@@ -55,40 +58,19 @@ class _NewTaskAppBarState extends State<NewTaskAppBar> {
       iconTheme: Theme.of(context).iconTheme,
       backwardsCompatibility: false,
       brightness: Brightness.dark,
-      leading: (widget.leadingButton != null) ? widget.leadingButton : null,
       actions: [
         IconButton(
           icon: Icon(Icons.search_outlined),
           onPressed: () {
             if (this.searchBarActive) {
               this._formKey.currentState.reset();
-              Provider.of<SettingsProvider>(context, listen: false).clearTaskName();
+              this.widget.searchingName == 'tag' ? Provider.of<TagProvider>(context, listen: false).clearSearchingText() : Provider.of<LocationProvider>(context, listen: false).clearSearchingText();
             }
 
             setState(() {
               this.searchBarActive = !this.searchBarActive;
             });
           },
-        ),
-        PopupMenuButton(
-          onSelected: (value) {
-            if (value == 'filters') {
-              Navigator.of(context).pushNamed(FiltersScreen.routeName);
-            } else if (value == 'map') {
-              Navigator.of(context).pushNamed(TaskMap.routeName);
-            }
-          },
-          icon: Icon(Icons.more_vert),
-          itemBuilder: (_) => [
-            PopupMenuItem(
-              child: Text('Filters'),
-              value: 'filters',
-            ),
-            PopupMenuItem(
-              child: Text('Task map'),
-              value: 'map',
-            ),
-          ],
         ),
       ],
     );

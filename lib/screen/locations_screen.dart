@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/widget/appBar/search_appBar.dart';
 import 'package:provider/provider.dart';
 import '../model/location.dart';
 import '../provider/location_provider.dart';
@@ -48,46 +49,54 @@ class _LocationScreenState extends State<LocationsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final locations = Provider.of<LocationProvider>(context).locationList;
+    final locations = Provider.of<LocationProvider>(context).locations;
 
-    return Scaffold(
-      appBar: TaskAppBar(
-        title: "Saved locations",
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(
-          Icons.add,
-          color: Colors.white,
-          size: 50,
+    return WillPopScope(
+      // ignore: missing_return
+      onWillPop: () {
+        Provider.of<LocationProvider>(context, listen: false).clearSearchingText();
+        Navigator.of(context).pop();
+      },
+      child: Scaffold(
+        appBar: SearchAppBar(
+          title: "Saved locations",
+          searchingName: 'location',
         ),
-        onPressed: () async {
-          Location choosenLocation = await showDialog(
-            context: context,
-            builder: (context) {
-              return LocationDialog(
-                choosenLocation: Location(
-                  id: -1,
-                  latitude: 0.0,
-                  longitude: 0.0,
-                  localizationName: 'test',
-                  country: "",
-                  locality: "",
-                  street: "",
-                ),
-              );
-            },
-          );
+        floatingActionButton: FloatingActionButton(
+          child: Icon(
+            Icons.add,
+            color: Colors.white,
+            size: 50,
+          ),
+          onPressed: () async {
+            Location choosenLocation = await showDialog(
+              context: context,
+              builder: (context) {
+                return LocationDialog(
+                  choosenLocation: Location(
+                    id: -1,
+                    latitude: 0.0,
+                    longitude: 0.0,
+                    localizationName: 'test',
+                    country: "",
+                    locality: "",
+                    street: "",
+                  ),
+                );
+              },
+            );
 
-          this._addNewLocationForm(context, choosenLocation);
-        },
-      ),
-      body: ListView.builder(
-        padding: EdgeInsets.only(left: 21, right: 17, top: 10),
-        shrinkWrap: true,
-        itemCount: locations.length,
-        itemBuilder: (context, index) => SingleLocation(
-          location: locations[index],
-          editLocationForm: this._editLocationForm,
+            this._addNewLocationForm(context, choosenLocation);
+          },
+        ),
+        body: ListView.builder(
+          padding: EdgeInsets.only(left: 21, right: 17, top: 10),
+          shrinkWrap: true,
+          itemCount: locations.length,
+          itemBuilder: (context, index) => SingleLocation(
+            location: locations[index],
+            editLocationForm: this._editLocationForm,
+          ),
         ),
       ),
     );

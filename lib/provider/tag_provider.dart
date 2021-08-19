@@ -12,6 +12,8 @@ class TagProvider with ChangeNotifier {
   final String userMail;
   final String authToken;
 
+  String searchingText;
+
   String _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
   TagProvider({
@@ -21,7 +23,11 @@ class TagProvider with ChangeNotifier {
   });
 
   List<Tag> get tags {
-    return [...this.tagList];
+    if (this.searchingText == null || this.searchingText.length < 1) {
+      return [...this.tagList];
+    } else {
+      return this.tagList.where((element) => element.name.contains(this.searchingText)).toList();
+    }
   }
 
   List<String> get tagNames {
@@ -32,6 +38,18 @@ class TagProvider with ChangeNotifier {
     });
 
     return result;
+  }
+
+  void setSearchingText(String text) {
+    this.searchingText = text;
+
+    notifyListeners();
+  }
+
+  void clearSearchingText() {
+    this.searchingText = '';
+
+    notifyListeners();
   }
 
   Future<void> getTags() async {
