@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/utils/task_validate.dart';
 import 'package:provider/provider.dart';
 import '../config/color_themes.dart';
 import '../model/attachment.dart';
@@ -146,44 +147,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
   Future<void> saveTask() async {
     bool isValid = this._formKey.currentState.validate();
 
-    if (taskToEdit.startDate == null && taskToEdit.localization == "SCHEDULED") {
-      isValid = false;
-      await Dialogs.showWarningDialog(context, "Scheduled tasks have to specify start date");
-    }
-
-    if (taskToEdit.startDate != null && taskToEdit.localization == "ANYTIME") {
-      isValid = false;
-      await Dialogs.showWarningDialog(context, "Tasks with start date should be scheduled");
-    }
-
-    if (taskToEdit.localization == "COMPLETED" && !taskToEdit.done) {
-      isValid = false;
-      await Dialogs.showWarningDialog(context, "Completed tasks have to be marked as done");
-    }
-
-    if (originalTask.localization != "INBOX" && taskToEdit.localization == "INBOX") {
-      isValid = false;
-      await Dialogs.showWarningDialog(context, "Task cannot return to inbox");
-    }
-
-    if (taskToEdit.localization == 'DELEGATED' && (taskToEdit.delegatedEmail == null || taskToEdit.delegatedEmail.length <= 1)) {
-      isValid = false;
-      await Dialogs.showWarningDialog(context, "Delegated task must have delegated person");
-    }
-
-    if (originalTask.localization == 'DELEGATED' && taskToEdit.localization != 'DELEGATED' && taskToEdit.delegatedEmail != null) {
-      isValid = false;
-      await Dialogs.showWarningDialog(context, "Task with specified delegated person must be on delegated list");
-    }
-
-    if (originalTask.supervisorEmail != null && originalTask.supervisorEmail == taskToEdit.delegatedEmail) {
-      isValid = false;
-      await Dialogs.showWarningDialog(context, 'Cannot delegate task to principal');
-    }
-    if (taskToEdit.endDate != null && taskToEdit.startDate != null && taskToEdit.endDate.isBefore(taskToEdit.startDate)) {
-      isValid = false;
-      await Dialogs.showWarningDialog(context, 'End date must be later than start date');
-    }
+    isValid = await TaskValidate.validateTaskEdit(taskToEdit, originalTask, context);
 
     if (!isValid) {
       return;
@@ -256,7 +220,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       this.changesSaved = true;
     } catch (error) {
       print(error);
-      Dialogs.showWarningDialog(context, "An error has occured");
+      await Dialogs.showWarningDialog(context, "An error has occured");
     }
     Navigator.of(context).pop();
   }
@@ -276,7 +240,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, taskToEdit.localization);
         Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);
       } catch (error) {
-        Dialogs.showWarningDialog(context, "An error has occured");
+        await Dialogs.showWarningDialog(context, "An error has occured");
       }
       Navigator.pop(context);
     }

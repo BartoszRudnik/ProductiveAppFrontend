@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:productive_app/utils/task_validate.dart';
 import 'package:provider/provider.dart';
 import '../model/tag.dart';
 import '../model/task.dart';
@@ -140,20 +141,7 @@ class _NewTaskState extends State<NewTask> {
   Future<void> _addNewTask() async {
     var isValid = this._formKey.currentState.validate();
 
-    if (this._localization == 'SCHEDULED' && this._startDate == null) {
-      Dialogs.showWarningDialog(context, 'Planned task need to have start date');
-      return;
-    }
-
-    if (this._startDate != null && this._endDate != null && this._endDate.isBefore(this._startDate)) {
-      Dialogs.showWarningDialog(context, 'End date must be before start date');
-      return;
-    }
-
-    if (this._localization == 'DELEGATED' && this._delegatedEmail == null) {
-      Dialogs.showWarningDialog(context, "Delegated tasks must have delegated person");
-      return;
-    }
+    isValid = await TaskValidate.validateNewTask(this._startDate, this._endDate, this._localization, this._isDone, this._delegatedEmail, context);
 
     setState(() {
       this._isValid = isValid;
