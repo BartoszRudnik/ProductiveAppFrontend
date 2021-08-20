@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/widget/appBar/newTask_appBar.dart';
+import 'package:productive_app/widget/list_shimmer.dart';
 import 'package:shimmer/shimmer.dart';
 
 class LoadingTaskScreen extends StatelessWidget {
@@ -17,28 +18,7 @@ class LoadingTaskScreen extends StatelessWidget {
           highlightColor: Theme.of(context).primaryColorDark,
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: ListView.builder(
-          itemCount: 5,
-          itemBuilder: (ctx, _) {
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Shimmer.fromColors(
-                child: Card(
-                  child: Container(
-                    height: 70,
-                    width: double.infinity,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
-                baseColor: Theme.of(context).primaryColorLight,
-                highlightColor: Theme.of(context).primaryColorDark,
-              ),
-            );
-          },
-        ),
-      ),
+      body: ListShimmer(),
       floatingActionButton: Shimmer.fromColors(
         child: FloatingActionButton(
           elevation: 0,

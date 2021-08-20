@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
-import 'package:productive_app/widget/chart/collaborator_tasks_chart.dart';
+import 'package:productive_app/widget/chart/chart_shimmer.dart';
+import 'package:productive_app/widget/list_shimmer.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 import '../model/collaborator.dart';
 import '../model/collaboratorTask.dart';
 import '../provider/delegate_provider.dart';
-import '../utils/collaborator_show_modal.dart';
 import '../widget/appBar/active_tasks_appBar.dart';
 import '../widget/button/ask_for_activity_permission.dart';
+import '../widget/chart/collaborator_tasks_chart.dart';
+import '../widget/single_collaborator_task.dart';
 
 class RecentTasks extends StatefulWidget {
   final Collaborator collaborator;
@@ -24,6 +27,7 @@ class RecentTasks extends StatefulWidget {
 class _RecentTasksState extends State<RecentTasks> {
   final _pagingController = PagingController<int, CollaboratorTask>(firstPageKey: 0);
   int allTasksNumber = 0;
+  bool loaded = false;
 
   @override
   void initState() {
@@ -74,7 +78,9 @@ class _RecentTasksState extends State<RecentTasks> {
         this._pagingController.appendPage(newPage, nextPage);
       }
 
-      setState(() {});
+      setState(() {
+        this.loaded = true;
+      });
     } catch (error) {
       this._pagingController.error = error;
     }
@@ -136,47 +142,20 @@ class _RecentTasksState extends State<RecentTasks> {
                 ),
                 child: Column(
                   children: [
-                    Container(
-                      height: 205,
-                      child: CollaboratorTasksChart(
-                        tasks: this._groupedTransactionsValues,
-                        weekTasks: this._weekTasks,
-                      ),
-                    ),
+                    this.loaded
+                        ? Container(
+                            height: 205,
+                            child: CollaboratorTasksChart(
+                              tasks: this._groupedTransactionsValues,
+                              weekTasks: this._weekTasks,
+                            ),
+                          )
+                        : ChartShimmer(),
                     Expanded(
                       child: PagedListView.separated(
                         builderDelegate: PagedChildBuilderDelegate<CollaboratorTask>(
-                          itemBuilder: (context, task, index) => GestureDetector(
-                            onTap: () {
-                              return CollaboratorModal.onTaskPressed(task, context);
-                            },
-                            child: Card(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      task.title,
-                                      textAlign: TextAlign.start,
-                                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
-                                    ),
-                                    Row(
-                                      children: [
-                                        Icon(Icons.update_outlined),
-                                        SizedBox(
-                                          width: 10,
-                                        ),
-                                        Text(
-                                          DateFormat('yMMMMd').format(task.lastUpdated) + ' ' + DateFormat('Hm').format(task.lastUpdated),
-                                        ),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
+                          itemBuilder: (context, task, index) => SingleCollaboratorTask(task: task),
+                          firstPageProgressIndicatorBuilder: (_) => ListShimmer(),
                         ),
                         pagingController: this._pagingController,
                         padding: const EdgeInsets.all(12),
