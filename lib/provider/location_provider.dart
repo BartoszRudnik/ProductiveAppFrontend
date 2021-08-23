@@ -30,7 +30,7 @@ class LocationProvider with ChangeNotifier {
     if (this.searchingText == null || this.searchingText.length < 1) {
       return [...this.locationList];
     } else {
-      return this.locationList.where((element) => element.localizationName.contains(this.searchingText)).toList();
+      return this.locationList.where((element) => element.localizationName.toLowerCase().contains(this.searchingText.toLowerCase())).toList();
     }
   }
 

@@ -42,8 +42,8 @@ class ManageFilters {
       Provider.of<TaskProvider>(context, listen: false).sortByPriorityAscending(tasks);
     }
 
-    if (userSettings.taskName != null && userSettings.taskName.length >= 2) {
-      tasks = tasks.where((task) => task.title.contains(userSettings.taskName)).toList();
+    if (userSettings.taskName != null && userSettings.taskName.length >= 1) {
+      tasks = tasks.where((task) => task.title.toLowerCase().contains(userSettings.taskName.toLowerCase())).toList();
     }
 
     return tasks;

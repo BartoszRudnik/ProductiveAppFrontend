@@ -72,7 +72,7 @@ class SettingsProvider with ChangeNotifier {
   }
 
   void clearTaskName() {
-    this.userSettings.taskName = ' ';
+    this.userSettings.taskName = '';
 
     notifyListeners();
   }

@@ -26,7 +26,7 @@ class TagProvider with ChangeNotifier {
     if (this.searchingText == null || this.searchingText.length < 1) {
       return [...this.tagList];
     } else {
-      return this.tagList.where((element) => element.name.contains(this.searchingText)).toList();
+      return this.tagList.where((element) => element.name.toLowerCase().contains(this.searchingText.toLowerCase())).toList();
     }
   }
 
