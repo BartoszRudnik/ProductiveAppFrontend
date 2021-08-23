@@ -3,6 +3,7 @@ import 'package:productive_app/config/color_themes.dart';
 import 'package:productive_app/model/task.dart';
 import 'package:productive_app/provider/delegate_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TaskDetailsAttributes extends StatelessWidget {
   final Task taskToEdit;
@@ -69,7 +70,7 @@ class TaskDetailsAttributes extends StatelessWidget {
                         ],
                       ),
                     if (this.taskToEdit.priority == 'CRITICAL') Icon(Icons.warning_amber_sharp),
-                    Text("Priority"),
+                    Text(AppLocalizations.of(context).priority),
                   ],
                 ),
               ),
@@ -113,7 +114,7 @@ class TaskDetailsAttributes extends StatelessWidget {
                   Icon(Icons.person_add),
                   Text(
                     this.taskToEdit.delegatedEmail == null
-                        ? "Assigned"
+                        ? AppLocalizations.of(context).assigned
                         : collaboratorName.length > 1
                             ? collaboratorName
                             : this.taskToEdit.delegatedEmail,

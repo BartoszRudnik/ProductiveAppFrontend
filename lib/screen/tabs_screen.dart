@@ -10,6 +10,7 @@ import 'anyTime_screen.dart';
 import 'delegated_screen.dart';
 import 'inbox_screen.dart';
 import 'scheduled_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TabsScreen extends StatefulWidget {
   static const routeName = '/tabs-screen';
@@ -284,19 +285,19 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
               type: BottomNavigationBarType.fixed,
               items: [
                 BottomNavigationBarItem(
-                  icon: _buildIconInbox(Icons.inbox_outlined, 'Inbox', 0),
+                  icon: _buildIconInbox(Icons.inbox_outlined, AppLocalizations.of(context).inbox, 0),
                   title: SizedBox.shrink(),
                 ),
                 BottomNavigationBarItem(
-                  icon: _buildIcon(Icons.access_time, 'Anytime', 1),
+                  icon: _buildIcon(Icons.access_time, AppLocalizations.of(context).anytime, 1),
                   title: SizedBox.shrink(),
                 ),
                 BottomNavigationBarItem(
-                  icon: _buildIcon(Icons.calendar_today, 'Scheduled', 2),
+                  icon: _buildIcon(Icons.calendar_today, AppLocalizations.of(context).scheduled, 2),
                   title: SizedBox.shrink(),
                 ),
                 BottomNavigationBarItem(
-                  icon: _buildIcon(Icons.person_outline_outlined, 'Delegated', 3),
+                  icon: _buildIcon(Icons.person_outline_outlined, AppLocalizations.of(context).delegated, 3),
                   title: SizedBox.shrink(),
                 ),
               ],

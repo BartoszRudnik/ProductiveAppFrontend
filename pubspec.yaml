@@ -23,31 +23,33 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
     
-  http: ^0.12.0+2
-  provider: ^4.0.0
-  shared_preferences: ^0.5.3+4
-  intl: ^0.16.1  
-  global_configuration: ^1.6.0
-  badges: ^1.2.0
-  image_picker: ^0.6.7+22
-  google_maps_flutter: ^1.2.0  
-  geocoding: ^1.0.0 
-  flutter_map: ^0.12.0    
-  flutter_background_geolocation: ^2.0.5  
-  flutter_local_notifications: ^4.0.1+2
-  flutter_launcher_icons: ^0.7.5
-  infinite_scroll_pagination: ^2.3.0
-  rxdart: ^0.25.0
-  google_sign_in: ^4.5.9
-  font_awesome_flutter: ^8.12.0
-  shimmer: ^1.1.2
-  file_picker: ^2.1.7
-  path_provider: ^1.6.28
-  flutter_pdfview: ^1.0.4
-  mime: ^0.9.7
-  share_plus: ^1.2.0
-  open_file: ^3.0.3
+  http: any
+  provider: any
+  shared_preferences: any
+  intl: any  
+  global_configuration: any
+  badges: any
+  image_picker: any
+  google_maps_flutter: any  
+  geocoding: any 
+  flutter_map: any    
+  flutter_background_geolocation: any  
+  flutter_local_notifications: any
+  flutter_launcher_icons: any
+  infinite_scroll_pagination: any
+  rxdart: any
+  google_sign_in: any
+  font_awesome_flutter: any
+  shimmer: any
+  file_picker: any
+  path_provider: any
+  flutter_pdfview: any
+  mime: any
+  share_plus: any
+  open_file: any
   
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -71,6 +73,7 @@ flutter:
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
+  generate: true
   uses-material-design: true
   
   assets:

@@ -8,6 +8,7 @@ import '../provider/task_provider.dart';
 import '../screen/task_details_screen.dart';
 import 'button/is_done_button.dart';
 import 'task_tags.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TaskWidget extends StatefulWidget {
   final Task task;
@@ -70,7 +71,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                           size: 50,
                         ),
                         Text(
-                          isArchived ? 'Restore' : 'Organize',
+                          isArchived ? AppLocalizations.of(context).restore : AppLocalizations.of(context).organize,
                           style: TextStyle(color: Theme.of(context).accentColor, fontSize: 20, fontWeight: FontWeight.w400),
                         ),
                       ],
@@ -85,7 +86,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
-                    isArchived ? 'Delete' : 'Archive',
+                    isArchived ? AppLocalizations.of(context).delete : AppLocalizations.of(context).archive,
                     style: TextStyle(color: Theme.of(context).accentColor, fontSize: 20, fontWeight: FontWeight.w400),
                   ),
                   Icon(
@@ -104,7 +105,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                   builder: (context) => AlertDialog(
                     title: Center(
                       child: Text(
-                        isArchived ? 'Delete' : 'Archive',
+                        isArchived ? AppLocalizations.of(context).delete : AppLocalizations.of(context).archive,
                         style: TextStyle(
                           color: Theme.of(context).primaryColor,
                           fontSize: 20,
@@ -116,7 +117,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          isArchived ? 'Are you sure you want to delete this task?' : 'Are you sure you want to archive this task?',
+                          isArchived ? AppLocalizations.of(context).areYouSureDeleteTask : AppLocalizations.of(context).areYouSureDeleteTask,
                         ),
                         SizedBox(height: 10),
                         Row(
@@ -139,13 +140,13 @@ class _TaskWidgetState extends State<TaskWidget> {
 
                                 Navigator.of(context).pop(true);
                               },
-                              child: Text('Yes'),
+                              child: Text(AppLocalizations.of(context).yes),
                             ),
                             ElevatedButton(
                               onPressed: () {
                                 Navigator.of(context).pop(false);
                               },
-                              child: Text('No'),
+                              child: Text(AppLocalizations.of(context).no),
                             ),
                           ],
                         )

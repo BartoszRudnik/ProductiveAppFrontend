@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:productive_app/provider/attachment_provider.dart';
+import 'package:productive_app/l10n/L10n.dart';
 import 'utils/notifications.dart';
 import 'package:provider/provider.dart';
 import 'config/color_themes.dart';
@@ -18,6 +20,7 @@ import 'screen/entry_screen.dart';
 import 'screen/main_screen.dart';
 import 'screen/loading_auth_screen.dart';
 import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void headlessTask(bg.HeadlessEvent headlessEvent) async {
   switch (headlessEvent.name) {
@@ -115,6 +118,13 @@ class MyApp extends StatelessWidget {
           themeMode: Provider.of<ThemeProvider>(context).themeMode,
           theme: ColorThemes.lightTheme,
           darkTheme: ColorThemes.darkTheme,
+          supportedLocales: L10n.all,
+          localizationsDelegates: [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
           home: Provider.of<AuthProvider>(context).isAuth
               ? MainScreen()
               : FutureBuilder(

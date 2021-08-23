@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../provider/tag_provider.dart';
 import '../provider/task_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SingleTag extends StatelessWidget {
   final tag;
@@ -30,7 +31,7 @@ class SingleTag extends StatelessWidget {
               size: 50,
             ),
             Text(
-              'Edit tag',
+              AppLocalizations.of(context).edit,
               style: TextStyle(color: Theme.of(context).accentColor, fontSize: 20, fontWeight: FontWeight.w400),
             ),
           ],
@@ -44,7 +45,7 @@ class SingleTag extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Text(
-              'Delete tag',
+              AppLocalizations.of(context).delete,
               style: TextStyle(color: Theme.of(context).accentColor, fontSize: 20, fontWeight: FontWeight.w400),
             ),
             Icon(
@@ -63,14 +64,14 @@ class SingleTag extends StatelessWidget {
             builder: (context) => AlertDialog(
               title: Center(
                 child: Text(
-                  'Delete',
+                  AppLocalizations.of(context).delete,
                   style: Theme.of(context).textTheme.headline3,
                 ),
               ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Are you sure you want to delete this tag?'),
+                  Text(AppLocalizations.of(context).areYouSureDeleteTag),
                   SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -81,13 +82,13 @@ class SingleTag extends StatelessWidget {
                           Provider.of<TagProvider>(context, listen: false).deleteTagPermanently(tag.name);
                           Navigator.of(context).pop(true);
                         },
-                        child: Text('Yes'),
+                        child: Text(AppLocalizations.of(context).yes),
                       ),
                       ElevatedButton(
                         onPressed: () {
                           Navigator.of(context).pop(false);
                         },
-                        child: Text('No'),
+                        child: Text(AppLocalizations.of(context).no),
                       ),
                     ],
                   )

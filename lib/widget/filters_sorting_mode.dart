@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../config/const_values.dart';
 import '../provider/settings_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FiltersSortingMode extends StatelessWidget {
   final int sortingMode;
@@ -23,7 +24,7 @@ class FiltersSortingMode extends StatelessWidget {
               child: Row(
                 children: [
                   Text(
-                    'Sort by',
+                    AppLocalizations.of(context).sort,
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w400,

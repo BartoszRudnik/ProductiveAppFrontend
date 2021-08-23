@@ -4,6 +4,7 @@ import 'package:productive_app/provider/settings_provider.dart';
 import 'package:productive_app/widget/dialog/filter_location_dialog.dart';
 import 'package:productive_app/widget/single_selected_filter.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FiltersLocations extends StatelessWidget {
   final locations;
@@ -27,7 +28,7 @@ class FiltersLocations extends StatelessWidget {
                 child: Row(
                   children: [
                     Text(
-                      'Locations',
+                      AppLocalizations.of(context).locations,
                       style: TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.w400,
@@ -62,7 +63,7 @@ class FiltersLocations extends StatelessWidget {
                         }
                       },
                       child: Text(
-                        'Choose locations',
+                        AppLocalizations.of(context).chooseLocations,
                         style: TextStyle(fontSize: 24),
                       ),
                     ),

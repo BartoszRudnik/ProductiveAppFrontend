@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../provider/task_provider.dart';
 
@@ -104,13 +105,13 @@ class FilterPriorityDialog extends StatelessWidget {
                       onPressed: () {
                         Navigator.of(context).pop('cancel');
                       },
-                      child: Text('Cancel'),
+                      child: Text(AppLocalizations.of(context).cancel),
                     ),
                     ElevatedButton(
                       onPressed: () {
                         Navigator.of(context).pop(this.choosenPriorities);
                       },
-                      child: Text('Save'),
+                      child: Text(AppLocalizations.of(context).save),
                     ),
                   ],
                 ),

@@ -7,6 +7,7 @@ import '../model/attachment.dart';
 import '../provider/attachment_provider.dart';
 import 'dialog/attachment_dialog.dart';
 import 'pdf_viewer.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TaskDetailsAttachments extends StatelessWidget {
   final List<Attachment> attachments;
@@ -112,7 +113,7 @@ class TaskDetailsAttachments extends StatelessWidget {
               },
               child: Center(
                 child: Text(
-                  "Add new attachments",
+                  AppLocalizations.of(context).addAttachment,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Color.fromRGBO(119, 119, 120, 1),

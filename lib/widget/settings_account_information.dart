@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SettingsAccountInformation extends StatelessWidget {
   final formKey;
@@ -34,7 +35,7 @@ class SettingsAccountInformation extends StatelessWidget {
               alignment: Alignment(-1.1, 0),
               child: Center(
                 child: Text(
-                  "ACCOUNT INFORMATION",
+                  AppLocalizations.of(context).accountInformation,
                   style: TextStyle(fontSize: 20),
                 ),
               ),
@@ -78,7 +79,7 @@ class SettingsAccountInformation extends StatelessWidget {
                     Expanded(
                       flex: 4,
                       child: Text(
-                        "First name:",
+                        AppLocalizations.of(context).firstName,
                         style: TextStyle(fontSize: 18),
                       ),
                     ),
@@ -88,7 +89,7 @@ class SettingsAccountInformation extends StatelessWidget {
                         initialValue: user.firstName,
                         style: TextStyle(fontSize: 18),
                         maxLines: 1,
-                        decoration: InputDecoration(hintText: "First name"),
+                        decoration: InputDecoration(hintText: AppLocalizations.of(context).firstName),
                         onSaved: (value) {
                           user.firstName = value;
                         },
@@ -101,7 +102,7 @@ class SettingsAccountInformation extends StatelessWidget {
                     Expanded(
                       flex: 4,
                       child: Text(
-                        "Last name:",
+                        AppLocalizations.of(context).lastName,
                         style: TextStyle(fontSize: 18),
                       ),
                     ),
@@ -111,7 +112,7 @@ class SettingsAccountInformation extends StatelessWidget {
                         initialValue: user.lastName,
                         style: TextStyle(fontSize: 18),
                         maxLines: 1,
-                        decoration: InputDecoration(hintText: "Last name"),
+                        decoration: InputDecoration(hintText: AppLocalizations.of(context).lastName),
                         onSaved: (value) {
                           user.lastName = value;
                         },
@@ -129,7 +130,7 @@ class SettingsAccountInformation extends StatelessWidget {
                       this.updateUserInfo(user.firstName, user.lastName);
                     }
                   },
-                  child: Text('Save account information'),
+                  child: Text(AppLocalizations.of(context).saveAccountInformation),
                 ),
               ],
             ),

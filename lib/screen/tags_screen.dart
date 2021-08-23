@@ -6,6 +6,7 @@ import '../provider/tag_provider.dart';
 import '../widget/appBar/task_appBar.dart';
 import '../widget/new_tag.dart';
 import '../widget/single_tag.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TagsScreen extends StatefulWidget {
   static const routeName = '/tags-screen';
@@ -62,7 +63,7 @@ class _TagsScreenState extends State<TagsScreen> {
       },
       child: Scaffold(
         appBar: SearchAppBar(
-          title: 'Tags',
+          title: AppLocalizations.of(context).tags,
           searchingName: 'tag',
         ),
         floatingActionButton: FloatingActionButton(

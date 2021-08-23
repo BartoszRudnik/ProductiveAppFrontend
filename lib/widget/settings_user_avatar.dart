@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:productive_app/config/images.dart';
 import 'package:productive_app/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SettingsUserAvatar extends StatefulWidget {
   final Function removeAvatar;
@@ -81,7 +82,7 @@ class _SettingsUserAvatarState extends State<SettingsUserAvatar> {
                   onPressed: () {
                     this.widget.removeAvatar();
                   },
-                  child: Text('Remove avatar'),
+                  child: Text(AppLocalizations.of(context).removeAvatar),
                 ),
               ],
             ),

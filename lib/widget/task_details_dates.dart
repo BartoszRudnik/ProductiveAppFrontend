@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../config/color_themes.dart';
 import '../model/task.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TaskDetailsDates extends StatefulWidget {
   final Function selectStartDate;
@@ -40,7 +41,7 @@ class _TaskDetailsDatesState extends State<TaskDetailsDates> {
           title: Align(
             alignment: Alignment(-1.1, 0),
             child: Text(
-              "Start and due date",
+              AppLocalizations.of(context).startAndEndDate,
               style: TextStyle(fontSize: 21),
             ),
           ),
@@ -51,7 +52,7 @@ class _TaskDetailsDatesState extends State<TaskDetailsDates> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Start date: ',
+                AppLocalizations.of(context).startDate,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
@@ -98,7 +99,7 @@ class _TaskDetailsDatesState extends State<TaskDetailsDates> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Due date:',
+                AppLocalizations.of(context).endDate,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w400,

@@ -22,6 +22,7 @@ import '../widget/task_details_bottom_bar.dart';
 import '../widget/task_details_dates.dart';
 import '../widget/task_details_map.dart';
 import '../widget/task_tags_edit.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TaskDetailScreen extends StatefulWidget {
   static const routeName = "/task-details";
@@ -449,7 +450,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       },
       child: Scaffold(
         appBar: DetailsAppBar(
-          title: 'Details',
+          title: AppLocalizations.of(context).details,
           task: originalTask,
         ),
         body: SingleChildScrollView(
@@ -483,7 +484,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                     title: Align(
                       alignment: Alignment(-1.1, 0),
                       child: Text(
-                        "Description",
+                        AppLocalizations.of(context).description,
                         style: TextStyle(fontSize: 21),
                       ),
                     ),
@@ -541,7 +542,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                     title: Align(
                       alignment: Alignment(-1.1, 0),
                       child: Text(
-                        "Tags",
+                        AppLocalizations.of(context).tags,
                         style: TextStyle(fontSize: 21),
                       ),
                     ),

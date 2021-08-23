@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/provider/theme_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ThemeSwitchListTile extends StatelessWidget {
   @override
@@ -21,7 +22,7 @@ class ThemeSwitchListTile extends StatelessWidget {
           inactiveTrackColor: Theme.of(context).primaryColorLight,
           activeTrackColor: Theme.of(context).primaryColor,
           title: Text(
-            'Dark Mode',
+            AppLocalizations.of(context).darkMode,
             style: TextStyle(
               fontSize: 16,
               color: Colors.white,

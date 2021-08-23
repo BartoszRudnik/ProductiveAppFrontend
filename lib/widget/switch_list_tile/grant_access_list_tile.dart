@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/provider/delegate_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class GrantAccessListTile extends StatefulWidget {
   final email;
@@ -24,7 +25,7 @@ class _GrantAccessListTileState extends State<GrantAccessListTile> {
       inactiveTrackColor: Theme.of(context).primaryColorLight,
       activeTrackColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColor : Theme.of(context).accentColor,
       title: Text(
-        'Grant access to my activity',
+        AppLocalizations.of(context).grantActivityAccess,
         style: TextStyle(color: Colors.white),
       ),
       value: this.widget.grantAccess,

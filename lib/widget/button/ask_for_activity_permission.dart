@@ -3,6 +3,7 @@ import 'package:productive_app/model/collaborator.dart';
 import 'package:productive_app/provider/delegate_provider.dart';
 import 'package:productive_app/utils/dialogs.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AskForActivityPermission extends StatelessWidget {
   final Collaborator collaborator;
@@ -17,7 +18,7 @@ class AskForActivityPermission extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('You don\'t have permission to see collaborator acitivity!'),
+          Text(AppLocalizations.of(context).noPermissionCollaborator),
           ElevatedButton(
             onPressed: () {
               if (this.collaborator.alreadyAsked) {
@@ -37,7 +38,7 @@ class AskForActivityPermission extends StatelessWidget {
                 );
               }
             },
-            child: Text('Ask for permission'),
+            child: Text(AppLocalizations.of(context).askForPermission),
           ),
         ],
       ),

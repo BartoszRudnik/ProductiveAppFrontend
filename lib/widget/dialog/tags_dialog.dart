@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:productive_app/model/tag.dart';
 import 'package:productive_app/provider/tag_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TagsDialog extends StatefulWidget {
   static const routeName = "/tags-dialog";
@@ -96,7 +97,7 @@ class _TagsDialogState extends State<TagsDialog> {
                   maxLines: null,
                   decoration: InputDecoration(
                     contentPadding: EdgeInsets.all(10),
-                    hintText: 'Find or create new tag',
+                    hintText: AppLocalizations.of(context).enterTagName,
                   ),
                 ),
               ),
@@ -148,13 +149,13 @@ class _TagsDialogState extends State<TagsDialog> {
                   onPressed: () {
                     Navigator.of(context).pop(widget.taskTags);
                   },
-                  child: Text('Cancel'),
+                  child: Text(AppLocalizations.of(context).cancel),
                 ),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.of(context).pop(_finalTags);
                   },
-                  child: Text('Add tag/tags'),
+                  child: Text(AppLocalizations.of(context).save),
                 ),
               ],
             ),

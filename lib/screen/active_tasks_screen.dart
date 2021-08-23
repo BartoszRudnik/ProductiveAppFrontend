@@ -12,6 +12,7 @@ import '../widget/appBar/active_tasks_appBar.dart';
 import '../widget/button/ask_for_activity_permission.dart';
 import '../widget/chart/collaborator_tasks_chart.dart';
 import '../widget/single_collaborator_task.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ActiveTasks extends StatefulWidget {
   final Collaborator collaborator;
@@ -141,7 +142,7 @@ class _ActiveTasksState extends State<ActiveTasks> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: ActiveTasksAppBar(
-        message: 'Active tasks',
+        message: AppLocalizations.of(context).activeTasks,
       ),
       body: this.widget.collaborator.receivedPermission
           ? Container(

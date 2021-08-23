@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SettingsManageAccount extends StatelessWidget {
   final Function deleteUser;
@@ -34,7 +35,7 @@ class SettingsManageAccount extends StatelessWidget {
               alignment: Alignment(-1.1, 0),
               child: Center(
                 child: Text(
-                  "MANAGE ACCOUNT",
+                  AppLocalizations.of(context).manageAccount,
                   style: TextStyle(fontSize: 20),
                 ),
               ),
@@ -47,13 +48,13 @@ class SettingsManageAccount extends StatelessWidget {
                 onPressed: () {
                   this.resetPassword(user.email);
                 },
-                child: Text('Reset password'),
+                child: Text(AppLocalizations.of(context).resetPassword),
               ),
               ElevatedButton(
                 onPressed: () {
                   this.deleteUser();
                 },
-                child: Text('Delete Account'),
+                child: Text(AppLocalizations.of(context).deleteAccount),
               ),
             ],
           )

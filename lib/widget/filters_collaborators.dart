@@ -4,6 +4,7 @@ import 'package:productive_app/provider/settings_provider.dart';
 import 'package:productive_app/widget/dialog/filter_delegate_dialog.dart';
 import 'package:productive_app/widget/single_selected_filter.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FiltersCollaborators extends StatelessWidget {
   final collaborators;
@@ -27,7 +28,7 @@ class FiltersCollaborators extends StatelessWidget {
                 child: Row(
                   children: [
                     Text(
-                      'Collaborators',
+                      AppLocalizations.of(context).collaborators,
                       style: TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.w400,
@@ -62,7 +63,7 @@ class FiltersCollaborators extends StatelessWidget {
                         }
                       },
                       child: Text(
-                        'Choose collaborators',
+                        AppLocalizations.of(context).chooseCollaborators,
                         style: TextStyle(fontSize: 24),
                       ),
                     ),

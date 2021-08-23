@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../model/collaborator.dart';
 import '../provider/delegate_provider.dart';
 import 'collaborator_list_element.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SendCollaborator extends StatelessWidget {
   Collaborator collaborator;
@@ -24,7 +25,7 @@ class SendCollaborator extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Text(
-              'Cancel invitation',
+              AppLocalizations.of(context).cancel,
               style: TextStyle(color: Theme.of(context).accentColor, fontSize: 20, fontWeight: FontWeight.w400),
             ),
             Icon(
@@ -43,14 +44,14 @@ class SendCollaborator extends StatelessWidget {
             builder: (context) => AlertDialog(
               title: Center(
                 child: Text(
-                  'Cancel',
+                  AppLocalizations.of(context).cancel,
                   style: Theme.of(context).textTheme.headline3,
                 ),
               ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Are you sure you want to cancel this invitation?'),
+                  Text(AppLocalizations.of(context).areYouSureCancelInvitation),
                   SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -61,7 +62,7 @@ class SendCollaborator extends StatelessWidget {
                           Navigator.of(context).pop(true);
                         },
                         child: Text(
-                          'Yes',
+                          AppLocalizations.of(context).yes,
                           style: TextStyle(
                             fontSize: 14,
                             color: Theme.of(context).accentColor,
@@ -73,7 +74,7 @@ class SendCollaborator extends StatelessWidget {
                           Navigator.of(context).pop(false);
                         },
                         child: Text(
-                          'No',
+                          AppLocalizations.of(context).no,
                           style: TextStyle(
                             fontSize: 14,
                             color: Theme.of(context).accentColor,

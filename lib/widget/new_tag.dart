@@ -4,6 +4,7 @@ import 'package:productive_app/provider/tag_provider.dart';
 import 'package:productive_app/provider/task_provider.dart';
 import 'package:productive_app/utils/dialogs.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NewTag extends StatefulWidget {
   final int tagsLength;
@@ -51,7 +52,7 @@ class _NewTagState extends State<NewTag> {
             },
             maxLines: null,
             decoration: InputDecoration(
-              hintText: 'Enter tag name',
+              hintText: AppLocalizations.of(context).enterTagName,
               hintStyle: TextStyle(
                 fontWeight: FontWeight.w400,
                 fontSize: 20,

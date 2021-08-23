@@ -3,6 +3,7 @@ import '../provider/location_provider.dart';
 import '../provider/task_provider.dart';
 import '../utils/dialogs.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SingleLocation extends StatelessWidget {
   final location;
@@ -29,7 +30,7 @@ class SingleLocation extends StatelessWidget {
               size: 50,
             ),
             Text(
-              'Edit location',
+              AppLocalizations.of(context).edit,
               style: TextStyle(color: Theme.of(context).accentColor, fontSize: 20, fontWeight: FontWeight.w400),
             ),
           ],
@@ -43,7 +44,7 @@ class SingleLocation extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Text(
-              'Delete location',
+              AppLocalizations.of(context).delete,
               style: TextStyle(color: Theme.of(context).accentColor, fontSize: 20, fontWeight: FontWeight.w400),
             ),
             Icon(
@@ -56,7 +57,7 @@ class SingleLocation extends StatelessWidget {
       ),
       confirmDismiss: (direction) async {
         if (direction == DismissDirection.endToStart) {
-          bool hasAgreed = await Dialogs.showChoiceDialog(context, "Are you sure you want to delete this location?");
+          bool hasAgreed = await Dialogs.showChoiceDialog(context, AppLocalizations.of(context).areSureDeleteLocation);
           if (hasAgreed) {
             Provider.of<TaskProvider>(context, listen: false).clearLocationFromTasks(location.id);
             Provider.of<LocationProvider>(context, listen: false).deleteLocation(location.id);

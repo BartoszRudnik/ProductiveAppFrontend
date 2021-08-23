@@ -9,6 +9,7 @@ import '../widget/settings_account_information.dart';
 import '../widget/settings_graphic_settings.dart';
 import '../widget/settings_manage_account.dart';
 import '../widget/settings_user_avatar.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SettingsScreen extends StatefulWidget {
   static const routeName = "/collaborators";
@@ -24,7 +25,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _cofirmPasswordKey = GlobalKey<FormFieldState>();
 
   Future<void> updateUserInfo(String firstName, String lastName) async {
-    bool hasAgreed = await Dialogs.showChoiceDialog(context, "Are you sure you want to update your account information?");
+    bool hasAgreed = await Dialogs.showChoiceDialog(context, AppLocalizations.of(context).areYouSureUpdateAccount);
     if (hasAgreed) {
       await Provider.of<AuthProvider>(context, listen: false).updateUserData(firstName, lastName);
 
@@ -38,7 +39,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> deleteUser() async {
-    bool hasAgreed = await Dialogs.showChoiceDialog(context, "Are you sure you want to delete your account? This action cannot be undone!");
+    bool hasAgreed = await Dialogs.showChoiceDialog(context, AppLocalizations.of(context).areYouSureDeleteAccount);
     if (hasAgreed) {
       Provider.of<AuthProvider>(context, listen: false).getDeleteToken();
       String enteredToken;
@@ -89,7 +90,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
-                        child: Text('Cancel'),
+                        child: Text(AppLocalizations.of(context).cancel),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -101,7 +102,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             Navigator.of(context).pop();
                           }
                         },
-                        child: Text('Delete Account'),
+                        child: Text(AppLocalizations.of(context).deleteAccount),
                       ),
                     ],
                   )
@@ -115,7 +116,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> resetPassword(String userMail) async {
-    bool hasAgreed = await Dialogs.showChoiceDialog(context, "Are you sure you want to reset your password?");
+    bool hasAgreed = await Dialogs.showChoiceDialog(context, AppLocalizations.of(context).resetPassword);
     if (hasAgreed) {
       Provider.of<AuthProvider>(context, listen: false).resetPassword(userMail);
 
@@ -207,7 +208,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
-                        child: Text('Cancel'),
+                        child: Text(AppLocalizations.of(context).cancel),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -246,7 +247,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             );
                           }
                         },
-                        child: Text('Reset Password'),
+                        child: Text(AppLocalizations.of(context).reset),
                       ),
                     ],
                   )
@@ -260,7 +261,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> removeAvatar() async {
-    bool hasAgreed = await Dialogs.showChoiceDialog(context, "Are you sure you want to remove your avatar?");
+    bool hasAgreed = await Dialogs.showChoiceDialog(context, AppLocalizations.of(context).areYouSureRemoveAvatar);
     if (hasAgreed) {
       Provider.of<AuthProvider>(context, listen: false).removeAvatar();
     }
@@ -294,7 +295,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     return Scaffold(
       appBar: TaskAppBar(
-        title: 'Account settings',
+        title: AppLocalizations.of(context).accountSettings,
       ),
       body: SingleChildScrollView(
         child: Padding(

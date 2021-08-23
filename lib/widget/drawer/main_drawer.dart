@@ -11,6 +11,7 @@ import '../../screen/settings_tabs_screen.dart';
 import '../../screen/tags_screen.dart';
 import '../../screen/trash_screen.dart';
 import '../drawerListTile.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MainDrawer extends StatelessWidget {
   @override
@@ -85,39 +86,39 @@ class MainDrawer extends StatelessWidget {
               ),
               child: DrawerListTile(
                 icon: Icons.settings,
-                title: 'Settings',
+                title: AppLocalizations.of(context).settings,
                 routeName: SettingsTabsScreen.routeName,
               ),
             ),
             DrawerListTile(
               icon: Icons.tag,
-              title: 'Tags',
+              title: AppLocalizations.of(context).tags,
               routeName: TagsScreen.routeName,
             ),
             DrawerListTile(
               icon: Icons.analytics_outlined,
-              title: 'Analytics',
+              title: AppLocalizations.of(context).analytics,
             ),
             DrawerListTile(
               icon: Icons.location_on,
-              title: 'Locations',
+              title: AppLocalizations.of(context).locations,
               routeName: LocationsScreen.routeName,
             ),
             DrawerListTile(
               icon: Icons.done_all_outlined,
-              title: 'Completed',
+              title: AppLocalizations.of(context).completed,
               routeName: CompletedScreen.routeName,
             ),
             DrawerListTile(
               icon: Icons.delete_outline_outlined,
-              title: 'Trash',
+              title: AppLocalizations.of(context).trash,
               routeName: TrashScreen.routeName,
             ),
             ListTile(
               minLeadingWidth: 16,
               contentPadding: EdgeInsets.symmetric(horizontal: 0),
               leading: Icon(Icons.logout),
-              title: Text('Log out'),
+              title: Text(AppLocalizations.of(context).logout),
               onTap: () => Dialogs.logoutDialog(context),
             ),
           ],

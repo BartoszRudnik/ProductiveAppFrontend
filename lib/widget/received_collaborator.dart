@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../model/collaborator.dart';
 import '../provider/delegate_provider.dart';
 import 'collaborator_list_element.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ReceivedCollaborator extends StatelessWidget {
   Collaborator collaborator;
@@ -79,7 +80,7 @@ class ReceivedCollaborator extends StatelessWidget {
                           Navigator.of(context).pop(true);
                         },
                         child: Text(
-                          'Yes',
+                          AppLocalizations.of(context).yes,
                           style: TextStyle(
                             fontSize: 14,
                             color: Theme.of(context).accentColor,
@@ -91,7 +92,7 @@ class ReceivedCollaborator extends StatelessWidget {
                           Navigator.of(context).pop(false);
                         },
                         child: Text(
-                          'No',
+                          AppLocalizations.of(context).no,
                           style: TextStyle(
                             fontSize: 14,
                             color: Theme.of(context).accentColor,

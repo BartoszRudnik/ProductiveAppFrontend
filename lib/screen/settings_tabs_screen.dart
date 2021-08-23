@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../provider/delegate_provider.dart';
 import 'collaborators_screen.dart';
 import 'settings_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SettingsTabsScreen extends StatefulWidget {
   static const routeName = "/settingTabsScreen";
@@ -112,11 +113,11 @@ class _SettingsTabsScreenState extends State<SettingsTabsScreen> {
             type: BottomNavigationBarType.fixed,
             items: [
               BottomNavigationBarItem(
-                icon: _buildIcon(Icons.settings, "Settings", 0, false),
+                icon: _buildIcon(Icons.settings, AppLocalizations.of(context).settings, 0, false),
                 title: SizedBox.shrink(),
               ),
               BottomNavigationBarItem(
-                icon: _buildIcon(Icons.people_outline, "Collaborators", 1, true),
+                icon: _buildIcon(Icons.people_outline, AppLocalizations.of(context).collaborators, 1, true),
                 title: SizedBox.shrink(),
               )
             ],

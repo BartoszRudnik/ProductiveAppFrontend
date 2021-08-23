@@ -6,6 +6,7 @@ import '../provider/task_provider.dart';
 import '../utils/manage_filters.dart';
 import '../widget/empty_list.dart';
 import '../widget/task_widget.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ScheduledScreen extends StatelessWidget {
   @override
@@ -24,7 +25,7 @@ class ScheduledScreen extends StatelessWidget {
       backgroundColor: Theme.of(context).primaryColor,
       onRefresh: () => Provider.of<TaskProvider>(context, listen: false).fetchTasks(),
       child: before.length == 0 && today.length == 0 && after.length == 0
-          ? EmptyList(message: 'Your scheduled list is empty')
+          ? EmptyList(message: AppLocalizations.of(context).emptyScheduled)
           : SingleChildScrollView(
               physics: AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.only(left: 21, right: 17, top: 10),
@@ -39,7 +40,7 @@ class ScheduledScreen extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'Before Today',
+                            AppLocalizations.of(context).beforeToday,
                             style: TextStyle(
                               fontSize: 27,
                               fontWeight: FontWeight.w400,
@@ -117,7 +118,7 @@ class ScheduledScreen extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'Today',
+                            AppLocalizations.of(context).today,
                             style: TextStyle(
                               fontSize: 27,
                               fontWeight: FontWeight.w400,
@@ -195,7 +196,7 @@ class ScheduledScreen extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'After Today',
+                            AppLocalizations.of(context).afterToday,
                             style: TextStyle(
                               fontSize: 27,
                               fontWeight: FontWeight.w400,

@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:productive_app/config/color_themes.dart';
 import 'package:productive_app/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SignWithGoogle extends StatelessWidget {
   @override
@@ -21,7 +22,7 @@ class SignWithGoogle extends StatelessWidget {
             Icon(FontAwesomeIcons.google),
             SizedBox(width: 10),
             Text(
-              'Sign in with Google',
+              AppLocalizations.of(context).signInGoogle,
               style: TextStyle(
                 fontSize: 25,
               ),

@@ -3,6 +3,7 @@ import '../model/collaborator.dart';
 import 'active_tasks_screen.dart';
 import 'collaborator_profile.dart';
 import 'recent_tasks.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CollaboratorProfileTabs extends StatefulWidget {
   static const routeName = "/collaboratorProfileTabs";
@@ -114,15 +115,15 @@ class _CollaboratorProfileTabsState extends State<CollaboratorProfileTabs> {
             type: BottomNavigationBarType.fixed,
             items: [
               BottomNavigationBarItem(
-                icon: _buildIcon(Icons.settings, "Collaborator profile", 0),
+                icon: _buildIcon(Icons.settings, AppLocalizations.of(context).collaboratorProfile, 0),
                 title: SizedBox.shrink(),
               ),
               BottomNavigationBarItem(
-                icon: _buildIcon(Icons.done_all_outlined, "Recently finished tasks", 1),
+                icon: _buildIcon(Icons.done_all_outlined, AppLocalizations.of(context).recentlyFinishedTasks, 1),
                 title: SizedBox.shrink(),
               ),
               BottomNavigationBarItem(
-                icon: _buildIcon(Icons.present_to_all_outlined, "Active tasks", 2),
+                icon: _buildIcon(Icons.present_to_all_outlined, AppLocalizations.of(context).activeTasks, 2),
                 title: SizedBox.shrink(),
               )
             ],

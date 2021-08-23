@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TaskDescription extends StatelessWidget {
   Function setTaskDescription;
@@ -18,7 +19,7 @@ class TaskDescription extends StatelessWidget {
         fontWeight: FontWeight.w400,
       ),
       decoration: InputDecoration(
-        hintText: 'Task description',
+        hintText: AppLocalizations.of(context).taskDescription,
         hintStyle: TextStyle(
           fontWeight: FontWeight.w400,
           fontSize: 15,

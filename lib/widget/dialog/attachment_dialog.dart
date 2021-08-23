@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AttachmentDialog extends StatefulWidget {
   final List<File> files;
@@ -20,7 +21,7 @@ class _AttachmentDialogState extends State<AttachmentDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(
-        'Add new files',
+        AppLocalizations.of(context).addNewFiles,
         textAlign: TextAlign.center,
         style: TextStyle(
           fontWeight: FontWeight.w500,
@@ -43,7 +44,7 @@ class _AttachmentDialogState extends State<AttachmentDialog> {
             setState(() {});
           },
           child: Text(
-            'Add new File',
+            AppLocalizations.of(context).addNewFile,
             textAlign: TextAlign.start,
           ),
         ),
@@ -52,7 +53,7 @@ class _AttachmentDialogState extends State<AttachmentDialog> {
             Navigator.of(context).pop(this.widget.files);
           },
           child: Text(
-            'Save',
+            AppLocalizations.of(context).save,
             textAlign: TextAlign.end,
           ),
         ),

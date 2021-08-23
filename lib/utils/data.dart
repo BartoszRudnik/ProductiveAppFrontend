@@ -1,7 +1,5 @@
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
-import 'package:provider/provider.dart';
-
 import '../model/task.dart';
 import '../provider/attachment_provider.dart';
 import '../provider/auth_provider.dart';

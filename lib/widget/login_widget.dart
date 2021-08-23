@@ -7,6 +7,7 @@ import '../provider/auth_provider.dart';
 import '../screen/reset_password_screen.dart';
 import 'validation_fail_widget.dart';
 import 'login_greet.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LoginWidget extends StatefulWidget {
   @override
@@ -71,13 +72,13 @@ class _LoginWidgetState extends State<LoginWidget> {
           context: context,
           builder: (context) => AlertDialog(
             title: Text(
-              'Registration successful',
+              AppLocalizations.of(context).registrationSuccessful,
               style: Theme.of(context).textTheme.headline2,
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Please check your registered email for email verification'),
+                Text(AppLocalizations.of(context).checkEmail),
                 SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -153,7 +154,7 @@ class _LoginWidgetState extends State<LoginWidget> {
           key: this._formKey,
           child: Column(
             children: [
-              LoginGreet(greetText: this._isLogin ? 'Welcome back' : 'Create account'),
+              LoginGreet(greetText: this._isLogin ? AppLocalizations.of(context).welcomeBack : AppLocalizations.of(context).createAccount),
               if (!this._isValid) ValidationFailWidget(message: this._authenticationFailedMessage),
               SizedBox(height: this._isValid ? 0 : 10),
               TextFormField(
@@ -195,7 +196,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                 obscureText: true,
                 decoration: ColorThemes.loginFormFieldDecoration(
                   context,
-                  'Password',
+                  AppLocalizations.of(context).password,
                   Icons.lock_outline,
                 ),
               ),
@@ -208,7 +209,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                             Navigator.of(context).pushReplacementNamed(ResetPassword.routeName);
                           },
                           child: Text(
-                            'Forgot Password?',
+                            AppLocalizations.of(context).forgotPassword,
                             style: Theme.of(context).textTheme.headline5,
                           ),
                         ),
@@ -227,7 +228,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                           style: ColorThemes.loginButtonStyle(context),
                           onPressed: this._trySubmit,
                           child: Text(
-                            this._isLogin ? 'Sign in' : 'Sign up',
+                            this._isLogin ? AppLocalizations.of(context).signInShort : AppLocalizations.of(context).signUpShort,
                             style: TextStyle(
                               fontSize: 25,
                             ),
@@ -240,7 +241,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    this._isLogin ? 'Don\'t have account?' : 'Already have a account',
+                    this._isLogin ? AppLocalizations.of(context).noAccount : AppLocalizations.of(context).alreadyAccount,
                     style: TextStyle(
                       fontSize: 12,
                       fontFamily: 'RobotoCondensed',
@@ -254,7 +255,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                       });
                     },
                     child: Text(
-                      this._isLogin ? 'create a new account!' : 'Login',
+                      this._isLogin ? AppLocalizations.of(context).createAccount : AppLocalizations.of(context).signInShort,
                       style: Theme.of(context).textTheme.headline5,
                     ),
                   ),

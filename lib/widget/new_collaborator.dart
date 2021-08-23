@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/provider/delegate_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NewCollaborator extends StatefulWidget {
   @override
@@ -57,7 +58,7 @@ class _NewCollaboratorState extends State<NewCollaborator> {
                                 Navigator.of(context).pop(false);
                                 Navigator.of(context).pop();
                               },
-                              child: Text('Cancel'),
+                              child: Text(AppLocalizations.of(context).cancel),
                             ),
                             ElevatedButton(
                               onPressed: () {
@@ -76,7 +77,7 @@ class _NewCollaboratorState extends State<NewCollaborator> {
             },
             maxLines: null,
             decoration: InputDecoration(
-              hintText: 'Enter collaborator email',
+              hintText: AppLocalizations.of(context).enterCollaboratorEmail,
               hintStyle: TextStyle(
                 fontWeight: FontWeight.w400,
                 fontSize: 20,

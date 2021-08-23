@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/widget/switch_list_tile/theme_switch_list_tile.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SettingsGraphicSettings extends StatefulWidget {
   @override
@@ -28,7 +29,7 @@ class _SettingsGraphicSettingsState extends State<SettingsGraphicSettings> {
               alignment: Alignment(-1.1, 0),
               child: Center(
                 child: Text(
-                  "GRAPHIC SETTINGS",
+                  AppLocalizations.of(context).graphicSettings,
                   style: TextStyle(fontSize: 20),
                 ),
               ),

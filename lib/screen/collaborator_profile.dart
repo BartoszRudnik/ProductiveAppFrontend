@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../model/collaborator.dart';
 import '../provider/delegate_provider.dart';
 import '../widget/appBar/collaborator_profile_appBar.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CollaboratorProfile extends StatelessWidget {
   final int collaboratorId;
@@ -65,7 +66,7 @@ class CollaboratorProfile extends StatelessWidget {
                         Expanded(
                           flex: 4,
                           child: Text(
-                            "E-mail:",
+                            AppLocalizations.of(context).email,
                             style: TextStyle(fontSize: 18),
                           ),
                         ),
@@ -85,7 +86,7 @@ class CollaboratorProfile extends StatelessWidget {
                         Expanded(
                           flex: 4,
                           child: Text(
-                            "Name:",
+                            AppLocalizations.of(context).name,
                             style: TextStyle(fontSize: 18),
                           ),
                         ),
@@ -97,7 +98,7 @@ class CollaboratorProfile extends StatelessWidget {
                             initialValue: collaborator.collaboratorName,
                             style: TextStyle(fontSize: 18),
                             maxLines: 1,
-                            decoration: InputDecoration(hintText: "Name"),
+                            decoration: InputDecoration(hintText: AppLocalizations.of(context).name),
                           ),
                         )
                       ],
@@ -131,7 +132,7 @@ class CollaboratorProfile extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             Text(
-                              'Asked for permission to see your activity',
+                              AppLocalizations.of(context).isAskingForPermission,
                             ),
                             IconButton(
                               icon: Icon(Icons.cancel_outlined),
@@ -174,31 +175,30 @@ class CollaboratorProfile extends StatelessWidget {
                           builder: (context) => AlertDialog(
                             title: Center(
                               child: Text(
-                                'Delete',
+                                AppLocalizations.of(context).delete,
                                 style: Theme.of(context).textTheme.headline3,
                               ),
                             ),
                             content: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text('Are you sure you want to delete this collaborator?'),
+                                Text(AppLocalizations.of(context).areYouSureDeleteCollab),
                                 SizedBox(height: 10),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: [
                                     ElevatedButton(
-                                      onPressed: () async {
-                                        await Provider.of<DelegateProvider>(context, listen: false).deleteCollaborator(collaborator.id);
-                                        Navigator.of(context).pop(true);
-                                        Navigator.of(context).pop(true);
-                                      },
-                                      child: Text('Yes'),
-                                    ),
+                                        onPressed: () async {
+                                          await Provider.of<DelegateProvider>(context, listen: false).deleteCollaborator(collaborator.id);
+                                          Navigator.of(context).pop(true);
+                                          Navigator.of(context).pop(true);
+                                        },
+                                        child: Text(AppLocalizations.of(context).yes)),
                                     ElevatedButton(
                                       onPressed: () {
                                         Navigator.of(context).pop(false);
                                       },
-                                      child: Text('No'),
+                                      child: Text(AppLocalizations.of(context).no),
                                     ),
                                   ],
                                 )
@@ -207,7 +207,7 @@ class CollaboratorProfile extends StatelessWidget {
                           ),
                         );
                       },
-                      child: Text('Delete from collaborators'),
+                      child: Text(AppLocalizations.of(context).deleteFromCollaborators),
                     ),
                   ],
                 ),

@@ -3,6 +3,7 @@ import 'package:productive_app/provider/settings_provider.dart';
 import 'package:productive_app/widget/dialog/filter_priority_dialog.dart';
 import 'package:productive_app/widget/single_selected_filter.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FilterPriorities extends StatelessWidget {
   final priorities;
@@ -26,7 +27,7 @@ class FilterPriorities extends StatelessWidget {
                 child: Row(
                   children: [
                     Text(
-                      'Priorities',
+                      AppLocalizations.of(context).priority,
                       style: TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.w400,
@@ -61,7 +62,7 @@ class FilterPriorities extends StatelessWidget {
                         }
                       },
                       child: Text(
-                        'Choose priorities',
+                        AppLocalizations.of(context).choosePriorities,
                         style: TextStyle(fontSize: 24),
                       ),
                     ),
