@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/config/color_themes.dart';
+import 'package:productive_app/config/const_values.dart';
 import 'package:productive_app/model/task.dart';
 import 'package:productive_app/provider/delegate_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class TaskDetailsAttributes extends StatelessWidget {
   final Task taskToEdit;
@@ -112,13 +114,15 @@ class TaskDetailsAttributes extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.person_add),
-                  Text(
+                  AutoSizeText(
                     this.taskToEdit.delegatedEmail == null
                         ? AppLocalizations.of(context).assigned
                         : collaboratorName.length > 1
                             ? collaboratorName
                             : this.taskToEdit.delegatedEmail,
                     textAlign: TextAlign.center,
+                    presetFontSizes: ConstValues.fontSizes,
+                    maxLines: 1,
                   ),
                 ],
               ),

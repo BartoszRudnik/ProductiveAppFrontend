@@ -237,14 +237,12 @@ class _LoginWidgetState extends State<LoginWidget> {
                 ),
               SizedBox(height: 20),
               Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
                     this._isLogin ? AppLocalizations.of(context).noAccount : AppLocalizations.of(context).alreadyAccount,
                     style: TextStyle(
                       fontSize: 12,
-                      fontFamily: 'RobotoCondensed',
                     ),
                   ),
                   TextButton(
@@ -254,9 +252,12 @@ class _LoginWidgetState extends State<LoginWidget> {
                         this._isLogin = !this._isLogin;
                       });
                     },
-                    child: Text(
-                      this._isLogin ? AppLocalizations.of(context).createAccount : AppLocalizations.of(context).signInShort,
-                      style: Theme.of(context).textTheme.headline5,
+                    child: Center(
+                      child: Text(
+                        this._isLogin ? AppLocalizations.of(context).createAccount : AppLocalizations.of(context).signInShort,
+                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
                 ],

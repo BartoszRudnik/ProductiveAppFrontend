@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:productive_app/config/color_themes.dart';
+import 'package:productive_app/config/const_values.dart';
 import 'package:productive_app/provider/settings_provider.dart';
 import 'package:provider/provider.dart';
 import '../../screen/filters_screen.dart';
 import '../../screen/task_map.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class NewTaskAppBar extends StatefulWidget with PreferredSizeWidget {
   final String title;
@@ -43,13 +45,14 @@ class _NewTaskAppBarState extends State<NewTaskAppBar> {
                 },
               ),
             )
-          : Text(
+          : AutoSizeText(
               this.widget.title,
               style: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.w400,
                 color: Theme.of(context).primaryColor,
               ),
+              minFontSize: 20,
+              maxFontSize: 26,
+              maxLines: 1,
             ),
       systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: Colors.black),
       backgroundColor: Theme.of(context).accentColor,

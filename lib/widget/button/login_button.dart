@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:productive_app/config/const_values.dart';
 
 class LoginButton extends StatelessWidget {
   final String labelText;
@@ -30,10 +32,10 @@ class LoginButton extends StatelessWidget {
             arguments: {'loginMode': this.loginMode},
           );
         },
-        child: Text(
+        child: AutoSizeText(
           this.labelText,
+          presetFontSizes: ConstValues.fontSizes,
           style: TextStyle(
-            fontSize: 25,
             color: this.textColor,
           ),
         ),

@@ -560,7 +560,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                     title: Align(
                       alignment: Alignment(-1.1, 0),
                       child: Text(
-                        "Attachments",
+                        AppLocalizations.of(context).attachments,
                         style: TextStyle(fontSize: 21),
                       ),
                     ),

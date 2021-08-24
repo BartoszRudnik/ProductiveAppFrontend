@@ -50,6 +50,7 @@ dependencies:
   mime: any
   share_plus: any
   open_file: any
+  auto_size_text: any
   
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

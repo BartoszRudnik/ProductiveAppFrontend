@@ -1,6 +1,7 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:productive_app/config/const_values.dart';
 import 'package:provider/provider.dart';
 import '../provider/delegate_provider.dart';
 import '../provider/task_provider.dart';
@@ -11,6 +12,7 @@ import 'delegated_screen.dart';
 import 'inbox_screen.dart';
 import 'scheduled_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class TabsScreen extends StatefulWidget {
   static const routeName = '/tabs-screen';
@@ -65,6 +67,25 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
       this._selectedBgColor = Colors.black;
       this._unselectedBgColor = Colors.white;
     }
+
+    this._pages = [
+      {
+        'page': InboxScreen(),
+        'title': AppLocalizations.of(context).inbox,
+      },
+      {
+        'page': AnytimeScreen(),
+        'title': AppLocalizations.of(context).anytime,
+      },
+      {
+        'page': ScheduledScreen(),
+        'title': AppLocalizations.of(context).scheduled,
+      },
+      {
+        'page': DelegatedScreen(),
+        'title': AppLocalizations.of(context).delegated,
+      }
+    ];
   }
 
   @override
@@ -73,25 +94,6 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
 
     this._hideFab = AnimationController(vsync: this, duration: kThemeAnimationDuration);
     this._hideFab.forward();
-
-    _pages = [
-      {
-        'page': InboxScreen(),
-        'title': 'Inbox',
-      },
-      {
-        'page': AnytimeScreen(),
-        'title': 'AnyTime',
-      },
-      {
-        'page': ScheduledScreen(),
-        'title': 'Scheduled',
-      },
-      {
-        'page': DelegatedScreen(),
-        'title': 'Delegated',
-      }
-    ];
   }
 
   @override
@@ -165,7 +167,17 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Icon(iconData),
-                Text(text, style: TextStyle(fontSize: 12, color: this._getItemColor(index))),
+                Flexible(
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: AutoSizeText(
+                      text,
+                      style: TextStyle(color: this._getItemColor(index)),
+                      presetFontSizes: ConstValues.fontSizes,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
               ],
             ),
             onTap: () => this._selectPage(index),
@@ -194,7 +206,14 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
                   ),
                   child: Icon(iconData),
                 ),
-                Text(text, style: TextStyle(fontSize: 12, color: this._getItemColor(index))),
+                Flexible(
+                  child: AutoSizeText(
+                    text,
+                    style: TextStyle(color: this._getItemColor(index)),
+                    textAlign: TextAlign.center,
+                    presetFontSizes: ConstValues.fontSizes,
+                  ),
+                ),
               ],
             ),
             onTap: () => this._selectPage(index),
@@ -251,7 +270,7 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
           },
           child: Scaffold(
             appBar: NewTaskAppBar(
-              title: _pages[_selectedPageIndex]['title'],
+              title: this._pages[_selectedPageIndex]['title'],
               leadingButton: IconButton(
                 icon: Badge(
                   position: BadgePosition.topStart(),
@@ -264,7 +283,7 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
                 },
               ),
             ),
-            body: _pages[_selectedPageIndex]['page'],
+            body: this._pages[_selectedPageIndex]['page'],
             floatingActionButton: ScaleTransition(
               scale: this._hideFab,
               alignment: Alignment.bottomCenter,

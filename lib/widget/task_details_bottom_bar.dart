@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/config/const_values.dart';
 import 'package:productive_app/model/task.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class TaskDetailsBottomBar extends StatefulWidget {
   final Function deleteTask;
@@ -31,7 +33,14 @@ class _TaskDetailsBottomBarState extends State<TaskDetailsBottomBar> {
                 onPrimary: Theme.of(context).primaryColor,
               ),
               icon: Icon(Icons.delete),
-              label: Text(AppLocalizations.of(context).archive),
+              label: Flexible(
+                child: AutoSizeText(
+                  AppLocalizations.of(context).archive,
+                  minFontSize: 10,
+                  maxFontSize: 16,
+                  maxLines: 1,
+                ),
+              ),
             ),
           ),
           Expanded(
@@ -46,8 +55,13 @@ class _TaskDetailsBottomBarState extends State<TaskDetailsBottomBar> {
                 onPrimary: Theme.of(context).primaryColor,
               ),
               icon: Icon(this.widget.taskToEdit.done ? Icons.cancel : Icons.done),
-              label: Text(
-                this.widget.taskToEdit.done ? AppLocalizations.of(context).unmarkAsDone : AppLocalizations.of(context).markAsDone,
+              label: Flexible(
+                child: AutoSizeText(
+                  this.widget.taskToEdit.done ? AppLocalizations.of(context).unmarkAsDone : AppLocalizations.of(context).markAsDone,
+                  minFontSize: 10,
+                  maxFontSize: 16,
+                  maxLines: 1,
+                ),
               ),
             ),
           ),
@@ -59,7 +73,14 @@ class _TaskDetailsBottomBarState extends State<TaskDetailsBottomBar> {
                 onPrimary: Theme.of(context).primaryColor,
               ),
               icon: Icon(Icons.save),
-              label: Text(AppLocalizations.of(context).save),
+              label: Flexible(
+                child: AutoSizeText(
+                  AppLocalizations.of(context).save,
+                  minFontSize: 10,
+                  maxFontSize: 16,
+                  maxLines: 1,
+                ),
+              ),
             ),
           ),
         ],

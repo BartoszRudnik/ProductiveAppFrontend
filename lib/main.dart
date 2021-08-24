@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:productive_app/provider/attachment_provider.dart';
 import 'package:productive_app/l10n/L10n.dart';
+import 'package:productive_app/provider/locale_provider.dart';
 import 'utils/notifications.dart';
 import 'package:provider/provider.dart';
 import 'config/color_themes.dart';
@@ -48,6 +49,13 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
           create: (context) => AuthProvider(),
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, LocaleProvider>(
+          create: null,
+          update: (ctx, auth, previousLocale) => LocaleProvider(
+            locale: previousLocale == null ? Locale('en') : previousLocale.locale,
+            email: auth.email,
+          ),
         ),
         ChangeNotifierProxyProvider<AuthProvider, AttachmentProvider>(
           create: null,
@@ -125,6 +133,7 @@ class MyApp extends StatelessWidget {
             GlobalCupertinoLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
           ],
+          locale: Provider.of<LocaleProvider>(context).locale,
           home: Provider.of<AuthProvider>(context).isAuth
               ? MainScreen()
               : FutureBuilder(

@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:productive_app/provider/locale_provider.dart';
 import 'package:provider/provider.dart';
 import '../model/task.dart';
 import '../provider/attachment_provider.dart';
@@ -23,6 +24,7 @@ class Data {
           Provider.of<AuthProvider>(context, listen: false).getUserData(),
           Provider.of<AuthProvider>(context, listen: false).checkIfAvatarExists(),
           Provider.of<AttachmentProvider>(context, listen: false).getAttachments(),
+          Provider.of<LocaleProvider>(context, listen: false).getLocale(),
         ],
       );
     } catch (error) {

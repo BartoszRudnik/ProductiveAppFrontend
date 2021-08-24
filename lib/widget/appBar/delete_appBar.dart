@@ -60,7 +60,15 @@ class DeleteAppBar extends StatelessWidget with PreferredSizeWidget {
                 },
               );
             } else if (value == "deleteAll") {
-              await Provider.of<TaskProvider>(context, listen: false).deleteAllTasks(this.title);
+              String listName;
+
+              if (this.title == AppLocalizations.of(context).completed) {
+                listName = 'Completed';
+              } else {
+                listName = 'Trash';
+              }
+
+              await Provider.of<TaskProvider>(context, listen: false).deleteAllTasks(listName);
             }
           },
           itemBuilder: (_) => [

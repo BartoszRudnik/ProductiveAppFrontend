@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:productive_app/widget/settings_language.dart';
 import 'package:provider/provider.dart';
 import '../provider/auth_provider.dart';
 import '../utils/dialogs.dart';
@@ -311,6 +312,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SettingsManageAccount(deleteUser: this.deleteUser, resetPassword: this.resetPassword),
                 SizedBox(height: 10),
                 SettingsGraphicSettings(),
+                SizedBox(height: 10),
+                SettingsLanguage(),
               ],
             ),
           ),

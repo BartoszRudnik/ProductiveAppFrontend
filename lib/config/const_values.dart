@@ -1,18 +1,24 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 class ConstValues {
-  static const sortingModes = [
-    'end Date ascending',
-    'end Date descending',
-    'start Date ascending',
-    'start Date descending',
-    'priority descending',
-    'priority ascending',
-    'custom',
-  ];
+  static String sortingModes(int index, BuildContext context) {
+    if (index == 0) {
+      return AppLocalizations.of(context).endDateAsc;
+    } else if (index == 1) {
+      return AppLocalizations.of(context).endDateDesc;
+    } else if (index == 2) {
+      return AppLocalizations.of(context).startDateAsc;
+    } else if (index == 3) {
+      return AppLocalizations.of(context).startDateDesc;
+    } else if (index == 4) {
+      return AppLocalizations.of(context).priorityDesc;
+    } else if (index == 5) {
+      return AppLocalizations.of(context).priorityAsc;
+    } else {
+      return AppLocalizations.of(context).custom;
+    }
+  }
 
-  static const defaultMapTemplate = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
-
-  static const lightMapTemplate = "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png";
-  static const darkMapTemplate = "https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png";
-
-  static const mapSubdomains = ['a', 'b', 'c'];
+  static const fontSizes = [48.0, 36.0, 32.0, 26.0, 24.0, 20.0, 18.0, 16.0, 14.0, 12.0];
 }
