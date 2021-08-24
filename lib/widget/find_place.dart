@@ -43,7 +43,7 @@ class _FindPlaceState extends State<FindPlace> {
                 controller: _textEditingController,
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.location_on),
-                  hintText: "Search for location",
+                  hintText: AppLocalizations.of(context).searchForLocation,
                   contentPadding: EdgeInsets.all(16.0),
                 ),
                 onChanged: (search) async {

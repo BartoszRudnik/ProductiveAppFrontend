@@ -32,7 +32,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Your data has been saved', textAlign: TextAlign.center),
+          content: Text(AppLocalizations.of(context).savedData, textAlign: TextAlign.center),
           duration: Duration(seconds: 2),
         ),
       );
@@ -58,7 +58,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   Center(
                     child: Text(
-                      'Checkout your email for delete token',
+                      AppLocalizations.of(context).checkEmail,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
@@ -69,11 +69,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: TextFormField(
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.all(10),
-                        hintText: 'Enter token',
+                        hintText: AppLocalizations.of(context).deleteToken,
                       ),
                       validator: (value) {
                         if (value.isEmpty || value.length < 6) {
-                          return 'Please provide valid token';
+                          return AppLocalizations.of(context).validToken;
                         }
                         return null;
                       },
@@ -117,7 +117,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> resetPassword(String userMail) async {
-    bool hasAgreed = await Dialogs.showChoiceDialog(context, AppLocalizations.of(context).resetPassword);
+    bool hasAgreed = await Dialogs.showChoiceDialog(context, AppLocalizations.of(context).areYouSureResetPassword);
     if (hasAgreed) {
       Provider.of<AuthProvider>(context, listen: false).resetPassword(userMail);
 
@@ -138,7 +138,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   Center(
                     child: Text(
-                      'Checkout your email for reset password token',
+                      AppLocalizations.of(context).checkEmail,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
@@ -151,11 +151,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         TextFormField(
                           decoration: InputDecoration(
                             contentPadding: EdgeInsets.all(10),
-                            hintText: 'Enter reset token',
+                            hintText: AppLocalizations.of(context).enterResetToken,
                           ),
                           validator: (value) {
                             if (value.isEmpty || value.length < 6) {
-                              return 'Please provide valid token';
+                              return AppLocalizations.of(context).wrongToken;
                             }
                             return null;
                           },
@@ -167,14 +167,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           obscureText: true,
                           decoration: InputDecoration(
                             contentPadding: EdgeInsets.all(10),
-                            hintText: 'Enter new password',
+                            hintText: AppLocalizations.of(context).enterNewPassword,
                           ),
                           validator: (value) {
                             if (value != this._cofirmPasswordKey.currentState.value) {
-                              return 'Passwords must be the same';
+                              return AppLocalizations.of(context).samePasswords;
                             }
                             if (value.isEmpty || value.length < 7) {
-                              return 'Password must be at least 7 characters long';
+                              return AppLocalizations.of(context).passwordLength;
                             }
                             return null;
                           },
@@ -187,11 +187,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           key: this._cofirmPasswordKey,
                           decoration: InputDecoration(
                             contentPadding: EdgeInsets.all(10),
-                            hintText: 'Confirm new password',
+                            hintText: AppLocalizations.of(context).repeatPassword,
                           ),
                           validator: (value) {
                             if (value.isEmpty || value.length < 7) {
-                              return 'Password must be at least 7 characters long';
+                              return AppLocalizations.of(context).passwordLength;
                             }
                             return null;
                           },
@@ -224,7 +224,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               builder: (context) => AlertDialog(
                                 title: Center(
                                   child: Text(
-                                    'New password successfuly set',
+                                    AppLocalizations.of(context).newPasswordSuccess,
                                     style: Theme.of(context).textTheme.headline2,
                                   ),
                                 ),
@@ -269,7 +269,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> changeAvatar() async {
-    String mode = await Dialogs.showImagePickerDialog(context, 'Choose picking mode');
+    String mode = await Dialogs.showImagePickerDialog(context, AppLocalizations.of(context).pickingMode);
 
     if (mode != null) {
       final imageSource = mode == 'Camera' ? ImageSource.camera : ImageSource.gallery;

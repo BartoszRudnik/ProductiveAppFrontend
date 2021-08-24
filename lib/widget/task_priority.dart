@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:productive_app/config/const_values.dart';
 
 class TaskPriority extends StatefulWidget {
   final Function setTaskPriority;
@@ -33,7 +35,7 @@ class _TaskPriorityState extends State<TaskPriority> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
-                Text(e),
+                Text(ConstValues.priorities(e, context)),
                 SizedBox(
                   width: 5,
                 ),

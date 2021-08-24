@@ -34,7 +34,8 @@ class LoginButton extends StatelessWidget {
         },
         child: AutoSizeText(
           this.labelText,
-          presetFontSizes: ConstValues.fontSizes,
+          minFontSize: 17,
+          maxFontSize: 32,
           style: TextStyle(
             color: this.textColor,
           ),

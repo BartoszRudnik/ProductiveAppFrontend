@@ -4,6 +4,7 @@ import 'package:productive_app/provider/location_provider.dart';
 import 'package:provider/provider.dart';
 import '../../config/color_themes.dart';
 import '../../provider/tag_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SearchAppBar extends StatefulWidget with PreferredSizeWidget {
   final String title;
@@ -38,7 +39,7 @@ class _SearchAppBarState extends State<SearchAppBar> {
               },
               decoration: ColorThemes.searchFormFieldDecoration(
                 context,
-                'Enter ${this.widget.searchingName} name',
+                this.widget.searchingName == 'tag' ? AppLocalizations.of(context).enterTagName : AppLocalizations.of(context).enterLocationName,
                 () {
                   this._formKey.currentState.reset();
                   this.widget.searchingName == 'tag' ? Provider.of<TagProvider>(context, listen: false).clearSearchingText() : Provider.of<LocationProvider>(context, listen: false).clearSearchingText();

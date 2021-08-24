@@ -203,10 +203,10 @@ class Dialogs {
                   key: _tKey,
                   child: TextFormField(
                     controller: _textEditingController,
-                    decoration: InputDecoration(hintText: "Enter name", contentPadding: EdgeInsets.all(16.0)),
+                    decoration: InputDecoration(hintText: AppLocalizations.of(context).enterLocationName, contentPadding: EdgeInsets.all(16.0)),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter name of the location';
+                        return AppLocalizations.of(context).enterLocationName;
                       }
                       return null;
                     },
@@ -258,10 +258,10 @@ class Dialogs {
                   key: _tKey,
                   child: TextFormField(
                     initialValue: initialValue,
-                    decoration: InputDecoration(hintText: "Enter name", contentPadding: EdgeInsets.all(16.0)),
+                    decoration: InputDecoration(hintText: AppLocalizations.of(context).enterLocationName, contentPadding: EdgeInsets.all(16.0)),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter name of the location';
+                        return AppLocalizations.of(context).enterLocationName;
                       }
                       return null;
                     },
@@ -314,13 +314,13 @@ class Dialogs {
                         onPressed: () {
                           Navigator.of(context).pop('Camera');
                         },
-                        child: Text('Camera'),
+                        child: Text(AppLocalizations.of(context).camera),
                       ),
                       ElevatedButton(
                         onPressed: () {
                           Navigator.of(context).pop('Gallery');
                         },
-                        child: Text('Gallery'),
+                        child: Text(AppLocalizations.of(context).gallery),
                       ),
                       ElevatedButton(
                         onPressed: () {

@@ -20,5 +20,59 @@ class ConstValues {
     }
   }
 
+  static String priorities(String priority, BuildContext context) {
+    if (priority.toLowerCase() == "CRITICAL".toLowerCase()) {
+      return AppLocalizations.of(context).critical;
+    } else if (priority.toLowerCase() == "HIGHER".toLowerCase()) {
+      return AppLocalizations.of(context).higher;
+    } else if (priority.toLowerCase() == "HIGH".toLowerCase()) {
+      return AppLocalizations.of(context).high;
+    } else if (priority.toLowerCase() == "NORMAL".toLowerCase()) {
+      return AppLocalizations.of(context).normal;
+    } else {
+      return AppLocalizations.of(context).low;
+    }
+  }
+
+  static String listName(String listName, BuildContext context) {
+    if (listName.toLowerCase() == "INBOX".toLowerCase()) {
+      return AppLocalizations.of(context).inbox;
+    } else if (listName.toLowerCase() == "SCHEDULED".toLowerCase()) {
+      return AppLocalizations.of(context).scheduled;
+    } else if (listName.toLowerCase() == "ANYTIME".toLowerCase()) {
+      return AppLocalizations.of(context).anytime;
+    } else if (listName.toLowerCase() == "COMPLETED".toLowerCase()) {
+      return AppLocalizations.of(context).completed;
+    } else if (listName.toLowerCase() == "TRASH".toLowerCase()) {
+      return AppLocalizations.of(context).trash;
+    } else {
+      return AppLocalizations.of(context).delegated;
+    }
+  }
+
+  static String language(String langCode, BuildContext context) {
+    if (langCode.toLowerCase() == "EN".toLowerCase()) {
+      return AppLocalizations.of(context).english;
+    } else {
+      return AppLocalizations.of(context).polish;
+    }
+  }
+
+  static String taskStatus(String status, BuildContext context) {
+    if (status.toLowerCase() == "sent") {
+      return AppLocalizations.of(context).taskSent;
+    } else if (status.toLowerCase() == "waiting") {
+      return AppLocalizations.of(context).waiting;
+    } else if (status.toLowerCase() == "in progress") {
+      return AppLocalizations.of(context).inProgress;
+    } else if (status.toLowerCase() == "canceled") {
+      return AppLocalizations.of(context).canceled;
+    } else if (status.toLowerCase() == "done") {
+      return AppLocalizations.of(context).done;
+    } else {
+      return AppLocalizations.of(context).deleted;
+    }
+  }
+
   static const fontSizes = [48.0, 36.0, 32.0, 26.0, 24.0, 20.0, 18.0, 16.0, 14.0, 12.0];
 }

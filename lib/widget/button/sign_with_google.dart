@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:productive_app/config/color_themes.dart';
-import 'package:productive_app/config/const_values.dart';
-import 'package:productive_app/provider/auth_provider.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+
+import '../../config/color_themes.dart';
+import '../../provider/auth_provider.dart';
 
 class SignWithGoogle extends StatelessWidget {
   @override
@@ -27,7 +27,9 @@ class SignWithGoogle extends StatelessWidget {
               child: AutoSizeText(
                 AppLocalizations.of(context).signInGoogle,
                 maxLines: 1,
-                presetFontSizes: ConstValues.fontSizes,
+                minFontSize: 16,
+                maxFontSize: 32,
+                textAlign: TextAlign.center,
               ),
             ),
           ],

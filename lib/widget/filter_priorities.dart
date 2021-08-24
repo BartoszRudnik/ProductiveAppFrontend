@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/config/const_values.dart';
 import 'package:productive_app/provider/settings_provider.dart';
 import 'package:productive_app/widget/dialog/filter_priority_dialog.dart';
 import 'package:productive_app/widget/single_selected_filter.dart';
@@ -94,7 +95,7 @@ class FilterPriorities extends StatelessWidget {
                       if (this.priorities[index] == 'CRITICAL') icon = Icon(Icons.warning_amber_sharp, color: Theme.of(context).primaryColor);
 
                       return SingleSelectedFilter(
-                        text: this.priorities[index],
+                        text: ConstValues.priorities(this.priorities[index], context),
                         onPressed: onPressed,
                         icon: icon,
                       );

@@ -144,7 +144,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
 
                                     this._addNewLocationForm(context, choosenLocation);
                                   },
-                                  child: Text('New'),
+                                  child: Text(AppLocalizations.of(context).newWord),
                                 ),
                               ),
                             ),

@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../config/color_themes.dart';
 import '../model/task.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class TaskDetailsDates extends StatefulWidget {
   final Function selectStartDate;
@@ -40,9 +41,10 @@ class _TaskDetailsDatesState extends State<TaskDetailsDates> {
           leading: Icon(Icons.calendar_today),
           title: Align(
             alignment: Alignment(-1.1, 0),
-            child: Text(
+            child: AutoSizeText(
               AppLocalizations.of(context).startAndEndDate,
-              style: TextStyle(fontSize: 21),
+              minFontSize: 18,
+              maxFontSize: 24,
             ),
           ),
         ),

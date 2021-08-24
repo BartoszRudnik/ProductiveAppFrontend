@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/config/const_values.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -60,7 +61,7 @@ class FilterPriorityDialog extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                priorities[priorityIndex],
+                                ConstValues.priorities(priorities[priorityIndex], context),
                                 style: TextStyle(
                                   color: selectedPriorities[priorityIndex] ? Theme.of(context).accentColor : Theme.of(context).primaryColor,
                                 ),

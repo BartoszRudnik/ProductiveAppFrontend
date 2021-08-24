@@ -4,6 +4,7 @@ import 'active_tasks_screen.dart';
 import 'collaborator_profile.dart';
 import 'recent_tasks.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class CollaboratorProfileTabs extends StatefulWidget {
   static const routeName = "/collaboratorProfileTabs";
@@ -85,7 +86,16 @@ class _CollaboratorProfileTabsState extends State<CollaboratorProfileTabs> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Text(text, style: TextStyle(fontSize: 12, color: this._getItemColor(index))),
+                Flexible(
+                  child: AutoSizeText(
+                    text,
+                    style: TextStyle(color: this._getItemColor(index)),
+                    textAlign: TextAlign.center,
+                    minFontSize: 10,
+                    maxFontSize: 16,
+                    maxLines: 2,
+                  ),
+                ),
               ],
             ),
             onTap: () => this._selectPage(index),

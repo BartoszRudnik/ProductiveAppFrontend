@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:productive_app/model/location.dart';
 import 'package:productive_app/provider/location_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FilterLocationDialog extends StatelessWidget {
   final _locationKey = GlobalKey<FormState>();
@@ -49,7 +50,7 @@ class FilterLocationDialog extends StatelessWidget {
                       maxLines: null,
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.all(10),
-                        hintText: 'Find location',
+                        hintText: AppLocalizations.of(context).findLocation,
                       ),
                     ),
                   ),
@@ -96,7 +97,7 @@ class FilterLocationDialog extends StatelessWidget {
                         });
                         Navigator.of(context).pop('cancel');
                       },
-                      child: Text('Cancel'),
+                      child: Text(AppLocalizations.of(context).cancel),
                     ),
                     ElevatedButton(
                       onPressed: () {
@@ -105,7 +106,7 @@ class FilterLocationDialog extends StatelessWidget {
                         });
                         Navigator.of(context).pop(this.choosenLocations);
                       },
-                      child: Text('Save'),
+                      child: Text(AppLocalizations.of(context).save),
                     ),
                   ],
                 ),

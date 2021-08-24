@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class ActiveTasksAppBar extends StatelessWidget with PreferredSizeWidget {
   final String message;
@@ -11,11 +12,16 @@ class ActiveTasksAppBar extends StatelessWidget with PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text(
-        this.message,
-        style: TextStyle(
-          fontSize: 26,
-          color: Theme.of(context).primaryColor,
+      title: Container(
+        width: MediaQuery.of(context).size.width * 0.9,
+        height: 30,
+        child: AutoSizeText(
+          this.message,
+          minFontSize: 16,
+          maxFontSize: 28,
+          style: TextStyle(
+            color: Theme.of(context).primaryColor,
+          ),
         ),
       ),
       toolbarHeight: 50,

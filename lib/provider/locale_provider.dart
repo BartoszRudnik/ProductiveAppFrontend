@@ -24,9 +24,6 @@ class LocaleProvider with ChangeNotifier {
 
       final responseBody = json.decode(response.body);
 
-      print(response.body);
-      print(responseBody);
-
       this.locale = Locale(responseBody['languageCode']);
 
       notifyListeners();

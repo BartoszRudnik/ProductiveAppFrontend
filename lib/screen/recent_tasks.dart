@@ -156,6 +156,11 @@ class _RecentTasksState extends State<RecentTasks> {
                         builderDelegate: PagedChildBuilderDelegate<CollaboratorTask>(
                           itemBuilder: (context, task, index) => SingleCollaboratorTask(task: task),
                           firstPageProgressIndicatorBuilder: (_) => ListShimmer(),
+                          noItemsFoundIndicatorBuilder: (_) => Container(
+                            child: Center(
+                              child: Text(AppLocalizations.of(context).emptyList),
+                            ),
+                          ),
                         ),
                         pagingController: this._pagingController,
                         padding: const EdgeInsets.all(12),

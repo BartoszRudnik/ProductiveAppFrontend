@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/config/const_values.dart';
 import 'package:productive_app/utils/task_validate.dart';
 import 'package:provider/provider.dart';
 import '../config/color_themes.dart';
@@ -210,7 +211,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       if (this.originalTask.localization != newLocalization) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Your task has been moved to $newLocalization.'),
+            content: Text(AppLocalizations.of(context).taskMoved + ConstValues.listName(newLocalization, context)),
             duration: Duration(seconds: 2),
           ),
         );
@@ -221,13 +222,13 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       this.changesSaved = true;
     } catch (error) {
       print(error);
-      await Dialogs.showWarningDialog(context, "An error has occured");
+      await Dialogs.showWarningDialog(context, AppLocalizations.of(context).errorOccurred);
     }
     Navigator.of(context).pop();
   }
 
   Future<void> deleteTask() async {
-    bool accepted = await Dialogs.showChoiceDialog(context, "Are you sure you want to archive this task?");
+    bool accepted = await Dialogs.showChoiceDialog(context, AppLocalizations.of(context).areYouSureArchive);
     if (accepted) {
       originalTask.done = taskToEdit.done;
       setTaskToEdit(originalTask);
@@ -241,7 +242,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, taskToEdit.localization);
         Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);
       } catch (error) {
-        await Dialogs.showWarningDialog(context, "An error has occured");
+        await Dialogs.showWarningDialog(context, AppLocalizations.of(context).errorOccurred);
       }
       Navigator.pop(context);
     }
@@ -437,7 +438,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         if ((!this.checkEquals(this.originalTask, this.taskToEdit) || Provider.of<AttachmentProvider>(context, listen: false).notSavedAttachments.length > 0) && !this.changesSaved) {
           result = await Dialogs.showActionDialog(
             context,
-            'You have made changes, Do you want to save?',
+            AppLocalizations.of(context).changes,
             this.saveTask,
             () {},
           );

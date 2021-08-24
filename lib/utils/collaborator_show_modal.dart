@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_app/model/collaboratorTask.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class CollaboratorModal {
   static void onTaskPressed(CollaboratorTask task, BuildContext context) {
@@ -34,7 +35,7 @@ class CollaboratorModal {
                   children: [
                     Row(
                       children: [
-                        Text('Title'),
+                        Text(AppLocalizations.of(context).taskName),
                         SizedBox(
                           width: MediaQuery.of(context).size.width / 4 + 16,
                         ),
@@ -162,11 +163,17 @@ class CollaboratorModal {
                   children: [
                     Icon(Icons.update_outlined),
                     SizedBox(
-                      width: 16,
+                      width: 8,
                     ),
-                    Text('Last updated:'),
+                    Flexible(
+                      child: AutoSizeText(
+                        AppLocalizations.of(context).lastUpdated,
+                        minFontSize: 12,
+                        maxFontSize: 18,
+                      ),
+                    ),
                     SizedBox(
-                      width: 16,
+                      width: 8,
                     ),
                     Container(
                       child: Row(

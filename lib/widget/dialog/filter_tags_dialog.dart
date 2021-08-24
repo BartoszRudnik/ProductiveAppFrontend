@@ -49,7 +49,7 @@ class FilterTagsDialog extends StatelessWidget {
                       },
                       validator: (value) {
                         if (value.isEmpty) {
-                          return 'tag name cannot be empty';
+                          return AppLocalizations.of(context).tagEmptyName;
                         }
                         return null;
                       },

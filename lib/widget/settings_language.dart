@@ -1,17 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/config/const_values.dart';
 import 'package:productive_app/l10n/L10n.dart';
 import 'package:productive_app/provider/locale_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SettingsLanguage extends StatelessWidget {
-  String getLanguageName(String languageCode) {
-    if (languageCode == 'en') {
-      return 'English';
-    } else {
-      return 'Polish';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final actualLanguageCode = Provider.of<LocaleProvider>(context).locale;
@@ -34,7 +28,7 @@ class SettingsLanguage extends StatelessWidget {
               alignment: Alignment(-1.1, 0),
               child: Center(
                 child: Text(
-                  "Language",
+                  AppLocalizations.of(context).language,
                   style: TextStyle(fontSize: 20),
                 ),
               ),
@@ -43,13 +37,15 @@ class SettingsLanguage extends StatelessWidget {
           DropdownButtonHideUnderline(
             child: Center(
               child: DropdownButton(
-                hint: Text(actualLanguageCode.languageCode == 'en' ? 'English' : 'Polish'),
+                hint: Text(
+                  actualLanguageCode.languageCode == 'en' ? AppLocalizations.of(context).english : AppLocalizations.of(context).polish,
+                ),
                 icon: Icon(Icons.language_outlined),
                 items: L10n.all.map(
                   (Locale locale) {
                     return DropdownMenuItem(
                       child: Text(
-                        this.getLanguageName(locale.languageCode),
+                        ConstValues.language(locale.languageCode, context),
                       ),
                       value: locale,
                     );

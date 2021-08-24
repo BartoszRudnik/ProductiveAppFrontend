@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../config/images.dart';
 import '../widget/appBar/login_appbar.dart';
 import '../widget/button/login_button.dart';
 import '../widget/button/sign_with_google.dart';
 import 'login_screen.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class EntryScreen extends StatelessWidget {
   static const routeName = 'entry-screen';
@@ -59,7 +59,7 @@ class EntryScreen extends StatelessWidget {
             ),
             SizedBox(height: 20),
             Text(
-              'Or',
+              AppLocalizations.of(context).or,
               style: TextStyle(
                 fontSize: 25,
                 fontWeight: FontWeight.w500,

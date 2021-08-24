@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/config/const_values.dart';
 import 'package:provider/provider.dart';
 
 import '../model/task.dart';
@@ -217,7 +218,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                         ),
                         child: Center(
                           child: Text(
-                            this.widget.task.taskStatus,
+                            ConstValues.taskStatus(this.widget.task.taskStatus, context),
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -235,7 +236,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                         ),
                         child: Center(
                           child: Text(
-                            'CANCELED',
+                            AppLocalizations.of(context).canceled,
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -285,9 +286,12 @@ class _TaskWidgetState extends State<TaskWidget> {
                                       DateFormat('Hm').format(this.widget.task.endDate),
                                     ),
                                   if (taskEndDate.difference(today).inDays < 0) Icon(Icons.fireplace_outlined),
-                                  if (taskEndDate.difference(today).inDays < 0) Text(today.difference(taskEndDate).inDays.toString() + 'd overude'),
+                                  if (taskEndDate.difference(today).inDays < 0)
+                                    Text(
+                                      today.difference(taskEndDate).inDays.toString() + 'd ' + AppLocalizations.of(context).overdue,
+                                    ),
                                   if (taskEndDate.difference(today).inDays > 0) Icon(Icons.hourglass_bottom_outlined),
-                                  if (taskEndDate.difference(today).inDays > 0) Text(taskEndDate.difference(today).inDays.toString() + 'd left'),
+                                  if (taskEndDate.difference(today).inDays > 0) Text(taskEndDate.difference(today).inDays.toString() + AppLocalizations.of(context).left),
                                 ],
                               ),
                             )

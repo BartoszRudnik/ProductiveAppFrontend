@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class PDFAppBar extends StatelessWidget with PreferredSizeWidget {
   final controller;
@@ -31,7 +32,7 @@ class PDFAppBar extends StatelessWidget with PreferredSizeWidget {
       actions: [
         Center(
           child: Text(
-            (this.indexPage + 1).toString() + ' of ' + this.pages.toString(),
+            (this.indexPage + 1).toString() + AppLocalizations.of(context).ofWord + this.pages.toString(),
             style: TextStyle(
               color: Theme.of(context).primaryColor,
             ),

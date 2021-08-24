@@ -82,7 +82,7 @@ class TaskDetailsAttributes extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Text(e),
+                        Text(ConstValues.priorities(e, context)),
                         SizedBox(
                           width: 5,
                         ),
@@ -155,14 +155,22 @@ class TaskDetailsAttributes extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.inbox),
-                    Text(taskToEdit.localization),
+                    Flexible(
+                      child: AutoSizeText(
+                        ConstValues.listName(taskToEdit.localization, context),
+                        minFontSize: 10,
+                        maxFontSize: 16,
+                        maxLines: 2,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                   ],
                 ),
               ),
               itemBuilder: (context) {
                 return localizations.map((e) {
                   return PopupMenuItem(
-                    child: Text(e),
+                    child: Text(ConstValues.listName(e, context)),
                     value: e,
                   );
                 }).toList();
