@@ -12,6 +12,7 @@ import '../widget/appBar/active_tasks_appBar.dart';
 import '../widget/button/ask_for_activity_permission.dart';
 import '../widget/chart/collaborator_tasks_chart.dart';
 import '../widget/single_collaborator_task.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ActiveTasks extends StatefulWidget {
   final Collaborator collaborator;
@@ -141,7 +142,7 @@ class _ActiveTasksState extends State<ActiveTasks> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: ActiveTasksAppBar(
-        message: 'Active tasks',
+        message: AppLocalizations.of(context).activeTasks,
       ),
       body: this.widget.collaborator.receivedPermission
           ? Container(
@@ -166,6 +167,11 @@ class _ActiveTasksState extends State<ActiveTasks> {
                         builderDelegate: PagedChildBuilderDelegate<CollaboratorTask>(
                           itemBuilder: (context, task, index) => SingleCollaboratorTask(task: task),
                           firstPageProgressIndicatorBuilder: (_) => ListShimmer(),
+                          noItemsFoundIndicatorBuilder: (_) => Container(
+                            child: Center(
+                              child: Text(AppLocalizations.of(context).emptyList),
+                            ),
+                          ),
                         ),
                         pagingController: this._pagingController,
                         padding: const EdgeInsets.all(12),

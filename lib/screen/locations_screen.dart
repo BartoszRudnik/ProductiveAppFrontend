@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/widget/appBar/search_appBar.dart';
+import '../widget/appBar/search_appBar.dart';
 import 'package:provider/provider.dart';
 import '../model/location.dart';
 import '../provider/location_provider.dart';
 import '../utils/dialogs.dart';
-import '../widget/appBar/task_appBar.dart';
 import '../widget/dialog/location_dialog.dart';
 import '../widget/single_location.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LocationsScreen extends StatefulWidget {
   static const routeName = '/locations-screen';
@@ -18,7 +18,7 @@ class LocationsScreen extends StatefulWidget {
 class _LocationScreenState extends State<LocationsScreen> {
   Future<void> _addNewLocationForm(BuildContext buildContext, Location choosenLocation) async {
     if (choosenLocation != null) {
-      String name = await Dialogs.showTextFieldDialog(context, 'Enter location name');
+      String name = await Dialogs.showTextFieldDialog(context, AppLocalizations.of(context).enterLocationName);
       if (name == null || name.isEmpty) {
         return;
       }
@@ -38,7 +38,7 @@ class _LocationScreenState extends State<LocationsScreen> {
     );
 
     if (locationToEdit != null) {
-      String name = await Dialogs.showTextFieldDialogWithInitialValue(context, 'Enter location name', locationToEdit.localizationName);
+      String name = await Dialogs.showTextFieldDialogWithInitialValue(context, AppLocalizations.of(context).enterLocationName, locationToEdit.localizationName);
       if (name == null || name.isEmpty) {
         return;
       }
@@ -59,7 +59,7 @@ class _LocationScreenState extends State<LocationsScreen> {
       },
       child: Scaffold(
         appBar: SearchAppBar(
-          title: "Saved locations",
+          title: AppLocalizations.of(context).locations,
           searchingName: 'location',
         ),
         floatingActionButton: FloatingActionButton(

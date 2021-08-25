@@ -5,6 +5,7 @@ import '../widget/appBar/task_appBar.dart';
 import '../widget/collaborators_list.dart';
 import '../widget/empty_list.dart';
 import '../widget/new_collaborator.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CollaboratorsScreen extends StatefulWidget {
   static const routeName = "/collaborators";
@@ -34,7 +35,7 @@ class _CollaboratorsScreenState extends State<CollaboratorsScreen> {
 
     return Scaffold(
       appBar: TaskAppBar(
-        title: 'Collaborators',
+        title: AppLocalizations.of(context).collaborators,
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(
@@ -50,7 +51,7 @@ class _CollaboratorsScreenState extends State<CollaboratorsScreen> {
         backgroundColor: Theme.of(context).primaryColor,
         onRefresh: () => Provider.of<DelegateProvider>(context, listen: false).getCollaborators(),
         child: provider.accepted.length == 0 && provider.received.length == 0 && provider.send.length == 0
-            ? EmptyList(message: 'Your collaborator list is empty')
+            ? EmptyList(message: AppLocalizations.of(context).emptyCollaborator)
             : SingleChildScrollView(
                 physics: ScrollPhysics(),
                 padding: const EdgeInsets.only(left: 21, right: 17, top: 10),
@@ -63,19 +64,19 @@ class _CollaboratorsScreenState extends State<CollaboratorsScreen> {
                         CollaboratorsList(
                           collaboratorType: 'accepted',
                           collaborators: provider.accepted,
-                          listTitle: 'Accepted Invitations',
+                          listTitle: AppLocalizations.of(context).acceptedInvitations,
                         ),
                       if (provider.received.length > 0)
                         CollaboratorsList(
                           collaboratorType: 'received',
                           collaborators: provider.received,
-                          listTitle: 'Received Invitations',
+                          listTitle: AppLocalizations.of(context).receivedInvitations,
                         ),
                       if (provider.send.length > 0)
                         CollaboratorsList(
                           collaboratorType: 'send',
                           collaborators: provider.send,
-                          listTitle: 'Sent Invitations',
+                          listTitle: AppLocalizations.of(context).sentInvitations,
                         ),
                     ],
                   ),

@@ -3,6 +3,7 @@ import 'package:global_configuration/global_configuration.dart';
 import 'package:provider/provider.dart';
 import '../../model/collaborator.dart';
 import '../../provider/delegate_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class DelegateDialog extends StatelessWidget {
   final _collaboratorKey = GlobalKey<FormState>();
@@ -51,10 +52,10 @@ class DelegateDialog extends StatelessWidget {
                       },
                       validator: (value) {
                         if (value.isEmpty) {
-                          return 'collaborator email cannot be empty';
+                          return AppLocalizations.of(context).collaboratorEmailNotEmpty;
                         }
                         if (value == Provider.of<DelegateProvider>(context, listen: false).userEmail) {
-                          return 'Cannot invite yourself';
+                          return AppLocalizations.of(context).cannotInviteYourself;
                         }
                         return null;
                       },
@@ -69,14 +70,14 @@ class DelegateDialog extends StatelessWidget {
                               builder: (context) => AlertDialog(
                                 title: Center(
                                   child: Text(
-                                    'User not found',
+                                    AppLocalizations.of(context).userNotFound,
                                     style: Theme.of(context).textTheme.headline2,
                                   ),
                                 ),
                                 content: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text('User with given email doesn\'t exists, do you want to send invitation?'),
+                                    Text(AppLocalizations.of(context).doYouWantSendInvitation),
                                     SizedBox(height: 10),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -85,13 +86,13 @@ class DelegateDialog extends StatelessWidget {
                                           onPressed: () {
                                             Navigator.of(context).pop(false);
                                           },
-                                          child: Text('Cancel'),
+                                          child: Text(AppLocalizations.of(context).cancel),
                                         ),
                                         ElevatedButton(
                                           onPressed: () {
                                             Navigator.of(context).pop(true);
                                           },
-                                          child: Text('Send invitation'),
+                                          child: Text(AppLocalizations.of(context).sendInvitation),
                                         ),
                                       ],
                                     ),
@@ -105,7 +106,7 @@ class DelegateDialog extends StatelessWidget {
                       maxLines: null,
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.all(10),
-                        hintText: 'Find or add new collaborator',
+                        hintText: AppLocalizations.of(context).findOrAddCollaborator,
                       ),
                     ),
                   ),
@@ -183,7 +184,7 @@ class DelegateDialog extends StatelessWidget {
 
                         Navigator.of(context).pop();
                       },
-                      child: Text('Cancel'),
+                      child: Text(AppLocalizations.of(context).cancel),
                     ),
                     ElevatedButton(
                       onPressed: () {
@@ -194,7 +195,7 @@ class DelegateDialog extends StatelessWidget {
                           Navigator.of(context).pop();
                         }
                       },
-                      child: Text('Add collaborator'),
+                      child: Text(AppLocalizations.of(context).save),
                     ),
                   ],
                 ),

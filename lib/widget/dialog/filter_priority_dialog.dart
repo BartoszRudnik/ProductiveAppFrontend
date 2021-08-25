@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/config/const_values.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../provider/task_provider.dart';
 
@@ -59,7 +61,7 @@ class FilterPriorityDialog extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                priorities[priorityIndex],
+                                ConstValues.priorities(priorities[priorityIndex], context),
                                 style: TextStyle(
                                   color: selectedPriorities[priorityIndex] ? Theme.of(context).accentColor : Theme.of(context).primaryColor,
                                 ),
@@ -104,13 +106,13 @@ class FilterPriorityDialog extends StatelessWidget {
                       onPressed: () {
                         Navigator.of(context).pop('cancel');
                       },
-                      child: Text('Cancel'),
+                      child: Text(AppLocalizations.of(context).cancel),
                     ),
                     ElevatedButton(
                       onPressed: () {
                         Navigator.of(context).pop(this.choosenPriorities);
                       },
-                      child: Text('Save'),
+                      child: Text(AppLocalizations.of(context).save),
                     ),
                   ],
                 ),

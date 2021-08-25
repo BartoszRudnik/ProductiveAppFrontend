@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../config/const_values.dart';
 
 class TaskPriority extends StatefulWidget {
   final Function setTaskPriority;
@@ -33,7 +34,7 @@ class _TaskPriorityState extends State<TaskPriority> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
-                Text(e),
+                Text(ConstValues.priorities(e, context)),
                 SizedBox(
                   width: 5,
                 ),

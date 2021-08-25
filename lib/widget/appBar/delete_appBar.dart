@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../provider/location_provider.dart';
 import '../../provider/task_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class DeleteAppBar extends StatelessWidget with PreferredSizeWidget {
   final String title;
@@ -33,7 +34,7 @@ class DeleteAppBar extends StatelessWidget with PreferredSizeWidget {
           icon: Icon(Icons.more_vert_outlined),
           onSelected: (value) async {
             if (value == "restoreAll") {
-              final tasks = this.title == 'Completed' ? Provider.of<TaskProvider>(context, listen: false).completedTasks : Provider.of<TaskProvider>(context, listen: false).trashTasks;
+              final tasks = this.title == AppLocalizations.of(context).completed ? Provider.of<TaskProvider>(context, listen: false).completedTasks : Provider.of<TaskProvider>(context, listen: false).trashTasks;
 
               tasks.forEach(
                 (element) {
@@ -59,16 +60,24 @@ class DeleteAppBar extends StatelessWidget with PreferredSizeWidget {
                 },
               );
             } else if (value == "deleteAll") {
-              await Provider.of<TaskProvider>(context, listen: false).deleteAllTasks(this.title);
+              String listName;
+
+              if (this.title == AppLocalizations.of(context).completed) {
+                listName = 'Completed';
+              } else {
+                listName = 'Trash';
+              }
+
+              await Provider.of<TaskProvider>(context, listen: false).deleteAllTasks(listName);
             }
           },
           itemBuilder: (_) => [
             PopupMenuItem(
-              child: Text('Restore all'),
+              child: Text(AppLocalizations.of(context).restoreAll),
               value: 'restoreAll',
             ),
             PopupMenuItem(
-              child: Text('Delete all'),
+              child: Text(AppLocalizations.of(context).deleteAll),
               value: 'deleteAll',
             ),
           ],

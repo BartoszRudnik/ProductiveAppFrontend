@@ -7,6 +7,7 @@ import '../../provider/location_provider.dart';
 import '../../utils/dialogs.dart';
 import '../../utils/notifications.dart';
 import 'location_dialog.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NotificationLocationDialog extends StatefulWidget {
   final Key key;
@@ -39,7 +40,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
 
   Future<void> _addNewLocationForm(BuildContext buildContext, Location choosenLocation) async {
     if (choosenLocation != null) {
-      String name = await Dialogs.showTextFieldDialog(context, 'Enter location name');
+      String name = await Dialogs.showTextFieldDialog(context, AppLocalizations.of(context).enterLocationName);
       if (name == null || name.isEmpty) {
         return;
       }
@@ -94,7 +95,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Location'),
+                        Text(AppLocalizations.of(context).locations),
                         if (this.location != null)
                           Flexible(
                             child: Padding(
@@ -143,7 +144,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
 
                                     this._addNewLocationForm(context, choosenLocation);
                                   },
-                                  child: Text('New'),
+                                  child: Text(AppLocalizations.of(context).newWord),
                                 ),
                               ),
                             ),
@@ -165,7 +166,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                                       child: DropdownButton(
                                         isExpanded: true,
                                         hint: Text(
-                                          'Saved',
+                                          AppLocalizations.of(context).saved,
                                           textAlign: TextAlign.center,
                                           style: TextStyle(color: Theme.of(context).primaryColor),
                                         ),
@@ -212,7 +213,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                   elevation: 8,
                   child: Column(
                     children: [
-                      Text('Change notification range'),
+                      Text(AppLocalizations.of(context).changeNotificationRange),
                       Slider(
                         divisions: 49,
                         activeColor: Theme.of(context).primaryColor,
@@ -228,7 +229,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                           );
                         },
                       ),
-                      Text('Actual range: ' + this.notificationRadius.toStringAsFixed(2) + ' km'),
+                      Text(AppLocalizations.of(context).actualRange + this.notificationRadius.toStringAsFixed(2) + ' km'),
                     ],
                   ),
                 ),
@@ -239,7 +240,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                   elevation: 8,
                   child: SwitchListTile(
                     activeColor: Theme.of(context).primaryColor,
-                    title: Text('Notification on enter'),
+                    title: Text(AppLocalizations.of(context).notificationOnEnter),
                     value: this.notificationOnEnter,
                     onChanged: (bool value) {
                       setState(
@@ -257,7 +258,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                   elevation: 8,
                   child: SwitchListTile(
                     activeColor: Theme.of(context).primaryColor,
-                    title: Text('Notification on exit'),
+                    title: Text(AppLocalizations.of(context).notificationOnExit),
                     value: this.notificationOnExit,
                     onChanged: (bool value) {
                       setState(
@@ -290,7 +291,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                         Navigator.of(context).pop(null);
                       }
                     },
-                    child: Text('Cancel'),
+                    child: Text(AppLocalizations.of(context).cancel),
                   ),
                   ElevatedButton(
                     onPressed: () {
@@ -303,7 +304,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                         this.notificationRadius = 0.25;
                       });
                     },
-                    child: Text('Delete'),
+                    child: Text(AppLocalizations.of(context).delete),
                   ),
                   ElevatedButton(
                     onPressed: () {
@@ -322,7 +323,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                         Navigator.of(context).pop(null);
                       }
                     },
-                    child: Text('Save'),
+                    child: Text(AppLocalizations.of(context).save),
                   ),
                 ],
               ),

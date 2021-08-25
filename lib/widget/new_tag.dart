@@ -4,6 +4,7 @@ import 'package:productive_app/provider/tag_provider.dart';
 import 'package:productive_app/provider/task_provider.dart';
 import 'package:productive_app/utils/dialogs.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NewTag extends StatefulWidget {
   final int tagsLength;
@@ -41,7 +42,7 @@ class _NewTagState extends State<NewTag> {
                 if (!Provider.of<TagProvider>(context, listen: false).tagNames.contains(newTag.name)) {
                   Provider.of<TagProvider>(context, listen: false).addTag(newTag);
                 } else {
-                  Dialogs.showWarningDialog(context, 'Tag already exists');
+                  Dialogs.showWarningDialog(context, AppLocalizations.of(context).tagAlreadyExist);
                 }
               } else {
                 Provider.of<TagProvider>(context, listen: false).updateTag(value, widget.initialValue);
@@ -51,7 +52,7 @@ class _NewTagState extends State<NewTag> {
             },
             maxLines: null,
             decoration: InputDecoration(
-              hintText: 'Enter tag name',
+              hintText: AppLocalizations.of(context).enterTagName,
               hintStyle: TextStyle(
                 fontWeight: FontWeight.w400,
                 fontSize: 20,

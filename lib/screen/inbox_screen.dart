@@ -7,6 +7,7 @@ import '../utils/manage_filters.dart';
 import '../widget/empty_list.dart';
 import '../widget/reorderable_task_list.dart';
 import '../widget/tasks_list.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class InboxScreen extends StatelessWidget {
   void onReorder(int newIndex, int oldIndex, List<Task> tasks, BuildContext context) {
@@ -53,7 +54,7 @@ class InboxScreen extends StatelessWidget {
                 backgroundColor: Theme.of(context).primaryColor,
                 onRefresh: () => Provider.of<TaskProvider>(context, listen: false).fetchTasks(),
                 child: tasks.length == 0
-                    ? EmptyList(message: 'Your inbox is empty')
+                    ? EmptyList(message: AppLocalizations.of(context).emptyInbox)
                     : userSettings.sortingMode == 6
                         ? ReorderableTaskList(tasks: tasks, onReorder: onReorder)
                         : TasksList(tasks: tasks)),

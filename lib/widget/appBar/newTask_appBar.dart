@@ -5,6 +5,8 @@ import 'package:productive_app/provider/settings_provider.dart';
 import 'package:provider/provider.dart';
 import '../../screen/filters_screen.dart';
 import '../../screen/task_map.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class NewTaskAppBar extends StatefulWidget with PreferredSizeWidget {
   final String title;
@@ -35,20 +37,21 @@ class _NewTaskAppBarState extends State<NewTaskAppBar> {
               },
               decoration: ColorThemes.searchFormFieldDecoration(
                 context,
-                'Enter task name',
+                AppLocalizations.of(context).enterTaskName,
                 () {
                   this._formKey.currentState.reset();
                   Provider.of<SettingsProvider>(context, listen: false).clearTaskName();
                 },
               ),
             )
-          : Text(
+          : AutoSizeText(
               this.widget.title,
               style: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.w400,
                 color: Theme.of(context).primaryColor,
               ),
+              minFontSize: 20,
+              maxFontSize: 26,
+              maxLines: 1,
             ),
       systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: Colors.black),
       backgroundColor: Theme.of(context).accentColor,
@@ -81,11 +84,11 @@ class _NewTaskAppBarState extends State<NewTaskAppBar> {
           icon: Icon(Icons.more_vert),
           itemBuilder: (_) => [
             PopupMenuItem(
-              child: Text('Filters'),
+              child: Text(AppLocalizations.of(context).filters),
               value: 'filters',
             ),
             PopupMenuItem(
-              child: Text('Task map'),
+              child: Text(AppLocalizations.of(context).taskMap),
               value: 'map',
             ),
           ],

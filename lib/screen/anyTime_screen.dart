@@ -7,6 +7,7 @@ import '../utils/manage_filters.dart';
 import '../widget/empty_list.dart';
 import '../widget/reorderable_task_list.dart';
 import '../widget/tasks_list.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AnytimeScreen extends StatelessWidget {
   void onReorder(int newIndex, int oldIndex, List<Task> tasks, BuildContext context) {
@@ -54,7 +55,7 @@ class AnytimeScreen extends StatelessWidget {
               backgroundColor: Theme.of(context).primaryColor,
               onRefresh: () => Provider.of<TaskProvider>(context, listen: false).fetchTasks(),
               child: tasks.length == 0
-                  ? EmptyList(message: 'Your anytime list is empty')
+                  ? EmptyList(message: AppLocalizations.of(context).emptyAnytime)
                   : userSettings.sortingMode == 6
                       ? ReorderableTaskList(tasks: tasks, onReorder: onReorder)
                       : TasksList(tasks: tasks),

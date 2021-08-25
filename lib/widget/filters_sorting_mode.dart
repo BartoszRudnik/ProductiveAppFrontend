@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../config/const_values.dart';
 import '../provider/settings_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FiltersSortingMode extends StatelessWidget {
   final int sortingMode;
@@ -23,7 +24,7 @@ class FiltersSortingMode extends StatelessWidget {
               child: Row(
                 children: [
                   Text(
-                    'Sort by',
+                    AppLocalizations.of(context).sort,
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w400,
@@ -37,7 +38,7 @@ class FiltersSortingMode extends StatelessWidget {
               height: 70,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                itemCount: ConstValues.sortingModes.length,
+                itemCount: 7,
                 itemBuilder: (context, index) => GestureDetector(
                   onTap: () => Provider.of<SettingsProvider>(context, listen: false).changeSortingMode(index),
                   child: Container(
@@ -49,7 +50,7 @@ class FiltersSortingMode extends StatelessWidget {
                     ),
                     child: Center(
                       child: Text(
-                        ConstValues.sortingModes[index],
+                        ConstValues.sortingModes(index, context),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontWeight: FontWeight.w500,

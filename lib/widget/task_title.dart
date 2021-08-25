@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TaskTitle extends StatelessWidget {
   Function setTaskName;
@@ -11,7 +12,7 @@ class TaskTitle extends StatelessWidget {
       key: ValueKey('taskName'),
       validator: (value) {
         if (value.isEmpty) {
-          return 'Task title cannot be empty';
+          return AppLocalizations.of(context).taskTitleEmpty;
         }
 
         return null;
@@ -28,7 +29,7 @@ class TaskTitle extends StatelessWidget {
           fontWeight: FontWeight.w400,
           fontSize: 20,
         ),
-        hintText: 'Task name',
+        hintText: AppLocalizations.of(context).taskName,
         border: InputBorder.none,
         focusedBorder: InputBorder.none,
       ),

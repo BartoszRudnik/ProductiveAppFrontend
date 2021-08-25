@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:productive_app/provider/settings_provider.dart';
 import 'package:productive_app/widget/single_selected_filter.dart';
 import 'package:provider/provider.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dialog/filter_tags_dialog.dart';
 
 class FiltersTags extends StatelessWidget {
@@ -28,7 +28,7 @@ class FiltersTags extends StatelessWidget {
                 child: Row(
                   children: [
                     Text(
-                      'Tags',
+                      AppLocalizations.of(context).tags,
                       style: TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.w400,
@@ -61,7 +61,7 @@ class FiltersTags extends StatelessWidget {
                         }
                       },
                       child: Text(
-                        'Choose tags',
+                        AppLocalizations.of(context).chooseTags,
                         style: TextStyle(fontSize: 24),
                       ),
                     ),

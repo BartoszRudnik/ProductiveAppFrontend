@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:productive_app/model/task.dart';
 import 'package:productive_app/widget/new_task_notification_localization.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TaskDetailsMap extends StatefulWidget {
   final Function setLocation;
@@ -148,7 +149,7 @@ class _TaskDetailsMapState extends State<TaskDetailsMap> {
                           taskId: this.widget.originalTask.id,
                         ),
                         Text(
-                          'Tap to add location',
+                          AppLocalizations.of(context).tapToAddLocation,
                           style: TextStyle(fontSize: 20),
                         ),
                       ],

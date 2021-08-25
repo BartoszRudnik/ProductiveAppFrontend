@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/provider/delegate_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NewCollaborator extends StatefulWidget {
   @override
@@ -21,10 +22,10 @@ class _NewCollaboratorState extends State<NewCollaborator> {
             key: ValueKey('CollaboratorName'),
             validator: (value) {
               if (value.isEmpty) {
-                return 'Collaborator name cannot be empty';
+                return AppLocalizations.of(context).collaboratorEmailNotEmpty;
               }
               if (value == Provider.of<DelegateProvider>(context, listen: false).userEmail) {
-                return 'Cannot invite yourself';
+                return AppLocalizations.of(context).cannotInviteYourself;
               }
               return null;
             },
@@ -37,17 +38,18 @@ class _NewCollaboratorState extends State<NewCollaborator> {
                   builder: (context) => AlertDialog(
                     title: Center(
                       child: Text(
-                        'User not found',
+                        AppLocalizations.of(context).userNotFound,
                         style: TextStyle(
                           fontSize: 26,
                           fontFamily: 'RobotoCondensed',
                         ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('User with given email doesn\'t exists, do you want to send invitation?'),
+                        Text(AppLocalizations.of(context).doYouWantSendInvitation),
                         SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -57,14 +59,14 @@ class _NewCollaboratorState extends State<NewCollaborator> {
                                 Navigator.of(context).pop(false);
                                 Navigator.of(context).pop();
                               },
-                              child: Text('Cancel'),
+                              child: Text(AppLocalizations.of(context).cancel),
                             ),
                             ElevatedButton(
                               onPressed: () {
                                 Navigator.of(context).pop(true);
                                 Navigator.of(context).pop();
                               },
-                              child: Text('Send invitation'),
+                              child: Text(AppLocalizations.of(context).sendInvitation),
                             ),
                           ],
                         ),
@@ -76,7 +78,7 @@ class _NewCollaboratorState extends State<NewCollaborator> {
             },
             maxLines: null,
             decoration: InputDecoration(
-              hintText: 'Enter collaborator email',
+              hintText: AppLocalizations.of(context).enterCollaboratorEmail,
               hintStyle: TextStyle(
                 fontWeight: FontWeight.w400,
                 fontSize: 20,

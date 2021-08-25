@@ -4,6 +4,7 @@ import '../model/collaborator.dart';
 import '../provider/delegate_provider.dart';
 import '../screen/collaborator_profile_tabs.dart';
 import 'collaborator_list_element.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AcceptedCollaborator extends StatelessWidget {
   Collaborator collaborator;
@@ -25,7 +26,7 @@ class AcceptedCollaborator extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Text(
-              'Delete collaborator',
+              AppLocalizations.of(context).delete,
               style: TextStyle(color: Theme.of(context).accentColor, fontSize: 20, fontWeight: FontWeight.w400),
             ),
             Icon(
@@ -44,14 +45,14 @@ class AcceptedCollaborator extends StatelessWidget {
             builder: (context) => AlertDialog(
               title: Center(
                 child: Text(
-                  'Delete',
+                  AppLocalizations.of(context).delete,
                   style: Theme.of(context).textTheme.headline3,
                 ),
               ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Are you sure you want to delete this collaborator?'),
+                  Text(AppLocalizations.of(context).areYouSureDeleteCollab),
                   SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -61,13 +62,13 @@ class AcceptedCollaborator extends StatelessWidget {
                           await Provider.of<DelegateProvider>(context, listen: false).deleteCollaborator(this.collaborator.id);
                           Navigator.of(context).pop(true);
                         },
-                        child: Text('Yes'),
+                        child: Text(AppLocalizations.of(context).yes),
                       ),
                       ElevatedButton(
                         onPressed: () {
                           Navigator.of(context).pop(false);
                         },
-                        child: Text('No'),
+                        child: Text(AppLocalizations.of(context).no),
                       ),
                     ],
                   )

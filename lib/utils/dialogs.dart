@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Dialogs {
   static void logoutDialog(BuildContext context) {
@@ -9,7 +10,7 @@ class Dialogs {
       builder: (context) => AlertDialog(
         title: Center(
           child: Text(
-            'Log out',
+            AppLocalizations.of(context).logout,
             style: TextStyle(
               color: Theme.of(context).primaryColor,
               fontSize: 20,
@@ -20,7 +21,7 @@ class Dialogs {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Are you sure you want to log out?'),
+            Text(AppLocalizations.of(context).areYouSureLogout),
             SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -34,13 +35,13 @@ class Dialogs {
                     }
                     Navigator.of(context).pop(true);
                   },
-                  child: Text('Yes'),
+                  child: Text(AppLocalizations.of(context).yes),
                 ),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.of(context).pop(false);
                   },
-                  child: Text('No'),
+                  child: Text(AppLocalizations.of(context).no),
                 ),
               ],
             )
@@ -57,7 +58,7 @@ class Dialogs {
         return AlertDialog(
           title: Center(
             child: Text(
-              'Warning',
+              AppLocalizations.of(context).warning,
               style: TextStyle(
                 color: Theme.of(context).primaryColor,
                 fontSize: 20,
@@ -94,7 +95,7 @@ class Dialogs {
       builder: (_) => AlertDialog(
         title: Center(
           child: Text(
-            'Warning',
+            AppLocalizations.of(context).warning,
             style: TextStyle(
               color: Theme.of(context).primaryColor,
               fontSize: 20,
@@ -115,14 +116,14 @@ class Dialogs {
                     await yesAction();
                     Navigator.of(context).pop(true);
                   },
-                  child: Text('Yes'),
+                  child: Text(AppLocalizations.of(context).yes),
                 ),
                 ElevatedButton(
                   onPressed: () {
                     noAction();
                     Navigator.of(context).pop(false);
                   },
-                  child: Text('No'),
+                  child: Text(AppLocalizations.of(context).no),
                 ),
               ],
             ),
@@ -139,7 +140,7 @@ class Dialogs {
       builder: (context) => AlertDialog(
         title: Center(
           child: Text(
-            'Warning',
+            AppLocalizations.of(context).warning,
             style: TextStyle(
               color: Theme.of(context).primaryColor,
               fontSize: 20,
@@ -159,13 +160,13 @@ class Dialogs {
                   onPressed: () {
                     Navigator.of(context).pop(true);
                   },
-                  child: Text('Yes'),
+                  child: Text(AppLocalizations.of(context).yes),
                 ),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.of(context).pop(false);
                   },
-                  child: Text('No'),
+                  child: Text(AppLocalizations.of(context).no),
                 ),
               ],
             ),
@@ -202,10 +203,10 @@ class Dialogs {
                   key: _tKey,
                   child: TextFormField(
                     controller: _textEditingController,
-                    decoration: InputDecoration(hintText: "Enter name", contentPadding: EdgeInsets.all(16.0)),
+                    decoration: InputDecoration(hintText: AppLocalizations.of(context).enterLocationName, contentPadding: EdgeInsets.all(16.0)),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter name of the location';
+                        return AppLocalizations.of(context).enterLocationName;
                       }
                       return null;
                     },
@@ -257,10 +258,10 @@ class Dialogs {
                   key: _tKey,
                   child: TextFormField(
                     initialValue: initialValue,
-                    decoration: InputDecoration(hintText: "Enter name", contentPadding: EdgeInsets.all(16.0)),
+                    decoration: InputDecoration(hintText: AppLocalizations.of(context).enterLocationName, contentPadding: EdgeInsets.all(16.0)),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter name of the location';
+                        return AppLocalizations.of(context).enterLocationName;
                       }
                       return null;
                     },
@@ -293,7 +294,7 @@ class Dialogs {
         builder: (context) => AlertDialog(
               title: Center(
                 child: Text(
-                  'Warning',
+                  AppLocalizations.of(context).warning,
                   style: TextStyle(
                     color: Theme.of(context).primaryColor,
                     fontSize: 20,
@@ -313,19 +314,19 @@ class Dialogs {
                         onPressed: () {
                           Navigator.of(context).pop('Camera');
                         },
-                        child: Text('Camera'),
+                        child: Text(AppLocalizations.of(context).camera),
                       ),
                       ElevatedButton(
                         onPressed: () {
                           Navigator.of(context).pop('Gallery');
                         },
-                        child: Text('Gallery'),
+                        child: Text(AppLocalizations.of(context).gallery),
                       ),
                       ElevatedButton(
                         onPressed: () {
                           Navigator.of(context).pop(null);
                         },
-                        child: Text('Cancel'),
+                        child: Text(AppLocalizations.of(context).cancel),
                       ),
                     ],
                   ),

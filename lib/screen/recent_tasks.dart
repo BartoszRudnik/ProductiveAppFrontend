@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
-import 'package:productive_app/widget/chart/chart_shimmer.dart';
-import 'package:productive_app/widget/list_shimmer.dart';
 import 'package:provider/provider.dart';
-import 'package:shimmer/shimmer.dart';
 import '../model/collaborator.dart';
 import '../model/collaboratorTask.dart';
 import '../provider/delegate_provider.dart';
 import '../widget/appBar/active_tasks_appBar.dart';
 import '../widget/button/ask_for_activity_permission.dart';
+import '../widget/chart/chart_shimmer.dart';
 import '../widget/chart/collaborator_tasks_chart.dart';
+import '../widget/list_shimmer.dart';
 import '../widget/single_collaborator_task.dart';
 
 class RecentTasks extends StatefulWidget {
@@ -132,7 +132,7 @@ class _RecentTasksState extends State<RecentTasks> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ActiveTasksAppBar(message: 'Recently finished tasks'),
+      appBar: ActiveTasksAppBar(message: AppLocalizations.of(context).recentlyFinishedTasks),
       body: this.widget.collaborator.receivedPermission
           ? Container(
               height: MediaQuery.of(context).size.height,
@@ -156,6 +156,11 @@ class _RecentTasksState extends State<RecentTasks> {
                         builderDelegate: PagedChildBuilderDelegate<CollaboratorTask>(
                           itemBuilder: (context, task, index) => SingleCollaboratorTask(task: task),
                           firstPageProgressIndicatorBuilder: (_) => ListShimmer(),
+                          noItemsFoundIndicatorBuilder: (_) => Container(
+                            child: Center(
+                              child: Text(AppLocalizations.of(context).emptyList),
+                            ),
+                          ),
                         ),
                         pagingController: this._pagingController,
                         padding: const EdgeInsets.all(12),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SaveLocationButton extends StatelessWidget {
   final choosenLocation;
@@ -22,7 +23,7 @@ class SaveLocationButton extends StatelessWidget {
                   onPressed: () {
                     Navigator.of(context).pop(this.choosenLocation);
                   },
-                  child: Text('Save location'),
+                  child: Text(AppLocalizations.of(context).save),
                 ),
               ],
             ),

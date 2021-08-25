@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/config/color_themes.dart';
+import 'package:productive_app/config/const_values.dart';
 import 'package:productive_app/model/task.dart';
 import 'package:productive_app/provider/delegate_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class TaskDetailsAttributes extends StatelessWidget {
   final Task taskToEdit;
@@ -69,7 +72,7 @@ class TaskDetailsAttributes extends StatelessWidget {
                         ],
                       ),
                     if (this.taskToEdit.priority == 'CRITICAL') Icon(Icons.warning_amber_sharp),
-                    Text("Priority"),
+                    Text(AppLocalizations.of(context).priority),
                   ],
                 ),
               ),
@@ -79,7 +82,7 @@ class TaskDetailsAttributes extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Text(e),
+                        Text(ConstValues.priorities(e, context)),
                         SizedBox(
                           width: 5,
                         ),
@@ -111,13 +114,15 @@ class TaskDetailsAttributes extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.person_add),
-                  Text(
+                  AutoSizeText(
                     this.taskToEdit.delegatedEmail == null
-                        ? "Assigned"
+                        ? AppLocalizations.of(context).assigned
                         : collaboratorName.length > 1
                             ? collaboratorName
                             : this.taskToEdit.delegatedEmail,
                     textAlign: TextAlign.center,
+                    presetFontSizes: ConstValues.fontSizes,
+                    maxLines: 1,
                   ),
                 ],
               ),
@@ -150,14 +155,22 @@ class TaskDetailsAttributes extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.inbox),
-                    Text(taskToEdit.localization),
+                    Flexible(
+                      child: AutoSizeText(
+                        ConstValues.listName(taskToEdit.localization, context),
+                        minFontSize: 10,
+                        maxFontSize: 16,
+                        maxLines: 2,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                   ],
                 ),
               ),
               itemBuilder: (context) {
                 return localizations.map((e) {
                   return PopupMenuItem(
-                    child: Text(e),
+                    child: Text(ConstValues.listName(e, context)),
                     value: e,
                   );
                 }).toList();

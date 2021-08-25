@@ -10,6 +10,8 @@ import 'anyTime_screen.dart';
 import 'delegated_screen.dart';
 import 'inbox_screen.dart';
 import 'scheduled_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class TabsScreen extends StatefulWidget {
   static const routeName = '/tabs-screen';
@@ -64,6 +66,25 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
       this._selectedBgColor = Colors.black;
       this._unselectedBgColor = Colors.white;
     }
+
+    this._pages = [
+      {
+        'page': InboxScreen(),
+        'title': AppLocalizations.of(context).inbox,
+      },
+      {
+        'page': AnytimeScreen(),
+        'title': AppLocalizations.of(context).anytime,
+      },
+      {
+        'page': ScheduledScreen(),
+        'title': AppLocalizations.of(context).scheduled,
+      },
+      {
+        'page': DelegatedScreen(),
+        'title': AppLocalizations.of(context).delegated,
+      }
+    ];
   }
 
   @override
@@ -72,25 +93,6 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
 
     this._hideFab = AnimationController(vsync: this, duration: kThemeAnimationDuration);
     this._hideFab.forward();
-
-    _pages = [
-      {
-        'page': InboxScreen(),
-        'title': 'Inbox',
-      },
-      {
-        'page': AnytimeScreen(),
-        'title': 'AnyTime',
-      },
-      {
-        'page': ScheduledScreen(),
-        'title': 'Scheduled',
-      },
-      {
-        'page': DelegatedScreen(),
-        'title': 'Delegated',
-      }
-    ];
   }
 
   @override
@@ -164,7 +166,18 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Icon(iconData),
-                Text(text, style: TextStyle(fontSize: 12, color: this._getItemColor(index))),
+                Flexible(
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: AutoSizeText(
+                      text,
+                      style: TextStyle(color: this._getItemColor(index)),
+                      minFontSize: 10,
+                      maxFontSize: 24,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
               ],
             ),
             onTap: () => this._selectPage(index),
@@ -193,7 +206,15 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
                   ),
                   child: Icon(iconData),
                 ),
-                Text(text, style: TextStyle(fontSize: 12, color: this._getItemColor(index))),
+                Flexible(
+                  child: AutoSizeText(
+                    text,
+                    style: TextStyle(color: this._getItemColor(index)),
+                    textAlign: TextAlign.center,
+                    minFontSize: 10,
+                    maxFontSize: 24,
+                  ),
+                ),
               ],
             ),
             onTap: () => this._selectPage(index),
@@ -250,7 +271,7 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
           },
           child: Scaffold(
             appBar: NewTaskAppBar(
-              title: _pages[_selectedPageIndex]['title'],
+              title: this._pages[_selectedPageIndex]['title'],
               leadingButton: IconButton(
                 icon: Badge(
                   position: BadgePosition.topStart(),
@@ -263,7 +284,7 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
                 },
               ),
             ),
-            body: _pages[_selectedPageIndex]['page'],
+            body: this._pages[_selectedPageIndex]['page'],
             floatingActionButton: ScaleTransition(
               scale: this._hideFab,
               alignment: Alignment.bottomCenter,
@@ -284,19 +305,19 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
               type: BottomNavigationBarType.fixed,
               items: [
                 BottomNavigationBarItem(
-                  icon: _buildIconInbox(Icons.inbox_outlined, 'Inbox', 0),
+                  icon: _buildIconInbox(Icons.inbox_outlined, AppLocalizations.of(context).inbox, 0),
                   title: SizedBox.shrink(),
                 ),
                 BottomNavigationBarItem(
-                  icon: _buildIcon(Icons.access_time, 'Anytime', 1),
+                  icon: _buildIcon(Icons.access_time, AppLocalizations.of(context).anytime, 1),
                   title: SizedBox.shrink(),
                 ),
                 BottomNavigationBarItem(
-                  icon: _buildIcon(Icons.calendar_today, 'Scheduled', 2),
+                  icon: _buildIcon(Icons.calendar_today, AppLocalizations.of(context).scheduled, 2),
                   title: SizedBox.shrink(),
                 ),
                 BottomNavigationBarItem(
-                  icon: _buildIcon(Icons.person_outline_outlined, 'Delegated', 3),
+                  icon: _buildIcon(Icons.person_outline_outlined, AppLocalizations.of(context).delegated, 3),
                   title: SizedBox.shrink(),
                 ),
               ],

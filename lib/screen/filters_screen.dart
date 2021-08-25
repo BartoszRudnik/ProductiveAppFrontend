@@ -9,6 +9,7 @@ import '../widget/filters_locations.dart';
 import '../widget/filters_sorting_mode.dart';
 import '../widget/filters_tags.dart';
 import '../widget/switch_list_tile/filter_switch_list_tile.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FiltersScreen extends StatelessWidget {
   static const routeName = '/filters-screen';
@@ -19,7 +20,7 @@ class FiltersScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: FiltersAppBar(
-        title: 'Tasks filters',
+        title: AppLocalizations.of(context).filters,
       ),
       bottomNavigationBar: ClearFiltersButton(),
       body: SingleChildScrollView(
@@ -37,17 +38,17 @@ class FiltersScreen extends StatelessWidget {
               FilterPriorities(priorities: userSettings.priorities),
               FilterSwitchListTile(
                 func: Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyUnfinished,
-                message: 'Show unfinished tasks',
+                message: AppLocalizations.of(context).showOnlyUnfinished,
                 value: userSettings.showOnlyUnfinished,
               ),
               FilterSwitchListTile(
                 func: Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyDelegated,
-                message: 'Show received tasks',
+                message: AppLocalizations.of(context).showOnlyReceived,
                 value: userSettings.showOnlyDelegated,
               ),
               FilterSwitchListTile(
                 func: Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyWithLocalization,
-                message: 'Show tasks with localization',
+                message: AppLocalizations.of(context).showTasksWithLocalization,
                 value: userSettings.showOnlyWithLocalization,
               ),
             ],

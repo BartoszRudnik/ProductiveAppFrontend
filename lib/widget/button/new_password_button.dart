@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/config/color_themes.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NewPasswordButton extends StatelessWidget {
   final Function setNewPassword;
@@ -17,7 +18,7 @@ class NewPasswordButton extends StatelessWidget {
         style: ColorThemes.loginButtonStyle(context),
         onPressed: this.setNewPassword,
         child: Text(
-          'Submit',
+          AppLocalizations.of(context).submit,
           style: TextStyle(
             fontSize: 25,
           ),

@@ -3,6 +3,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:productive_app/provider/location_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FindPlace extends StatefulWidget {
   final Function mapMove;
@@ -42,7 +43,7 @@ class _FindPlaceState extends State<FindPlace> {
                 controller: _textEditingController,
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.location_on),
-                  hintText: "Search for location",
+                  hintText: AppLocalizations.of(context).searchForLocation,
                   contentPadding: EdgeInsets.all(16.0),
                 ),
                 onChanged: (search) async {

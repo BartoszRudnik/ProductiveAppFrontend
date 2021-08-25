@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_app/model/collaboratorTask.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class CollaboratorModal {
   static void onTaskPressed(CollaboratorTask task, BuildContext context) {
@@ -33,7 +35,7 @@ class CollaboratorModal {
                   children: [
                     Row(
                       children: [
-                        Text('Title:      '),
+                        Text(AppLocalizations.of(context).taskName),
                         SizedBox(
                           width: MediaQuery.of(context).size.width / 4 + 16,
                         ),
@@ -46,7 +48,7 @@ class CollaboratorModal {
                     if (task.description != null && task.description.length > 1)
                       Row(
                         children: [
-                          Text('Description: '),
+                          Text(AppLocalizations.of(context).description),
                           SizedBox(
                             width: 16,
                           ),
@@ -76,12 +78,12 @@ class CollaboratorModal {
                         SizedBox(
                           width: 16,
                         ),
-                        Text('Start and due date:'),
+                        Text(AppLocalizations.of(context).startAndEndDate),
                       ],
                     ),
                     Row(
                       children: [
-                        Text('Start date:'),
+                        Text(AppLocalizations.of(context).startDate),
                         SizedBox(width: 32),
                         Container(
                           child: Row(
@@ -114,7 +116,7 @@ class CollaboratorModal {
                     ),
                     Row(
                       children: [
-                        Text('Due date:  '),
+                        Text(AppLocalizations.of(context).endDate),
                         SizedBox(width: 32),
                         Container(
                           child: Row(
@@ -161,11 +163,17 @@ class CollaboratorModal {
                   children: [
                     Icon(Icons.update_outlined),
                     SizedBox(
-                      width: 16,
+                      width: 8,
                     ),
-                    Text('Last updated:'),
+                    Flexible(
+                      child: AutoSizeText(
+                        AppLocalizations.of(context).lastUpdated,
+                        minFontSize: 12,
+                        maxFontSize: 18,
+                      ),
+                    ),
                     SizedBox(
-                      width: 16,
+                      width: 8,
                     ),
                     Container(
                       child: Row(

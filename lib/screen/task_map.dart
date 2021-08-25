@@ -9,6 +9,7 @@ import '../provider/location_provider.dart';
 import '../provider/task_provider.dart';
 import '../widget/appBar/filters_appBar.dart';
 import 'task_details_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TaskMap extends StatefulWidget {
   static const routeName = "/task-map";
@@ -149,16 +150,16 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
             children: [
               Center(
                 child: Text(
-                  "Task (" + (this.tasks.indexWhere((element) => element.id == task.id) + 1).toString() + '/' + this.tasks.length.toString() + ')',
+                  AppLocalizations.of(context).task + " (" + (this.tasks.indexWhere((element) => element.id == task.id) + 1).toString() + '/' + this.tasks.length.toString() + ')',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
               ListTile(
                 title: Text(
-                  'Task title: ' + task.title,
+                  AppLocalizations.of(context).taskTitle + ": " + task.title,
                 ),
                 subtitle: Text(
-                  task.description.length > 0 ? 'Task description: ' + task.description : '',
+                  task.description.length > 0 ? AppLocalizations.of(context).taskDescription + ": " + task.description : '',
                 ),
               ),
               Container(
@@ -206,7 +207,7 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: Text('Cancel'),
+                      child: Text(AppLocalizations.of(context).cancel),
                     ),
                     ElevatedButton(
                       onPressed: () {
@@ -218,7 +219,7 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
                           return this._onMarkerPressed(tasks.firstWhere((element) => element.id == task.id), previousTaskIndex, nextTaskIndex);
                         });
                       },
-                      child: Text('Task details'),
+                      child: Text(AppLocalizations.of(context).details),
                     ),
                     IconButton(
                       icon: Icon(Icons.navigate_next_outlined),
@@ -269,7 +270,7 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
     this._getTasks();
 
     return Scaffold(
-      appBar: FiltersAppBar(title: 'Task Map'),
+      appBar: FiltersAppBar(title: AppLocalizations.of(context).taskMap),
       body: Container(
         height: MediaQuery.of(context).size.height,
         width: double.infinity,

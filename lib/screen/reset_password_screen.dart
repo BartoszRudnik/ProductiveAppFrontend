@@ -10,6 +10,7 @@ import '../widget/validation_fail_widget.dart';
 import '../widget/login_greet.dart';
 import 'login_screen.dart';
 import 'new_password_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ResetPassword extends StatefulWidget {
   static const routeName = '/reset-password';
@@ -22,11 +23,9 @@ class _ResetPasswordState extends State<ResetPassword> {
   final _resetKey = GlobalKey<FormState>();
 
   var _email = '';
-
   var _isValid = true;
   var _isLoading = false;
-
-  var _operationFailedMessage = 'Operation failed';
+  var _operationFailedMessage = '';
 
   Future<void> _tryReset() async {
     setState(() {
@@ -54,7 +53,7 @@ class _ResetPasswordState extends State<ResetPassword> {
         context: context,
         builder: (context) => AlertDialog(
           title: Text(
-            'Reset Password Success',
+            AppLocalizations.of(context).resetPasswordSuccess,
             style: TextStyle(
               fontSize: 26,
               fontFamily: 'RobotoCondensed',
@@ -63,7 +62,7 @@ class _ResetPasswordState extends State<ResetPassword> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Please check your registered email for reset token'),
+              Text(AppLocalizations.of(context).emailResetToken),
               SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -88,17 +87,17 @@ class _ResetPasswordState extends State<ResetPassword> {
       );
     } on HttpException catch (_) {
       setState(() {
-        this._operationFailedMessage = 'Authentication failed.';
+        this._operationFailedMessage = AppLocalizations.of(context).authenticationFailed;
         this._isValid = false;
       });
     } on SocketException catch (_) {
       setState(() {
-        this._operationFailedMessage = 'Connection failed';
+        this._operationFailedMessage = AppLocalizations.of(context).connectionFailed;
         this._isValid = false;
       });
     } catch (error) {
       print(error);
-      this._operationFailedMessage = 'Email address not found';
+      this._operationFailedMessage = AppLocalizations.of(context).emailNotFound;
       this._isValid = false;
     }
     setState(() {
@@ -118,7 +117,7 @@ class _ResetPasswordState extends State<ResetPassword> {
             key: this._resetKey,
             child: Column(
               children: <Widget>[
-                LoginGreet(greetText: 'Reset password'),
+                LoginGreet(greetText: AppLocalizations.of(context).resetPassword),
                 if (!this._isValid) ValidationFailWidget(message: this._operationFailedMessage),
                 SizedBox(
                   height: this._isValid ? 0 : 10,
@@ -131,7 +130,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     if (value.isEmpty || !value.contains('@')) {
-                      return 'Please enter a valid email address.';
+                      return AppLocalizations.of(context).enterValidEmail;
                     }
                     return null;
                   },
@@ -152,7 +151,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                       style: ColorThemes.loginButtonStyle(context),
                       onPressed: this._tryReset,
                       child: Text(
-                        'Reset',
+                        AppLocalizations.of(context).reset,
                         style: TextStyle(fontSize: 25),
                       ),
                     ),
@@ -169,7 +168,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                         Navigator.of(context).popAndPushNamed(LoginScreen.routeName);
                       },
                       child: Text(
-                        'Go back to login form',
+                        AppLocalizations.of(context).goBackLogin,
                         style: Theme.of(context).textTheme.headline5,
                       ),
                     ),

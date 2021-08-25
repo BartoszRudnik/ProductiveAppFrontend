@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../config/images.dart';
 import '../widget/appBar/login_appbar.dart';
 import '../widget/button/login_button.dart';
@@ -45,7 +46,7 @@ class EntryScreen extends StatelessWidget {
               routeName: LoginScreen.routeName,
               backgroundColor: Theme.of(context).accentColor,
               textColor: Theme.of(context).primaryColor,
-              labelText: 'Sign in with e-mail',
+              labelText: AppLocalizations.of(context).signIn,
               loginMode: true,
             ),
             SizedBox(height: 40),
@@ -53,12 +54,12 @@ class EntryScreen extends StatelessWidget {
               routeName: LoginScreen.routeName,
               backgroundColor: Theme.of(context).accentColor,
               textColor: Theme.of(context).primaryColor,
-              labelText: 'Sign up with e-mail',
+              labelText: AppLocalizations.of(context).signUp,
               loginMode: false,
             ),
             SizedBox(height: 20),
             Text(
-              'Or',
+              AppLocalizations.of(context).or,
               style: TextStyle(
                 fontSize: 25,
                 fontWeight: FontWeight.w500,

@@ -94,6 +94,8 @@ class DelegateProvider with ChangeNotifier {
         },
       );
 
+      this.collaborators.firstWhere((element) => element.email == collaboratorEmail).isAskingForPermission = false;
+
       notifyListeners();
     } catch (error) {
       print(error);

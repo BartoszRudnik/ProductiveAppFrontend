@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_app/config/color_themes.dart';
 import 'package:productive_app/utils/date_time_pickers.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TaskDate extends StatefulWidget {
   DateTime startValue;
@@ -55,7 +56,7 @@ class _TaskDateState extends State<TaskDate> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Center(
-                          child: Text('Start date'),
+                          child: Text(AppLocalizations.of(context).startDate),
                         ),
                         SizedBox(height: 5),
                         ConstrainedBox(
@@ -109,7 +110,7 @@ class _TaskDateState extends State<TaskDate> {
                           height: 20,
                         ),
                         Center(
-                          child: Text('End date'),
+                          child: Text(AppLocalizations.of(context).endDate),
                         ),
                         SizedBox(height: 5),
                         ConstrainedBox(
@@ -173,7 +174,7 @@ class _TaskDateState extends State<TaskDate> {
                                 this._endInitialTime = this.widget.endTime;
                                 Navigator.of(context).pop(false);
                               },
-                              child: Text('Cancel'),
+                              child: Text(AppLocalizations.of(context).cancel),
                             ),
                             ElevatedButton(
                               onPressed: () {
@@ -183,7 +184,7 @@ class _TaskDateState extends State<TaskDate> {
                                     builder: (context) => AlertDialog(
                                       title: Center(
                                         child: Text(
-                                          'Cannot select only time',
+                                          AppLocalizations.of(context).cannotSelectOnlyTime,
                                           style: Theme.of(context).textTheme.headline2,
                                         ),
                                       ),
@@ -230,7 +231,7 @@ class _TaskDateState extends State<TaskDate> {
                                 });
                                 Navigator.of(context).pop(true);
                               },
-                              child: Text('Save'),
+                              child: Text(AppLocalizations.of(context).save),
                             ),
                           ],
                         ),

@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
 class LoginButton extends StatelessWidget {
@@ -30,10 +31,11 @@ class LoginButton extends StatelessWidget {
             arguments: {'loginMode': this.loginMode},
           );
         },
-        child: Text(
+        child: AutoSizeText(
           this.labelText,
+          minFontSize: 17,
+          maxFontSize: 32,
           style: TextStyle(
-            fontSize: 25,
             color: this.textColor,
           ),
         ),

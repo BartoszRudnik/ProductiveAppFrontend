@@ -9,6 +9,7 @@ import '../widget/button/new_password_button.dart';
 import '../widget/login_greet.dart';
 import '../widget/validation_fail_widget.dart';
 import 'login_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NewPassword extends StatefulWidget {
   static const routeName = '/new-password';
@@ -26,7 +27,7 @@ class _NewPasswordState extends State<NewPassword> {
   var _resetToken = '';
   var _password = '';
   var _repeatPassword = '';
-  var _validationMessage = 'Authentication failed';
+  var _validationMessage = '';
   var _isLoading = false;
 
   @override
@@ -76,7 +77,7 @@ class _NewPasswordState extends State<NewPassword> {
         builder: (context) => AlertDialog(
           title: Center(
             child: Text(
-              'New password successfuly set',
+              AppLocalizations.of(context).newPasswordSuccess,
               style: TextStyle(
                 fontSize: 26,
                 fontFamily: 'RobotoCondensed',
@@ -103,13 +104,13 @@ class _NewPasswordState extends State<NewPassword> {
         ),
       );
     } on HttpException catch (_) {
-      this._validationMessage = 'Authentication failed.';
+      this._validationMessage = AppLocalizations.of(context).authenticationFailed;
       this._isValid = false;
     } on SocketException catch (_) {
-      this._validationMessage = 'Connection failed';
+      this._validationMessage = AppLocalizations.of(context).connectionFailed;
       this._isValid = false;
     } catch (error) {
-      this._validationMessage = 'Wrong token';
+      this._validationMessage = AppLocalizations.of(context).wrongToken;
       this._isValid = false;
     }
 
@@ -129,7 +130,7 @@ class _NewPasswordState extends State<NewPassword> {
             key: this._newPasswordKey,
             child: Column(
               children: [
-                LoginGreet(greetText: 'Enter new password'),
+                LoginGreet(greetText: AppLocalizations.of(context).enterNewPassword),
                 if (!this._isValid) ValidationFailWidget(message: this._validationMessage),
                 SizedBox(
                   height: this._isValid ? 0 : 10,
@@ -143,9 +144,9 @@ class _NewPasswordState extends State<NewPassword> {
                   validator: (value) {
                     if (value.isEmpty) {
                       setState(() {
-                        this._validationMessage = 'Please enter reset token';
+                        this._validationMessage = AppLocalizations.of(context).enterResetToken;
                       });
-                      return 'Please enter reset token';
+                      return AppLocalizations.of(context).enterResetToken;
                     }
                     return null;
                   },
@@ -166,21 +167,21 @@ class _NewPasswordState extends State<NewPassword> {
                   validator: (value) {
                     if (value.isEmpty || value.length < 7) {
                       setState(() {
-                        this._validationMessage = 'Password must be at least 7 characters long';
+                        this._validationMessage = AppLocalizations.of(context).passwordLength;
                       });
-                      return 'Password must be at least 7 characters long';
+                      return AppLocalizations.of(context).passwordLength;
                     }
                     if (value != this._passwordConfirmKey.currentState.value) {
                       setState(() {
-                        this._validationMessage = 'Passwords must be the same';
+                        this._validationMessage = AppLocalizations.of(context).samePasswords;
                       });
-                      return 'Passwords must be the same';
+                      return AppLocalizations.of(context).samePasswords;
                     }
                     return null;
                   },
                   decoration: ColorThemes.loginFormFieldDecoration(
                     context,
-                    'Password',
+                    AppLocalizations.of(context).password,
                     Icons.lock_outline,
                   ),
                 ),
@@ -195,15 +196,15 @@ class _NewPasswordState extends State<NewPassword> {
                   validator: (value) {
                     if (value.isEmpty || value.length < 7) {
                       setState(() {
-                        this._validationMessage = 'Password must be at least 7 characters long';
+                        this._validationMessage = AppLocalizations.of(context).passwordLength;
                       });
-                      return 'Password must be at least 7 characters long';
+                      return AppLocalizations.of(context).passwordLength;
                     }
                     return null;
                   },
                   decoration: ColorThemes.loginFormFieldDecoration(
                     context,
-                    'Repeat Password',
+                    AppLocalizations.of(context).repeatPassword,
                     Icons.lock_outline,
                   ),
                 ),
@@ -224,7 +225,7 @@ class _NewPasswordState extends State<NewPassword> {
                         Navigator.of(context).popAndPushNamed(LoginScreen.routeName);
                       },
                       child: Text(
-                        'Go back to login form',
+                        AppLocalizations.of(context).goBackLogin,
                         style: Theme.of(context).textTheme.headline5,
                       ),
                     ),

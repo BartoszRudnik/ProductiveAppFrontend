@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/config/text_themes.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ColorThemes {
   static final ThemeData lightTheme = ThemeData(
@@ -103,7 +104,7 @@ class ColorThemes {
 
   static InputDecoration taskDetailsFieldDecoration(isFocused, description, BuildContext context) {
     return InputDecoration(
-      hintText: isFocused ? "" : "Tap to add description",
+      hintText: isFocused ? "" : AppLocalizations.of(context).tapToAddDescription,
       filled: true,
       fillColor: Theme.of(context).primaryColorLight,
       enabledBorder: description.isEmpty

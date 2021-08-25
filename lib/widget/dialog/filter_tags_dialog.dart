@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../model/tag.dart';
 import '../../provider/tag_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FilterTagsDialog extends StatelessWidget {
   final _tagKey = GlobalKey<FormState>();
@@ -49,7 +49,7 @@ class FilterTagsDialog extends StatelessWidget {
                       },
                       validator: (value) {
                         if (value.isEmpty) {
-                          return 'tag name cannot be empty';
+                          return AppLocalizations.of(context).tagEmptyName;
                         }
                         return null;
                       },
@@ -66,7 +66,7 @@ class FilterTagsDialog extends StatelessWidget {
                       maxLines: null,
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.all(10),
-                        hintText: 'Find or add new tag',
+                        hintText: AppLocalizations.of(context).findOrAddTag,
                       ),
                     ),
                   ),
@@ -130,7 +130,7 @@ class FilterTagsDialog extends StatelessWidget {
                         });
                         Navigator.of(context).pop('cancel');
                       },
-                      child: Text('Cancel'),
+                      child: Text(AppLocalizations.of(context).cancel),
                     ),
                     ElevatedButton(
                       onPressed: () {
@@ -139,7 +139,7 @@ class FilterTagsDialog extends StatelessWidget {
                         });
                         Navigator.of(context).pop(this.choosenTags);
                       },
-                      child: Text('Save'),
+                      child: Text(AppLocalizations.of(context).save),
                     ),
                   ],
                 ),

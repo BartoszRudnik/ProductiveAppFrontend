@@ -7,6 +7,7 @@ import '../provider/auth_provider.dart';
 import '../screen/reset_password_screen.dart';
 import 'validation_fail_widget.dart';
 import 'login_greet.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LoginWidget extends StatefulWidget {
   @override
@@ -16,13 +17,13 @@ class LoginWidget extends StatefulWidget {
 class _LoginWidgetState extends State<LoginWidget> {
   final _formKey = GlobalKey<FormState>();
 
-  var _isValid = true;
-  var _isLogin = true;
-  var _isLoading = false;
-  var _isSuccessfull = false;
-  var _email = '';
-  var _password = '';
-  var _authenticationFailedMessage = 'Authentication failed';
+  bool _isValid = true;
+  bool _isLogin = true;
+  bool _isLoading = false;
+  bool _isSuccessfull = false;
+  String _email = '';
+  String _password = '';
+  String _authenticationFailedMessage = '';
 
   @override
   void initState() {
@@ -71,13 +72,13 @@ class _LoginWidgetState extends State<LoginWidget> {
           context: context,
           builder: (context) => AlertDialog(
             title: Text(
-              'Registration successful',
+              AppLocalizations.of(context).registrationSuccessful,
               style: Theme.of(context).textTheme.headline2,
             ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Please check your registered email for email verification'),
+                Text(AppLocalizations.of(context).checkEmail),
                 SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -109,32 +110,29 @@ class _LoginWidgetState extends State<LoginWidget> {
         Navigator.of(context).pop();
       }
     } on HttpException catch (error) {
-      var message = 'Authentication failed';
+      var message = AppLocalizations.of(context).authenticationFailed;
 
       if (error.toString().contains('email already taken')) {
-        message = 'Email already taken';
+        message = AppLocalizations.of(context).emailAlreadyTaken;
       }
       if (error.toString().contains('Wrong email or password')) {
-        message = 'E-mail or Password is incorrect';
+        message = AppLocalizations.of(context).wrongEmailOrPassword;
       }
 
       setState(() {
         this._authenticationFailedMessage = message;
         this._isValid = false;
       });
-    } on SocketException catch (error) {
-      var message = "Connection failed. PLease check your network connection.";
-      if (error.osError.errorCode == 110) {
-        message = "Server connection timed out";
-      } else if (error.osError.errorCode == 101) {
-        message = "No network connection";
-      }
+    } on SocketException catch (_) {
+      var message = AppLocalizations.of(context).connectionFailed;
+
       setState(() {
         this._authenticationFailedMessage = message;
         this._isValid = false;
       });
     } catch (error) {
       setState(() {
+        this._authenticationFailedMessage = AppLocalizations.of(context).authenticationFailed;
         this._isValid = false;
       });
     }
@@ -153,7 +151,7 @@ class _LoginWidgetState extends State<LoginWidget> {
           key: this._formKey,
           child: Column(
             children: [
-              LoginGreet(greetText: this._isLogin ? 'Welcome back' : 'Create account'),
+              LoginGreet(greetText: this._isLogin ? AppLocalizations.of(context).welcomeBack : AppLocalizations.of(context).createAccount),
               if (!this._isValid) ValidationFailWidget(message: this._authenticationFailedMessage),
               SizedBox(height: this._isValid ? 0 : 10),
               TextFormField(
@@ -165,9 +163,9 @@ class _LoginWidgetState extends State<LoginWidget> {
                 validator: (value) {
                   if (value.isEmpty || !value.contains('@')) {
                     setState(() {
-                      this._authenticationFailedMessage = 'Please enter a valid email address.';
+                      this._authenticationFailedMessage = AppLocalizations.of(context).enterValidEmail;
                     });
-                    return 'Please enter a valid email address.';
+                    return AppLocalizations.of(context).enterValidEmail;
                   }
                   return null;
                 },
@@ -183,9 +181,9 @@ class _LoginWidgetState extends State<LoginWidget> {
                 validator: (value) {
                   if (value.isEmpty || value.length < 7) {
                     setState(() {
-                      this._authenticationFailedMessage = 'Password must be at least 7 characters long.';
+                      this._authenticationFailedMessage = AppLocalizations.of(context).passwordLength;
                     });
-                    return 'Password must be at least 7 characters long.';
+                    return AppLocalizations.of(context).passwordLength;
                   }
                   return null;
                 },
@@ -195,7 +193,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                 obscureText: true,
                 decoration: ColorThemes.loginFormFieldDecoration(
                   context,
-                  'Password',
+                  AppLocalizations.of(context).password,
                   Icons.lock_outline,
                 ),
               ),
@@ -208,7 +206,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                             Navigator.of(context).pushReplacementNamed(ResetPassword.routeName);
                           },
                           child: Text(
-                            'Forgot Password?',
+                            AppLocalizations.of(context).forgotPassword,
                             style: Theme.of(context).textTheme.headline5,
                           ),
                         ),
@@ -227,7 +225,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                           style: ColorThemes.loginButtonStyle(context),
                           onPressed: this._trySubmit,
                           child: Text(
-                            this._isLogin ? 'Sign in' : 'Sign up',
+                            this._isLogin ? AppLocalizations.of(context).signInShort : AppLocalizations.of(context).signUpShort,
                             style: TextStyle(
                               fontSize: 25,
                             ),
@@ -236,14 +234,12 @@ class _LoginWidgetState extends State<LoginWidget> {
                 ),
               SizedBox(height: 20),
               Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    this._isLogin ? 'Don\'t have account?' : 'Already have a account',
+                    this._isLogin ? AppLocalizations.of(context).noAccount : AppLocalizations.of(context).alreadyAccount,
                     style: TextStyle(
                       fontSize: 12,
-                      fontFamily: 'RobotoCondensed',
                     ),
                   ),
                   TextButton(
@@ -253,9 +249,12 @@ class _LoginWidgetState extends State<LoginWidget> {
                         this._isLogin = !this._isLogin;
                       });
                     },
-                    child: Text(
-                      this._isLogin ? 'create a new account!' : 'Login',
-                      style: Theme.of(context).textTheme.headline5,
+                    child: Center(
+                      child: Text(
+                        this._isLogin ? AppLocalizations.of(context).createAccount : AppLocalizations.of(context).signInShort,
+                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
                 ],

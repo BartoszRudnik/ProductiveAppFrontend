@@ -27,6 +27,7 @@ class LoginGreet extends StatelessWidget {
               fontSize: 36,
               fontFamily: 'RobotoCondensed',
             ),
+            textAlign: TextAlign.center,
           ),
           SizedBox(
             height: 50,

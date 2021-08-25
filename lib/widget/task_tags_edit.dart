@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TaskTagsEdit extends StatelessWidget {
   final tags;
@@ -46,7 +47,7 @@ class TaskTagsEdit extends StatelessWidget {
             decoration: BoxDecoration(color: Color.fromRGBO(237, 237, 240, 1), borderRadius: BorderRadius.all(Radius.circular(5))),
             child: Center(
               child: Text(
-                "Add tags",
+                AppLocalizations.of(context).addTags,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Color.fromRGBO(119, 119, 120, 1),

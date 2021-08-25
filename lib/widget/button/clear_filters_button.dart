@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/provider/settings_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ClearFiltersButton extends StatelessWidget {
   Future<void> clear(userSettings, context) async {
@@ -36,7 +37,7 @@ class ClearFiltersButton extends StatelessWidget {
             await this.clear(userSettings, context);
           },
           child: Text(
-            'Clear Filters',
+            AppLocalizations.of(context).clearFilters,
             style: TextStyle(fontSize: 28),
           ),
         ),

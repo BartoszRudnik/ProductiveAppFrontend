@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/config/const_values.dart';
 import 'package:productive_app/utils/task_validate.dart';
 import 'package:provider/provider.dart';
 import '../config/color_themes.dart';
@@ -22,6 +23,7 @@ import '../widget/task_details_bottom_bar.dart';
 import '../widget/task_details_dates.dart';
 import '../widget/task_details_map.dart';
 import '../widget/task_tags_edit.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TaskDetailScreen extends StatefulWidget {
   static const routeName = "/task-details";
@@ -209,7 +211,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       if (this.originalTask.localization != newLocalization) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Your task has been moved to $newLocalization.'),
+            content: Text(AppLocalizations.of(context).taskMoved + ConstValues.listName(newLocalization, context)),
             duration: Duration(seconds: 2),
           ),
         );
@@ -220,13 +222,13 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       this.changesSaved = true;
     } catch (error) {
       print(error);
-      await Dialogs.showWarningDialog(context, "An error has occured");
+      await Dialogs.showWarningDialog(context, AppLocalizations.of(context).errorOccurred);
     }
     Navigator.of(context).pop();
   }
 
   Future<void> deleteTask() async {
-    bool accepted = await Dialogs.showChoiceDialog(context, "Are you sure you want to archive this task?");
+    bool accepted = await Dialogs.showChoiceDialog(context, AppLocalizations.of(context).areYouSureArchive);
     if (accepted) {
       originalTask.done = taskToEdit.done;
       setTaskToEdit(originalTask);
@@ -240,7 +242,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, taskToEdit.localization);
         Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);
       } catch (error) {
-        await Dialogs.showWarningDialog(context, "An error has occured");
+        await Dialogs.showWarningDialog(context, AppLocalizations.of(context).errorOccurred);
       }
       Navigator.pop(context);
     }
@@ -436,7 +438,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         if ((!this.checkEquals(this.originalTask, this.taskToEdit) || Provider.of<AttachmentProvider>(context, listen: false).notSavedAttachments.length > 0) && !this.changesSaved) {
           result = await Dialogs.showActionDialog(
             context,
-            'You have made changes, Do you want to save?',
+            AppLocalizations.of(context).changes,
             this.saveTask,
             () {},
           );
@@ -449,7 +451,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       },
       child: Scaffold(
         appBar: DetailsAppBar(
-          title: 'Details',
+          title: AppLocalizations.of(context).details,
           task: originalTask,
         ),
         body: SingleChildScrollView(
@@ -468,7 +470,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                     },
                     validator: (value) {
                       if (value.isEmpty) {
-                        return 'Task title cannot be empty';
+                        return AppLocalizations.of(context).taskTitleEmpty;
                       }
                       return null;
                     },
@@ -483,7 +485,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                     title: Align(
                       alignment: Alignment(-1.1, 0),
                       child: Text(
-                        "Description",
+                        AppLocalizations.of(context).description,
                         style: TextStyle(fontSize: 21),
                       ),
                     ),
@@ -541,7 +543,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                     title: Align(
                       alignment: Alignment(-1.1, 0),
                       child: Text(
-                        "Tags",
+                        AppLocalizations.of(context).tags,
                         style: TextStyle(fontSize: 21),
                       ),
                     ),
@@ -559,7 +561,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                     title: Align(
                       alignment: Alignment(-1.1, 0),
                       child: Text(
-                        "Attachments",
+                        AppLocalizations.of(context).attachments,
                         style: TextStyle(fontSize: 21),
                       ),
                     ),

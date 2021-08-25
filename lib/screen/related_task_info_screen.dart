@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/config/const_values.dart';
 import 'package:provider/provider.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../model/task.dart';
 import '../provider/task_provider.dart';
 import '../widget/appBar/task_appBar.dart';
@@ -48,13 +49,13 @@ class _RelatedTaskInfoScreenState extends State<RelatedTaskInfoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: TaskAppBar(
-        title: 'Related task',
+        title: AppLocalizations.of(context).relatedTask,
       ),
       body: FutureBuilder(
         future: this.loadData(),
         builder: (_, snapshot) {
           if (originalTask == null) {
-            return Center(child: Text("Fetching data"));
+            return Center(child: Text(AppLocalizations.of(context).fetchingData));
           } else {
             return SingleChildScrollView(
               child: Padding(
@@ -95,7 +96,7 @@ class _RelatedTaskInfoScreenState extends State<RelatedTaskInfoScreen> {
                             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                               Icon(Icons.person),
                               Text(
-                                "Owner",
+                                AppLocalizations.of(context).owner,
                                 style: TextStyle(fontSize: 21),
                               ),
                             ]),
@@ -122,7 +123,7 @@ class _RelatedTaskInfoScreenState extends State<RelatedTaskInfoScreen> {
                             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                               Icon(Icons.edit),
                               Text(
-                                "Description",
+                                AppLocalizations.of(context).description,
                                 style: TextStyle(fontSize: 21),
                               ),
                             ]),
@@ -149,8 +150,9 @@ class _RelatedTaskInfoScreenState extends State<RelatedTaskInfoScreen> {
                             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                               Icon(Icons.flag),
                               Text(
-                                "Priority",
+                                AppLocalizations.of(context).priority,
                                 style: TextStyle(fontSize: 21),
+                                textAlign: TextAlign.center,
                               ),
                             ]),
                             Divider(),
@@ -159,8 +161,9 @@ class _RelatedTaskInfoScreenState extends State<RelatedTaskInfoScreen> {
                               children: [
                                 Icon(priorityIcon),
                                 Text(
-                                  originalTask.priority,
+                                  ConstValues.priorities(originalTask.priority, context),
                                   style: TextStyle(fontSize: 18),
+                                  textAlign: TextAlign.center,
                                 ),
                               ],
                             ),
@@ -184,7 +187,7 @@ class _RelatedTaskInfoScreenState extends State<RelatedTaskInfoScreen> {
                               children: [
                                 Icon(Icons.calendar_today),
                                 Text(
-                                  "Start and due date",
+                                  AppLocalizations.of(context).startAndEndDate,
                                   style: TextStyle(fontSize: 21),
                                 ),
                               ],
@@ -192,14 +195,14 @@ class _RelatedTaskInfoScreenState extends State<RelatedTaskInfoScreen> {
                             Divider(),
                             formatter.format(originalTask.startDate) == "1970-01-01"
                                 ? Text(
-                                    'No start date',
+                                    AppLocalizations.of(context).noStartDate,
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400,
                                     ),
                                   )
                                 : Text(
-                                    'Start date: ' + formatter.format(originalTask.startDate) + ', ' + startTime.format(context),
+                                    AppLocalizations.of(context).startDate + ": " + formatter.format(originalTask.startDate) + ', ' + startTime.format(context),
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400,
@@ -210,14 +213,14 @@ class _RelatedTaskInfoScreenState extends State<RelatedTaskInfoScreen> {
                             ),
                             formatter.format(originalTask.endDate) == "1970-01-01"
                                 ? Text(
-                                    'No due date',
+                                    AppLocalizations.of(context).noEndDate,
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400,
                                     ),
                                   )
                                 : Text(
-                                    'Due date: ' + formatter.format(originalTask.endDate) + ', ' + endTime.format(context),
+                                    AppLocalizations.of(context).endDate + ": " + formatter.format(originalTask.endDate) + ', ' + endTime.format(context),
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400,

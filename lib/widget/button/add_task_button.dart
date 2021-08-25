@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/config/color_themes.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AddTaskButton extends StatelessWidget {
   final Function addNewTask;
@@ -17,7 +18,7 @@ class AddTaskButton extends StatelessWidget {
       },
       icon: Icon(Icons.subdirectory_arrow_left_outlined),
       label: Text(
-        'Save',
+        AppLocalizations.of(context).save,
         style: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w400,
