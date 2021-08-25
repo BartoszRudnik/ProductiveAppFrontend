@@ -3,7 +3,6 @@ import 'package:productive_app/widget/appBar/search_appBar.dart';
 import 'package:provider/provider.dart';
 import '../model/tag.dart';
 import '../provider/tag_provider.dart';
-import '../widget/appBar/task_appBar.dart';
 import '../widget/new_tag.dart';
 import '../widget/single_tag.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';

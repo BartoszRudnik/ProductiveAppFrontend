@@ -146,7 +146,7 @@ class _NewPasswordState extends State<NewPassword> {
                       setState(() {
                         this._validationMessage = AppLocalizations.of(context).enterResetToken;
                       });
-                      return 'Please enter reset token';
+                      return AppLocalizations.of(context).enterResetToken;
                     }
                     return null;
                   },
@@ -169,13 +169,13 @@ class _NewPasswordState extends State<NewPassword> {
                       setState(() {
                         this._validationMessage = AppLocalizations.of(context).passwordLength;
                       });
-                      return 'Password must be at least 7 characters long';
+                      return AppLocalizations.of(context).passwordLength;
                     }
                     if (value != this._passwordConfirmKey.currentState.value) {
                       setState(() {
                         this._validationMessage = AppLocalizations.of(context).samePasswords;
                       });
-                      return 'Passwords must be the same';
+                      return AppLocalizations.of(context).samePasswords;
                     }
                     return null;
                   },
@@ -198,7 +198,7 @@ class _NewPasswordState extends State<NewPassword> {
                       setState(() {
                         this._validationMessage = AppLocalizations.of(context).passwordLength;
                       });
-                      return 'Password must be at least 7 characters long';
+                      return AppLocalizations.of(context).passwordLength;
                     }
                     return null;
                   },

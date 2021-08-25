@@ -66,7 +66,7 @@ class SettingsAccountInformation extends StatelessWidget {
                         },
                         validator: (value) {
                           if (value.isEmpty) {
-                            return 'Email cannot be empty';
+                            return AppLocalizations.of(context).emptyEmail;
                           }
                           return null;
                         },

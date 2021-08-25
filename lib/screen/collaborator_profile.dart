@@ -7,6 +7,7 @@ import '../model/collaborator.dart';
 import '../provider/delegate_provider.dart';
 import '../widget/appBar/collaborator_profile_appBar.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class CollaboratorProfile extends StatelessWidget {
   final int collaboratorId;
@@ -131,8 +132,14 @@ class CollaboratorProfile extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            Text(
-                              AppLocalizations.of(context).isAskingForPermission,
+                            Expanded(
+                              child: AutoSizeText(
+                                AppLocalizations.of(context).isAskingForPermission,
+                                maxLines: 2,
+                                minFontSize: 10,
+                                maxFontSize: 16,
+                                textAlign: TextAlign.center,
+                              ),
                             ),
                             IconButton(
                               icon: Icon(Icons.cancel_outlined),

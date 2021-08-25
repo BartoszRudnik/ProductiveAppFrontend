@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:productive_app/config/const_values.dart';
-import 'package:productive_app/model/task.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../model/task.dart';
 
 class TaskDetailsBottomBar extends StatefulWidget {
   final Function deleteTask;

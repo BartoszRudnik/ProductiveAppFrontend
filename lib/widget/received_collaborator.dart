@@ -29,7 +29,7 @@ class ReceivedCollaborator extends StatelessWidget {
               size: 40,
             ),
             Text(
-              'Accept Invitation',
+              AppLocalizations.of(context).acceptInvitation,
               style: TextStyle(color: Theme.of(context).accentColor, fontSize: 20, fontWeight: FontWeight.w400),
             ),
           ],
@@ -43,7 +43,7 @@ class ReceivedCollaborator extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Text(
-              'Decline Invitation',
+              AppLocalizations.of(context).declineInvitation,
               style: TextStyle(color: Theme.of(context).accentColor, fontSize: 20, fontWeight: FontWeight.w400),
             ),
             Icon(
@@ -62,14 +62,15 @@ class ReceivedCollaborator extends StatelessWidget {
             builder: (context) => AlertDialog(
               title: Center(
                 child: Text(
-                  'Decline invitation',
+                  AppLocalizations.of(context).declineInvitation,
                   style: Theme.of(context).textTheme.headline3,
+                  textAlign: TextAlign.center,
                 ),
               ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Are you sure you want to decline this invitation?'),
+                  Text(AppLocalizations.of(context).areYouSureDeclineInvitation, textAlign: TextAlign.center),
                   SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,

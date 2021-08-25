@@ -42,7 +42,7 @@ class _NewTagState extends State<NewTag> {
                 if (!Provider.of<TagProvider>(context, listen: false).tagNames.contains(newTag.name)) {
                   Provider.of<TagProvider>(context, listen: false).addTag(newTag);
                 } else {
-                  Dialogs.showWarningDialog(context, 'Tag already exists');
+                  Dialogs.showWarningDialog(context, AppLocalizations.of(context).tagAlreadyExist);
                 }
               } else {
                 Provider.of<TagProvider>(context, listen: false).updateTag(value, widget.initialValue);

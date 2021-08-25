@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../model/task.dart';
 import '../../screen/related_task_info_screen.dart';
 
@@ -50,7 +50,7 @@ class _DetailsAppBarState extends State<DetailsAppBar> {
           itemBuilder: (this.widget.task.childId != null || this.widget.task.isDelegated)
               ? (_) => [
                     PopupMenuItem(
-                      child: Text('Related task info'),
+                      child: Text(AppLocalizations.of(context).relatedTask),
                       value: 'related',
                     ),
                   ]

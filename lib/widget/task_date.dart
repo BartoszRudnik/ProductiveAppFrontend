@@ -184,7 +184,7 @@ class _TaskDateState extends State<TaskDate> {
                                     builder: (context) => AlertDialog(
                                       title: Center(
                                         child: Text(
-                                          'Cannot select only time',
+                                          AppLocalizations.of(context).cannotSelectOnlyTime,
                                           style: Theme.of(context).textTheme.headline2,
                                         ),
                                       ),

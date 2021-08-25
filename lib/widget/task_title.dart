@@ -12,7 +12,7 @@ class TaskTitle extends StatelessWidget {
       key: ValueKey('taskName'),
       validator: (value) {
         if (value.isEmpty) {
-          return 'Task title cannot be empty';
+          return AppLocalizations.of(context).taskTitleEmpty;
         }
 
         return null;

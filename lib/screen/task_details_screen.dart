@@ -470,7 +470,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                     },
                     validator: (value) {
                       if (value.isEmpty) {
-                        return 'Task title cannot be empty';
+                        return AppLocalizations.of(context).taskTitleEmpty;
                       }
                       return null;
                     },

@@ -22,7 +22,7 @@ class AskForActivityPermission extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               if (this.collaborator.alreadyAsked) {
-                return Dialogs.showWarningDialog(context, 'You already asked for permission!');
+                return Dialogs.showWarningDialog(context, AppLocalizations.of(context).alreadyAsked);
               } else {
                 Provider.of<DelegateProvider>(context, listen: false).askForPermission(this.collaborator.email);
                 this.collaborator.alreadyAsked = true;
@@ -30,7 +30,7 @@ class AskForActivityPermission extends StatelessWidget {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      'Request has been sent',
+                      AppLocalizations.of(context).requestHasBeenSend,
                       textAlign: TextAlign.center,
                     ),
                     duration: Duration(seconds: 2),

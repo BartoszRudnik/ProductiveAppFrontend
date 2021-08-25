@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:productive_app/config/const_values.dart';
+import '../config/const_values.dart';
 
 class TaskPriority extends StatefulWidget {
   final Function setTaskPriority;

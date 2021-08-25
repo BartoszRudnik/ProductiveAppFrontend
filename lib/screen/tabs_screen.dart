@@ -1,7 +1,6 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:productive_app/config/const_values.dart';
 import 'package:provider/provider.dart';
 import '../provider/delegate_provider.dart';
 import '../provider/task_provider.dart';

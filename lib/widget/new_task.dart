@@ -8,7 +8,6 @@ import '../model/taskLocation.dart';
 import '../provider/attachment_provider.dart';
 import '../provider/location_provider.dart';
 import '../provider/task_provider.dart';
-import '../utils/dialogs.dart';
 import 'button/add_task_button.dart';
 import 'button/full_screen_button.dart';
 import 'button/is_done_button.dart';
