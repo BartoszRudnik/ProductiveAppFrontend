@@ -306,7 +306,7 @@
   "taskMoved": "Twoje zadanie zostało przeniesione do listy ",
   "canceled": "Odwołane",
   "overdue": "spóźnienia",
-  "left": "dni zostało",
+  "left": " dni zostało",
   "taskSent": "Wysłane",
   "waiting": "Oczekujące",
   "inProgress": "W trakcie",
