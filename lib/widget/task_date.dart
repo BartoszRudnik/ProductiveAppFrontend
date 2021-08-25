@@ -186,12 +186,13 @@ class _TaskDateState extends State<TaskDate> {
                                         child: Text(
                                           AppLocalizations.of(context).cannotSelectOnlyTime,
                                           style: Theme.of(context).textTheme.headline2,
+                                          textAlign: TextAlign.center,
                                         ),
                                       ),
                                       content: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Text('...'),
+                                          Text(AppLocalizations.of(context).cannotSelectOnlyTime),
                                           SizedBox(height: 10),
                                           Row(
                                             mainAxisAlignment: MainAxisAlignment.center,

@@ -253,12 +253,11 @@ class _NewTaskState extends State<NewTask> {
         child: Container(
           height: this._screenHeight == null ? MediaQuery.of(context).size.height * 0.33 : this._screenHeight,
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Flexible(
                 child: ListTile(
-                  isThreeLine: true,
+                  isThreeLine: false,
                   horizontalTitleGap: 5,
                   minLeadingWidth: 20,
                   contentPadding: EdgeInsets.all(0),
@@ -268,7 +267,11 @@ class _NewTaskState extends State<NewTask> {
                   ),
                   title: TaskTitle(setTaskName: this.setTaskName, newTaskTitleKey: this.newTaskTitleKey),
                   trailing: FullScreenButton(setFullScreen: this.setFullScreen),
-                  subtitle: TaskDescription(setTaskDescription: this.setTaskDescription, newTaskDescriptionKey: this.newTaskDescriptionKey),
+                  subtitle: TaskDescription(
+                    setTaskDescription: this.setTaskDescription,
+                    newTaskDescriptionKey: this.newTaskDescriptionKey,
+                    isFullScreen: this._isFullScreen,
+                  ),
                 ),
               ),
               Column(

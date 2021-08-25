@@ -358,6 +358,16 @@ class DelegateProvider with ChangeNotifier {
     }
   }
 
+  bool checkIfCollaboratorAlreadyExist(String collaboratorMail) {
+    for (Collaborator element in this.collaborators) {
+      if (element.email == collaboratorMail) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   Future<void> addCollaborator(String newCollaborator) async {
     final requestUrl = this._serverUrl + 'delegate/addCollaborator';
 

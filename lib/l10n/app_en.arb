@@ -342,5 +342,6 @@
   "emailAlreadyTaken": "Email already taken",
   "wrongEmailOrPassword": "Wrong email or password",
   "tagAlreadyExist": "Tag already exist",
-  "emptyEmail": "Email cannot be empty"
+  "emptyEmail": "Email cannot be empty",
+  "collaboratorAlreadyExist": "Collaborator already exist"
 }

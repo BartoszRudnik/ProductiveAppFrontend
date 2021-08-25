@@ -4,10 +4,12 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class TaskDescription extends StatelessWidget {
   final Function setTaskDescription;
   final newTaskDescriptionKey;
+  final isFullScreen;
 
   TaskDescription({
     @required this.setTaskDescription,
     @required this.newTaskDescriptionKey,
+    @required this.isFullScreen,
   });
 
   @override
@@ -15,7 +17,7 @@ class TaskDescription extends StatelessWidget {
     return Form(
       key: this.newTaskDescriptionKey,
       child: TextFormField(
-        maxLines: null,
+        maxLines: this.isFullScreen ? 25 : 3,
         key: ValueKey('taskDescription'),
         onSaved: (value) {
           this.setTaskDescription(value);
