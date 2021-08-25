@@ -34,10 +34,12 @@ class NewTask extends StatefulWidget {
 
 class _NewTaskState extends State<NewTask> {
   double _screenHeight;
-  var _isFullScreen = false;
-  var _isValid = true;
+  bool _isFullScreen = false;
+  bool _isValid = true;
+  bool _waiting = false;
 
-  final _formKey = GlobalKey<FormState>();
+  final newTaskTitleKey = GlobalKey<FormState>();
+  final newTaskDescriptionKey = GlobalKey<FormState>();
 
   List<Tag> _finalTags = [];
   List<File> _files = [];
@@ -138,19 +140,25 @@ class _NewTaskState extends State<NewTask> {
   }
 
   Future<void> _addNewTask() async {
-    var isValid = this._formKey.currentState.validate();
+    bool isValidTitle = this.newTaskTitleKey.currentState.validate();
+    bool isValidRest = await TaskValidate.validateNewTask(this._startDate, this._endDate, this._localization, this._isDone, this._delegatedEmail, context);
 
-    isValid = await TaskValidate.validateNewTask(this._startDate, this._endDate, this._localization, this._isDone, this._delegatedEmail, context);
-
-    setState(() {
-      this._isValid = isValid;
-    });
+    if (!isValidRest || !isValidTitle) {
+      this._isValid = false;
+    } else {
+      this._isValid = true;
+    }
 
     if (!this._isValid) {
       return;
     }
 
-    this._formKey.currentState.save();
+    setState(() {
+      this._waiting = true;
+    });
+
+    this.newTaskTitleKey.currentState.save();
+    this.newTaskDescriptionKey.currentState.save();
 
     if (this._startDate != null && this._startTime != null) {
       this._startDate = DateTime(this._startDate.year, this._startDate.month, this._startDate.day, this._startTime.hour, this._startTime.minute);
@@ -198,7 +206,8 @@ class _NewTaskState extends State<NewTask> {
         await Provider.of<AttachmentProvider>(context, listen: false).setAttachments(this._files, taskId, false);
       }
 
-      this._formKey.currentState.reset();
+      this.newTaskTitleKey.currentState.reset();
+      this.newTaskDescriptionKey.currentState.reset();
       setState(() {
         this._startDate = null;
         this._endDate = null;
@@ -206,6 +215,7 @@ class _NewTaskState extends State<NewTask> {
         this._endTime = null;
         this._localization = this.widget.localization;
         this._isDone = false;
+        this._priority = 'NORMAL';
         this._finalTags.forEach((element) {
           element.isSelected = false;
         });
@@ -220,6 +230,10 @@ class _NewTaskState extends State<NewTask> {
       print(error);
       throw error;
     }
+
+    setState(() {
+      this._waiting = false;
+    });
   }
 
   @override
@@ -235,85 +249,93 @@ class _NewTaskState extends State<NewTask> {
       padding: EdgeInsets.symmetric(
         horizontal: 20,
       ),
-      child: Form(
-        key: this._formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            ListTile(
-              isThreeLine: true,
-              horizontalTitleGap: 5,
-              minLeadingWidth: 20,
-              contentPadding: EdgeInsets.all(0),
-              leading: IsDoneButton(
-                isDone: this._isDone,
-                changeIsDoneStatus: this.changeIsDone,
+      child: SingleChildScrollView(
+        child: Container(
+          height: this._screenHeight == null ? MediaQuery.of(context).size.height * 0.33 : this._screenHeight,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(
+                child: ListTile(
+                  isThreeLine: true,
+                  horizontalTitleGap: 5,
+                  minLeadingWidth: 20,
+                  contentPadding: EdgeInsets.all(0),
+                  leading: IsDoneButton(
+                    isDone: this._isDone,
+                    changeIsDoneStatus: this.changeIsDone,
+                  ),
+                  title: TaskTitle(setTaskName: this.setTaskName, newTaskTitleKey: this.newTaskTitleKey),
+                  trailing: FullScreenButton(setFullScreen: this.setFullScreen),
+                  subtitle: TaskDescription(setTaskDescription: this.setTaskDescription, newTaskDescriptionKey: this.newTaskDescriptionKey),
+                ),
               ),
-              title: TaskTitle(setTaskName: this.setTaskName),
-              trailing: FullScreenButton(
-                setFullScreen: this.setFullScreen,
+              Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      TaskPriority(
+                        setTaskPriority: this.setPriority,
+                        priority: this._priority,
+                        priorities: priorities,
+                      ),
+                      TaskDate(
+                        startValue: this._startDate,
+                        endValue: this._endDate,
+                        startTime: this._startTime,
+                        endTime: this._endTime,
+                        setDate: this.setDate,
+                      ),
+                      NewTaskTags(
+                        setTags: this.setTags,
+                        finalTags: this._finalTags,
+                      ),
+                      NewTaskNotificationLocalization(
+                        setNotificationLocalization: this.setNotificationLocalization,
+                        notificationLocalizationId: this._notificationLocalizationId,
+                        notificationOnEnter: this._notificationOnEnter,
+                        notificationOnExit: this._notificationOnExit,
+                        notificationRadius: this._notificationLocalizationRadius,
+                      ),
+                      TaskDelegate(
+                        setDelegatedEmail: this.setDelegatedEmail,
+                        collaboratorEmail: this._delegatedEmail,
+                      ),
+                      NewTaskAttachment(
+                        setAttachments: this._setAttachment,
+                        files: this._files,
+                      ),
+                    ],
+                  ),
+                  Divider(
+                    thickness: 1.5,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TaskLocalization(
+                        localization: this._localization,
+                        localizations: localizations,
+                        setLocalization: this.setLocalization,
+                      ),
+                      if (this._waiting == true)
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: CircularProgressIndicator(backgroundColor: Theme.of(context).primaryColor),
+                        )
+                      else
+                        AddTaskButton(
+                          addNewTask: this._addNewTask,
+                        ),
+                    ],
+                  ),
+                ],
               ),
-              subtitle: TaskDescription(setTaskDescription: this.setTaskDescription),
-            ),
-            Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    TaskPriority(
-                      setTaskPriority: this.setPriority,
-                      priority: this._priority,
-                      priorities: priorities,
-                    ),
-                    TaskDate(
-                      startValue: this._startDate,
-                      endValue: this._endDate,
-                      startTime: this._startTime,
-                      endTime: this._endTime,
-                      setDate: this.setDate,
-                    ),
-                    NewTaskTags(
-                      setTags: this.setTags,
-                      finalTags: this._finalTags,
-                    ),
-                    NewTaskNotificationLocalization(
-                      setNotificationLocalization: this.setNotificationLocalization,
-                      notificationLocalizationId: this._notificationLocalizationId,
-                      notificationOnEnter: this._notificationOnEnter,
-                      notificationOnExit: this._notificationOnExit,
-                      notificationRadius: this._notificationLocalizationRadius,
-                    ),
-                    TaskDelegate(
-                      setDelegatedEmail: this.setDelegatedEmail,
-                      collaboratorEmail: this._delegatedEmail,
-                    ),
-                    NewTaskAttachment(
-                      setAttachments: this._setAttachment,
-                      files: this._files,
-                    ),
-                  ],
-                ),
-                Divider(
-                  thickness: 1.5,
-                  color: Theme.of(context).primaryColor,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TaskLocalization(
-                      localization: this._localization,
-                      localizations: localizations,
-                      setLocalization: this.setLocalization,
-                    ),
-                    AddTaskButton(
-                      addNewTask: this._addNewTask,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

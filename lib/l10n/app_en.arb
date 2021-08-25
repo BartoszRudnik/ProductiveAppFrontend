@@ -306,7 +306,7 @@
   "taskMoved": "Your task has been moved to ",
   "canceled": "Canceled",
   "overdue": "overdue",
-  "left": "d left",
+  "left": " d left",
   "taskSent": "Sent",
   "waiting": "Waiting",
   "inProgress": "In progress",
