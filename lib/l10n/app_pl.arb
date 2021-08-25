@@ -342,5 +342,6 @@
   "emailAlreadyTaken": "Adres email został już zajęty",
   "wrongEmailOrPassword": "Błędny email lub hasło",
   "tagAlreadyExist": "Tag już istnieje",
-  "emptyEmail": "Email nie może być pusty"
+  "emptyEmail": "Email nie może być pusty",
+  "collaboratorAlreadyExist": "Zaproszenie zostało już wysłane"
 }

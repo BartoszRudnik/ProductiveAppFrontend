@@ -1,9 +1,7 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:productive_app/config/color_themes.dart';
 import 'package:provider/provider.dart';
-
 import '../widget/appBar/login_appbar.dart';
 import '../provider/auth_provider.dart';
 import '../widget/validation_fail_widget.dart';
@@ -22,10 +20,10 @@ class ResetPassword extends StatefulWidget {
 class _ResetPasswordState extends State<ResetPassword> {
   final _resetKey = GlobalKey<FormState>();
 
-  var _email = '';
-  var _isValid = true;
-  var _isLoading = false;
-  var _operationFailedMessage = '';
+  String _email = '';
+  bool _isValid = true;
+  bool _isLoading = false;
+  String _operationFailedMessage = '';
 
   Future<void> _tryReset() async {
     setState(() {
@@ -46,9 +44,10 @@ class _ResetPasswordState extends State<ResetPassword> {
     this._resetKey.currentState.save();
 
     try {
-      await Provider.of<AuthProvider>(context, listen: false).resetPassword(
-        this._email,
-      );
+      await Provider.of<AuthProvider>(context, listen: false).resetPassword(this._email);
+      setState(() {
+        this._isLoading = false;
+      });
       return showDialog(
         context: context,
         builder: (context) => AlertDialog(

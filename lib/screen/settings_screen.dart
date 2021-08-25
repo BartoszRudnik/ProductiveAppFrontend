@@ -64,24 +64,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                   ),
-                  Form(
-                    key: this._deleteDialogKey,
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.all(10),
-                        hintText: AppLocalizations.of(context).deleteToken,
-                      ),
-                      validator: (value) {
-                        if (value.isEmpty || value.length < 6) {
-                          return AppLocalizations.of(context).validToken;
-                        }
-                        return null;
-                      },
-                      onSaved: (value) async {
-                        enteredToken = value;
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Form(
+                        key: this._deleteDialogKey,
+                        child: TextFormField(
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.all(10),
+                            hintText: AppLocalizations.of(context).deleteToken,
+                          ),
+                          validator: (value) {
+                            if (value.isEmpty || value.length < 6) {
+                              return AppLocalizations.of(context).validToken;
+                            }
+                            return null;
+                          },
+                          onSaved: (value) async {
+                            enteredToken = value;
 
-                        Provider.of<AuthProvider>(context, listen: false).deleteAccount(enteredToken);
-                      },
+                            Provider.of<AuthProvider>(context, listen: false).deleteAccount(enteredToken);
+                          },
+                        ),
+                      ),
                     ),
                   ),
                   Row(
@@ -144,62 +148,66 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                   ),
-                  Form(
-                    key: _resetPasswordKey,
-                    child: Column(
-                      children: [
-                        TextFormField(
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.all(10),
-                            hintText: AppLocalizations.of(context).enterResetToken,
-                          ),
-                          validator: (value) {
-                            if (value.isEmpty || value.length < 6) {
-                              return AppLocalizations.of(context).wrongToken;
-                            }
-                            return null;
-                          },
-                          onSaved: (value) async {
-                            enteredToken = value;
-                          },
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Form(
+                        key: _resetPasswordKey,
+                        child: Column(
+                          children: [
+                            TextFormField(
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.all(10),
+                                hintText: AppLocalizations.of(context).enterResetToken,
+                              ),
+                              validator: (value) {
+                                if (value.isEmpty || value.length < 6) {
+                                  return AppLocalizations.of(context).wrongToken;
+                                }
+                                return null;
+                              },
+                              onSaved: (value) async {
+                                enteredToken = value;
+                              },
+                            ),
+                            TextFormField(
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.all(10),
+                                hintText: AppLocalizations.of(context).enterNewPassword,
+                              ),
+                              validator: (value) {
+                                if (value != this._cofirmPasswordKey.currentState.value) {
+                                  return AppLocalizations.of(context).samePasswords;
+                                }
+                                if (value.isEmpty || value.length < 7) {
+                                  return AppLocalizations.of(context).passwordLength;
+                                }
+                                return null;
+                              },
+                              onSaved: (value) async {
+                                newPassword = value;
+                              },
+                            ),
+                            TextFormField(
+                              obscureText: true,
+                              key: this._cofirmPasswordKey,
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.all(10),
+                                hintText: AppLocalizations.of(context).repeatPassword,
+                              ),
+                              validator: (value) {
+                                if (value.isEmpty || value.length < 7) {
+                                  return AppLocalizations.of(context).passwordLength;
+                                }
+                                return null;
+                              },
+                              onSaved: (value) async {
+                                newPasswordRepeated = value;
+                              },
+                            ),
+                          ],
                         ),
-                        TextFormField(
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.all(10),
-                            hintText: AppLocalizations.of(context).enterNewPassword,
-                          ),
-                          validator: (value) {
-                            if (value != this._cofirmPasswordKey.currentState.value) {
-                              return AppLocalizations.of(context).samePasswords;
-                            }
-                            if (value.isEmpty || value.length < 7) {
-                              return AppLocalizations.of(context).passwordLength;
-                            }
-                            return null;
-                          },
-                          onSaved: (value) async {
-                            newPassword = value;
-                          },
-                        ),
-                        TextFormField(
-                          obscureText: true,
-                          key: this._cofirmPasswordKey,
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.all(10),
-                            hintText: AppLocalizations.of(context).repeatPassword,
-                          ),
-                          validator: (value) {
-                            if (value.isEmpty || value.length < 7) {
-                              return AppLocalizations.of(context).passwordLength;
-                            }
-                            return null;
-                          },
-                          onSaved: (value) async {
-                            newPasswordRepeated = value;
-                          },
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                   Row(

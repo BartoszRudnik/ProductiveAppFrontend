@@ -27,6 +27,9 @@ class _NewCollaboratorState extends State<NewCollaborator> {
               if (value == Provider.of<DelegateProvider>(context, listen: false).userEmail) {
                 return AppLocalizations.of(context).cannotInviteYourself;
               }
+              if (Provider.of<DelegateProvider>(context, listen: false).checkIfCollaboratorAlreadyExist(value)) {
+                return AppLocalizations.of(context).collaboratorAlreadyExist;
+              }
               return null;
             },
             onSaved: (value) async {
