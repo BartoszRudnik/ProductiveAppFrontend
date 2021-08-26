@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
+import 'package:productive_app/model/location.dart';
 import '../utils/notifications.dart';
 import '../model/tag.dart';
 import '../model/task.dart';
@@ -983,6 +984,53 @@ class TaskProvider with ChangeNotifier {
     });
 
     notifyListeners();
+  }
+
+  Future<void> deleteReceivedFromCollaborator(String collaboratorEmail, List<Location> locations) async {
+    final receivedTasks = this.taskList.where((task) => task.supervisorEmail == collaboratorEmail);
+
+    receivedTasks.forEach((task) {
+      String newLocation = "TRASH";
+
+      if (task.notificationLocalizationId == null) {
+        this.updateTask(task, newLocation);
+      } else {
+        final longitude = locations.firstWhere((location) => location.id == task.notificationLocalizationId).longitude;
+        final latitude = locations.firstWhere((location) => location.id == task.notificationLocalizationId).latitude;
+
+        this.updateTaskWithGeolocation(task, newLocation, longitude, latitude);
+      }
+    });
+  }
+
+  Future<void> deleteCollaboratorFromTasks(String collaboratorEmail, List<Location> locations) async {
+    final delegatedTasks = this.delegatedTasks.where((element) => element.delegatedEmail == collaboratorEmail);
+
+    delegatedTasks.forEach(
+      (element) {
+        element.delegatedEmail = null;
+        element.supervisorEmail = null;
+        element.childId = null;
+        element.parentId = null;
+
+        String newLocation;
+
+        if (element.startDate != null) {
+          newLocation = 'SCHEDULED';
+        } else {
+          newLocation = 'ANYTIME';
+        }
+
+        if (element.notificationLocalizationId == null) {
+          this.updateTask(element, newLocation);
+        } else {
+          final longitude = locations.firstWhere((location) => location.id == element.notificationLocalizationId).longitude;
+          final latitude = locations.firstWhere((location) => location.id == element.notificationLocalizationId).latitude;
+
+          this.updateTaskWithGeolocation(element, newLocation, longitude, latitude);
+        }
+      },
+    );
   }
 
   void sortByPosition(List<Task> listToSort) {

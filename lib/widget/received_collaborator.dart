@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/provider/location_provider.dart';
+import 'package:productive_app/provider/task_provider.dart';
 import 'package:provider/provider.dart';
 import '../model/collaborator.dart';
 import '../provider/delegate_provider.dart';
@@ -77,6 +79,10 @@ class ReceivedCollaborator extends StatelessWidget {
                     children: [
                       ElevatedButton(
                         onPressed: () {
+                          final locations = Provider.of<LocationProvider>(context, listen: false).locationList;
+                          Provider.of<TaskProvider>(context, listen: false).deleteCollaboratorFromTasks(this.collaborator.email, locations);
+                          Provider.of<TaskProvider>(context, listen: false).deleteReceivedFromCollaborator(this.collaborator.email, locations);
+
                           Provider.of<DelegateProvider>(context, listen: false).declineInvitation(this.collaborator.id);
                           Navigator.of(context).pop(true);
                         },

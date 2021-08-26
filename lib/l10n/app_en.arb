@@ -8,7 +8,7 @@
   "@\"accountSettings": {},
   "activeTasks": "Active tasks",
   "@\"activeTasks": {},
-  "actualRange": "Current range",
+  "actualRange": "Current range: ",
   "@\"actualRange": {},
   "addAttachment": "Add attachments",
   "@\"addAttachment": {},
@@ -305,8 +305,15 @@
   "emptyList": "The list is currently empty",
   "taskMoved": "Your task has been moved to ",
   "canceled": "Canceled",
-  "overdue": "overdue",
-  "left": " d left",
+  "overdue": " d overdue",
+  "left": "{liczba} d left",
+  "@left":{
+    "placeholders":{
+      "liczba":{
+        "type": "String"
+      }
+    }
+  },
   "taskSent": "Sent",
   "waiting": "Waiting",
   "inProgress": "In progress",

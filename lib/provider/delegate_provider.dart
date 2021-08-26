@@ -396,6 +396,7 @@ class DelegateProvider with ChangeNotifier {
         relationState: 'WAITING',
         isSelected: false,
         received: false,
+        collaboratorName: '',
       );
 
       this.collaborators.insert(0, collaborator);

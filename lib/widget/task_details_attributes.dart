@@ -26,10 +26,14 @@ class TaskDetailsAttributes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String collaboratorName = '';
+    String collaboratorName;
 
     if (this.taskToEdit.delegatedEmail != null) {
-      collaboratorName = Provider.of<DelegateProvider>(context).collaborators.firstWhere((element) => element.email == this.taskToEdit.delegatedEmail).collaboratorName;
+      final collab = Provider.of<DelegateProvider>(context).collaborators.firstWhere((element) => element.email == this.taskToEdit.delegatedEmail, orElse: () => null);
+
+      if (collab != null) {
+        collaboratorName = collab.collaboratorName;
+      }
     }
 
     return Row(
@@ -115,7 +119,7 @@ class TaskDetailsAttributes extends StatelessWidget {
                 children: [
                   Icon(Icons.person_add),
                   AutoSizeText(
-                    this.taskToEdit.delegatedEmail == null
+                    this.taskToEdit.delegatedEmail == null || collaboratorName == null
                         ? AppLocalizations.of(context).assigned
                         : collaboratorName.length > 1
                             ? collaboratorName

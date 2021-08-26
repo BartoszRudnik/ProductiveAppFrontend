@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'dialog/delegate_dialog.dart';
 
 class TaskDelegate extends StatelessWidget {
-  Function setDelegatedEmail;
+  final Function setDelegatedEmail;
   String collaboratorEmail;
 
   TaskDelegate({

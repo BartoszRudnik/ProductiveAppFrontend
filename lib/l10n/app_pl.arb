@@ -8,7 +8,7 @@
   "@\"accountSettings": {},
   "activeTasks": "Aktywne zadania",
   "@\"activeTasks": {},
-  "actualRange": "Aktualny zasięg",
+  "actualRange": "Aktualny zasięg: ",
   "@\"actualRange": {},
   "addAttachment": "Dodaj załączniki",
   "@\"addAttachment": {},
@@ -305,8 +305,15 @@
   "emptyList": "Lista jest obecnie pusta",
   "taskMoved": "Twoje zadanie zostało przeniesione do listy ",
   "canceled": "Odwołane",
-  "overdue": "spóźnienia",
-  "left": " dni zostało",
+  "overdue": " dni spóźnienia",
+  "left": "zostało {liczba} dni",
+  "@left":{
+    "placeholders":{
+      "liczba":{
+        "type": "String"
+      }
+    }
+  },
   "taskSent": "Wysłane",
   "waiting": "Oczekujące",
   "inProgress": "W trakcie",
