@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:productive_app/utils/dialogs.dart';
 import 'package:provider/provider.dart';
 import '../model/task.dart';
 import '../provider/location_provider.dart';
@@ -49,9 +50,14 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
     this._lightMapStyle = await rootBundle.loadString('assets/map/lightMap.json');
   }
 
-  void _getTasks() {
+  void _getTasks() async {
     tasks = Provider.of<TaskProvider>(context, listen: false).tasksWithLocation;
     this.markers = [];
+
+    if (tasks.length == 0) {
+      await Future.delayed(Duration(seconds: 1));
+      await Dialogs.showWarningDialog(context, AppLocalizations.of(context).noLocationTasks);
+    }
 
     for (int i = 0; i < tasks.length; i++) {
       final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(tasks[i].notificationLocalizationId);

@@ -350,5 +350,6 @@
   "wrongEmailOrPassword": "Błędny email lub hasło",
   "tagAlreadyExist": "Tag już istnieje",
   "emptyEmail": "Email nie może być pusty",
-  "collaboratorAlreadyExist": "Zaproszenie zostało już wysłane"
+  "collaboratorAlreadyExist": "Zaproszenie zostało już wysłane",
+  "noLocationTasks": "Brak zadań z lokalizacją"
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/provider/locale_provider.dart';
 import 'package:provider/provider.dart';
 import '../model/collaborator.dart';
 import '../model/collaboratorTask.dart';
@@ -122,8 +123,8 @@ class _RecentTasksState extends State<RecentTasks> {
       }
 
       return {
-        'calendarDay': DateFormat.MMMd().format(weekDay),
-        'day': DateFormat.E().format(weekDay),
+        'calendarDay': DateFormat.MMMd(Provider.of<LocaleProvider>(context, listen: false).locale.languageCode).format(weekDay),
+        'day': DateFormat.E(Provider.of<LocaleProvider>(context, listen: false).locale.languageCode).format(weekDay),
         'amount': dayTotalTasks,
       };
     }).reversed.toList();

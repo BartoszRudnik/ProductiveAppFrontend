@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/provider/locale_provider.dart';
 import 'package:productive_app/utils/collaborator_show_modal.dart';
+import 'package:provider/provider.dart';
 
 class SingleCollaboratorTask extends StatelessWidget {
   final task;
@@ -33,7 +35,15 @@ class SingleCollaboratorTask extends StatelessWidget {
                     width: 10,
                   ),
                   Text(
-                    DateFormat('yMMMMd').format(this.task.lastUpdated) + ' ' + DateFormat('Hm').format(this.task.lastUpdated),
+                    DateFormat(
+                          'yMMMMd',
+                          Provider.of<LocaleProvider>(context, listen: false).locale.languageCode,
+                        ).format(this.task.lastUpdated) +
+                        ' ' +
+                        DateFormat(
+                          'Hm',
+                          Provider.of<LocaleProvider>(context, listen: false).locale.languageCode,
+                        ).format(this.task.lastUpdated),
                   ),
                 ],
               )
