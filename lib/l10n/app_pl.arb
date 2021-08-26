@@ -351,5 +351,6 @@
   "tagAlreadyExist": "Tag już istnieje",
   "emptyEmail": "Email nie może być pusty",
   "collaboratorAlreadyExist": "Zaproszenie zostało już wysłane",
-  "noLocationTasks": "Brak zadań z lokalizacją"
+  "noLocationTasks": "Brak zadań z lokalizacją",
+  "collaboratorNameOrEmail": "Podaj nazwę lub email współpracownika"
 }

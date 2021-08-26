@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:productive_app/provider/delegate_provider.dart';
 import 'package:productive_app/provider/location_provider.dart';
 import 'package:provider/provider.dart';
 import '../../config/color_themes.dart';
@@ -28,6 +29,16 @@ class _SearchAppBarState extends State<SearchAppBar> {
 
   @override
   Widget build(BuildContext context) {
+    String text;
+
+    if (this.widget.searchingName == 'tag') {
+      text = AppLocalizations.of(context).enterTagName;
+    } else if (this.widget.searchingName == "location") {
+      text = AppLocalizations.of(context).enterLocationName;
+    } else {
+      text = AppLocalizations.of(context).collaboratorNameOrEmail;
+    }
+
     return AppBar(
       elevation: 0,
       title: this.searchBarActive
@@ -35,14 +46,24 @@ class _SearchAppBarState extends State<SearchAppBar> {
               autofocus: true,
               key: this._formKey,
               onChanged: (value) {
-                this.widget.searchingName == 'tag' ? Provider.of<TagProvider>(context, listen: false).setSearchingText(value) : Provider.of<LocationProvider>(context, listen: false).setSearchingText(value);
+                if (this.widget.searchingName == 'tag')
+                  Provider.of<TagProvider>(context, listen: false).setSearchingText(value);
+                else if (this.widget.searchingName == 'location')
+                  Provider.of<LocationProvider>(context, listen: false).setSearchingText(value);
+                else
+                  Provider.of<DelegateProvider>(context, listen: false).setSearchingText(value);
               },
               decoration: ColorThemes.searchFormFieldDecoration(
                 context,
-                this.widget.searchingName == 'tag' ? AppLocalizations.of(context).enterTagName : AppLocalizations.of(context).enterLocationName,
+                text,
                 () {
                   this._formKey.currentState.reset();
-                  this.widget.searchingName == 'tag' ? Provider.of<TagProvider>(context, listen: false).clearSearchingText() : Provider.of<LocationProvider>(context, listen: false).clearSearchingText();
+                  if (this.widget.searchingName == 'tag')
+                    Provider.of<TagProvider>(context, listen: false).clearSearchingText();
+                  else if (this.widget.searchingName == 'location')
+                    Provider.of<LocationProvider>(context, listen: false).clearSearchingText();
+                  else
+                    Provider.of<DelegateProvider>(context, listen: false).clearSearchingText();
                 },
               ),
             )
@@ -65,7 +86,12 @@ class _SearchAppBarState extends State<SearchAppBar> {
           onPressed: () {
             if (this.searchBarActive) {
               this._formKey.currentState.reset();
-              this.widget.searchingName == 'tag' ? Provider.of<TagProvider>(context, listen: false).clearSearchingText() : Provider.of<LocationProvider>(context, listen: false).clearSearchingText();
+              if (this.widget.searchingName == 'tag')
+                Provider.of<TagProvider>(context, listen: false).clearSearchingText();
+              else if (this.widget.searchingName == 'location')
+                Provider.of<LocationProvider>(context, listen: false).clearSearchingText();
+              else
+                Provider.of<DelegateProvider>(context, listen: false).clearSearchingText();
             }
 
             setState(() {

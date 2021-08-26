@@ -13,6 +13,8 @@ class DelegateProvider with ChangeNotifier {
   List<Collaborator> _received = [];
   List<Collaborator> _send = [];
 
+  String searchingText;
+
   final userToken;
   final userEmail;
 
@@ -31,15 +33,39 @@ class DelegateProvider with ChangeNotifier {
   }
 
   List<Collaborator> get accepted {
-    return [...this._accepted];
+    if (this.searchingText != null && this.searchingText.length >= 1) {
+      return this._accepted.where((collaborator) => collaborator.email.contains(searchingText) || collaborator.collaboratorName.contains(searchingText)).toList();
+    } else {
+      return [...this._accepted];
+    }
   }
 
   List<Collaborator> get received {
-    return [...this._received];
+    if (this.searchingText != null && this.searchingText.length >= 1) {
+      return this._received.where((collaborator) => collaborator.email.contains(searchingText) || collaborator.collaboratorName.contains(searchingText)).toList();
+    } else {
+      return [...this._received];
+    }
   }
 
   List<Collaborator> get send {
-    return [...this._send];
+    if (this.searchingText != null && this.searchingText.length >= 1) {
+      return this._send.where((collaborator) => collaborator.email.contains(searchingText) || collaborator.collaboratorName.contains(searchingText)).toList();
+    } else {
+      return [...this._send];
+    }
+  }
+
+  void setSearchingText(String text) {
+    this.searchingText = text;
+
+    notifyListeners();
+  }
+
+  void clearSearchingText() {
+    this.searchingText = '';
+
+    notifyListeners();
   }
 
   int get numberOfPermissionRequest {
