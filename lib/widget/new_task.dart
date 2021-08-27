@@ -77,11 +77,16 @@ class _NewTaskState extends State<NewTask> {
 
   void setNotificationLocalization(TaskLocation taskLocation) {
     setState(() {
-      if (taskLocation.location != null) {
+      if (taskLocation != null && taskLocation.location != null) {
         this._notificationLocalizationId = taskLocation.location.id;
         this._notificationLocalizationRadius = taskLocation.notificationRadius;
         this._notificationOnEnter = taskLocation.notificationOnEnter;
         this._notificationOnExit = taskLocation.notificationOnExit;
+      } else {
+        this._notificationLocalizationId = null;
+        this._notificationLocalizationRadius = null;
+        this._notificationOnEnter = null;
+        this._notificationOnExit = null;
       }
     });
   }
@@ -94,8 +99,6 @@ class _NewTaskState extends State<NewTask> {
   }
 
   void setDelegatedEmail(String value) {
-    if (value == null) return;
-
     this._delegatedEmail = value;
   }
 

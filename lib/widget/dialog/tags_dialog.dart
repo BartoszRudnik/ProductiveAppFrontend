@@ -7,7 +7,11 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class TagsDialog extends StatefulWidget {
   static const routeName = "/tags-dialog";
   final List<Tag> taskTags;
-  TagsDialog(Key key, [this.taskTags]) : super(key: key);
+
+  TagsDialog({
+    @required this.taskTags,
+  });
+
   @override
   _TagsDialogState createState() => _TagsDialogState();
 }
@@ -38,24 +42,19 @@ class _TagsDialogState extends State<TagsDialog> {
   }
 
   void initValues() {
-    tags = List<Tag>.from(Provider.of<TagProvider>(context, listen: false).tags);
+    tags = Provider.of<TagProvider>(context, listen: false).tags;
     filteredTags = List<Tag>.from(tags);
+
     filteredTags.forEach((element) {
       element.isSelected = false;
     });
-    taskTags = widget.taskTags;
-    if (taskTags != null) {
-      _finalTags = List<Tag>.from(taskTags);
-      for (int i = 0; i < taskTags.length; i++) {
-        Tag t = filteredTags.firstWhere((element) => element.name == taskTags[i].name, orElse: () => null);
-        if (t != null) {
-          int index = filteredTags.indexOf(t);
 
-          if (index != -1) {
-            filteredTags[index].isSelected = true;
-          }
-        }
-      }
+    if (this.widget.taskTags != null) {
+      _finalTags = List<Tag>.from(this.widget.taskTags);
+
+      this.widget.taskTags.forEach((element) {
+        element.isSelected = true;
+      });
     }
   }
 
@@ -147,13 +146,21 @@ class _TagsDialogState extends State<TagsDialog> {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop(widget.taskTags);
+                    if (this.widget.taskTags == null) {
+                      Navigator.of(context).pop('cancel');
+                    } else {
+                      Navigator.of(context).pop(this.widget.taskTags);
+                    }
                   },
                   child: Text(AppLocalizations.of(context).cancel),
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop(_finalTags);
+                    if (_finalTags == null) {
+                      Navigator.of(context).pop('cancel');
+                    } else {
+                      Navigator.of(context).pop(_finalTags);
+                    }
                   },
                   child: Text(AppLocalizations.of(context).save),
                 ),

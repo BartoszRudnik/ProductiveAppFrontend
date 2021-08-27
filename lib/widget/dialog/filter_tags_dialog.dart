@@ -7,20 +7,21 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class FilterTagsDialog extends StatelessWidget {
   final _tagKey = GlobalKey<FormState>();
 
-  List<String> choosenTags = [];
+  final List<String> alreadyChoosenTags;
 
   FilterTagsDialog({
-    this.choosenTags,
+    @required this.alreadyChoosenTags,
   });
 
   @override
   Widget build(BuildContext context) {
     List<Tag> tags = Provider.of<TagProvider>(context).tags;
     List<Tag> filteredTags = List<Tag>.from(tags);
+    List<String> newTags = List<String>.from(this.alreadyChoosenTags);
 
     filteredTags.forEach(
       (element) {
-        if (this.choosenTags != null && this.choosenTags.contains(element.name)) {
+        if (this.alreadyChoosenTags != null && this.alreadyChoosenTags.contains(element.name)) {
           element.isSelected = true;
         } else {
           element.isSelected = false;
@@ -97,10 +98,10 @@ class FilterTagsDialog extends StatelessWidget {
                         onTap: () {
                           setState(() {
                             filteredTags[tagIndex].isSelected = !filteredTags[tagIndex].isSelected;
-                            if (!this.choosenTags.contains(filteredTags[tagIndex].name) && filteredTags[tagIndex].isSelected) {
-                              this.choosenTags.add(filteredTags[tagIndex].name);
+                            if (!newTags.contains(filteredTags[tagIndex].name) && filteredTags[tagIndex].isSelected) {
+                              newTags.add(filteredTags[tagIndex].name);
                             } else if (!filteredTags[tagIndex].isSelected) {
-                              this.choosenTags.remove(filteredTags[tagIndex].name);
+                              newTags.remove(filteredTags[tagIndex].name);
                             }
                           });
                         },
@@ -137,7 +138,7 @@ class FilterTagsDialog extends StatelessWidget {
                         filteredTags.forEach((element) {
                           element.isSelected = false;
                         });
-                        Navigator.of(context).pop(this.choosenTags);
+                        Navigator.of(context).pop(newTags);
                       },
                       child: Text(AppLocalizations.of(context).save),
                     ),

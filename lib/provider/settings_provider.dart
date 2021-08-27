@@ -99,13 +99,7 @@ class SettingsProvider with ChangeNotifier {
       );
 
       if (locations != null) {
-        locations.forEach(
-          (element) {
-            if (!this.userSettings.locations.contains(element)) {
-              this.userSettings.locations.add(element);
-            }
-          },
-        );
+        this.userSettings.locations = locations;
       }
 
       notifyListeners();
@@ -133,13 +127,7 @@ class SettingsProvider with ChangeNotifier {
       );
 
       if (tags != null) {
-        tags.forEach(
-          (element) {
-            if (!this.userSettings.tags.contains(element)) {
-              this.userSettings.tags.add(element);
-            }
-          },
-        );
+        this.userSettings.tags = tags;
       }
 
       notifyListeners();
@@ -167,13 +155,7 @@ class SettingsProvider with ChangeNotifier {
       );
 
       if (priorities != null) {
-        priorities.forEach(
-          (element) {
-            if (!this.userSettings.priorities.contains(element)) {
-              this.userSettings.priorities.add(element);
-            }
-          },
-        );
+        this.userSettings.priorities = priorities;
       }
       notifyListeners();
     } catch (error) {
@@ -200,13 +182,7 @@ class SettingsProvider with ChangeNotifier {
       );
 
       if (collaboratorEmail != null) {
-        collaboratorEmail.forEach(
-          (element) {
-            if (!this.userSettings.collaborators.contains(element)) {
-              this.userSettings.collaborators.add(element);
-            }
-          },
-        );
+        this.userSettings.collaborators = collaboratorEmail;
       }
       notifyListeners();
     } catch (error) {

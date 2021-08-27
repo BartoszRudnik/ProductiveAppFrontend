@@ -47,11 +47,9 @@ class FiltersLocations extends StatelessWidget {
                           context: context,
                           builder: (context) {
                             if (this.locations != null) {
-                              return FilterLocationDialog(
-                                choosenLocations: this.locations,
-                              );
+                              return FilterLocationDialog(alreadyChoosenLocations: this.locations);
                             } else {
-                              return FilterLocationDialog();
+                              return FilterLocationDialog(alreadyChoosenLocations: []);
                             }
                           },
                         );

@@ -48,10 +48,12 @@ class FilterPriorities extends StatelessWidget {
                           builder: (context) {
                             if (this.priorities != null) {
                               return FilterPriorityDialog(
-                                choosenPriorities: this.priorities,
+                                alreadyChoosenPriorities: this.priorities,
                               );
                             } else {
-                              return FilterPriorityDialog();
+                              return FilterPriorityDialog(
+                                alreadyChoosenPriorities: [],
+                              );
                             }
                           },
                         );

@@ -13,12 +13,13 @@ class TaskDelegate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String newEmail;
     return IconButton(
       icon: Icon(
         Icons.person_add_alt_1_outlined,
       ),
       onPressed: () async {
-        collaboratorEmail = await showDialog(
+        newEmail = await showDialog(
           context: context,
           builder: (context) {
             if (this.collaboratorEmail == null) {
@@ -30,7 +31,15 @@ class TaskDelegate extends StatelessWidget {
             }
           },
         );
-        this.setDelegatedEmail(collaboratorEmail);
+
+        if (newEmail != 'cancel' && newEmail != null) {
+          if (newEmail == 'empty') {
+            newEmail = null;
+          }
+
+          this.collaboratorEmail = newEmail;
+          this.setDelegatedEmail(newEmail);
+        }
       },
     );
   }

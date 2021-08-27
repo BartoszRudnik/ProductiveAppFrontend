@@ -35,7 +35,7 @@ class _NewTaskNotificationLocalizationState extends State<NewTaskNotificationLoc
         size: this.widget.bigIcon != null && this.widget.bigIcon ? 32 : 24,
       ),
       onPressed: () async {
-        final taskLocation = await showDialog(
+        var taskLocation = await showDialog(
           context: context,
           builder: (context) {
             return NotificationLocationDialog(
@@ -48,7 +48,13 @@ class _NewTaskNotificationLocalizationState extends State<NewTaskNotificationLoc
             );
           },
         );
-        this.widget.setNotificationLocalization(taskLocation);
+        if (taskLocation != null) {
+          if (taskLocation == 'cancel') {
+            taskLocation = null;
+          }
+
+          this.widget.setNotificationLocalization(taskLocation);
+        }
       },
     );
   }

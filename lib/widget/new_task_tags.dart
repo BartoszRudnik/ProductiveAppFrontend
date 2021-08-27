@@ -5,7 +5,7 @@ import 'dialog/tags_dialog.dart';
 
 class NewTaskTags extends StatefulWidget {
   final Function setTags;
-  final List<Tag> finalTags;
+  List<Tag> finalTags;
 
   NewTaskTags({
     @required this.setTags,
@@ -24,12 +24,22 @@ class _NewTaskTagsState extends State<NewTaskTags> {
         Icons.tag,
       ),
       onPressed: () async {
-        final newTags = await showDialog(
-            context: context,
-            builder: (context) {
-              return TagsDialog(UniqueKey(), this.widget.finalTags);
-            });
-        this.widget.setTags(newTags);
+        var newTags = await showDialog(
+          context: context,
+          builder: (context) {
+            return TagsDialog(
+              taskTags: this.widget.finalTags,
+            );
+          },
+        );
+        if (newTags != null) {
+          if (newTags == 'cancel') {
+            newTags = null;
+          }
+
+          this.widget.finalTags = newTags;
+          this.widget.setTags(newTags);
+        }
       },
     );
   }

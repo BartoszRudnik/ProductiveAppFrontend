@@ -274,7 +274,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     final newTags = await showDialog(
         context: context,
         builder: (context) {
-          return TagsDialog(UniqueKey(), taskToEdit.tags);
+          return TagsDialog(taskTags: taskToEdit.tags);
         });
     if (newTags != null) {
       setState(() {

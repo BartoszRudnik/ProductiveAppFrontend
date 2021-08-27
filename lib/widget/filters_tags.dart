@@ -47,9 +47,9 @@ class FiltersTags extends StatelessWidget {
                           context: context,
                           builder: (context) {
                             if (this.tags != null) {
-                              return FilterTagsDialog(choosenTags: this.tags);
+                              return FilterTagsDialog(alreadyChoosenTags: this.tags);
                             } else {
-                              return FilterTagsDialog();
+                              return FilterTagsDialog(alreadyChoosenTags: []);
                             }
                           },
                         );

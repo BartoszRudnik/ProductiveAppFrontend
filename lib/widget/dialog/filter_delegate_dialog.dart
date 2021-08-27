@@ -8,21 +8,22 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class FilterDelegateDialog extends StatelessWidget {
   final _collaboratorKey = GlobalKey<FormState>();
 
-  List<String> choosenCollaborators = [];
+  final List<String> alreadyChoosenCollaborators;
   String _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
   FilterDelegateDialog({
-    this.choosenCollaborators,
+    @required this.alreadyChoosenCollaborators,
   });
 
   @override
   Widget build(BuildContext context) {
     List<Collaborator> collaborators = Provider.of<DelegateProvider>(context).collaboratorsList;
     List<Collaborator> filteredCollaborators = List<Collaborator>.from(collaborators);
+    List<String> newCollaborators = List<String>.from(this.alreadyChoosenCollaborators);
 
     filteredCollaborators.forEach(
       (element) {
-        if (this.choosenCollaborators != null && this.choosenCollaborators.contains(element.email)) {
+        if (this.alreadyChoosenCollaborators != null && this.alreadyChoosenCollaborators.contains(element.email)) {
           element.isSelected = true;
         } else {
           element.isSelected = false;
@@ -136,10 +137,10 @@ class FilterDelegateDialog extends StatelessWidget {
                         onTap: () {
                           setState(() {
                             filteredCollaborators[collaboratorIndex].isSelected = !filteredCollaborators[collaboratorIndex].isSelected;
-                            if (!this.choosenCollaborators.contains(filteredCollaborators[collaboratorIndex].email) && filteredCollaborators[collaboratorIndex].isSelected) {
-                              this.choosenCollaborators.add(filteredCollaborators[collaboratorIndex].email);
+                            if (!newCollaborators.contains(filteredCollaborators[collaboratorIndex].email) && filteredCollaborators[collaboratorIndex].isSelected) {
+                              newCollaborators.add(filteredCollaborators[collaboratorIndex].email);
                             } else if (!filteredCollaborators[collaboratorIndex].isSelected) {
-                              this.choosenCollaborators.remove(filteredCollaborators[collaboratorIndex].email);
+                              newCollaborators.remove(filteredCollaborators[collaboratorIndex].email);
                             }
                           });
                         },
@@ -185,7 +186,7 @@ class FilterDelegateDialog extends StatelessWidget {
                         filteredCollaborators.forEach((element) {
                           element.isSelected = false;
                         });
-                        Navigator.of(context).pop(this.choosenCollaborators);
+                        Navigator.of(context).pop(newCollaborators);
                       },
                       child: Text(AppLocalizations.of(context).save),
                     ),

@@ -48,10 +48,10 @@ class FiltersCollaborators extends StatelessWidget {
                           builder: (context) {
                             if (this.collaborators != null) {
                               return FilterDelegateDialog(
-                                choosenCollaborators: this.collaborators,
+                                alreadyChoosenCollaborators: this.collaborators,
                               );
                             } else {
-                              return FilterDelegateDialog();
+                              return FilterDelegateDialog(alreadyChoosenCollaborators: []);
                             }
                           },
                         );

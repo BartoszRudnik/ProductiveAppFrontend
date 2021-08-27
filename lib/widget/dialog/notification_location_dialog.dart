@@ -278,18 +278,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      if (this.location != null) {
-                        TaskLocation returnLocation = TaskLocation(
-                          location: this.location,
-                          notificationOnEnter: this.notificationOnEnter,
-                          notificationOnExit: this.notificationOnExit,
-                          notificationRadius: this.notificationRadius,
-                        );
-
-                        Navigator.of(context).pop(returnLocation);
-                      } else {
-                        Navigator.of(context).pop(null);
-                      }
+                      Navigator.of(context).pop(null);
                     },
                     child: Text(AppLocalizations.of(context).cancel),
                   ),
@@ -301,7 +290,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                         this.location = null;
                         this.notificationOnEnter = false;
                         this.notificationOnExit = false;
-                        this.notificationRadius = 0.25;
+                        this.notificationRadius = 0.1;
                       });
                     },
                     child: Text(AppLocalizations.of(context).delete),
@@ -320,7 +309,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                       } else if (this.deleted && this.widget.taskId != null) {
                         Navigator.of(context).pop(-1);
                       } else {
-                        Navigator.of(context).pop(null);
+                        Navigator.of(context).pop('cancel');
                       }
                     },
                     child: Text(AppLocalizations.of(context).save),

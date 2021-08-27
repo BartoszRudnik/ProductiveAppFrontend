@@ -6,19 +6,20 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../provider/task_provider.dart';
 
 class FilterPriorityDialog extends StatelessWidget {
-  List<String> choosenPriorities = [];
+  final List<String> alreadyChoosenPriorities;
 
   FilterPriorityDialog({
-    this.choosenPriorities,
+    @required this.alreadyChoosenPriorities,
   });
 
   @override
   Widget build(BuildContext context) {
     List<String> priorities = Provider.of<TaskProvider>(context, listen: false).priorities.reversed.toList();
+    List<String> newPriorities = List<String>.from(this.alreadyChoosenPriorities);
     List<bool> selectedPriorities = [false, false, false, false, false];
 
     for (int i = 0; i < priorities.length; i++) {
-      if (this.choosenPriorities.contains(priorities[i])) {
+      if (this.alreadyChoosenPriorities.contains(priorities[i])) {
         selectedPriorities[i] = true;
       }
     }
@@ -47,10 +48,10 @@ class FilterPriorityDialog extends StatelessWidget {
                             () {
                               if (selectedPriorities[priorityIndex]) {
                                 selectedPriorities[priorityIndex] = false;
-                                this.choosenPriorities.remove(priorities[priorityIndex]);
+                                newPriorities.remove(priorities[priorityIndex]);
                               } else {
                                 selectedPriorities[priorityIndex] = true;
-                                this.choosenPriorities.add(priorities[priorityIndex]);
+                                newPriorities.add(priorities[priorityIndex]);
                               }
                             },
                           );
@@ -110,7 +111,7 @@ class FilterPriorityDialog extends StatelessWidget {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.of(context).pop(this.choosenPriorities);
+                        Navigator.of(context).pop(newPriorities);
                       },
                       child: Text(AppLocalizations.of(context).save),
                     ),

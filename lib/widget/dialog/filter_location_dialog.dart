@@ -7,20 +7,21 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class FilterLocationDialog extends StatelessWidget {
   final _locationKey = GlobalKey<FormState>();
 
-  List<int> choosenLocations = [];
+  final List<int> alreadyChoosenLocations;
 
   FilterLocationDialog({
-    this.choosenLocations,
+    @required this.alreadyChoosenLocations,
   });
 
   @override
   Widget build(BuildContext context) {
     List<Location> locations = Provider.of<LocationProvider>(context, listen: false).locations;
     List<Location> filteredLocations = List<Location>.from(locations);
+    List<int> newLocations = List<int>.from(this.alreadyChoosenLocations);
 
     filteredLocations.forEach(
       (element) {
-        if (this.choosenLocations != null && this.choosenLocations.contains(element.id)) {
+        if (this.alreadyChoosenLocations != null && this.alreadyChoosenLocations.contains(element.id)) {
           element.isSelected = true;
         } else {
           element.isSelected = false;
@@ -64,10 +65,10 @@ class FilterLocationDialog extends StatelessWidget {
                         onTap: () {
                           setState(() {
                             filteredLocations[tagIndex].isSelected = !filteredLocations[tagIndex].isSelected;
-                            if (this.choosenLocations != null && !this.choosenLocations.contains(filteredLocations[tagIndex].id) && filteredLocations[tagIndex].isSelected) {
-                              this.choosenLocations.add(filteredLocations[tagIndex].id);
-                            } else if (this.choosenLocations != null && !filteredLocations[tagIndex].isSelected) {
-                              this.choosenLocations.remove(filteredLocations[tagIndex].id);
+                            if (newLocations != null && !newLocations.contains(filteredLocations[tagIndex].id) && filteredLocations[tagIndex].isSelected) {
+                              newLocations.add(filteredLocations[tagIndex].id);
+                            } else if (newLocations != null && !filteredLocations[tagIndex].isSelected) {
+                              newLocations.remove(filteredLocations[tagIndex].id);
                             }
                           });
                         },
@@ -104,7 +105,7 @@ class FilterLocationDialog extends StatelessWidget {
                         filteredLocations.forEach((element) {
                           element.isSelected = false;
                         });
-                        Navigator.of(context).pop(this.choosenLocations);
+                        Navigator.of(context).pop(newLocations);
                       },
                       child: Text(AppLocalizations.of(context).save),
                     ),

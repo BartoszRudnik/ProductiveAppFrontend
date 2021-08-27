@@ -10,7 +10,7 @@ class DelegateDialog extends StatelessWidget {
 
   Collaborator choosenCollaborator;
   String choosenMail;
-  String _serverUrl = GlobalConfiguration().getValue("serverUrl");
+  final _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
   DelegateDialog({
     this.choosenCollaborator,
@@ -23,6 +23,11 @@ class DelegateDialog extends StatelessWidget {
     List<Collaborator> filteredCollaborators = List<Collaborator>.from(collaborators);
 
     final index = filteredCollaborators.indexWhere((element) => element.email == this.choosenMail);
+
+    filteredCollaborators.forEach((element) {
+      element.isSelected = false;
+    });
+
     if (index != -1) {
       filteredCollaborators.elementAt(index).isSelected = true;
     }
@@ -182,7 +187,7 @@ class DelegateDialog extends StatelessWidget {
                           this.choosenCollaborator.isSelected = false;
                         }
 
-                        Navigator.of(context).pop();
+                        Navigator.of(context).pop('cancel');
                       },
                       child: Text(AppLocalizations.of(context).cancel),
                     ),
@@ -192,7 +197,7 @@ class DelegateDialog extends StatelessWidget {
                           this.choosenCollaborator.isSelected = false;
                           Navigator.of(context).pop(this.choosenCollaborator.email);
                         } else {
-                          Navigator.of(context).pop();
+                          Navigator.of(context).pop('empty');
                         }
                       },
                       child: Text(AppLocalizations.of(context).save),
