@@ -102,6 +102,16 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
         );
   }
 
+  void setChoosenLocation(double latitude, double longitude, String country, String street, String locality) {
+    setState(() {
+      this.widget.choosenLocation.latitude = latitude;
+      this.widget.choosenLocation.longitude = longitude;
+      this.widget.choosenLocation.country = country;
+      this.widget.choosenLocation.street = street;
+      this.widget.choosenLocation.locality = locality;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     this.getUserLocation();
@@ -143,7 +153,7 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
                 ),
                 FindPlace(
                   mapMove: this._animatedMapMove,
-                  choosenLocation: this.widget.choosenLocation,
+                  setChoosenLocation: this.setChoosenLocation,
                 ),
                 SaveLocationButton(
                   choosenLocation: this.widget.choosenLocation,

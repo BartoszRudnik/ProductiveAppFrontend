@@ -7,11 +7,11 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FindPlace extends StatefulWidget {
   final Function mapMove;
-  var choosenLocation;
+  final Function setChoosenLocation;
 
   FindPlace({
     @required this.mapMove,
-    @required this.choosenLocation,
+    @required this.setChoosenLocation,
   });
 
   @override
@@ -67,11 +67,7 @@ class _FindPlaceState extends State<FindPlace> {
                             LatLng point = LatLng(placemarks[index].value.latitude, placemarks[index].value.longitude);
                             this.widget.mapMove(point, 15.0);
 
-                            this.widget.choosenLocation.latitude = point.latitude;
-                            this.widget.choosenLocation.longitude = point.longitude;
-                            this.widget.choosenLocation.country = placemarks[index].key.country;
-                            this.widget.choosenLocation.street = placemarks[index].key.street;
-                            this.widget.choosenLocation.locality = placemarks[index].key.locality;
+                            this.widget.setChoosenLocation(point.latitude, point.longitude, placemarks[index].key.country, placemarks[index].key.street, placemarks[index].key.locality);
 
                             _textEditingController.clear();
                             searchString = '';
