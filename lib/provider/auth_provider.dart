@@ -53,6 +53,10 @@ class AuthProvider with ChangeNotifier {
 
       this.user.firstName = responseBody['firstName'];
       this.user.lastName = responseBody['lastName'];
+    } on SocketException catch (error) {
+      print(error);
+
+      await this._loadUsernameFromLocal();
     } catch (error) {
       print(error);
       throw (error);
@@ -160,6 +164,8 @@ class AuthProvider with ChangeNotifier {
       this._user = new User(
         email: googleUser.email,
         userType: 'google',
+        firstName: firstName,
+        lastName: lastName,
       );
 
       this._email = googleUser.email;
@@ -171,9 +177,11 @@ class AuthProvider with ChangeNotifier {
       );
 
       this._autoLogout();
+
       notifyListeners();
 
       this._saveLocalData();
+      this._saveUsernameToLocal();
     } catch (error) {
       print(error);
       throw (error);
@@ -399,6 +407,42 @@ class AuthProvider with ChangeNotifier {
     } catch (error) {
       throw error;
     }
+  }
+
+  Future<bool> _loadUsernameFromLocal() async {
+    final getPreferences = await SharedPreferences.getInstance();
+
+    if (!getPreferences.containsKey('username') ||
+        !getPreferences.containsKey('userData')) {
+      return false;
+    }
+
+    final extractedUserData = json.decode(getPreferences.getString('userData'))
+        as Map<String, Object>;
+    final extractedUsername =
+        json.decode(getPreferences.get('username')) as Map<String, Object>;
+
+    this._user = User(
+      email: extractedUserData['email'],
+      userType: extractedUserData['userType'],
+      firstName: extractedUsername['firstName'],
+      lastName: extractedUsername['lastName'],
+    );
+
+    notifyListeners();
+    return true;
+  }
+
+  void _saveUsernameToLocal() async {
+    final preferences = await SharedPreferences.getInstance();
+    final userData = json.encode(
+      {
+        'firstName': this.user.firstName,
+        'lastName': this.user.lastName,
+      },
+    );
+
+    preferences.setString('username', userData);
   }
 
   void _saveLocalData() async {

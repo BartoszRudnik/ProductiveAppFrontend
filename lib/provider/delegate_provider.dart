@@ -34,7 +34,12 @@ class DelegateProvider with ChangeNotifier {
 
   List<Collaborator> get accepted {
     if (this.searchingText != null && this.searchingText.length >= 1) {
-      return this._accepted.where((collaborator) => collaborator.email.contains(searchingText) || collaborator.collaboratorName.contains(searchingText)).toList();
+      return this
+          ._accepted
+          .where((collaborator) =>
+              collaborator.email.contains(searchingText) ||
+              collaborator.collaboratorName.contains(searchingText))
+          .toList();
     } else {
       return [...this._accepted];
     }
@@ -42,7 +47,12 @@ class DelegateProvider with ChangeNotifier {
 
   List<Collaborator> get received {
     if (this.searchingText != null && this.searchingText.length >= 1) {
-      return this._received.where((collaborator) => collaborator.email.contains(searchingText) || collaborator.collaboratorName.contains(searchingText)).toList();
+      return this
+          ._received
+          .where((collaborator) =>
+              collaborator.email.contains(searchingText) ||
+              collaborator.collaboratorName.contains(searchingText))
+          .toList();
     } else {
       return [...this._received];
     }
@@ -50,7 +60,12 @@ class DelegateProvider with ChangeNotifier {
 
   List<Collaborator> get send {
     if (this.searchingText != null && this.searchingText.length >= 1) {
-      return this._send.where((collaborator) => collaborator.email.contains(searchingText) || collaborator.collaboratorName.contains(searchingText)).toList();
+      return this
+          ._send
+          .where((collaborator) =>
+              collaborator.email.contains(searchingText) ||
+              collaborator.collaboratorName.contains(searchingText))
+          .toList();
     } else {
       return [...this._send];
     }
@@ -69,11 +84,16 @@ class DelegateProvider with ChangeNotifier {
   }
 
   int get numberOfPermissionRequest {
-    return this.accepted.where((collaborator) => collaborator.isAskingForPermission && !collaborator.sentPermission).length;
+    return this
+        .accepted
+        .where((collaborator) =>
+            collaborator.isAskingForPermission && !collaborator.sentPermission)
+        .length;
   }
 
   Future<void> askForPermission(String collaboratorEmail) async {
-    final requestUrl = this._serverUrl + 'delegate/askForPermission/${this.userEmail}/$collaboratorEmail';
+    final requestUrl = this._serverUrl +
+        'delegate/askForPermission/${this.userEmail}/$collaboratorEmail';
 
     try {
       await http.post(
@@ -90,7 +110,8 @@ class DelegateProvider with ChangeNotifier {
   }
 
   Future<void> acceptAskForPermission(String collaboratorEmail) async {
-    final requestUrl = this._serverUrl + 'delegate/acceptAskForPermission/${this.userEmail}/$collaboratorEmail';
+    final requestUrl = this._serverUrl +
+        'delegate/acceptAskForPermission/${this.userEmail}/$collaboratorEmail';
 
     try {
       await http.post(
@@ -109,7 +130,8 @@ class DelegateProvider with ChangeNotifier {
   }
 
   Future<void> declineAskForPermission(String collaboratorEmail) async {
-    final requestUrl = this._serverUrl + 'delegate/declineAskForPermission/${this.userEmail}/$collaboratorEmail';
+    final requestUrl = this._serverUrl +
+        'delegate/declineAskForPermission/${this.userEmail}/$collaboratorEmail';
 
     try {
       await http.post(
@@ -120,7 +142,10 @@ class DelegateProvider with ChangeNotifier {
         },
       );
 
-      this.collaborators.firstWhere((element) => element.email == collaboratorEmail).isAskingForPermission = false;
+      this
+          .collaborators
+          .firstWhere((element) => element.email == collaboratorEmail)
+          .isAskingForPermission = false;
 
       notifyListeners();
     } catch (error) {
@@ -130,7 +155,8 @@ class DelegateProvider with ChangeNotifier {
   }
 
   Future<void> changePermission(String collaboratorEmail) async {
-    final requestUrl = this._serverUrl + 'delegate/changePermission/${this.userEmail}/$collaboratorEmail';
+    final requestUrl = this._serverUrl +
+        'delegate/changePermission/${this.userEmail}/$collaboratorEmail';
 
     try {
       await http.post(
@@ -141,7 +167,15 @@ class DelegateProvider with ChangeNotifier {
         },
       );
 
-      this.collaborators.firstWhere((collaborator) => collaborator.email == collaboratorEmail).sentPermission = !this.collaborators.firstWhere((collaborator) => collaborator.email == collaboratorEmail).sentPermission;
+      this
+              .collaborators
+              .firstWhere((collaborator) => collaborator.email == collaboratorEmail)
+              .sentPermission =
+          !this
+              .collaborators
+              .firstWhere(
+                  (collaborator) => collaborator.email == collaboratorEmail)
+              .sentPermission;
 
       notifyListeners();
     } catch (error) {
@@ -150,8 +184,10 @@ class DelegateProvider with ChangeNotifier {
     }
   }
 
-  Future<int> getNumberOfCollaboratorActiveTasks(String collaboratorEmail) async {
-    final requestUrl = this._serverUrl + 'delegate/getNumberOfCollaboratorActiveTasks/${this.userEmail}/$collaboratorEmail';
+  Future<int> getNumberOfCollaboratorActiveTasks(
+      String collaboratorEmail) async {
+    final requestUrl = this._serverUrl +
+        'delegate/getNumberOfCollaboratorActiveTasks/${this.userEmail}/$collaboratorEmail';
 
     try {
       final response = await http.get(requestUrl);
@@ -168,8 +204,10 @@ class DelegateProvider with ChangeNotifier {
     }
   }
 
-  Future<int> getNumberOfCollaboratorFinishedTasks(String collaboratorEmail) async {
-    final requestUrl = this._serverUrl + 'delegate/getNumberOfCollaboratorFinishedTasks/${this.userEmail}/$collaboratorEmail';
+  Future<int> getNumberOfCollaboratorFinishedTasks(
+      String collaboratorEmail) async {
+    final requestUrl = this._serverUrl +
+        'delegate/getNumberOfCollaboratorFinishedTasks/${this.userEmail}/$collaboratorEmail';
 
     try {
       final response = await http.get(requestUrl);
@@ -187,8 +225,10 @@ class DelegateProvider with ChangeNotifier {
     }
   }
 
-  Future<List<CollaboratorTask>> getCollaboratorActiveTasks(String collaboratorEmail, int page, int size) async {
-    final requestUrl = this._serverUrl + 'delegate/getCollaboratorActiveTasks/${this.userEmail}/$collaboratorEmail/$page/$size';
+  Future<List<CollaboratorTask>> getCollaboratorActiveTasks(
+      String collaboratorEmail, int page, int size) async {
+    final requestUrl = this._serverUrl +
+        'delegate/getCollaboratorActiveTasks/${this.userEmail}/$collaboratorEmail/$page/$size';
 
     List<CollaboratorTask> loadedTasks = [];
 
@@ -216,8 +256,10 @@ class DelegateProvider with ChangeNotifier {
     }
   }
 
-  Future<List<CollaboratorTask>> getCollaboratorRecentlyFinishedTasks(String collaboratorEmail, int page, int size) async {
-    final requestUrl = this._serverUrl + 'delegate/getCollaboratorRecentlyFinished/${this.userEmail}/$collaboratorEmail/$page/$size';
+  Future<List<CollaboratorTask>> getCollaboratorRecentlyFinishedTasks(
+      String collaboratorEmail, int page, int size) async {
+    final requestUrl = this._serverUrl +
+        'delegate/getCollaboratorRecentlyFinished/${this.userEmail}/$collaboratorEmail/$page/$size';
 
     List<CollaboratorTask> loadedTasks = [];
 
@@ -247,7 +289,8 @@ class DelegateProvider with ChangeNotifier {
   }
 
   Future<void> getCollaborators() async {
-    final requestUrl = this._serverUrl + 'delegate/getAllCollaborators/${this.userEmail}';
+    final requestUrl =
+        this._serverUrl + 'delegate/getAllCollaborators/${this.userEmail}';
 
     List<Collaborator> loadedCollaborators = [];
 
@@ -321,7 +364,8 @@ class DelegateProvider with ChangeNotifier {
         },
       );
 
-      Collaborator collaborator = this.collaborators.firstWhere((element) => element.id == id);
+      Collaborator collaborator =
+          this.collaborators.firstWhere((element) => element.id == id);
 
       if (collaborator.relationState == 'WAITING') {
         this._send.remove(collaborator);
@@ -350,7 +394,8 @@ class DelegateProvider with ChangeNotifier {
         },
       );
 
-      Collaborator collaborator = this._received.firstWhere((collaborator) => collaborator.id == id);
+      Collaborator collaborator =
+          this._received.firstWhere((collaborator) => collaborator.id == id);
       collaborator.relationState = "ACCEPTED";
 
       this._received.remove(collaborator);
@@ -443,9 +488,11 @@ class DelegateProvider with ChangeNotifier {
     collaborators.forEach((collaborator) {
       if (collaborator.relationState == 'ACCEPTED') {
         this._accepted.add(collaborator);
-      } else if (collaborator.relationState == 'WAITING' && collaborator.received) {
+      } else if (collaborator.relationState == 'WAITING' &&
+          collaborator.received) {
         this._received.add(collaborator);
-      } else if (collaborator.relationState == 'WAITING' && !collaborator.received) {
+      } else if (collaborator.relationState == 'WAITING' &&
+          !collaborator.received) {
         this._send.add(collaborator);
       }
     });

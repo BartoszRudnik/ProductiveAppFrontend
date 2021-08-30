@@ -18,7 +18,9 @@ class CollaboratorModal {
       builder: (context) {
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          height: task.description != null && task.description.length > 0 ? 350 : 325,
+          height: task.description != null && task.description.length > 0
+              ? 350
+              : 325,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -36,12 +38,11 @@ class CollaboratorModal {
                     Row(
                       children: [
                         Text(AppLocalizations.of(context).taskName),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width / 4 + 16,
-                        ),
-                        Text(
-                          task.title,
-                          style: TextStyle(fontSize: 16),
+                        Flexible(
+                          child: Text(
+                            ": " + task.title,
+                            style: TextStyle(fontSize: 16),
+                          ),
                         ),
                       ],
                     ),
@@ -49,12 +50,11 @@ class CollaboratorModal {
                       Row(
                         children: [
                           Text(AppLocalizations.of(context).description),
-                          SizedBox(
-                            width: 16,
-                          ),
-                          Text(
-                            task.description,
-                            style: TextStyle(fontSize: 16),
+                          Flexible(
+                            child: Text(
+                              ": " + task.description,
+                              style: TextStyle(fontSize: 16),
+                            ),
                           ),
                         ],
                       ),
@@ -91,10 +91,12 @@ class CollaboratorModal {
                               ElevatedButton(
                                 onPressed: () {},
                                 child: Center(
-                                  child: task.startDate.toString() == "null" || task.startDate.year == 1970
+                                  child: task.startDate.toString() == "null" ||
+                                          task.startDate.year == 1970
                                       ? Icon(Icons.calendar_today_outlined)
                                       : Text(
-                                          DateFormat("yyyy-MM-dd").format(task.startDate),
+                                          DateFormat("yyyy-MM-dd")
+                                              .format(task.startDate),
                                         ),
                                 ),
                               ),
@@ -102,10 +104,12 @@ class CollaboratorModal {
                               ElevatedButton(
                                 onPressed: () {},
                                 child: Center(
-                                  child: task.startDate.toString() == "null" || task.startDate.year == 1970
+                                  child: task.startDate.toString() == "null" ||
+                                          task.startDate.year == 1970
                                       ? Icon(Icons.access_time_outlined)
                                       : Text(
-                                          DateFormat("Hm").format(task.startDate),
+                                          DateFormat("Hm")
+                                              .format(task.startDate),
                                         ),
                                 ),
                               ),
@@ -124,10 +128,12 @@ class CollaboratorModal {
                               ElevatedButton(
                                 onPressed: () {},
                                 child: Center(
-                                  child: task.endDate.toString() == "null" || task.endDate.year == 1970
+                                  child: task.endDate.toString() == "null" ||
+                                          task.endDate.year == 1970
                                       ? Icon(Icons.calendar_today_outlined)
                                       : Text(
-                                          DateFormat("yyyy-MM-dd").format(task.endDate),
+                                          DateFormat("yyyy-MM-dd")
+                                              .format(task.endDate),
                                         ),
                                 ),
                               ),
@@ -135,7 +141,8 @@ class CollaboratorModal {
                               ElevatedButton(
                                 onPressed: () {},
                                 child: Center(
-                                  child: task.endDate.toString() == "null" || task.endDate.year == 1970
+                                  child: task.endDate.toString() == "null" ||
+                                          task.endDate.year == 1970
                                       ? Icon(Icons.access_time_outlined)
                                       : Text(
                                           DateFormat("Hm").format(task.endDate),
@@ -181,10 +188,12 @@ class CollaboratorModal {
                           ElevatedButton(
                             onPressed: () {},
                             child: Center(
-                              child: task.lastUpdated.toString() == "null" || task.lastUpdated.year == 1970
+                              child: task.lastUpdated.toString() == "null" ||
+                                      task.lastUpdated.year == 1970
                                   ? Icon(Icons.calendar_today_outlined)
                                   : Text(
-                                      DateFormat("yyyy-MM-dd").format(task.lastUpdated),
+                                      DateFormat("yyyy-MM-dd")
+                                          .format(task.lastUpdated),
                                     ),
                             ),
                           ),
@@ -192,7 +201,8 @@ class CollaboratorModal {
                           ElevatedButton(
                             onPressed: () {},
                             child: Center(
-                              child: task.lastUpdated.toString() == "null" || task.lastUpdated.year == 1970
+                              child: task.lastUpdated.toString() == "null" ||
+                                      task.lastUpdated.year == 1970
                                   ? Icon(Icons.access_time_outlined)
                                   : Text(
                                       DateFormat("Hm").format(task.lastUpdated),

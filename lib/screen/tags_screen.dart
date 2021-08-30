@@ -17,34 +17,48 @@ class TagsScreen extends StatefulWidget {
 class _TagsScreenState extends State<TagsScreen> {
   void _addNewTagForm(BuildContext buildContext, int tagsLength) {
     showModalBottomSheet(
-      backgroundColor: Theme.of(context).primaryColorLight,
+      backgroundColor: Theme.of(buildContext).primaryColorLight,
       context: buildContext,
-      builder: (_) {
-        return GestureDetector(
-          onTap: () {},
-          child: NewTag(
-            tagsLength: tagsLength,
-            editMode: false,
+      builder: (context) {
+        return SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
+            child: GestureDetector(
+              onTap: () {},
+              child: NewTag(
+                tagsLength: tagsLength,
+                editMode: false,
+              ),
+              behavior: HitTestBehavior.opaque,
+            ),
           ),
-          behavior: HitTestBehavior.opaque,
         );
       },
     );
   }
 
-  void _editTagForm(BuildContext buildContext, int tagsLength, String initialValue) {
+  void _editTagForm(
+      BuildContext buildContext, int tagsLength, String initialValue) {
     showModalBottomSheet(
-      backgroundColor: Theme.of(context).primaryColorLight,
+      backgroundColor: Theme.of(buildContext).primaryColorLight,
       context: buildContext,
-      builder: (_) {
-        return GestureDetector(
-          onTap: () {},
-          child: NewTag(
-            tagsLength: tagsLength,
-            editMode: true,
-            initialValue: initialValue,
+      builder: (context) {
+        return SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: GestureDetector(
+              onTap: () {},
+              child: NewTag(
+                tagsLength: tagsLength,
+                editMode: true,
+                initialValue: initialValue,
+              ),
+              behavior: HitTestBehavior.opaque,
+            ),
           ),
-          behavior: HitTestBehavior.opaque,
         );
       },
     );
