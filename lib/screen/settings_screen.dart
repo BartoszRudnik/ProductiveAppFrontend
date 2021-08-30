@@ -26,13 +26,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _cofirmPasswordKey = GlobalKey<FormFieldState>();
 
   Future<void> updateUserInfo(String firstName, String lastName) async {
-    bool hasAgreed = await Dialogs.showChoiceDialog(context, AppLocalizations.of(context).areYouSureUpdateAccount);
+    bool hasAgreed = await Dialogs.showChoiceDialog(
+        context, AppLocalizations.of(context).areYouSureUpdateAccount);
     if (hasAgreed) {
-      await Provider.of<AuthProvider>(context, listen: false).updateUserData(firstName, lastName);
+      await Provider.of<AuthProvider>(context, listen: false)
+          .updateUserData(firstName, lastName);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(AppLocalizations.of(context).savedData, textAlign: TextAlign.center),
+          content: Text(AppLocalizations.of(context).savedData,
+              textAlign: TextAlign.center),
           duration: Duration(seconds: 2),
         ),
       );
@@ -40,7 +43,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> deleteUser() async {
-    bool hasAgreed = await Dialogs.showChoiceDialog(context, AppLocalizations.of(context).areYouSureDeleteAccount);
+    bool hasAgreed = await Dialogs.showChoiceDialog(
+        context, AppLocalizations.of(context).areYouSureDeleteAccount);
     if (hasAgreed) {
       Provider.of<AuthProvider>(context, listen: false).getDeleteToken();
       String enteredToken;
@@ -82,7 +86,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           onSaved: (value) async {
                             enteredToken = value;
 
-                            Provider.of<AuthProvider>(context, listen: false).deleteAccount(enteredToken);
+                            Provider.of<AuthProvider>(context, listen: false)
+                                .deleteAccount(enteredToken);
                           },
                         ),
                       ),
@@ -99,7 +104,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          bool isValid = this._deleteDialogKey.currentState.validate();
+                          bool isValid =
+                              this._deleteDialogKey.currentState.validate();
 
                           if (isValid) {
                             this._deleteDialogKey.currentState.save();
@@ -121,7 +127,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> resetPassword(String userMail) async {
-    bool hasAgreed = await Dialogs.showChoiceDialog(context, AppLocalizations.of(context).areYouSureResetPassword);
+    bool hasAgreed = await Dialogs.showChoiceDialog(
+        context, AppLocalizations.of(context).areYouSureResetPassword);
     if (hasAgreed) {
       Provider.of<AuthProvider>(context, listen: false).resetPassword(userMail);
 
@@ -157,11 +164,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             TextFormField(
                               decoration: InputDecoration(
                                 contentPadding: EdgeInsets.all(10),
-                                hintText: AppLocalizations.of(context).enterResetToken,
+                                hintText: AppLocalizations.of(context)
+                                    .enterResetToken,
                               ),
                               validator: (value) {
                                 if (value.isEmpty || value.length < 6) {
-                                  return AppLocalizations.of(context).wrongToken;
+                                  return AppLocalizations.of(context)
+                                      .wrongToken;
                                 }
                                 return null;
                               },
@@ -173,14 +182,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               obscureText: true,
                               decoration: InputDecoration(
                                 contentPadding: EdgeInsets.all(10),
-                                hintText: AppLocalizations.of(context).enterNewPassword,
+                                hintText: AppLocalizations.of(context)
+                                    .enterNewPassword,
                               ),
                               validator: (value) {
-                                if (value != this._cofirmPasswordKey.currentState.value) {
-                                  return AppLocalizations.of(context).samePasswords;
+                                if (value !=
+                                    this
+                                        ._cofirmPasswordKey
+                                        .currentState
+                                        .value) {
+                                  return AppLocalizations.of(context)
+                                      .samePasswords;
                                 }
                                 if (value.isEmpty || value.length < 7) {
-                                  return AppLocalizations.of(context).passwordLength;
+                                  return AppLocalizations.of(context)
+                                      .passwordLength;
                                 }
                                 return null;
                               },
@@ -193,11 +209,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               key: this._cofirmPasswordKey,
                               decoration: InputDecoration(
                                 contentPadding: EdgeInsets.all(10),
-                                hintText: AppLocalizations.of(context).repeatPassword,
+                                hintText:
+                                    AppLocalizations.of(context).repeatPassword,
                               ),
                               validator: (value) {
                                 if (value.isEmpty || value.length < 7) {
-                                  return AppLocalizations.of(context).passwordLength;
+                                  return AppLocalizations.of(context)
+                                      .passwordLength;
                                 }
                                 return null;
                               },
@@ -221,26 +239,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          bool isValid = this._resetPasswordKey.currentState.validate();
+                          bool isValid =
+                              this._resetPasswordKey.currentState.validate();
 
                           if (isValid) {
                             this._resetPasswordKey.currentState.save();
-                            Provider.of<AuthProvider>(context, listen: false).newPassword(userMail, enteredToken, newPassword);
+                            Provider.of<AuthProvider>(context, listen: false)
+                                .newPassword(
+                                    userMail, enteredToken, newPassword);
                             Navigator.of(context).pop();
                             return showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
                                 title: Center(
                                   child: Text(
-                                    AppLocalizations.of(context).newPasswordSuccess,
-                                    style: Theme.of(context).textTheme.headline2,
+                                    AppLocalizations.of(context)
+                                        .newPasswordSuccess,
+                                    style:
+                                        Theme.of(context).textTheme.headline2,
                                   ),
                                 ),
                                 content: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         ElevatedButton(
                                           onPressed: () {
@@ -270,17 +294,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> removeAvatar() async {
-    bool hasAgreed = await Dialogs.showChoiceDialog(context, AppLocalizations.of(context).areYouSureRemoveAvatar);
+    bool hasAgreed = await Dialogs.showChoiceDialog(
+        context, AppLocalizations.of(context).areYouSureRemoveAvatar);
     if (hasAgreed) {
       Provider.of<AuthProvider>(context, listen: false).removeAvatar();
     }
   }
 
   Future<void> changeAvatar() async {
-    String mode = await Dialogs.showImagePickerDialog(context, AppLocalizations.of(context).pickingMode);
+    String mode = await Dialogs.showImagePickerDialog(
+        context, AppLocalizations.of(context).pickingMode);
 
     if (mode != null) {
-      final imageSource = mode == 'Camera' ? ImageSource.camera : ImageSource.gallery;
+      final imageSource =
+          mode == 'Camera' ? ImageSource.camera : ImageSource.gallery;
 
       final picker = ImagePicker();
       final pickedImage = await picker.getImage(
@@ -289,7 +316,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       );
       final pickedImageFile = File(pickedImage.path);
       setState(() {
-        Provider.of<AuthProvider>(context, listen: false).changeUserImage(pickedImageFile);
+        Provider.of<AuthProvider>(context, listen: false)
+            .changeUserImage(pickedImageFile);
       });
     }
   }
@@ -298,7 +326,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final user = Provider.of<AuthProvider>(context).user;
 
-    if (!user.removed) {
+    if (user != null && !user.removed) {
       Provider.of<AuthProvider>(context, listen: false).getUserImage();
     }
 
@@ -313,11 +341,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SettingsUserAvatar(removeAvatar: this.removeAvatar, changeAvatar: this.changeAvatar),
+                SettingsUserAvatar(
+                    removeAvatar: this.removeAvatar,
+                    changeAvatar: this.changeAvatar),
                 SizedBox(height: 10),
-                SettingsAccountInformation(formKey: this._formKey, updateUserInfo: updateUserInfo),
+                SettingsAccountInformation(
+                    formKey: this._formKey, updateUserInfo: updateUserInfo),
                 SizedBox(height: 10),
-                SettingsManageAccount(deleteUser: this.deleteUser, resetPassword: this.resetPassword),
+                SettingsManageAccount(
+                    deleteUser: this.deleteUser,
+                    resetPassword: this.resetPassword),
                 SizedBox(height: 10),
                 SettingsGraphicSettings(),
                 SizedBox(height: 10),

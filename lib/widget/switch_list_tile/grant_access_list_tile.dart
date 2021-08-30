@@ -19,24 +19,41 @@ class GrantAccessListTile extends StatefulWidget {
 class _GrantAccessListTileState extends State<GrantAccessListTile> {
   @override
   Widget build(BuildContext context) {
-    return SwitchListTile(
-      tileColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColorDark : Colors.black,
-      activeColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColor : Theme.of(context).primaryColorDark,
-      inactiveTrackColor: Theme.of(context).primaryColorLight,
-      activeTrackColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColor : Theme.of(context).accentColor,
-      title: Text(
-        AppLocalizations.of(context).grantActivityAccess,
-        style: TextStyle(color: Colors.white),
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Theme.of(context).floatingActionButtonTheme.backgroundColor
+            : Theme.of(context).primaryColor,
+        border: Border.all(
+          color: Theme.of(context).primaryColor,
+        ),
       ),
-      value: this.widget.grantAccess,
-      onChanged: (bool value) {
-        setState(
-          () {
-            this.widget.grantAccess = value;
-            Provider.of<DelegateProvider>(context, listen: false).changePermission(this.widget.email);
-          },
-        );
-      },
+      child: SwitchListTile(
+        tileColor: Theme.of(context).brightness == Brightness.dark
+            ? Theme.of(context).primaryColorDark
+            : Colors.black,
+        activeColor: Theme.of(context).brightness == Brightness.dark
+            ? Theme.of(context).primaryColor
+            : Theme.of(context).primaryColorDark,
+        inactiveTrackColor: Theme.of(context).primaryColorLight,
+        activeTrackColor: Theme.of(context).brightness == Brightness.dark
+            ? Theme.of(context).primaryColor
+            : Theme.of(context).accentColor,
+        title: Text(
+          AppLocalizations.of(context).grantActivityAccess,
+          style: TextStyle(color: Colors.white),
+        ),
+        value: this.widget.grantAccess,
+        onChanged: (bool value) {
+          setState(
+            () {
+              this.widget.grantAccess = value;
+              Provider.of<DelegateProvider>(context, listen: false)
+                  .changePermission(this.widget.email);
+            },
+          );
+        },
+      ),
     );
   }
 }

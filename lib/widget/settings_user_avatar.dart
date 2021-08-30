@@ -44,13 +44,14 @@ class _SettingsUserAvatarState extends State<SettingsUserAvatar> {
                 position: BadgePosition.topEnd(),
                 badgeColor: Theme.of(context).accentColor,
                 badgeContent: Icon(Icons.photo_camera),
-                child: !user.removed
+                child: user != null && !user.removed
                     ? Container(
                         width: 100,
                         height: 100,
                         child: CircleAvatar(
                           radius: 50,
-                          backgroundImage: user.userImage != null ? user.userImage : null,
+                          backgroundImage:
+                              user.userImage != null ? user.userImage : null,
                         ),
                       )
                     : Container(
@@ -58,7 +59,8 @@ class _SettingsUserAvatarState extends State<SettingsUserAvatar> {
                         height: 100,
                         child: CircleAvatar(
                           radius: 50,
-                          backgroundImage: AssetImage(Images.profilePicturePlacholder),
+                          backgroundImage:
+                              AssetImage(Images.profilePicturePlacholder),
                         ),
                       ),
               ),

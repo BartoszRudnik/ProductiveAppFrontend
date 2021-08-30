@@ -12,14 +12,16 @@ class ThemeSwitchListTile extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       child: Container(
         decoration: BoxDecoration(
+          color: themeProvider.isDarkMode
+              ? Theme.of(context).floatingActionButtonTheme.backgroundColor
+              : Theme.of(context).primaryColor,
           border: Border.all(
             color: Theme.of(context).primaryColor,
           ),
         ),
         child: SwitchListTile(
-          tileColor: themeProvider.isDarkMode ? Theme.of(context).primaryColorDark : Colors.black,
           activeColor: Theme.of(context).primaryColor,
-          inactiveTrackColor: Theme.of(context).primaryColorLight,
+          inactiveTrackColor: Theme.of(context).accentColor,
           activeTrackColor: Theme.of(context).primaryColor,
           title: Text(
             AppLocalizations.of(context).darkMode,
