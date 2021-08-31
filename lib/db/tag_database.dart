@@ -11,8 +11,6 @@ class TagDatabase {
 
     final id = await db.insert(tableTags, tag.toJson());
 
-    print(id);
-
     return tag.copy(id: id, lastUpdated: DateTime.now());
   }
 
@@ -46,7 +44,7 @@ class TagDatabase {
 
     tag.lastUpdated = DateTime.now();
 
-    return db.update(
+    return await db.update(
       tableTags,
       tag.toJson(),
       where: '${TagFields.id} = ?',

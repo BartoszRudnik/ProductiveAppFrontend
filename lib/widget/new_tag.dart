@@ -11,11 +11,13 @@ class NewTag extends StatefulWidget {
   final int tagsLength;
   String initialValue;
   final bool editMode;
+  final int tagId;
 
   NewTag({
     @required this.tagsLength,
     this.editMode,
     this.initialValue,
+    this.tagId,
   });
 
   @override
@@ -42,20 +44,15 @@ class _NewTagState extends State<NewTag> {
 
                 TagDatabase.create(newTag);
 
-                if (!Provider.of<TagProvider>(context, listen: false)
-                    .tagNames
-                    .contains(newTag.name)) {
-                  Provider.of<TagProvider>(context, listen: false)
-                      .addTag(newTag);
+                if (!Provider.of<TagProvider>(context, listen: false).tagNames.contains(newTag.name)) {
+                  Provider.of<TagProvider>(context, listen: false).addTag(newTag);
                 } else {
-                  Dialogs.showWarningDialog(
-                      context, AppLocalizations.of(context).tagAlreadyExist);
+                  Dialogs.showWarningDialog(context, AppLocalizations.of(context).tagAlreadyExist);
                 }
               } else {
-                Provider.of<TagProvider>(context, listen: false)
-                    .updateTag(value, widget.initialValue);
-                Provider.of<TaskProvider>(context, listen: false)
-                    .editTag(widget.initialValue, value);
+                TagDatabase.update(Tag(id: this.widget.tagId, name: value));
+                Provider.of<TagProvider>(context, listen: false).updateTag(value, widget.initialValue);
+                Provider.of<TaskProvider>(context, listen: false).editTag(widget.initialValue, value);
                 Navigator.of(context).pop();
               }
             },

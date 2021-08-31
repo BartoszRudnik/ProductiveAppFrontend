@@ -4,6 +4,7 @@ import 'package:global_configuration/global_configuration.dart';
 import 'package:productive_app/provider/attachment_provider.dart';
 import 'package:productive_app/l10n/L10n.dart';
 import 'package:productive_app/provider/locale_provider.dart';
+import 'package:productive_app/provider/synchronize_provider.dart';
 import 'utils/notifications.dart';
 import 'package:provider/provider.dart';
 import 'config/color_themes.dart';
@@ -55,6 +56,13 @@ class MyApp extends StatelessWidget {
           update: (ctx, auth, previousLocale) => LocaleProvider(
             locale: previousLocale == null ? Locale('en') : previousLocale.locale,
             email: auth.email,
+          ),
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, SynchronizeProvider>(
+          create: null,
+          update: (ctx, auth, previousSynchronize) => SynchronizeProvider(
+            authToken: auth.token,
+            userMail: auth.email,
           ),
         ),
         ChangeNotifierProxyProvider<AuthProvider, AttachmentProvider>(
@@ -116,8 +124,11 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProxyProvider<AuthProvider, LocationProvider>(
           create: null,
-          update: (ctx, auth, previousTasks) =>
-              LocationProvider(userMail: auth.email, authToken: auth.token, locationList: previousTasks == null ? [] : previousTasks.locationList, placemarks: previousTasks == null ? [] : previousTasks.placemarks),
+          update: (ctx, auth, previousTasks) => LocationProvider(
+              userMail: auth.email,
+              authToken: auth.token,
+              locationList: previousTasks == null ? [] : previousTasks.locationList,
+              placemarks: previousTasks == null ? [] : previousTasks.placemarks),
         ),
       ],
       builder: (context, _) {
@@ -138,7 +149,8 @@ class MyApp extends StatelessWidget {
               ? MainScreen()
               : FutureBuilder(
                   future: Provider.of<AuthProvider>(context, listen: false).tryAutoLogin(),
-                  builder: (ctx, authResult) => authResult.connectionState == ConnectionState.waiting ? LoadingAuthScreen() : EntryScreen(),
+                  builder: (ctx, authResult) =>
+                      authResult.connectionState == ConnectionState.waiting ? LoadingAuthScreen() : EntryScreen(),
                 ),
           routes: MyRoutes.routes,
         );

@@ -36,13 +36,14 @@ class Tag {
         id: id ?? this.id,
         name: name ?? this.name,
         isSelected: isSelected ?? this.isSelected,
-        lastUpdated: lastUpdated ?? this.lastUpdated == null ? DateTime.now() : this.lastUpdated,
+        lastUpdated: DateTime.now(),
       );
 
   static Tag fromJson(Map<String, Object> json) => Tag(
         id: json[TagFields.id] as int,
         name: json[TagFields.name] as String,
         isSelected: json[TagFields.isSelected] == 1,
+        lastUpdated: DateTime.parse(json[TagFields.lastUpdated] as String),
       );
 
   Map<String, dynamic> toJson() {

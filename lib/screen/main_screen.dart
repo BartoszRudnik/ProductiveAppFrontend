@@ -60,7 +60,7 @@ class _MainScreenState extends State<MainScreen> {
     Notifications.initNotification();
 
     listenNotifications();
-    //listenInternetChanges();
+    listenInternetChanges();
 
     super.initState();
   }

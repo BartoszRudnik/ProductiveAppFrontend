@@ -31,10 +31,11 @@ class InitDatabase {
     final textType = 'TEXT NOT NULL';
 
     await db.execute('''
-    CREATE TABLE $tableTags(
+    CREATE TABLE $tableTags (
       ${TagFields.id} $idType,
       ${TagFields.name} $textType,
-      ${TagFields.isSelected} $boolType
+      ${TagFields.isSelected} $boolType,
+      ${TagFields.lastUpdated} $textType
     )
     ''');
   }

@@ -98,7 +98,7 @@ class SingleTag extends StatelessWidget {
           );
         }
         if (direction == DismissDirection.startToEnd) {
-          this.editTagForm(context, length, tag.name);
+          this.editTagForm(context, length, this.tag.name, this.tag.id);
         }
       },
       child: Card(

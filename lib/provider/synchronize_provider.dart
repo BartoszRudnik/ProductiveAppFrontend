@@ -17,8 +17,7 @@ class SynchronizeProvider with ChangeNotifier {
   String _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
   Future<List<Tag>> synchronizeTags(List<Tag> tagList) async {
-    final finalUrl =
-        this._serverUrl + "synchronize/synchronizeTags/${this.userMail}";
+    final finalUrl = this._serverUrl + "synchronize/synchronizeTags/${this.userMail}";
 
     try {
       final response = await http.post(
