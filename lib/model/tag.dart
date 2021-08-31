@@ -5,7 +5,7 @@ final String tableTags = "tags";
 class TagFields {
   static final List<String> values = [id, name, isSelected, lastUpdated];
 
-  static final String id = "_id";
+  static final String id = "id";
   static final String name = "name";
   static final String isSelected = "isSelected";
   static final String lastUpdated = "lastUpdated";
@@ -36,9 +36,7 @@ class Tag {
         id: id ?? this.id,
         name: name ?? this.name,
         isSelected: isSelected ?? this.isSelected,
-        lastUpdated: lastUpdated ?? this.lastUpdated == null
-            ? DateTime.now()
-            : this.lastUpdated,
+        lastUpdated: lastUpdated ?? this.lastUpdated == null ? DateTime.now() : this.lastUpdated,
       );
 
   static Tag fromJson(Map<String, Object> json) => Tag(
@@ -52,9 +50,8 @@ class Tag {
       TagFields.id: this.id,
       TagFields.name: this.name,
       TagFields.isSelected: this.isSelected ? 1 : 0,
-      TagFields.lastUpdated: this.lastUpdated != null
-          ? this.lastUpdated.toIso8601String()
-          : DateTime.now().toIso8601String()
+      TagFields.lastUpdated:
+          this.lastUpdated != null ? this.lastUpdated.toIso8601String() : DateTime.now().toIso8601String()
     };
   }
 }

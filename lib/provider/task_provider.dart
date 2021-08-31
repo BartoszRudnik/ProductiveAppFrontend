@@ -686,7 +686,11 @@ class TaskProvider with ChangeNotifier {
 
         final notificationExists = await Notifications.checkIfGeofenceExists(task.id);
 
-        if (task.localization != 'COMPLETED' && task.localization != 'TRASH' && !task.done && task.notificationLocalizationId != null && !notificationExists) {
+        if (task.localization != 'COMPLETED' &&
+            task.localization != 'TRASH' &&
+            !task.done &&
+            task.notificationLocalizationId != null &&
+            !notificationExists) {
           this.addGeofenceFromOtherDevice(task);
         }
 
@@ -1024,8 +1028,10 @@ class TaskProvider with ChangeNotifier {
         if (element.notificationLocalizationId == null) {
           this.updateTask(element, newLocation);
         } else {
-          final longitude = locations.firstWhere((location) => location.id == element.notificationLocalizationId).longitude;
-          final latitude = locations.firstWhere((location) => location.id == element.notificationLocalizationId).latitude;
+          final longitude =
+              locations.firstWhere((location) => location.id == element.notificationLocalizationId).longitude;
+          final latitude =
+              locations.firstWhere((location) => location.id == element.notificationLocalizationId).latitude;
 
           this.updateTaskWithGeolocation(element, newLocation, longitude, latitude);
         }
@@ -1043,19 +1049,32 @@ class TaskProvider with ChangeNotifier {
     return this
         ._scheduledTasks
         .where((element) => (element.startDate != null &&
-            (element.startDate.difference(DateTime.now()).inDays < 0 || (element.startDate.difference(DateTime.now()).inDays == 0 && (element.startDate.day < DateTime.now().day || element.startDate.month < DateTime.now().month)))))
+            (element.startDate.difference(DateTime.now()).inDays < 0 ||
+                (element.startDate.difference(DateTime.now()).inDays == 0 &&
+                    ((element.startDate.month < DateTime.now().month) ||
+                        (element.startDate.day < DateTime.now().day &&
+                            element.startDate.month <= DateTime.now().month))))))
         .toList();
   }
 
   List<Task> tasksToday() {
-    return this._scheduledTasks.where((element) => (element.startDate != null && element.startDate.difference(DateTime.now()).inDays == 0 && element.startDate.day == DateTime.now().day)).toList();
+    return this
+        ._scheduledTasks
+        .where((element) => (element.startDate != null &&
+            element.startDate.difference(DateTime.now()).inDays == 0 &&
+            element.startDate.day == DateTime.now().day))
+        .toList();
   }
 
   List<Task> taskAfterToday() {
     return this
         ._scheduledTasks
         .where((element) => (element.startDate != null &&
-            (element.startDate.difference(DateTime.now()).inDays > 0 || (element.startDate.difference(DateTime.now()).inDays == 0 && (element.startDate.day > DateTime.now().day || element.startDate.month > DateTime.now().month)))))
+            (element.startDate.difference(DateTime.now()).inDays > 0 ||
+                (element.startDate.difference(DateTime.now()).inDays == 0 &&
+                    ((element.startDate.month > DateTime.now().month) ||
+                        (element.startDate.day > DateTime.now().day &&
+                            element.startDate.month >= DateTime.now().month))))))
         .toList();
   }
 
@@ -1072,15 +1091,24 @@ class TaskProvider with ChangeNotifier {
   }
 
   List<Task> filterCollaboratorEmail(List<Task> listToFilter, List<String> filterEmails) {
-    return [...listToFilter.where((element) => ((element.delegatedEmail != null && filterEmails.contains(element.delegatedEmail)) || (element.supervisorEmail != null && filterEmails.contains(element.supervisorEmail))))];
+    return [
+      ...listToFilter.where((element) =>
+          ((element.delegatedEmail != null && filterEmails.contains(element.delegatedEmail)) ||
+              (element.supervisorEmail != null && filterEmails.contains(element.supervisorEmail))))
+    ];
   }
 
   List<Task> filterPriority(List<Task> listToFilter, List<String> filterPriorities) {
-    return [...listToFilter.where((element) => ((element.priority != null && filterPriorities.contains(element.priority))))];
+    return [
+      ...listToFilter.where((element) => ((element.priority != null && filterPriorities.contains(element.priority))))
+    ];
   }
 
   List<Task> filterLocations(List<Task> listToFilter, List<int> filterLocations) {
-    return [...listToFilter.where((element) => (element.notificationLocalizationId != null && filterLocations.contains(element.notificationLocalizationId)))];
+    return [
+      ...listToFilter.where((element) =>
+          (element.notificationLocalizationId != null && filterLocations.contains(element.notificationLocalizationId)))
+    ];
   }
 
   List<Task> filterTags(List<Task> listToFilter, List<String> filterTags) {
