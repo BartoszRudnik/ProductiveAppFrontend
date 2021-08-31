@@ -22,11 +22,22 @@ class TagProvider with ChangeNotifier {
     @required this.tagList,
   });
 
+  void setTags(List<Tag> listToSet) {
+    this.tagList = listToSet;
+
+    notifyListeners();
+  }
+
   List<Tag> get tags {
     if (this.searchingText == null || this.searchingText.length < 1) {
       return [...this.tagList];
     } else {
-      return this.tagList.where((element) => element.name.toLowerCase().contains(this.searchingText.toLowerCase())).toList();
+      return this
+          .tagList
+          .where((element) => element.name
+              .toLowerCase()
+              .contains(this.searchingText.toLowerCase()))
+          .toList();
     }
   }
 

@@ -23,31 +23,25 @@ class _MainScreenState extends State<MainScreen> {
   void onClickedNotification(String payload) async {
     Task task = Provider.of<TaskProvider>(context, listen: false)
         .taskList
-        .firstWhere((element) => element.id == int.parse(payload),
-            orElse: () => null);
+        .firstWhere((element) => element.id == int.parse(payload), orElse: () => null);
 
     if (task == null) {
-      await Provider.of<LocationProvider>(context, listen: false)
-          .getLocations();
-      await Provider.of<TaskProvider>(context, listen: false)
-          .fetchSingleTaskFull(int.parse(payload));
+      await Provider.of<LocationProvider>(context, listen: false).getLocations();
+      await Provider.of<TaskProvider>(context, listen: false).fetchSingleTaskFull(int.parse(payload));
 
       task = Provider.of<TaskProvider>(context, listen: false)
           .taskList
           .firstWhere((element) => element.id == int.parse(payload));
     }
 
-    Navigator.of(context)
-        .pushNamed(TaskDetailScreen.routeName, arguments: task);
+    Navigator.of(context).pushNamed(TaskDetailScreen.routeName, arguments: task);
   }
 
-  void listenNotifications() =>
-      Notifications.onNotifications.stream.listen(onClickedNotification);
+  void listenNotifications() => Notifications.onNotifications.stream.listen(onClickedNotification);
 
-  void listenInternetChanges() =>
-      Connectivity().onConnectivityChanged.listen((connectionResult) {
+  void listenInternetChanges() => Connectivity().onConnectivityChanged.listen((connectionResult) {
         if (checkInternetConnection(connectionResult)) {
-          Data.loadData(context);
+          Data.synchronizeData(context);
         }
       });
 
@@ -75,17 +69,16 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: this.future,
-      builder: (ctx, loadResult) =>
-          loadResult.connectionState == ConnectionState.waiting
-              ? LoadingTaskScreen()
-              : Scaffold(
-                  body: Stack(
-                    children: [
-                      MainDrawer(),
-                      TabsScreen(),
-                    ],
-                  ),
-                ),
+      builder: (ctx, loadResult) => loadResult.connectionState == ConnectionState.waiting
+          ? LoadingTaskScreen()
+          : Scaffold(
+              body: Stack(
+                children: [
+                  MainDrawer(),
+                  TabsScreen(),
+                ],
+              ),
+            ),
     );
   }
 }

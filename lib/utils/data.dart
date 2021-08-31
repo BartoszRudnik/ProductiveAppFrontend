@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
+import 'package:productive_app/db/tag_database.dart';
 import 'package:productive_app/provider/locale_provider.dart';
+import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:provider/provider.dart';
 import '../model/task.dart';
 import '../provider/attachment_provider.dart';
@@ -11,6 +13,18 @@ import '../provider/tag_provider.dart';
 import '../provider/task_provider.dart';
 
 class Data {
+  static Future<void> synchronizeData(BuildContext context) async {
+    try {
+      final databaseTags = await TagDatabase.readAll();
+
+      final tags = await Provider.of<SynchronizeProvider>(context, listen: false).synchronizeTags(databaseTags);
+
+      Provider.of<TagProvider>(context, listen: false).setTags(tags);
+    } catch (error) {
+      print(error);
+    }
+  }
+
   static Future<void> loadData(BuildContext context) async {
     try {
       await Future.wait(
@@ -31,7 +45,10 @@ class Data {
       print(error);
     }
 
-    final List<Task> delegatedTasks = Provider.of<TaskProvider>(context, listen: false).taskList.where((element) => element.parentId != null).toList();
+    final List<Task> delegatedTasks = Provider.of<TaskProvider>(context, listen: false)
+        .taskList
+        .where((element) => element.parentId != null)
+        .toList();
 
     if (delegatedTasks != null && delegatedTasks.length > 0) {
       List<int> delegatedTasksId = [];
