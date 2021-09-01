@@ -82,7 +82,7 @@ class Collaborator {
         receivedPermission: receivedPermission ?? this.receivedPermission,
         received: received ?? this.received,
         isSelected: isSelected ?? this.isSelected,
-        lastUpdated: lastUpdated ?? this.lastUpdated,
+        lastUpdated: DateTime.now(),
       );
 
   static Collaborator fromJson(Map<String, Object> json) => Collaborator(
@@ -96,9 +96,7 @@ class Collaborator {
         receivedPermission: json[CollaboratorsFields.receivedPermission] == 1,
         received: json[CollaboratorsFields.received] == 1,
         isSelected: json[CollaboratorsFields.isSelected] == 1,
-        lastUpdated: DateTime.parse(
-          json[CollaboratorsFields.lastUpdated] as String,
-        ),
+        lastUpdated: DateTime.parse(json[CollaboratorsFields.lastUpdated] as String),
       );
 
   Map<String, dynamic> toJson() {
@@ -113,8 +111,7 @@ class Collaborator {
       CollaboratorsFields.receivedPermission: this.receivedPermission ? 1 : 0,
       CollaboratorsFields.received: this.received ? 1 : 0,
       CollaboratorsFields.isSelected: this.isSelected ? 1 : 0,
-      CollaboratorsFields.lastUpdated:
-          this.lastUpdated != null ? this.lastUpdated.toIso8601String() : DateTime.now().toIso8601String()
+      CollaboratorsFields.lastUpdated: this.lastUpdated != null ? this.lastUpdated.toIso8601String() : DateTime.now().toIso8601String()
     };
   }
 }

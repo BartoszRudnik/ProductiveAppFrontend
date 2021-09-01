@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/db/collaborator_database.dart';
 import 'package:productive_app/provider/location_provider.dart';
 import 'package:productive_app/provider/task_provider.dart';
 import 'package:provider/provider.dart';
@@ -114,6 +115,8 @@ class ReceivedCollaborator extends StatelessWidget {
           );
         } else {
           Provider.of<DelegateProvider>(context, listen: false).acceptInvitation(this.collaborator.id);
+          this.collaborator.relationState = "ACCEPTED";
+          CollaboratorDatabase.update(this.collaborator);
         }
       },
       child: CollaboratorListElement(

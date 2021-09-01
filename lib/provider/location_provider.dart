@@ -26,6 +26,12 @@ class LocationProvider with ChangeNotifier {
     @required this.placemarks,
   });
 
+  void setLocations(List<models.Location> listToSet) {
+    this.locationList = listToSet;
+
+    notifyListeners();
+  }
+
   List<models.Location> get locations {
     if (this.searchingText == null || this.searchingText.length < 1) {
       return [...this.locationList];

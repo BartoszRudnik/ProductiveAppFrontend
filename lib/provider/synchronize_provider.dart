@@ -76,11 +76,13 @@ class SynchronizeProvider with ChangeNotifier {
           receivedPermission: receivedPermission,
           alreadyAsked: alreadyAsked,
           isAskingForPermission: isAskingForPermission,
-          lastUpdated: element['lastUpdated'],
+          lastUpdated: DateTime.parse(element['lastUpdated'] as String),
         );
 
         loadedCollaborators.add(newCollaborator);
       }
+
+      print('dupa2');
 
       return loadedCollaborators;
     } catch (error) {
@@ -118,7 +120,7 @@ class SynchronizeProvider with ChangeNotifier {
           country: element["country"],
           locality: element["locality"],
           street: element["street"],
-          lastUpdated: element["lastUpdated"],
+          lastUpdated: DateTime.parse(element["lastUpdated"] as String),
         );
 
         loadedLocations.add(newLocation);
@@ -156,6 +158,7 @@ class SynchronizeProvider with ChangeNotifier {
         Tag newTag = Tag(
           id: element['id'],
           name: element['name'],
+          lastUpdated: DateTime.parse(element['lastUpdated'] as String),
         );
 
         loadedTags.add(newTag);

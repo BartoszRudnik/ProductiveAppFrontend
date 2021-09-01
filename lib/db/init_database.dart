@@ -51,7 +51,7 @@ class InitDatabase {
       ${LocationFields.street} $textType,
       ${LocationFields.latitude} $doubleType,
       ${LocationFields.longitude} $doubleType,
-      ${LocationFields.isSelected} $boolType,
+      ${LocationFields.isSelected} $boolType
     )
     ''');
     await db.execute('''
@@ -66,7 +66,7 @@ class InitDatabase {
       ${CollaboratorsFields.relationState} $textType,
       ${CollaboratorsFields.receivedPermission} $boolType,
       ${CollaboratorsFields.received} $boolType,
-      ${CollaboratorsFields.sentPermission} $boolType,
+      ${CollaboratorsFields.sentPermission} $boolType
     )
     ''');
   }

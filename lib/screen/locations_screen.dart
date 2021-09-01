@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/db/location_database.dart';
 import '../widget/appBar/search_appBar.dart';
 import 'package:provider/provider.dart';
 import '../model/location.dart';
@@ -23,6 +24,7 @@ class _LocationScreenState extends State<LocationsScreen> {
         return;
       }
       choosenLocation.localizationName = name;
+      await LocationDatabase.create(choosenLocation);
       await Provider.of<LocationProvider>(context, listen: false).addLocation(choosenLocation);
     }
   }
@@ -43,6 +45,7 @@ class _LocationScreenState extends State<LocationsScreen> {
         return;
       }
       locationToEdit.localizationName = name;
+      await LocationDatabase.update(locationToEdit);
       await Provider.of<LocationProvider>(context, listen: false).updateLocation(locationToEdit.id, locationToEdit);
     }
   }

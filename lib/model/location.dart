@@ -83,9 +83,7 @@ class Location {
         locality: json[LocationFields.locality] as String,
         street: json[LocationFields.street] as String,
         isSelected: json[LocationFields.isSelected] == 1,
-        lastUpdated: DateTime.parse(
-          json[LocationFields.lastUpdated] as String,
-        ),
+        lastUpdated: DateTime.parse(json[LocationFields.lastUpdated] as String),
       );
 
   Map<String, dynamic> toJson() {
@@ -98,8 +96,7 @@ class Location {
       LocationFields.locality: this.locality,
       LocationFields.country: this.country,
       LocationFields.isSelected: this.isSelected ? 1 : 0,
-      LocationFields.lastUpdated:
-          this.lastUpdated != null ? this.lastUpdated.toIso8601String() : DateTime.now().toIso8601String()
+      LocationFields.lastUpdated: this.lastUpdated != null ? this.lastUpdated.toIso8601String() : DateTime.now().toIso8601String()
     };
   }
 }

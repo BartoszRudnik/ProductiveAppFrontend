@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/db/location_database.dart';
 import '../provider/location_provider.dart';
 import '../provider/task_provider.dart';
 import '../utils/dialogs.dart';
@@ -59,6 +60,7 @@ class SingleLocation extends StatelessWidget {
         if (direction == DismissDirection.endToStart) {
           bool hasAgreed = await Dialogs.showChoiceDialog(context, AppLocalizations.of(context).areSureDeleteLocation);
           if (hasAgreed) {
+            LocationDatabase.delete(location.id);
             Provider.of<TaskProvider>(context, listen: false).clearLocationFromTasks(location.id);
             Provider.of<LocationProvider>(context, listen: false).deleteLocation(location.id);
           }

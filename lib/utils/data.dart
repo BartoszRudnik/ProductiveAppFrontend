@@ -1,5 +1,10 @@
 import 'package:flutter/widgets.dart';
+import 'package:productive_app/db/collaborator_database.dart';
+import 'package:productive_app/db/location_database.dart';
 import 'package:productive_app/db/tag_database.dart';
+import 'package:productive_app/model/collaborator.dart';
+import 'package:productive_app/model/location.dart';
+import 'package:productive_app/model/tag.dart';
 import 'package:productive_app/provider/locale_provider.dart';
 import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:provider/provider.dart';
@@ -15,11 +20,25 @@ import '../provider/task_provider.dart';
 class Data {
   static Future<void> synchronizeData(BuildContext context) async {
     try {
-      final databaseTags = await TagDatabase.readAll();
+      List<Tag> tags = [];
+      List<Collaborator> collaborators = [];
+      List<Location> locations = [];
 
-      final tags = await Provider.of<SynchronizeProvider>(context, listen: false).synchronizeTags(databaseTags);
+      await Future.wait([
+        TagDatabase.readAll().then((value) => tags = value),
+        CollaboratorDatabase.readAll().then((value) => collaborators = value),
+        LocationDatabase.readAll().then((value) => locations = value),
+      ]);
+
+      await Future.wait([
+        Provider.of<SynchronizeProvider>(context, listen: false).synchronizeTags(tags).then((value) => tags = value),
+        Provider.of<SynchronizeProvider>(context, listen: false).synchronizeCollaborators(collaborators).then((value) => collaborators = value),
+        Provider.of<SynchronizeProvider>(context, listen: false).synchronizeLocations(locations).then((value) => locations = value),
+      ]);
 
       Provider.of<TagProvider>(context, listen: false).setTags(tags);
+      Provider.of<DelegateProvider>(context, listen: false).setCollaborators(collaborators);
+      Provider.of<LocationProvider>(context, listen: false).setLocations(locations);
     } catch (error) {
       print(error);
     }
@@ -45,10 +64,7 @@ class Data {
       print(error);
     }
 
-    final List<Task> delegatedTasks = Provider.of<TaskProvider>(context, listen: false)
-        .taskList
-        .where((element) => element.parentId != null)
-        .toList();
+    final List<Task> delegatedTasks = Provider.of<TaskProvider>(context, listen: false).taskList.where((element) => element.parentId != null).toList();
 
     if (delegatedTasks != null && delegatedTasks.length > 0) {
       List<int> delegatedTasksId = [];

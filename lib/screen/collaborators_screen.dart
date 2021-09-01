@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:productive_app/widget/appBar/search_appBar.dart';
 import 'package:provider/provider.dart';
 import '../provider/delegate_provider.dart';
-import '../widget/appBar/task_appBar.dart';
 import '../widget/collaborators_list.dart';
 import '../widget/empty_list.dart';
 import '../widget/new_collaborator.dart';
@@ -46,8 +45,7 @@ class _CollaboratorsScreenState extends State<CollaboratorsScreen> {
       // ignore: missing_return
       onWillPop: () {
         Navigator.of(context).pop();
-        Provider.of<DelegateProvider>(context, listen: false)
-            .clearSearchingText();
+        Provider.of<DelegateProvider>(context, listen: false).clearSearchingText();
       },
       child: Scaffold(
         resizeToAvoidBottomInset: false,
@@ -67,13 +65,9 @@ class _CollaboratorsScreenState extends State<CollaboratorsScreen> {
         ),
         body: RefreshIndicator(
           backgroundColor: Theme.of(context).primaryColor,
-          onRefresh: () => Provider.of<DelegateProvider>(context, listen: false)
-              .getCollaborators(),
-          child: provider.accepted.length == 0 &&
-                  provider.received.length == 0 &&
-                  provider.send.length == 0
-              ? EmptyList(
-                  message: AppLocalizations.of(context).emptyCollaborator)
+          onRefresh: () => Provider.of<DelegateProvider>(context, listen: false).getCollaborators(),
+          child: provider.accepted.length == 0 && provider.received.length == 0 && provider.send.length == 0
+              ? EmptyList(message: AppLocalizations.of(context).emptyCollaborator)
               : SingleChildScrollView(
                   physics: ScrollPhysics(),
                   padding: const EdgeInsets.only(left: 21, right: 17, top: 10),
@@ -86,22 +80,19 @@ class _CollaboratorsScreenState extends State<CollaboratorsScreen> {
                           CollaboratorsList(
                             collaboratorType: 'accepted',
                             collaborators: provider.accepted,
-                            listTitle: AppLocalizations.of(context)
-                                .acceptedInvitations,
+                            listTitle: AppLocalizations.of(context).acceptedInvitations,
                           ),
                         if (provider.received.length > 0)
                           CollaboratorsList(
                             collaboratorType: 'received',
                             collaborators: provider.received,
-                            listTitle: AppLocalizations.of(context)
-                                .receivedInvitations,
+                            listTitle: AppLocalizations.of(context).receivedInvitations,
                           ),
                         if (provider.send.length > 0)
                           CollaboratorsList(
                             collaboratorType: 'send',
                             collaborators: provider.send,
-                            listTitle:
-                                AppLocalizations.of(context).sentInvitations,
+                            listTitle: AppLocalizations.of(context).sentInvitations,
                           ),
                       ],
                     ),
