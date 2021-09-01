@@ -1,3 +1,4 @@
+import 'package:productive_app/model/collaborator.dart';
 import 'package:productive_app/model/location.dart';
 import 'package:productive_app/model/tag.dart';
 import 'package:sqflite/sqflite.dart';
@@ -51,6 +52,21 @@ class InitDatabase {
       ${LocationFields.latitude} $doubleType,
       ${LocationFields.longitude} $doubleType,
       ${LocationFields.isSelected} $boolType,
+    )
+    ''');
+    await db.execute('''
+    CREATE TABLE $tableCollaborators(
+      ${CollaboratorsFields.id} $idType,
+      ${CollaboratorsFields.collaboratorName} $textType,
+      ${CollaboratorsFields.email} $textType,
+      ${CollaboratorsFields.lastUpdated} $textType,
+      ${CollaboratorsFields.alreadyAsked} $boolType,
+      ${CollaboratorsFields.isAskingForPermission} $boolType,
+      ${CollaboratorsFields.isSelected} $boolType,
+      ${CollaboratorsFields.relationState} $textType,
+      ${CollaboratorsFields.receivedPermission} $boolType,
+      ${CollaboratorsFields.received} $boolType,
+      ${CollaboratorsFields.sentPermission} $boolType,
     )
     ''');
   }
