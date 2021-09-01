@@ -29,7 +29,6 @@ class Tag {
     int id,
     String name,
     bool isSelected,
-    bool synchronized,
     DateTime lastUpdated,
   }) =>
       Tag(
