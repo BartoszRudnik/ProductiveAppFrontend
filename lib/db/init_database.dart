@@ -69,6 +69,13 @@ class InitDatabase {
       ${CollaboratorsFields.sentPermission} $boolType
     )
     ''');
+    await db.execute('''
+    CREATE TABLE LOCALE(
+      'id' $idType,
+      'localeName' $textType,
+      'lastUpdated' $textType
+    )
+    ''');
   }
 
   Future close() async {

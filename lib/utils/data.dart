@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:productive_app/db/collaborator_database.dart';
+import 'package:productive_app/db/locale_database.dart';
 import 'package:productive_app/db/location_database.dart';
 import 'package:productive_app/db/tag_database.dart';
 import 'package:productive_app/model/collaborator.dart';
@@ -23,17 +24,20 @@ class Data {
       List<Tag> tags = [];
       List<Collaborator> collaborators = [];
       List<Location> locations = [];
+      List<String> locale = [];
 
       await Future.wait([
         TagDatabase.readAll().then((value) => tags = value),
         CollaboratorDatabase.readAll().then((value) => collaborators = value),
         LocationDatabase.readAll().then((value) => locations = value),
+        LocaleDatabase.read().then((value) => locale = value),
       ]);
 
       await Future.wait([
         Provider.of<SynchronizeProvider>(context, listen: false).synchronizeTags(tags),
         Provider.of<SynchronizeProvider>(context, listen: false).synchronizeCollaborators(collaborators),
         Provider.of<SynchronizeProvider>(context, listen: false).synchronizeLocations(locations),
+        Provider.of<SynchronizeProvider>(context, listen: false).synchronizeLocale(locale),
       ]);
     } catch (error) {
       print(error);
