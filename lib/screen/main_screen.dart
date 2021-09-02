@@ -21,17 +21,13 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   void onClickedNotification(String payload) async {
-    Task task = Provider.of<TaskProvider>(context, listen: false)
-        .taskList
-        .firstWhere((element) => element.id == int.parse(payload), orElse: () => null);
+    Task task = Provider.of<TaskProvider>(context, listen: false).taskList.firstWhere((element) => element.id == int.parse(payload), orElse: () => null);
 
     if (task == null) {
       await Provider.of<LocationProvider>(context, listen: false).getLocations();
       await Provider.of<TaskProvider>(context, listen: false).fetchSingleTaskFull(int.parse(payload));
 
-      task = Provider.of<TaskProvider>(context, listen: false)
-          .taskList
-          .firstWhere((element) => element.id == int.parse(payload));
+      task = Provider.of<TaskProvider>(context, listen: false).taskList.firstWhere((element) => element.id == int.parse(payload));
     }
 
     Navigator.of(context).pushNamed(TaskDetailScreen.routeName, arguments: task);
@@ -41,7 +37,7 @@ class _MainScreenState extends State<MainScreen> {
 
   void listenInternetChanges() => Connectivity().onConnectivityChanged.listen((connectionResult) {
         if (checkInternetConnection(connectionResult)) {
-          Data.synchronizeData(context);
+          this.loadData();
         }
       });
 
@@ -49,11 +45,16 @@ class _MainScreenState extends State<MainScreen> {
     return result != ConnectivityResult.none;
   }
 
-  Future<void> future;
+  Future<void> loadData() async {
+    await Data.synchronizeData(context);
+    await Data.loadData(context);
+  }
+
+  Future future;
 
   @override
   void initState() {
-    future = Data.loadData(context);
+    future = loadData();
     Provider.of<ThemeProvider>(context, listen: false).getUserMode();
 
     Notifications.initLocalization();

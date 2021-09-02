@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/provider/location_provider.dart';
+import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:productive_app/provider/task_provider.dart';
 import 'package:provider/provider.dart';
 import '../model/collaborator.dart';
@@ -8,7 +9,7 @@ import 'collaborator_list_element.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SendCollaborator extends StatelessWidget {
-  Collaborator collaborator;
+  final Collaborator collaborator;
 
   SendCollaborator({
     @required this.collaborator,
@@ -64,6 +65,7 @@ class SendCollaborator extends StatelessWidget {
                           Provider.of<TaskProvider>(context, listen: false).deleteCollaboratorFromTasks(this.collaborator.email, locations);
                           Provider.of<TaskProvider>(context, listen: false).deleteReceivedFromCollaborator(this.collaborator.email, locations);
 
+                          Provider.of<SynchronizeProvider>(context, listen: false).addCollaboratorToDelete(this.collaborator.email);
                           Provider.of<DelegateProvider>(context, listen: false).deleteCollaborator(this.collaborator.id);
                           Navigator.of(context).pop(true);
                         },

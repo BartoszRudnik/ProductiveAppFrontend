@@ -2,16 +2,16 @@ import 'package:productive_app/db/init_database.dart';
 import 'package:productive_app/model/location.dart';
 
 class LocationDatabase {
-  static Future<Location> create(Location location) async {
+  static Future<void> deleteAll() async {
     final db = await InitDatabase.instance.database;
 
-    if (location.id != null) {
-      location.id = null;
-    }
+    db.delete(tableLocations);
+  }
 
-    final id = await db.insert(tableLocations, location.toJson());
+  static Future<void> create(Location location) async {
+    final db = await InitDatabase.instance.database;
 
-    return location.copy(id: id, lastUpdated: DateTime.now());
+    await db.insert(tableLocations, location.toJson());
   }
 
   static Future<Location> read(int id) async {

@@ -31,14 +31,10 @@ class Data {
       ]);
 
       await Future.wait([
-        Provider.of<SynchronizeProvider>(context, listen: false).synchronizeTags(tags).then((value) => tags = value),
-        Provider.of<SynchronizeProvider>(context, listen: false).synchronizeCollaborators(collaborators).then((value) => collaborators = value),
-        Provider.of<SynchronizeProvider>(context, listen: false).synchronizeLocations(locations).then((value) => locations = value),
+        Provider.of<SynchronizeProvider>(context, listen: false).synchronizeTags(tags),
+        Provider.of<SynchronizeProvider>(context, listen: false).synchronizeCollaborators(collaborators),
+        Provider.of<SynchronizeProvider>(context, listen: false).synchronizeLocations(locations),
       ]);
-
-      Provider.of<TagProvider>(context, listen: false).setTags(tags);
-      Provider.of<DelegateProvider>(context, listen: false).setCollaborators(collaborators);
-      Provider.of<LocationProvider>(context, listen: false).setLocations(locations);
     } catch (error) {
       print(error);
     }

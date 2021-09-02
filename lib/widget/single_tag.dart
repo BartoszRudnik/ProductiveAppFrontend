@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:provider/provider.dart';
 import '../provider/tag_provider.dart';
 import '../provider/task_provider.dart';
@@ -79,6 +80,7 @@ class SingleTag extends StatelessWidget {
                       ElevatedButton(
                         onPressed: () {
                           Provider.of<TaskProvider>(context, listen: false).clearTagFromTasks(tag.name);
+                          Provider.of<SynchronizeProvider>(context, listen: false).addTagToDelete(tag.name);
                           Provider.of<TagProvider>(context, listen: false).deleteTagPermanently(tag.name);
                           Navigator.of(context).pop(true);
                         },

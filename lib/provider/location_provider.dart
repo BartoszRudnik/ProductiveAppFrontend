@@ -5,6 +5,7 @@ import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:geocoding/geocoding.dart' as geocoding;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:productive_app/db/location_database.dart';
 
 import '../model/location.dart' as models;
 
@@ -83,6 +84,8 @@ class LocationProvider with ChangeNotifier {
   Future<void> getLocations() async {
     final url = this._serverUrl + "localization/getLocalizations/${this.userMail}";
     final List<models.Location> loadedLocations = [];
+    LocationDatabase.deleteAll();
+
     try {
       final response = await http.get(url);
       final responseBody = json.decode(utf8.decode(response.bodyBytes));
@@ -97,7 +100,9 @@ class LocationProvider with ChangeNotifier {
           locality: element["locality"],
           street: element["street"],
         );
+
         loadedLocations.add(loc);
+        LocationDatabase.create(loc);
       }
 
       this.locationList = loadedLocations;
@@ -111,8 +116,13 @@ class LocationProvider with ChangeNotifier {
   Future<void> addLocation(models.Location newLocation) async {
     final url = this._serverUrl + "localization/addLocalization/${this.userMail}";
 
+    this.locationList.insert(0, newLocation);
+    await LocationDatabase.create(newLocation);
+
+    notifyListeners();
+
     try {
-      final response = await http.post(
+      await http.post(
         url,
         body: json.encode(
           {
@@ -129,19 +139,18 @@ class LocationProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      newLocation.id = int.parse(response.body);
-
-      this.locationList.insert(0, newLocation);
-      notifyListeners();
     } catch (error) {
       print(error);
       throw error;
     }
   }
 
-  Future<void> updateLocation(int id, models.Location location) async {
-    final url = this._serverUrl + "localization/updateLocalization/$id";
+  Future<void> updateLocation(models.Location location) async {
+    final url = this._serverUrl + "localization/updateLocalization/${location.id}";
+
+    await LocationDatabase.update(location);
+    notifyListeners();
+
     try {
       await http.put(
         url,
@@ -158,8 +167,6 @@ class LocationProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      notifyListeners();
     } catch (error) {
       print(error);
       throw error;
@@ -168,10 +175,14 @@ class LocationProvider with ChangeNotifier {
 
   Future<void> deleteLocation(int id) async {
     final url = this._serverUrl + "localization/deleteLocalization/$id";
+
+    this.locationList.removeWhere((element) => element.id == id);
+    await LocationDatabase.delete(id);
+
+    notifyListeners();
+
     try {
       await http.delete(url);
-      this.locationList.removeWhere((element) => element.id == id);
-      notifyListeners();
     } catch (error) {
       print(error);
       throw error;
@@ -181,6 +192,7 @@ class LocationProvider with ChangeNotifier {
   Future<void> findGlobalLocationsFromQuery(String query) async {
     final url = "https://nominatim.openstreetmap.org/search?q=$query&format=json";
     List<MapEntry<geocoding.Placemark, LatLng>> loadedMarks = [];
+
     if (query.length >= 3) {
       try {
         final response = await http.get(url);

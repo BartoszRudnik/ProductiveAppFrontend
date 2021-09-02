@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
+import 'package:productive_app/db/tag_database.dart';
 
 import '../model/tag.dart';
 
@@ -32,12 +33,7 @@ class TagProvider with ChangeNotifier {
     if (this.searchingText == null || this.searchingText.length < 1) {
       return [...this.tagList];
     } else {
-      return this
-          .tagList
-          .where((element) => element.name
-              .toLowerCase()
-              .contains(this.searchingText.toLowerCase()))
-          .toList();
+      return this.tagList.where((element) => element.name.toLowerCase().contains(this.searchingText.toLowerCase())).toList();
     }
   }
 
@@ -67,6 +63,7 @@ class TagProvider with ChangeNotifier {
     final url = this._serverUrl + "tag/getAll/${this.userMail}";
 
     final List<Tag> loadedTags = [];
+    TagDatabase.deleteAll();
 
     try {
       final response = await http.get(url);
@@ -78,6 +75,8 @@ class TagProvider with ChangeNotifier {
           id: element['id'],
           name: element['name'],
         );
+
+        newTag = await TagDatabase.create(newTag);
 
         loadedTags.add(newTag);
       }
@@ -93,11 +92,14 @@ class TagProvider with ChangeNotifier {
   Future<void> deleteTagPermanently(String tagName) async {
     final url = this._serverUrl + "tag/delete/$tagName&${this.userMail}";
 
+    final id = this.tagList.firstWhere((element) => element.name == tagName).id;
+    this.tagList.removeWhere((element) => element.name == tagName);
+    await TagDatabase.delete(id);
+
+    notifyListeners();
+
     try {
       await http.delete(url);
-
-      this.tagList.removeWhere((element) => element.name == tagName);
-      notifyListeners();
     } catch (error) {
       print(error);
       throw error;
@@ -106,6 +108,15 @@ class TagProvider with ChangeNotifier {
 
   Future<void> updateTag(String newName, String oldName) async {
     final url = this._serverUrl + "tag/update/${this.userMail}";
+
+    this.tagList.forEach((tag) async {
+      if (tag.name == oldName) {
+        tag.name = newName;
+        await TagDatabase.update(tag);
+      }
+    });
+
+    notifyListeners();
 
     try {
       await http.put(
@@ -119,14 +130,6 @@ class TagProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      this.tagList.forEach((tag) {
-        if (tag.name == oldName) {
-          tag.name = newName;
-        }
-      });
-
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
@@ -135,6 +138,11 @@ class TagProvider with ChangeNotifier {
 
   Future<void> addTag(Tag newTag) async {
     final url = this._serverUrl + "tag/add";
+
+    this.tagList.insert(0, newTag);
+    await TagDatabase.create(newTag);
+
+    notifyListeners();
 
     newTag.id = this.tagList.length + 1;
 
@@ -154,9 +162,6 @@ class TagProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      this.tagList.insert(0, newTag);
-      notifyListeners();
     } catch (error) {
       print(error);
       throw error;

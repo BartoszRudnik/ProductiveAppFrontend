@@ -2,6 +2,12 @@ import 'package:productive_app/db/init_database.dart';
 import 'package:productive_app/model/tag.dart';
 
 class TagDatabase {
+  static Future<void> deleteAll() async {
+    final db = await InitDatabase.instance.database;
+
+    db.delete(tableTags);
+  }
+
   static Future<Tag> create(Tag tag) async {
     final db = await InitDatabase.instance.database;
 

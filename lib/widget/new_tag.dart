@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/db/tag_database.dart';
 import 'package:productive_app/model/tag.dart';
 import 'package:productive_app/provider/tag_provider.dart';
 import 'package:productive_app/provider/task_provider.dart';
@@ -42,15 +41,12 @@ class _NewTagState extends State<NewTag> {
               if (!this.widget.editMode) {
                 Tag newTag = Tag(id: this.widget.tagsLength + 1, name: value);
 
-                TagDatabase.create(newTag);
-
                 if (!Provider.of<TagProvider>(context, listen: false).tagNames.contains(newTag.name)) {
                   Provider.of<TagProvider>(context, listen: false).addTag(newTag);
                 } else {
                   Dialogs.showWarningDialog(context, AppLocalizations.of(context).tagAlreadyExist);
                 }
               } else {
-                TagDatabase.update(Tag(id: this.widget.tagId, name: value));
                 Provider.of<TagProvider>(context, listen: false).updateTag(value, widget.initialValue);
                 Provider.of<TaskProvider>(context, listen: false).editTag(widget.initialValue, value);
                 Navigator.of(context).pop();

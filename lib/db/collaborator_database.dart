@@ -2,16 +2,16 @@ import 'package:productive_app/db/init_database.dart';
 import 'package:productive_app/model/collaborator.dart';
 
 class CollaboratorDatabase {
-  static Future<Collaborator> create(Collaborator collaborator) async {
+  static Future<void> deleteAll() async {
     final db = await InitDatabase.instance.database;
 
-    if (collaborator.id != null) {
-      collaborator.id = null;
-    }
+    await db.delete(tableCollaborators);
+  }
 
-    final id = await db.insert(tableCollaborators, collaborator.toJson());
+  static Future<void> create(Collaborator collaborator) async {
+    final db = await InitDatabase.instance.database;
 
-    return collaborator.copy(id: id, lastUpdated: DateTime.now());
+    await db.insert(tableCollaborators, collaborator.toJson());
   }
 
   static Future<Collaborator> read(int id) async {
@@ -27,7 +27,7 @@ class CollaboratorDatabase {
     if (maps.isNotEmpty) {
       return Collaborator.fromJson(maps.first);
     } else {
-      throw Exception("ID $id not found");
+      return null;
     }
   }
 

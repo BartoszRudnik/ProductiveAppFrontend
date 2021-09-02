@@ -4,6 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:productive_app/model/collaborator.dart';
+import 'package:productive_app/model/deleteCollaborator.dart';
+import 'package:productive_app/model/deleteLocation.dart';
+import 'package:productive_app/model/deleteTag.dart';
 import 'package:productive_app/model/location.dart';
 import 'package:productive_app/model/tag.dart';
 
@@ -11,22 +14,57 @@ class SynchronizeProvider with ChangeNotifier {
   final String userMail;
   final String authToken;
 
+  List<DeleteCollaborator> collaboratorsToDelete;
+  List<DeleteTag> tagsToDelete;
+  List<DeleteLocation> locationsToDelete;
+
   SynchronizeProvider({
-    this.userMail,
-    this.authToken,
+    @required this.userMail,
+    @required this.authToken,
+    @required this.collaboratorsToDelete,
+    @required this.tagsToDelete,
+    @required this.locationsToDelete,
   });
 
   String _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
-  Future<List<Collaborator>> synchronizeCollaborators(List<Collaborator> collaboratorList) async {
+  void addLocationToDelete(String locationName) {
+    DeleteLocation newToDelete = DeleteLocation(
+      ownerEmail: this.userMail,
+      locationName: locationName,
+    );
+
+    this.locationsToDelete.add(newToDelete);
+  }
+
+  void addTagToDelete(String tagName) {
+    DeleteTag newToDelete = DeleteTag(
+      ownerEmail: this.userMail,
+      tagName: tagName,
+    );
+
+    this.tagsToDelete.add(newToDelete);
+  }
+
+  void addCollaboratorToDelete(String collaboratorEmail) {
+    DeleteCollaborator newToDelete = DeleteCollaborator(
+      user1Mail: this.userMail,
+      user2Mail: collaboratorEmail,
+    );
+
+    this.collaboratorsToDelete.add(newToDelete);
+  }
+
+  Future<void> synchronizeCollaborators(List<Collaborator> collaboratorList) async {
     final finalUrl = this._serverUrl + "synchronize/synchronizeCollaborators/${this.userMail}";
 
     try {
-      final response = await http.post(
+      await http.post(
         finalUrl,
         body: json.encode(
           {
             'collaboratorList': collaboratorList,
+            'deleteList': this.collaboratorsToDelete,
           },
         ),
         headers: {
@@ -35,71 +73,23 @@ class SynchronizeProvider with ChangeNotifier {
         },
       );
 
-      final responseBody = json.decode(utf8.decode(response.bodyBytes));
-
-      List<Collaborator> loadedCollaborators = [];
-
-      for (final element in responseBody) {
-        bool isAskingForPermission = false;
-        bool alreadyAsked = false;
-        bool receivedPermission = false;
-        bool sentPermission = false;
-        bool isReceived = false;
-        String collaboratorEmail = '';
-        String collaboratorName = '';
-
-        if (element['invitationSender'] == this.userMail) {
-          collaboratorEmail = element['invitationReceiver'];
-          collaboratorName = element['invitationReceiverName'];
-          sentPermission = element['user2Permission'];
-          receivedPermission = element['user1Permission'];
-          isAskingForPermission = element['user2AskForPermission'];
-          alreadyAsked = element['user1AskForPermission'];
-        } else {
-          isReceived = true;
-          collaboratorEmail = element['invitationSender'];
-          collaboratorName = element['invitationSenderName'];
-          sentPermission = element['user1Permission'];
-          receivedPermission = element['user2Permission'];
-          isAskingForPermission = element['user1AskForPermission'];
-          alreadyAsked = element['user2AskForPermission'];
-        }
-
-        Collaborator newCollaborator = Collaborator(
-          id: element['id'],
-          email: collaboratorEmail,
-          collaboratorName: collaboratorName,
-          relationState: element['relationState'],
-          isSelected: false,
-          received: isReceived,
-          sentPermission: sentPermission,
-          receivedPermission: receivedPermission,
-          alreadyAsked: alreadyAsked,
-          isAskingForPermission: isAskingForPermission,
-          lastUpdated: DateTime.parse(element['lastUpdated'] as String),
-        );
-
-        loadedCollaborators.add(newCollaborator);
-      }
-
-      print('dupa2');
-
-      return loadedCollaborators;
+      this.collaboratorsToDelete = [];
     } catch (error) {
       print(error);
       throw (error);
     }
   }
 
-  Future<List<Location>> synchronizeLocations(List<Location> locationList) async {
+  Future<void> synchronizeLocations(List<Location> locationList) async {
     final finalUrl = this._serverUrl + "synchronize/synchronizeLocations/${this.userMail}";
 
     try {
-      final response = await http.post(
+      await http.post(
         finalUrl,
         body: json.encode(
           {
             'locationList': locationList,
+            'deleteList': this.locationsToDelete,
           },
         ),
         headers: {
@@ -107,41 +97,24 @@ class SynchronizeProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-      final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
-      List<Location> loadedLocations = [];
-
-      for (final element in responseBody) {
-        Location newLocation = Location(
-          id: element['id'],
-          localizationName: element["localizationName"],
-          longitude: element["longitude"],
-          latitude: element["latitude"],
-          country: element["country"],
-          locality: element["locality"],
-          street: element["street"],
-          lastUpdated: DateTime.parse(element["lastUpdated"] as String),
-        );
-
-        loadedLocations.add(newLocation);
-      }
-
-      return loadedLocations;
+      this.locationsToDelete = [];
     } catch (error) {
       print(error);
       throw (error);
     }
   }
 
-  Future<List<Tag>> synchronizeTags(List<Tag> tagList) async {
+  Future<void> synchronizeTags(List<Tag> tagList) async {
     final finalUrl = this._serverUrl + "synchronize/synchronizeTags/${this.userMail}";
 
     try {
-      final response = await http.post(
+      await http.post(
         finalUrl,
         body: json.encode(
           {
             'tagList': tagList,
+            'deleteList': this.tagsToDelete,
           },
         ),
         headers: {
@@ -150,21 +123,7 @@ class SynchronizeProvider with ChangeNotifier {
         },
       );
 
-      final responseBody = json.decode(utf8.decode(response.bodyBytes));
-
-      List<Tag> loadedTags = [];
-
-      for (final element in responseBody) {
-        Tag newTag = Tag(
-          id: element['id'],
-          name: element['name'],
-          lastUpdated: DateTime.parse(element['lastUpdated'] as String),
-        );
-
-        loadedTags.add(newTag);
-      }
-
-      return loadedTags;
+      this.tagsToDelete = [];
     } catch (error) {
       print(error);
       throw (error);

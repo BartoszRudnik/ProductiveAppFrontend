@@ -63,6 +63,9 @@ class MyApp extends StatelessWidget {
           update: (ctx, auth, previousSynchronize) => SynchronizeProvider(
             authToken: auth.token,
             userMail: auth.email,
+            collaboratorsToDelete: previousSynchronize == null ? [] : previousSynchronize.collaboratorsToDelete,
+            tagsToDelete: previousSynchronize == null ? [] : previousSynchronize.tagsToDelete,
+            locationsToDelete: previousSynchronize == null ? [] : previousSynchronize.locationsToDelete,
           ),
         ),
         ChangeNotifierProxyProvider<AuthProvider, AttachmentProvider>(
@@ -149,8 +152,7 @@ class MyApp extends StatelessWidget {
               ? MainScreen()
               : FutureBuilder(
                   future: Provider.of<AuthProvider>(context, listen: false).tryAutoLogin(),
-                  builder: (ctx, authResult) =>
-                      authResult.connectionState == ConnectionState.waiting ? LoadingAuthScreen() : EntryScreen(),
+                  builder: (ctx, authResult) => authResult.connectionState == ConnectionState.waiting ? LoadingAuthScreen() : EntryScreen(),
                 ),
           routes: MyRoutes.routes,
         );

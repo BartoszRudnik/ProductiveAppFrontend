@@ -47,15 +47,15 @@ class Collaborator {
   Collaborator({
     this.lastUpdated,
     this.id,
-    this.sentPermission,
-    this.receivedPermission,
+    this.sentPermission = false,
+    this.receivedPermission = false,
     this.collaboratorName,
     @required this.email,
     @required this.relationState,
     this.isSelected = false,
     this.received = false,
-    this.isAskingForPermission,
-    this.alreadyAsked,
+    this.isAskingForPermission = false,
+    this.alreadyAsked = false,
   });
 
   Collaborator copy({

@@ -318,8 +318,11 @@ class DelegateProvider with ChangeNotifier {
 
       this.divideCollaborators(this.collaborators);
 
-      for (Collaborator collaborator in this.received) {
-        CollaboratorDatabase.create(collaborator);
+      for (Collaborator collaborator in this.collaborators) {
+        final col = await CollaboratorDatabase.read(collaborator.id);
+        if (col == null) {
+          await CollaboratorDatabase.create(collaborator);
+        }
       }
 
       notifyListeners();
@@ -332,6 +335,19 @@ class DelegateProvider with ChangeNotifier {
   Future<void> deleteCollaborator(int id) async {
     final requestUrl = this._serverUrl + 'delegate/deleteCollaborator/$id';
 
+    Collaborator collaborator = this.collaborators.firstWhere((element) => element.id == id);
+
+    if (collaborator.relationState == 'WAITING') {
+      this._send.remove(collaborator);
+    } else {
+      this._accepted.remove(collaborator);
+    }
+
+    this.collaborators.remove(collaborator);
+    await CollaboratorDatabase.delete(id);
+
+    notifyListeners();
+
     try {
       await http.delete(
         requestUrl,
@@ -340,18 +356,6 @@ class DelegateProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      Collaborator collaborator = this.collaborators.firstWhere((element) => element.id == id);
-
-      if (collaborator.relationState == 'WAITING') {
-        this._send.remove(collaborator);
-      } else {
-        this._accepted.remove(collaborator);
-      }
-
-      this.collaborators.remove(collaborator);
-
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
@@ -361,6 +365,16 @@ class DelegateProvider with ChangeNotifier {
   Future<void> acceptInvitation(int id) async {
     final requestUrl = this._serverUrl + 'delegate/acceptInvitation/$id';
 
+    Collaborator collaborator = this._received.firstWhere((collaborator) => collaborator.id == id);
+    collaborator.relationState = "ACCEPTED";
+
+    this._received.remove(collaborator);
+    this._accepted.add(collaborator);
+
+    await CollaboratorDatabase.update(collaborator);
+
+    notifyListeners();
+
     try {
       await http.put(
         requestUrl,
@@ -369,14 +383,6 @@ class DelegateProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      Collaborator collaborator = this._received.firstWhere((collaborator) => collaborator.id == id);
-      collaborator.relationState = "ACCEPTED";
-
-      this._received.remove(collaborator);
-      this._accepted.add(collaborator);
-
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
@@ -386,6 +392,11 @@ class DelegateProvider with ChangeNotifier {
   Future<void> declineInvitation(int id) async {
     final requestUrl = this._serverUrl + 'delegate/declineInvitation/$id';
 
+    this._received.removeWhere((collaborator) => collaborator.id == id);
+    await CollaboratorDatabase.delete(id);
+
+    notifyListeners();
+
     try {
       await http.put(
         requestUrl,
@@ -394,10 +405,6 @@ class DelegateProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      this._received.removeWhere((collaborator) => collaborator.id == id);
-
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
@@ -447,6 +454,8 @@ class DelegateProvider with ChangeNotifier {
 
       this.collaborators.insert(0, collaborator);
       this._send.insert(0, collaborator);
+
+      await CollaboratorDatabase.create(collaborator);
 
       notifyListeners();
     } catch (error) {

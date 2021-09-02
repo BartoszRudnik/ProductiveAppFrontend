@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/db/collaborator_database.dart';
 import 'package:productive_app/provider/location_provider.dart';
+import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:productive_app/provider/task_provider.dart';
 import 'package:provider/provider.dart';
 import '../model/collaborator.dart';
@@ -9,7 +9,7 @@ import 'collaborator_list_element.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ReceivedCollaborator extends StatelessWidget {
-  Collaborator collaborator;
+  final Collaborator collaborator;
 
   ReceivedCollaborator({
     @required this.collaborator,
@@ -84,6 +84,7 @@ class ReceivedCollaborator extends StatelessWidget {
                           Provider.of<TaskProvider>(context, listen: false).deleteCollaboratorFromTasks(this.collaborator.email, locations);
                           Provider.of<TaskProvider>(context, listen: false).deleteReceivedFromCollaborator(this.collaborator.email, locations);
 
+                          Provider.of<SynchronizeProvider>(context, listen: false).addCollaboratorToDelete(collaborator.email);
                           Provider.of<DelegateProvider>(context, listen: false).declineInvitation(this.collaborator.id);
                           Navigator.of(context).pop(true);
                         },
@@ -115,8 +116,6 @@ class ReceivedCollaborator extends StatelessWidget {
           );
         } else {
           Provider.of<DelegateProvider>(context, listen: false).acceptInvitation(this.collaborator.id);
-          this.collaborator.relationState = "ACCEPTED";
-          CollaboratorDatabase.update(this.collaborator);
         }
       },
       child: CollaboratorListElement(
