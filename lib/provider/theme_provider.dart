@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
+import 'package:productive_app/db/graphic_database.dart';
 
 class ThemeProvider with ChangeNotifier {
   ThemeMode themeMode;
@@ -17,7 +18,9 @@ class ThemeProvider with ChangeNotifier {
     @required this.themeMode,
     @required this.userEmail,
     @required this.userToken,
-  });
+  }) {
+    GraphicDatabase.create(this._getColorMode());
+  }
 
   bool get isDarkMode {
     if (this.themeMode == ThemeMode.system) {
@@ -58,6 +61,9 @@ class ThemeProvider with ChangeNotifier {
     this.themeMode = isOn ? ThemeMode.dark : ThemeMode.light;
 
     final modeToSend = this._getColorMode();
+    GraphicDatabase.create(modeToSend);
+
+    notifyListeners();
 
     try {
       await http.post(
@@ -73,8 +79,6 @@ class ThemeProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);

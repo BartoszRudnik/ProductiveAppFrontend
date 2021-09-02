@@ -1,5 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:productive_app/db/collaborator_database.dart';
+import 'package:productive_app/db/graphic_database.dart';
 import 'package:productive_app/db/locale_database.dart';
 import 'package:productive_app/db/location_database.dart';
 import 'package:productive_app/db/tag_database.dart';
@@ -8,6 +10,7 @@ import 'package:productive_app/model/location.dart';
 import 'package:productive_app/model/tag.dart';
 import 'package:productive_app/provider/locale_provider.dart';
 import 'package:productive_app/provider/synchronize_provider.dart';
+import 'package:productive_app/provider/theme_provider.dart';
 import 'package:provider/provider.dart';
 import '../model/task.dart';
 import '../provider/attachment_provider.dart';
@@ -25,19 +28,24 @@ class Data {
       List<Collaborator> collaborators = [];
       List<Location> locations = [];
       List<String> locale = [];
+      List<String> graphic = [];
+
+      final provider = Provider.of<SynchronizeProvider>(context, listen: false);
 
       await Future.wait([
         TagDatabase.readAll().then((value) => tags = value),
         CollaboratorDatabase.readAll().then((value) => collaborators = value),
         LocationDatabase.readAll().then((value) => locations = value),
         LocaleDatabase.read().then((value) => locale = value),
+        GraphicDatabase.read().then((value) => graphic = value),
       ]);
 
       await Future.wait([
-        Provider.of<SynchronizeProvider>(context, listen: false).synchronizeTags(tags),
-        Provider.of<SynchronizeProvider>(context, listen: false).synchronizeCollaborators(collaborators),
-        Provider.of<SynchronizeProvider>(context, listen: false).synchronizeLocations(locations),
-        Provider.of<SynchronizeProvider>(context, listen: false).synchronizeLocale(locale),
+        provider.synchronizeTags(tags),
+        provider.synchronizeCollaborators(collaborators),
+        provider.synchronizeLocations(locations),
+        provider.synchronizeLocale(locale),
+        provider.synchronizeGraphic(graphic),
       ]);
     } catch (error) {
       print(error);
@@ -58,6 +66,7 @@ class Data {
           Provider.of<AuthProvider>(context, listen: false).checkIfAvatarExists(),
           Provider.of<AttachmentProvider>(context, listen: false).getAttachments(),
           Provider.of<LocaleProvider>(context, listen: false).getLocale(),
+          Provider.of<ThemeProvider>(context, listen: false).getUserMode(),
         ],
       );
     } catch (error) {

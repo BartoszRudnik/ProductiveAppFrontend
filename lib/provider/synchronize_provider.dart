@@ -55,6 +55,29 @@ class SynchronizeProvider with ChangeNotifier {
     this.collaboratorsToDelete.add(newToDelete);
   }
 
+  Future<void> synchronizeGraphic(List<String> data) async {
+    final finalUrl = this._serverUrl + "synchronize/synchronizeGraphic/${this.userMail}";
+
+    try {
+      await http.post(
+        finalUrl,
+        body: json.encode(
+          {
+            'mode': data[0],
+            'lastUpdated': data[1],
+          },
+        ),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
   Future<void> synchronizeLocale(List<String> data) async {
     final finalUrl = this._serverUrl + "synchronize/synchronizeLocale/${this.userMail}";
 

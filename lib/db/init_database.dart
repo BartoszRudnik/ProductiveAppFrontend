@@ -76,6 +76,13 @@ class InitDatabase {
       'lastUpdated' $textType
     )
     ''');
+    await db.execute('''
+    CREATE TABLE GRAPHIC(
+      'id' $idType,
+      'mode' $textType,
+      'lastUpdated' $textType
+    )
+    ''');
   }
 
   Future close() async {
