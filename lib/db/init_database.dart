@@ -1,4 +1,5 @@
 import 'package:productive_app/model/collaborator.dart';
+import 'package:productive_app/model/collaboratorTask.dart';
 import 'package:productive_app/model/location.dart';
 import 'package:productive_app/model/settings.dart';
 import 'package:productive_app/model/tag.dart';
@@ -112,6 +113,16 @@ class InitDatabase {
       ${SettingsFields.showOnlyUnfinished} $boolType,
       ${SettingsFields.showOnlyWithLocalization} $boolType,
       ${SettingsFields.sortingMode} $integerType      
+    )
+    ''');
+    await db.execute('''
+    CREATE TABLE $tableCollaboratorTask(
+      ${CollaboratorTaskFields.id} $idType,
+      ${CollaboratorTaskFields.title} $textType,
+      ${CollaboratorTaskFields.description} $textType,
+      ${CollaboratorTaskFields.startDate} $textType,
+      ${CollaboratorTaskFields.endDate} $textType,
+      ${CollaboratorTaskFields.lastUpdated} $textType
     )
     ''');
   }
