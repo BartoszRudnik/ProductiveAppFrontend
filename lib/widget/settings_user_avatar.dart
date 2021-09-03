@@ -50,8 +50,11 @@ class _SettingsUserAvatarState extends State<SettingsUserAvatar> {
                         height: 100,
                         child: CircleAvatar(
                           radius: 50,
-                          backgroundImage:
-                              user.userImage != null ? user.userImage : null,
+                          backgroundImage: user.userImage != null
+                              ? user.userImage
+                              : user.localImage != null
+                                  ? MemoryImage(user.localImage)
+                                  : null,
                         ),
                       )
                     : Container(
@@ -59,8 +62,7 @@ class _SettingsUserAvatarState extends State<SettingsUserAvatar> {
                         height: 100,
                         child: CircleAvatar(
                           radius: 50,
-                          backgroundImage:
-                              AssetImage(Images.profilePicturePlacholder),
+                          backgroundImage: AssetImage(Images.profilePicturePlacholder),
                         ),
                       ),
               ),

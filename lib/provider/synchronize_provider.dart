@@ -9,6 +9,7 @@ import 'package:productive_app/model/deleteLocation.dart';
 import 'package:productive_app/model/deleteTag.dart';
 import 'package:productive_app/model/location.dart';
 import 'package:productive_app/model/tag.dart';
+import 'package:productive_app/model/user.dart';
 
 class SynchronizeProvider with ChangeNotifier {
   final String userMail;
@@ -53,6 +54,35 @@ class SynchronizeProvider with ChangeNotifier {
     );
 
     this.collaboratorsToDelete.add(newToDelete);
+  }
+
+  Future<void> synchronizeUser(User user) async {
+    final finalUrl = this._serverUrl + "synchronize/synchronizeUser";
+
+    try {
+      await http.post(
+        finalUrl,
+        body: json.encode(
+          {
+            "firstName": user.firstName,
+            "lastName": user.lastName,
+            "email": user.email,
+            "lastUpdatedImage": user.lastUpdatedImage.toIso8601String(),
+            "lastUpdatedName": user.lastUpdatedName.toIso8601String(),
+            "removed": user.removed ? 1 : 0,
+            "userType": user.userType,
+            "localImage": user.localImage,
+          },
+        ),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
   }
 
   Future<void> synchronizeGraphic(List<String> data) async {

@@ -18,9 +18,8 @@ class MainDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = Provider.of<AuthProvider>(context).user;
 
-    if (user != null && !user.removed) {
-      Provider.of<AuthProvider>(context, listen: false).getUserImage();
-    }
+    print('notify');
+    print(user.removed);
 
     return SingleChildScrollView(
       child: Container(
@@ -39,8 +38,11 @@ class MainDrawer extends StatelessWidget {
                 height: 100,
                 child: CircleAvatar(
                   radius: 50,
-                  backgroundImage:
-                      user.userImage != null ? user.userImage : null,
+                  backgroundImage: user.userImage != null
+                      ? user.userImage
+                      : user.localImage != null
+                          ? MemoryImage(user.localImage)
+                          : null,
                 ),
               )
             else
@@ -56,16 +58,11 @@ class MainDrawer extends StatelessWidget {
               alignment: Alignment.centerLeft,
               width: 180,
               height: 72,
-              child: (user.firstName != null && user.firstName.length > 0) ||
-                      (user.lastName != null && user.lastName.length > 0)
+              child: (user.firstName != null && user.firstName.length > 0) || (user.lastName != null && user.lastName.length > 0)
                   ? Text(
                       user.firstName != null
-                          ? user.firstName +
-                              ' ' +
-                              (user.lastName != null ? user.lastName : '')
-                          : '' +
-                              ' ' +
-                              (user.lastName != null ? user.lastName : ''),
+                          ? user.firstName + ' ' + (user.lastName != null ? user.lastName : '')
+                          : '' + ' ' + (user.lastName != null ? user.lastName : ''),
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 21,
@@ -86,17 +83,10 @@ class MainDrawer extends StatelessWidget {
             ),
             Badge(
               position: BadgePosition.topStart(),
-              showBadge:
-                  Provider.of<DelegateProvider>(context).received.length > 0 ||
-                      Provider.of<DelegateProvider>(context)
-                              .numberOfPermissionRequest >
-                          0,
+              showBadge: Provider.of<DelegateProvider>(context).received.length > 0 || Provider.of<DelegateProvider>(context).numberOfPermissionRequest > 0,
               badgeColor: Theme.of(context).primaryColor,
               badgeContent: Text(
-                (Provider.of<DelegateProvider>(context).received.length +
-                        Provider.of<DelegateProvider>(context)
-                            .numberOfPermissionRequest)
-                    .toString(),
+                (Provider.of<DelegateProvider>(context).received.length + Provider.of<DelegateProvider>(context).numberOfPermissionRequest).toString(),
                 style: TextStyle(color: Theme.of(context).accentColor),
               ),
               child: DrawerListTile(

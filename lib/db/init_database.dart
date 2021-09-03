@@ -1,6 +1,7 @@
 import 'package:productive_app/model/collaborator.dart';
 import 'package:productive_app/model/location.dart';
 import 'package:productive_app/model/tag.dart';
+import 'package:productive_app/model/user.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -32,6 +33,7 @@ class InitDatabase {
     final boolType = 'BOOLEAN NOT NULL';
     final textType = 'TEXT NOT NULL';
     final doubleType = 'REAL NOT NULL';
+    final blob = 'BLOB';
 
     await db.execute('''
     CREATE TABLE $tableTags (
@@ -81,6 +83,19 @@ class InitDatabase {
       'id' $idType,
       'mode' $textType,
       'lastUpdated' $textType
+    )
+    ''');
+    await db.execute('''
+    CREATE TABLE $tableUser(
+      ${UserFields.id} $idType,
+      ${UserFields.email} $textType,
+      ${UserFields.firstName} $textType,
+      ${UserFields.lastName} $textType,
+      ${UserFields.lastUpdatedImage} $textType,
+      ${UserFields.lastUpdatedName} $textType,
+      ${UserFields.userType} $textType,
+      ${UserFields.localImage} $blob,
+      ${UserFields.removed} $boolType
     )
     ''');
   }

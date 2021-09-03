@@ -2,10 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
+import 'package:productive_app/db/user_database.dart';
 import 'package:productive_app/utils/google_sign_in_api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/painting.dart';
@@ -19,8 +21,7 @@ class AuthProvider with ChangeNotifier {
   String _email;
   User _user;
 
-  String _serverUrl =
-      GlobalConfiguration().getValue("serverUrl"); //computer IP address
+  String _serverUrl = GlobalConfiguration().getValue("serverUrl"); //computer IP address
 
   bool get isAuth {
     return token != null;
@@ -35,9 +36,7 @@ class AuthProvider with ChangeNotifier {
   }
 
   String get token {
-    if (this._expiryDate != null &&
-        this._expiryDate.isAfter(DateTime.now()) &&
-        this._token != null) {
+    if (this._expiryDate != null && this._expiryDate.isAfter(DateTime.now()) && this._token != null) {
       return this._token;
     }
     return null;
@@ -53,10 +52,6 @@ class AuthProvider with ChangeNotifier {
 
       this.user.firstName = responseBody['firstName'];
       this.user.lastName = responseBody['lastName'];
-    } on SocketException catch (error) {
-      print(error);
-
-      await this._loadUsernameFromLocal();
     } catch (error) {
       print(error);
       throw (error);
@@ -65,6 +60,14 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> updateUserData(String firstName, String lastName) async {
     String url = this._serverUrl + 'userData/update/${this._email}';
+
+    this._user.firstName = firstName;
+    this._user.lastName = lastName;
+    this._user.lastUpdatedName = DateTime.now();
+
+    await UserDatabase.update(this._user);
+
+    this.notifyListeners();
 
     try {
       await http.post(
@@ -80,11 +83,6 @@ class AuthProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      this.user.firstName = firstName;
-      this.user.lastName = lastName;
-
-      this.notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
@@ -92,8 +90,9 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> deleteAccount(String token) async {
-    String url =
-        this._serverUrl + 'account/deleteAccount/${this._email}/$token';
+    String url = this._serverUrl + 'account/deleteAccount/${this._email}/$token';
+
+    UserDatabase.delete();
 
     try {
       await http.post(
@@ -168,6 +167,12 @@ class AuthProvider with ChangeNotifier {
         lastName: lastName,
       );
 
+      final user = await UserDatabase.read();
+
+      if (user == null) {
+        UserDatabase.create(this._user);
+      }
+
       this._email = googleUser.email;
       this._token = responseData['token'];
       this._expiryDate = DateTime.now().add(
@@ -181,15 +186,13 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
 
       this._saveLocalData();
-      this._saveUsernameToLocal();
     } catch (error) {
       print(error);
       throw (error);
     }
   }
 
-  Future<void> _authenticate(
-      String email, String password, String urlSegment) async {
+  Future<void> _authenticate(String email, String password, String urlSegment) async {
     String url = this._serverUrl + '$urlSegment';
 
     try {
@@ -240,16 +243,13 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> checkIfAvatarExists() async {
-    final finalUrl =
-        this._serverUrl + 'userImage/checkIfExists/${this._user.email}';
+    final finalUrl = this._serverUrl + 'userImage/checkIfExists/${this._user.email}';
 
     try {
       final response = await http.get(finalUrl);
 
       if (this._user != null) {
-        response.body == 'true'
-            ? this._user.removed = false
-            : this._user.removed = true;
+        response.body == 'true' ? this._user.removed = false : this._user.removed = true;
       }
     } catch (error) {
       print(error);
@@ -258,8 +258,17 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> removeAvatar() async {
-    final finalUrl =
-        this._serverUrl + 'userImage/deleteImage/${this._user.email}';
+    final finalUrl = this._serverUrl + 'userImage/deleteImage/${this._user.email}';
+
+    this._user.userImage = null;
+    this._user.localImage = null;
+    this._user.removed = true;
+    this._user.lastUpdatedImage = DateTime.now();
+    this.evictImage();
+
+    await UserDatabase.update(this._user);
+
+    notifyListeners();
 
     try {
       http.post(
@@ -269,40 +278,43 @@ class AuthProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      this._user.userImage = null;
-      this._user.removed = true;
-
-      this.evictImage();
-
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
     }
   }
 
+  void evictImage() {
+    this._user.userImage = NetworkImage(this._serverUrl + 'userImage/getImage/${this._user.email}');
+    this._user.userImage.evict().then<void>((bool success) {});
+    this._user.userImage = null;
+  }
+
   Future<void> changeUserImage(File userImage) async {
     final finalUrl = this._serverUrl + 'userImage/setImage/${this._user.email}';
+
+    final bytes = await userImage.readAsBytes();
+
+    this._user.localImage = bytes;
+    this._user.userImage = null;
+    this._user.removed = false;
+    this._user.lastUpdatedImage = DateTime.now();
+    this.evictImage();
+
+    await UserDatabase.update(this._user);
+
+    notifyListeners();
 
     try {
       final uri = Uri.parse(finalUrl);
 
       final request = http.MultipartRequest('POST', uri);
-      final multipartFile = await http.MultipartFile.fromPath(
-          'multipartFile', userImage.path,
-          filename: userImage.path);
+      final multipartFile = await http.MultipartFile.fromPath('multipartFile', userImage.path, filename: userImage.path);
 
       request.files.add(multipartFile);
 
-      final response = await request.send();
-      final respStr = await response.stream.bytesToString();
-
-      print(respStr);
-
-      this.evictImage();
-      this.getUserImage();
-      this._user.removed = false;
+      await request.send();
+      await this.getUserImage();
 
       notifyListeners();
     } catch (error) {
@@ -313,21 +325,19 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> getUserImage() async {
     try {
-      this._user.userImage = NetworkImage(
-          this._serverUrl + 'userImage/getImage/${this._user.email}');
+      final result = await Connectivity().checkConnectivity();
+
+      if (result != ConnectivityResult.none) {
+        this._user.userImage = NetworkImage(this._serverUrl + 'userImage/getImage/${this._user.email}');
+      }
     } catch (error) {
       print(error);
     }
   }
 
-  void evictImage() {
-    this._user.userImage = NetworkImage(
-        this._serverUrl + 'userImage/getImage/${this._user.email}');
-    this._user.userImage.evict().then<void>((bool success) {});
-  }
-
   Future<void> signUp(String email, String password) async {
-    return this._authenticate(email, password, 'registration');
+    this._authenticate(email, password, 'registration');
+    UserDatabase.create(this._user);
   }
 
   Future<void> signIn(String email, String password) async {
@@ -365,8 +375,7 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<void> newPassword(
-      String email, String token, String newPassword) async {
+  Future<void> newPassword(String email, String token, String newPassword) async {
     String url = this._serverUrl + 'newPassword';
 
     try {
@@ -407,42 +416,6 @@ class AuthProvider with ChangeNotifier {
     } catch (error) {
       throw error;
     }
-  }
-
-  Future<bool> _loadUsernameFromLocal() async {
-    final getPreferences = await SharedPreferences.getInstance();
-
-    if (!getPreferences.containsKey('username') ||
-        !getPreferences.containsKey('userData')) {
-      return false;
-    }
-
-    final extractedUserData = json.decode(getPreferences.getString('userData'))
-        as Map<String, Object>;
-    final extractedUsername =
-        json.decode(getPreferences.get('username')) as Map<String, Object>;
-
-    this._user = User(
-      email: extractedUserData['email'],
-      userType: extractedUserData['userType'],
-      firstName: extractedUsername['firstName'],
-      lastName: extractedUsername['lastName'],
-    );
-
-    notifyListeners();
-    return true;
-  }
-
-  void _saveUsernameToLocal() async {
-    final preferences = await SharedPreferences.getInstance();
-    final userData = json.encode(
-      {
-        'firstName': this.user.firstName,
-        'lastName': this.user.lastName,
-      },
-    );
-
-    preferences.setString('username', userData);
   }
 
   void _saveLocalData() async {
@@ -509,8 +482,7 @@ class AuthProvider with ChangeNotifier {
       return false;
     }
 
-    final extractedUserData = json.decode(getPreferences.getString('userData'))
-        as Map<String, Object>;
+    final extractedUserData = json.decode(getPreferences.getString('userData')) as Map<String, Object>;
     final expiryDate = DateTime.parse(extractedUserData['expiryDate']);
 
     if (expiryDate.isBefore(DateTime.now())) {
@@ -527,6 +499,8 @@ class AuthProvider with ChangeNotifier {
         email: this._email,
         userType: userType,
       );
+
+      UserDatabase.create(this._user);
     }
 
     notifyListeners();

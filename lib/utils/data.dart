@@ -5,9 +5,11 @@ import 'package:productive_app/db/graphic_database.dart';
 import 'package:productive_app/db/locale_database.dart';
 import 'package:productive_app/db/location_database.dart';
 import 'package:productive_app/db/tag_database.dart';
+import 'package:productive_app/db/user_database.dart';
 import 'package:productive_app/model/collaborator.dart';
 import 'package:productive_app/model/location.dart';
 import 'package:productive_app/model/tag.dart';
+import 'package:productive_app/model/user.dart';
 import 'package:productive_app/provider/locale_provider.dart';
 import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:productive_app/provider/theme_provider.dart';
@@ -29,6 +31,7 @@ class Data {
       List<Location> locations = [];
       List<String> locale = [];
       List<String> graphic = [];
+      User user;
 
       final provider = Provider.of<SynchronizeProvider>(context, listen: false);
 
@@ -38,6 +41,7 @@ class Data {
         LocationDatabase.readAll().then((value) => locations = value),
         LocaleDatabase.read().then((value) => locale = value),
         GraphicDatabase.read().then((value) => graphic = value),
+        UserDatabase.read().then((value) => user = value),
       ]);
 
       await Future.wait([
@@ -46,6 +50,7 @@ class Data {
         provider.synchronizeLocations(locations),
         provider.synchronizeLocale(locale),
         provider.synchronizeGraphic(graphic),
+        provider.synchronizeUser(user),
       ]);
     } catch (error) {
       print(error);
@@ -67,6 +72,7 @@ class Data {
           Provider.of<AttachmentProvider>(context, listen: false).getAttachments(),
           Provider.of<LocaleProvider>(context, listen: false).getLocale(),
           Provider.of<ThemeProvider>(context, listen: false).getUserMode(),
+          Provider.of<AuthProvider>(context, listen: false).getUserImage(),
         ],
       );
     } catch (error) {
