@@ -107,12 +107,11 @@ class InitDatabase {
       ${SettingsFields.lastUpdated} $textType,
       ${SettingsFields.locations} $textType,
       ${SettingsFields.priorities} $textType,
+      ${SettingsFields.tags} $textType,
       ${SettingsFields.showOnlyDelegated} $boolType,
       ${SettingsFields.showOnlyUnfinished} $boolType,
-      ${SettingsFields.showOnlyDelegated} $boolType,
       ${SettingsFields.showOnlyWithLocalization} $boolType,
-      ${SettingsFields.sortingMode} $integerType,
-      ${SettingsFields.taskName} $textType
+      ${SettingsFields.sortingMode} $integerType      
     )
     ''');
   }

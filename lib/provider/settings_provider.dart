@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
+import 'package:productive_app/db/settings_database.dart';
 import 'package:productive_app/model/settings.dart';
 import 'package:http/http.dart' as http;
 
@@ -86,23 +87,27 @@ class SettingsProvider with ChangeNotifier {
   Future<void> addFilterLocations(List<int> locations) async {
     final finalUrl = this._serverUrl + 'filterSettings/addFilterLocations/${this.userMail}';
 
+    if (locations != null) {
+      this.userSettings.locations = locations;
+    }
+
+    SettingsDatabase.create(this.userSettings);
+
+    notifyListeners();
+
     try {
       await http.post(
         finalUrl,
         body: json.encode(
-          {'locations': locations},
+          {
+            'locations': locations,
+          },
         ),
         headers: {
           'content-type': 'application/json',
           'accept': 'application/json',
         },
       );
-
-      if (locations != null) {
-        this.userSettings.locations = locations;
-      }
-
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
@@ -111,6 +116,14 @@ class SettingsProvider with ChangeNotifier {
 
   Future<void> addFilterTags(List<String> tags) async {
     final finalUrl = this._serverUrl + 'filterSettings/addFilterTag/${this.userMail}';
+
+    if (tags != null) {
+      this.userSettings.tags = tags;
+    }
+
+    SettingsDatabase.create(this.userSettings);
+
+    notifyListeners();
 
     try {
       await http.post(
@@ -125,12 +138,6 @@ class SettingsProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      if (tags != null) {
-        this.userSettings.tags = tags;
-      }
-
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
@@ -139,6 +146,14 @@ class SettingsProvider with ChangeNotifier {
 
   Future<void> addFilterPriorities(List<String> priorities) async {
     final finalUrl = this._serverUrl + 'filterSettings/addFilterPriority/${this.userMail}';
+
+    if (priorities != null) {
+      this.userSettings.priorities = priorities;
+    }
+
+    SettingsDatabase.create(this.userSettings);
+
+    notifyListeners();
 
     try {
       await http.post(
@@ -153,11 +168,6 @@ class SettingsProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      if (priorities != null) {
-        this.userSettings.priorities = priorities;
-      }
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
@@ -166,6 +176,14 @@ class SettingsProvider with ChangeNotifier {
 
   Future<void> addFilterCollaboratorEmail(List<String> collaboratorEmail) async {
     final finalUrl = this._serverUrl + 'filterSettings/addFilterCollaboratorEmail/${this.userMail}';
+
+    if (collaboratorEmail != null) {
+      this.userSettings.collaborators = collaboratorEmail;
+    }
+
+    SettingsDatabase.create(this.userSettings);
+
+    notifyListeners();
 
     try {
       await http.post(
@@ -180,11 +198,6 @@ class SettingsProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      if (collaboratorEmail != null) {
-        this.userSettings.collaborators = collaboratorEmail;
-      }
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
@@ -193,6 +206,14 @@ class SettingsProvider with ChangeNotifier {
 
   Future<void> deleteFilterLocation(int location) async {
     final finalUrl = this._serverUrl + 'filterSettings/deleteFilterLocation/${this.userMail}';
+
+    if (location != null) {
+      this.userSettings.locations.remove(location);
+    }
+
+    SettingsDatabase.create(this.userSettings);
+
+    notifyListeners();
 
     try {
       await http.post(
@@ -207,11 +228,6 @@ class SettingsProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      if (location != null) {
-        this.userSettings.locations.remove(location);
-      }
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
@@ -220,6 +236,14 @@ class SettingsProvider with ChangeNotifier {
 
   Future<void> deleteFilterTag(String tag) async {
     final finalUrl = this._serverUrl + 'filterSettings/deleteFilterTag/${this.userMail}';
+
+    if (tag != null) {
+      this.userSettings.tags.remove(tag);
+    }
+
+    SettingsDatabase.create(this.userSettings);
+
+    notifyListeners();
 
     try {
       await http.post(
@@ -234,11 +258,6 @@ class SettingsProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-      if (tag != null) {
-        this.userSettings.tags.remove(tag);
-      }
-
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
@@ -247,6 +266,14 @@ class SettingsProvider with ChangeNotifier {
 
   Future<void> deleteFilterPriority(String priority) async {
     final finalUrl = this._serverUrl + 'filterSettings/deleteFilterPriority/${this.userMail}';
+
+    if (priority != null) {
+      this.userSettings.priorities.remove(priority);
+    }
+
+    SettingsDatabase.create(this.userSettings);
+
+    notifyListeners();
 
     try {
       await http.post(
@@ -261,12 +288,6 @@ class SettingsProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      if (priority != null) {
-        this.userSettings.priorities.remove(priority);
-      }
-
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
@@ -275,6 +296,14 @@ class SettingsProvider with ChangeNotifier {
 
   Future<void> deleteFilterCollaboratorEmail(String collaboratorEmail) async {
     final finalUrl = this._serverUrl + 'filterSettings/deleteFilterCollaboratorEmail/${this.userMail}';
+
+    if (collaboratorEmail != null) {
+      this.userSettings.collaborators.remove(collaboratorEmail);
+    }
+
+    SettingsDatabase.create(this.userSettings);
+
+    notifyListeners();
 
     try {
       await http.post(
@@ -289,12 +318,6 @@ class SettingsProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      if (collaboratorEmail != null) {
-        this.userSettings.collaborators.remove(collaboratorEmail);
-      }
-
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
@@ -304,6 +327,12 @@ class SettingsProvider with ChangeNotifier {
   Future<void> clearFilterLocations() async {
     final finalUrl = this._serverUrl + 'filterSettings/clearFilterLocations/${this.userMail}';
 
+    this.userSettings.locations = [];
+
+    SettingsDatabase.create(this.userSettings);
+
+    notifyListeners();
+
     try {
       await http.post(
         finalUrl,
@@ -312,10 +341,6 @@ class SettingsProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      this.userSettings.locations = [];
-
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
@@ -325,6 +350,12 @@ class SettingsProvider with ChangeNotifier {
   Future<void> clearFilterTags() async {
     final finalUrl = this._serverUrl + 'filterSettings/clearFilterTags/${this.userMail}';
 
+    this.userSettings.tags = [];
+
+    SettingsDatabase.create(this.userSettings);
+
+    notifyListeners();
+
     try {
       await http.post(
         finalUrl,
@@ -333,10 +364,6 @@ class SettingsProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      this.userSettings.tags = [];
-
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
@@ -346,6 +373,12 @@ class SettingsProvider with ChangeNotifier {
   Future<void> clearFilterPriorities() async {
     final finalUrl = this._serverUrl + 'filterSettings/clearFilterPriorities/${this.userMail}';
 
+    this.userSettings.priorities = [];
+
+    SettingsDatabase.create(this.userSettings);
+
+    notifyListeners();
+
     try {
       await http.post(
         finalUrl,
@@ -354,10 +387,6 @@ class SettingsProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      this.userSettings.priorities = [];
-
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
@@ -367,6 +396,12 @@ class SettingsProvider with ChangeNotifier {
   Future<void> clearFilterCollaborators() async {
     final finalUrl = this._serverUrl + 'filterSettings/clearFilterCollaborators/${this.userMail}';
 
+    this.userSettings.collaborators = [];
+
+    SettingsDatabase.create(this.userSettings);
+
+    notifyListeners();
+
     try {
       await http.post(
         finalUrl,
@@ -375,10 +410,6 @@ class SettingsProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      this.userSettings.collaborators = [];
-
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
@@ -388,6 +419,12 @@ class SettingsProvider with ChangeNotifier {
   Future<void> changeShowOnlyWithLocalization() async {
     final finalUrl = this._serverUrl + 'filterSettings/changeShowOnlyWithLocalization/${this.userMail}';
 
+    this.userSettings.showOnlyWithLocalization = !this.userSettings.showOnlyWithLocalization;
+
+    SettingsDatabase.create(this.userSettings);
+
+    notifyListeners();
+
     try {
       await http.post(
         finalUrl,
@@ -396,9 +433,6 @@ class SettingsProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      this.userSettings.showOnlyWithLocalization = !this.userSettings.showOnlyWithLocalization;
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
@@ -408,6 +442,12 @@ class SettingsProvider with ChangeNotifier {
   Future<void> changeShowOnlyDelegated() async {
     final finalUrl = this._serverUrl + 'filterSettings/changeShowOnlyDelegatedStatus/${this.userMail}';
 
+    this.userSettings.showOnlyDelegated = !this.userSettings.showOnlyDelegated;
+
+    SettingsDatabase.create(this.userSettings);
+
+    notifyListeners();
+
     try {
       await http.post(
         finalUrl,
@@ -416,9 +456,6 @@ class SettingsProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      this.userSettings.showOnlyDelegated = !this.userSettings.showOnlyDelegated;
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
@@ -428,6 +465,12 @@ class SettingsProvider with ChangeNotifier {
   Future<void> changeShowOnlyUnfinished() async {
     final finalUrl = this._serverUrl + 'filterSettings/changeShowOnlyUnfinishedStatus/${this.userMail}';
 
+    this.userSettings.showOnlyUnfinished = !this.userSettings.showOnlyUnfinished;
+
+    SettingsDatabase.create(this.userSettings);
+
+    notifyListeners();
+
     try {
       await http.post(
         finalUrl,
@@ -436,9 +479,6 @@ class SettingsProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      this.userSettings.showOnlyUnfinished = !this.userSettings.showOnlyUnfinished;
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
@@ -447,6 +487,12 @@ class SettingsProvider with ChangeNotifier {
 
   Future<void> changeSortingMode(int newMode) async {
     final finalUrl = this._serverUrl + 'filterSettings/changeSortingMode/${this.userMail}';
+
+    this.userSettings.sortingMode = newMode;
+
+    SettingsDatabase.create(this.userSettings);
+
+    notifyListeners();
 
     try {
       await http.post(
@@ -459,9 +505,6 @@ class SettingsProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      this.userSettings.sortingMode = newMode;
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);

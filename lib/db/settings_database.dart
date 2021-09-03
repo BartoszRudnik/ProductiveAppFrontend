@@ -48,6 +48,7 @@ class SettingsDatabase {
     final existing = await read();
 
     settings.id = 1;
+    settings.lastUpdated = DateTime.now();
 
     if (existing != null) {
       update(settings);

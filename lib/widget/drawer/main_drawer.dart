@@ -18,9 +18,6 @@ class MainDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = Provider.of<AuthProvider>(context).user;
 
-    print('notify');
-    print(user.removed);
-
     return SingleChildScrollView(
       child: Container(
         margin: EdgeInsets.only(

@@ -13,7 +13,6 @@ class SettingsFields {
     tags,
     locations,
     sortingMode,
-    taskName,
     lastUpdated,
   ];
 
@@ -26,7 +25,6 @@ class SettingsFields {
   static final String tags = "tags";
   static final String locations = "locations";
   static final String sortingMode = "sortingMode";
-  static final String taskName = "taskName";
   static final String lastUpdated = "lastUpdated";
 }
 
@@ -66,11 +64,26 @@ class Settings {
   }
 
   static List<String> splitStringList(String toSplit) {
-    return toSplit.split('|');
+    if (toSplit.length > 0) {
+      return toSplit.split('|');
+    }
+    return null;
   }
 
   static List<int> splitIntList(String toSplit) {
-    return toSplit.split('|').map((e) => int.parse(e));
+    if (toSplit.length > 0) {
+      final stringList = toSplit.split('|');
+
+      List<int> result = [];
+
+      stringList.forEach((element) {
+        result.add(int.tryParse(element));
+      });
+
+      return result;
+    } else {
+      return null;
+    }
   }
 
   Settings copy({
@@ -96,7 +109,6 @@ class Settings {
         tags: tags ?? this.tags,
         locations: locations ?? this.locations,
         sortingMode: sortingMode ?? this.sortingMode,
-        taskName: taskName ?? this.taskName,
         lastUpdated: DateTime.now(),
       );
 
@@ -110,7 +122,6 @@ class Settings {
         tags: splitStringList(json[SettingsFields.tags] as String),
         locations: splitIntList(json[SettingsFields.locations] as String),
         sortingMode: json[SettingsFields.sortingMode] as int,
-        taskName: json[SettingsFields.taskName] as String,
         lastUpdated: DateTime.parse(json[SettingsFields.lastUpdated] as String),
       );
 
@@ -125,7 +136,6 @@ class Settings {
       SettingsFields.tags: this.joinStringList(this.tags),
       SettingsFields.locations: this.joinIntList(this.locations),
       SettingsFields.sortingMode: this.sortingMode,
-      SettingsFields.taskName: this.taskName,
       SettingsFields.lastUpdated: this.lastUpdated != null ? this.lastUpdated.toIso8601String() : DateTime.now().toIso8601String(),
     };
   }

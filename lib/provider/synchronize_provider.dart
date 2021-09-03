@@ -69,7 +69,7 @@ class SynchronizeProvider with ChangeNotifier {
             "showOnlyDelegated": settings.showOnlyDelegated,
             "showOnlyWithLocalization": settings.showOnlyWithLocalization,
             "collaborators": settings.collaborators,
-            "prioritires": settings.priorities,
+            "priorities": settings.priorities,
             "tags": settings.tags,
             "locations": settings.locations,
             "sortingMode": settings.sortingMode,
