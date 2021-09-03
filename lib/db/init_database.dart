@@ -1,5 +1,6 @@
 import 'package:productive_app/model/collaborator.dart';
 import 'package:productive_app/model/location.dart';
+import 'package:productive_app/model/settings.dart';
 import 'package:productive_app/model/tag.dart';
 import 'package:productive_app/model/user.dart';
 import 'package:sqflite/sqflite.dart';
@@ -30,6 +31,7 @@ class InitDatabase {
 
   Future _createDB(Database db, int version) async {
     final idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
+    final integerType = 'INTEGER NOT NULL';
     final boolType = 'BOOLEAN NOT NULL';
     final textType = 'TEXT NOT NULL';
     final doubleType = 'REAL NOT NULL';
@@ -96,6 +98,21 @@ class InitDatabase {
       ${UserFields.userType} $textType,
       ${UserFields.localImage} $blob,
       ${UserFields.removed} $boolType
+    )
+    ''');
+    await db.execute('''
+    CREATE TABLE $tableSettings(
+      ${SettingsFields.id} $idType,
+      ${SettingsFields.collaborators} $textType,
+      ${SettingsFields.lastUpdated} $textType,
+      ${SettingsFields.locations} $textType,
+      ${SettingsFields.priorities} $textType,
+      ${SettingsFields.showOnlyDelegated} $boolType,
+      ${SettingsFields.showOnlyUnfinished} $boolType,
+      ${SettingsFields.showOnlyDelegated} $boolType,
+      ${SettingsFields.showOnlyWithLocalization} $boolType,
+      ${SettingsFields.sortingMode} $integerType,
+      ${SettingsFields.taskName} $textType
     )
     ''');
   }

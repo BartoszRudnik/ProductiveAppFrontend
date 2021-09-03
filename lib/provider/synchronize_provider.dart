@@ -8,6 +8,7 @@ import 'package:productive_app/model/deleteCollaborator.dart';
 import 'package:productive_app/model/deleteLocation.dart';
 import 'package:productive_app/model/deleteTag.dart';
 import 'package:productive_app/model/location.dart';
+import 'package:productive_app/model/settings.dart';
 import 'package:productive_app/model/tag.dart';
 import 'package:productive_app/model/user.dart';
 
@@ -54,6 +55,37 @@ class SynchronizeProvider with ChangeNotifier {
     );
 
     this.collaboratorsToDelete.add(newToDelete);
+  }
+
+  Future<void> synchronizeSettings(Settings settings) async {
+    final finalUrl = this._serverUrl + "synchronize/synchronizeSettings/${this.userMail}";
+
+    try {
+      await http.post(
+        finalUrl,
+        body: json.encode(
+          {
+            "showOnlyUnfinished": settings.showOnlyUnfinished,
+            "showOnlyDelegated": settings.showOnlyDelegated,
+            "showOnlyWithLocalization": settings.showOnlyWithLocalization,
+            "collaborators": settings.collaborators,
+            "prioritires": settings.priorities,
+            "tags": settings.tags,
+            "locations": settings.locations,
+            "sortingMode": settings.sortingMode,
+            "taskName": settings.taskName,
+            "lastUpdated": settings.lastUpdated.toIso8601String(),
+          },
+        ),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
   }
 
   Future<void> synchronizeUser(User user) async {

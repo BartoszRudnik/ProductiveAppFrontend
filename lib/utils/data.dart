@@ -4,10 +4,12 @@ import 'package:productive_app/db/collaborator_database.dart';
 import 'package:productive_app/db/graphic_database.dart';
 import 'package:productive_app/db/locale_database.dart';
 import 'package:productive_app/db/location_database.dart';
+import 'package:productive_app/db/settings_database.dart';
 import 'package:productive_app/db/tag_database.dart';
 import 'package:productive_app/db/user_database.dart';
 import 'package:productive_app/model/collaborator.dart';
 import 'package:productive_app/model/location.dart';
+import 'package:productive_app/model/settings.dart';
 import 'package:productive_app/model/tag.dart';
 import 'package:productive_app/model/user.dart';
 import 'package:productive_app/provider/locale_provider.dart';
@@ -32,6 +34,7 @@ class Data {
       List<String> locale = [];
       List<String> graphic = [];
       User user;
+      Settings settings;
 
       final provider = Provider.of<SynchronizeProvider>(context, listen: false);
 
@@ -42,6 +45,7 @@ class Data {
         LocaleDatabase.read().then((value) => locale = value),
         GraphicDatabase.read().then((value) => graphic = value),
         UserDatabase.read().then((value) => user = value),
+        SettingsDatabase.read().then((value) => settings = value),
       ]);
 
       await Future.wait([
@@ -51,6 +55,7 @@ class Data {
         provider.synchronizeLocale(locale),
         provider.synchronizeGraphic(graphic),
         provider.synchronizeUser(user),
+        provider.synchronizeSettings(settings),
       ]);
     } catch (error) {
       print(error);
