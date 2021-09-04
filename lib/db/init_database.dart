@@ -33,10 +33,10 @@ class InitDatabase {
 
   Future _createDB(Database db, int version) async {
     final idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
-    final integerType = 'INTEGER NOT NULL';
-    final boolType = 'BOOLEAN NOT NULL';
-    final textType = 'TEXT NOT NULL';
-    final doubleType = 'REAL NOT NULL';
+    final integerType = 'INTEGER';
+    final boolType = 'BOOLEAN';
+    final textType = 'TEXT';
+    final doubleType = 'REAL';
     final blob = 'BLOB';
 
     await db.execute('''

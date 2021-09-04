@@ -82,17 +82,21 @@ class Task with ChangeNotifier {
   DateTime lastUpdated;
 
   String joinTagList(List<Tag> tagList) {
-    List<int> listOfId = [];
+    if (tagList != null && tagList.length > 0) {
+      List<int> listOfId = [];
 
-    tagList.forEach((element) {
-      listOfId.add(element.id);
-    });
+      tagList.forEach((element) {
+        listOfId.add(element.id);
+      });
 
-    return listOfId.join('|');
+      return listOfId.join('|');
+    } else {
+      return null;
+    }
   }
 
   static List<Tag> splitTagList(String toSplit, BuildContext context) {
-    if (toSplit.length > 0) {
+    if (toSplit != null && toSplit.length > 0) {
       final stringList = toSplit.split('|');
 
       List<int> idList = [];
@@ -123,20 +127,20 @@ class Task with ChangeNotifier {
     this.startDate,
     this.endDate,
     this.tags,
-    this.done,
+    this.done = false,
     this.localization,
-    this.position,
+    this.position = 0.0,
     this.delegatedEmail,
-    this.isDelegated,
+    this.isDelegated = false,
     this.taskStatus,
-    this.isCanceled,
+    this.isCanceled = false,
     this.supervisorEmail,
     this.childId,
     this.parentId,
     this.notificationLocalizationId,
     this.notificationLocalizationRadius,
-    this.notificationOnEnter,
-    this.notificationOnExit,
+    this.notificationOnEnter = false,
+    this.notificationOnExit = false,
     this.lastUpdated,
   });
 
@@ -189,30 +193,32 @@ class Task with ChangeNotifier {
         lastUpdated: DateTime.now(),
       );
 
-  static Task fromJson(Map<String, Object> json, BuildContext context) => Task(
-        id: json[TaskFields.id] as int,
-        title: json[TaskFields.title] as String,
-        childId: json[TaskFields.childId] as int,
-        priority: json[TaskFields.priority] as String,
-        description: json[TaskFields.description] as String,
-        startDate: DateTime.parse(json[TaskFields.startDate] as String),
-        endDate: DateTime.parse(json[TaskFields.endDate] as String),
-        tags: splitTagList(json[TaskFields.tags] as String, context),
-        done: json[TaskFields.done] == 1,
-        localization: json[TaskFields.localization] as String,
-        position: json[TaskFields.position] as double,
-        delegatedEmail: json[TaskFields.delegatedEmail] as String,
-        isDelegated: json[TaskFields.isDelegated] == 1,
-        isCanceled: json[TaskFields.isCanceled] == 1,
-        taskStatus: json[TaskFields.taskStatus] as String,
-        supervisorEmail: json[TaskFields.supervisorEmail] as String,
-        parentId: json[TaskFields.parentId] as int,
-        notificationLocalizationId: json[TaskFields.notificationLocalizationId] as int,
-        notificationLocalizationRadius: json[TaskFields.notificationLocalizationRadius] as double,
-        notificationOnEnter: json[TaskFields.notificationOnEnter] == 1,
-        notificationOnExit: json[TaskFields.notificationOnExit] == 1,
-        lastUpdated: DateTime.parse(json[TaskFields.lastUpdated] as String),
-      );
+  static Task fromJson(Map<String, Object> json, BuildContext context) {
+    return Task(
+      id: json[TaskFields.id] as int,
+      title: json[TaskFields.title] as String,
+      childId: json[TaskFields.childId] as int,
+      priority: json[TaskFields.priority] as String,
+      description: json[TaskFields.description] as String,
+      startDate: json[TaskFields.startDate] == null ? null : DateTime.tryParse(json[TaskFields.startDate] as String),
+      endDate: json[TaskFields.endDate] == null ? null : DateTime.tryParse(json[TaskFields.endDate] as String),
+      tags: splitTagList(json[TaskFields.tags] as String, context),
+      done: json[TaskFields.done] == 1,
+      localization: json[TaskFields.localization] as String,
+      position: json[TaskFields.position] as double,
+      delegatedEmail: json[TaskFields.delegatedEmail] as String,
+      isDelegated: json[TaskFields.isDelegated] == 1,
+      isCanceled: json[TaskFields.isCanceled] == 1,
+      taskStatus: json[TaskFields.taskStatus] as String,
+      supervisorEmail: json[TaskFields.supervisorEmail] as String,
+      parentId: json[TaskFields.parentId] as int,
+      notificationLocalizationId: json[TaskFields.notificationLocalizationId] as int,
+      notificationLocalizationRadius: json[TaskFields.notificationLocalizationRadius] as double,
+      notificationOnEnter: json[TaskFields.notificationOnEnter] == 1,
+      notificationOnExit: json[TaskFields.notificationOnExit] == 1,
+      lastUpdated: DateTime.tryParse(json[TaskFields.lastUpdated] as String),
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -221,23 +227,43 @@ class Task with ChangeNotifier {
       TaskFields.childId: this.childId,
       TaskFields.priority: this.priority,
       TaskFields.description: this.description,
-      TaskFields.startDate: this.startDate.toIso8601String(),
-      TaskFields.endDate: this.endDate.toIso8601String(),
+      TaskFields.startDate: this.startDate != null ? this.startDate.toIso8601String() : null,
+      TaskFields.endDate: this.endDate != null ? this.endDate.toIso8601String() : null,
       TaskFields.tags: this.joinTagList(this.tags),
-      TaskFields.done: this.done ? 1 : 0,
+      TaskFields.done: this.done == null
+          ? 0
+          : this.done
+              ? 1
+              : 0,
       TaskFields.localization: this.localization,
       TaskFields.position: this.position,
       TaskFields.delegatedEmail: this.delegatedEmail,
-      TaskFields.isDelegated: this.isDelegated ? 1 : 0,
-      TaskFields.isCanceled: this.isCanceled ? 1 : 0,
+      TaskFields.isDelegated: this.isDelegated == null
+          ? 0
+          : this.isDelegated
+              ? 1
+              : 0,
+      TaskFields.isCanceled: this.isCanceled == null
+          ? 0
+          : this.isCanceled
+              ? 1
+              : 0,
       TaskFields.taskStatus: this.taskStatus,
       TaskFields.supervisorEmail: this.supervisorEmail,
       TaskFields.parentId: this.parentId,
       TaskFields.notificationLocalizationId: this.notificationLocalizationId,
       TaskFields.notificationLocalizationRadius: this.notificationLocalizationRadius,
-      TaskFields.notificationOnEnter: this.notificationOnEnter ? 1 : 0,
-      TaskFields.notificationOnExit: this.notificationOnExit ? 1 : 0,
-      TaskFields.lastUpdated: this.lastUpdated.toIso8601String(),
+      TaskFields.notificationOnEnter: this.notificationOnEnter == null
+          ? 0
+          : this.notificationOnEnter
+              ? 1
+              : 0,
+      TaskFields.notificationOnExit: this.notificationOnExit == null
+          ? 0
+          : this.notificationOnExit
+              ? 1
+              : 0,
+      TaskFields.lastUpdated: this.lastUpdated != null ? this.lastUpdated.toIso8601String() : DateTime.now().toIso8601String(),
     };
   }
 }

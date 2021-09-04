@@ -43,9 +43,9 @@ class Settings {
 
   Settings({
     this.id = 1,
-    @required this.showOnlyUnfinished,
-    @required this.showOnlyDelegated,
-    @required this.showOnlyWithLocalization,
+    this.showOnlyUnfinished = false,
+    this.showOnlyDelegated = false,
+    this.showOnlyWithLocalization = false,
     this.locations,
     this.collaborators,
     this.priorities,

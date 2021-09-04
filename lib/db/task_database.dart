@@ -9,10 +9,12 @@ class TaskDatabase {
     db.delete(tableTask);
   }
 
-  static Future<void> create(Task task) async {
+  static Future<Task> create(Task task) async {
     final db = await InitDatabase.instance.database;
 
-    await db.insert(tableTask, task.toJson());
+    final id = await db.insert(tableTask, task.toJson());
+
+    return task.copy(id: id);
   }
 
   static Future<Task> read(int id, BuildContext context) async {

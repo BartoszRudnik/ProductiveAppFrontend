@@ -10,6 +10,7 @@ import 'package:productive_app/model/deleteTag.dart';
 import 'package:productive_app/model/location.dart';
 import 'package:productive_app/model/settings.dart';
 import 'package:productive_app/model/tag.dart';
+import 'package:productive_app/model/task.dart';
 import 'package:productive_app/model/user.dart';
 
 class SynchronizeProvider with ChangeNotifier {
@@ -57,6 +58,36 @@ class SynchronizeProvider with ChangeNotifier {
     this.collaboratorsToDelete.add(newToDelete);
   }
 
+  Future<void> synchronizeTasks(List<Task> tasks) async {
+    final finalUrl = this._serverUrl + "synchronize/synchronizeTasks/${this.userMail}";
+
+    print(
+      json.encode(
+        {
+          "taskList": tasks,
+        },
+      ),
+    );
+
+    try {
+      await http.post(
+        finalUrl,
+        body: json.encode(
+          {
+            "taskList": tasks,
+          },
+        ),
+        headers: {
+          'content-type': 'application/json',
+          'accept': 'application/json',
+        },
+      );
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
   Future<void> synchronizeSettings(Settings settings) async {
     final finalUrl = this._serverUrl + "synchronize/synchronizeSettings/${this.userMail}";
 
@@ -74,7 +105,7 @@ class SynchronizeProvider with ChangeNotifier {
             "locations": settings.locations,
             "sortingMode": settings.sortingMode,
             "taskName": settings.taskName,
-            "lastUpdated": settings.lastUpdated.toIso8601String(),
+            "lastUpdated": settings.lastUpdated != null ? settings.lastUpdated.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
           },
         ),
         headers: {

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
+import 'package:productive_app/db/task_database.dart';
 import 'package:productive_app/model/location.dart';
 import '../utils/notifications.dart';
 import '../model/tag.dart';
@@ -145,13 +146,27 @@ class TaskProvider with ChangeNotifier {
   Future<int> addTaskWithGeolocation(Task task, double latitude, double longitude) async {
     String url = this._serverUrl + 'task/add';
 
-    if (task.startDate == null) {
-      task.startDate = DateTime.fromMicrosecondsSinceEpoch(0);
+    task = await TaskDatabase.create(task);
+
+    task.position = task.id + 1000.0;
+
+    if (task.notificationLocalizationId != null) {
+      Notifications.addGeofence(
+        task.id,
+        latitude,
+        longitude,
+        task.notificationLocalizationRadius,
+        task.notificationOnEnter,
+        task.notificationOnExit,
+        task.title,
+        task.description,
+      );
     }
 
-    if (task.endDate == null) {
-      task.endDate = DateTime.fromMicrosecondsSinceEpoch(0);
-    }
+    this.taskList.add(task);
+    this.addToLocalication(task);
+
+    notifyListeners();
 
     try {
       final response = await http.post(
@@ -161,8 +176,8 @@ class TaskProvider with ChangeNotifier {
             'taskName': task.title,
             'taskDescription': task.description,
             'userEmail': this.userMail,
-            'startDate': task.startDate.toIso8601String(),
-            'endDate': task.endDate.toIso8601String(),
+            'startDate': task.startDate != null ? task.startDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
+            'endDate': task.endDate != null ? task.endDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
             'ifDone': task.done,
             'priority': task.priority,
             'tags': task.tags.map((tag) => tag.toJson()).toList(),
@@ -183,30 +198,6 @@ class TaskProvider with ChangeNotifier {
 
       task.id = int.parse(response.body);
       task.position = int.parse(response.body) + 1000.0;
-
-      if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
-        task.endDate = null;
-      }
-
-      if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
-        task.startDate = null;
-      }
-
-      if (task.notificationLocalizationId != null) {
-        Notifications.addGeofence(
-          task.id,
-          latitude,
-          longitude,
-          task.notificationLocalizationRadius,
-          task.notificationOnEnter,
-          task.notificationOnExit,
-          task.title,
-          task.description,
-        );
-      }
-
-      this.taskList.add(task);
-      this.addToLocalication(task);
 
       notifyListeners();
 
@@ -220,13 +211,14 @@ class TaskProvider with ChangeNotifier {
   Future<int> addTask(Task task) async {
     String url = this._serverUrl + 'task/add';
 
-    if (task.startDate == null) {
-      task.startDate = DateTime.fromMicrosecondsSinceEpoch(0);
-    }
+    task = await TaskDatabase.create(task);
 
-    if (task.endDate == null) {
-      task.endDate = DateTime.fromMicrosecondsSinceEpoch(0);
-    }
+    task.position = task.id + 1000.0;
+
+    this.taskList.add(task);
+    this.addToLocalication(task);
+
+    notifyListeners();
 
     try {
       final response = await http.post(
@@ -236,8 +228,8 @@ class TaskProvider with ChangeNotifier {
             'taskName': task.title,
             'taskDescription': task.description,
             'userEmail': this.userMail,
-            'startDate': task.startDate.toIso8601String(),
-            'endDate': task.endDate.toIso8601String(),
+            'startDate': task.startDate != null ? task.startDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
+            'endDate': task.endDate != null ? task.endDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
             'ifDone': task.done,
             'priority': task.priority,
             'tags': task.tags.map((tag) => tag.toJson()).toList(),
@@ -259,17 +251,6 @@ class TaskProvider with ChangeNotifier {
       task.id = int.parse(response.body);
       task.position = int.parse(response.body) + 1000.0;
 
-      if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
-        task.endDate = null;
-      }
-
-      if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
-        task.startDate = null;
-      }
-
-      this.taskList.add(task);
-      this.addToLocalication(task);
-
       notifyListeners();
 
       return task.id;
@@ -281,6 +262,20 @@ class TaskProvider with ChangeNotifier {
 
   Future<void> updateTaskPosition(Task task, double newPosition) async {
     String url = this._serverUrl + 'task/updatePosition/${task.id}';
+
+    task.position = newPosition;
+
+    if (task.localization == 'INBOX') {
+      this.sortByPosition(this._inboxTasks);
+    } else if (task.localization == 'ANYTIME') {
+      this.sortByPosition(this._anytimeTasks);
+    } else if (task.localization == 'SCHEDULED') {
+      this.sortByPosition(this._scheduledTasks);
+    }
+
+    await TaskDatabase.update(task);
+
+    notifyListeners();
 
     try {
       await http.put(
@@ -295,18 +290,6 @@ class TaskProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      task.position = newPosition;
-
-      if (task.localization == 'INBOX') {
-        this.sortByPosition(this._inboxTasks);
-      } else if (task.localization == 'ANYTIME') {
-        this.sortByPosition(this._anytimeTasks);
-      } else if (task.localization == 'SCHEDULED') {
-        this.sortByPosition(this._scheduledTasks);
-      }
-
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
@@ -328,13 +311,25 @@ class TaskProvider with ChangeNotifier {
       Notifications.removeGeofence(task.id);
     }
 
-    if (task.startDate == null) {
-      task.startDate = DateTime.fromMicrosecondsSinceEpoch(0);
+    this.deleteFromLocalization(task);
+
+    task.localization = newLocation;
+
+    this.addToLocalication(task);
+
+    if (task.localization == 'INBOX') {
+      this.sortByPosition(this._inboxTasks);
+    } else if (task.localization == 'ANYTIME') {
+      this.sortByPosition(this._anytimeTasks);
+    } else if (task.localization == 'SCHEDULED') {
+      this.sortByPosition(this._scheduledTasks);
+    } else if (task.localization == 'DELEGATED') {
+      this.sortByPosition(this._delegatedTasks);
     }
 
-    if (task.endDate == null) {
-      task.endDate = DateTime.fromMicrosecondsSinceEpoch(0);
-    }
+    await TaskDatabase.update(task);
+
+    notifyListeners();
 
     try {
       await http.put(
@@ -344,8 +339,8 @@ class TaskProvider with ChangeNotifier {
             'taskName': task.title,
             'taskDescription': task.description,
             'userEmail': this.userMail,
-            'startDate': task.startDate.toIso8601String(),
-            'endDate': task.endDate.toIso8601String(),
+            'startDate': task.startDate != null ? task.startDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
+            'endDate': task.endDate != null ? task.endDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
             'ifDone': task.done,
             'priority': task.priority,
             'tags': task.tags.map((tag) => tag.toJson()).toList(),
@@ -364,32 +359,6 @@ class TaskProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
-        task.endDate = null;
-      }
-
-      if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
-        task.startDate = null;
-      }
-
-      this.deleteFromLocalization(task);
-
-      task.localization = newLocation;
-
-      this.addToLocalication(task);
-
-      if (task.localization == 'INBOX') {
-        this.sortByPosition(this._inboxTasks);
-      } else if (task.localization == 'ANYTIME') {
-        this.sortByPosition(this._anytimeTasks);
-      } else if (task.localization == 'SCHEDULED') {
-        this.sortByPosition(this._scheduledTasks);
-      } else if (task.localization == 'DELEGATED') {
-        this.sortByPosition(this._delegatedTasks);
-      }
-
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
@@ -411,13 +380,39 @@ class TaskProvider with ChangeNotifier {
       Notifications.removeGeofence(task.id);
     }
 
-    if (task.startDate == null) {
-      task.startDate = DateTime.fromMicrosecondsSinceEpoch(0);
+    this.deleteFromLocalization(task);
+
+    task.localization = newLocation;
+
+    this.addToLocalication(task);
+
+    if (task.localization == 'INBOX') {
+      this.sortByPosition(this._inboxTasks);
+    } else if (task.localization == 'ANYTIME') {
+      this.sortByPosition(this._anytimeTasks);
+    } else if (task.localization == 'SCHEDULED') {
+      this.sortByPosition(this._scheduledTasks);
+    } else if (task.localization == 'DELEGATED') {
+      this.sortByPosition(this._delegatedTasks);
     }
 
-    if (task.endDate == null) {
-      task.endDate = DateTime.fromMicrosecondsSinceEpoch(0);
+    if (newLocation != 'TRASH' && newLocation != 'COMPLETED') {
+      this.notificationChange(
+        task.id,
+        task.notificationLocalizationId,
+        task.notificationLocalizationRadius,
+        task.notificationOnExit,
+        task.notificationOnEnter,
+        latitude,
+        longitude,
+        task.title,
+        task.description,
+      );
     }
+
+    await TaskDatabase.update(task);
+
+    notifyListeners();
 
     try {
       await http.put(
@@ -427,8 +422,8 @@ class TaskProvider with ChangeNotifier {
             'taskName': task.title,
             'taskDescription': task.description,
             'userEmail': this.userMail,
-            'startDate': task.startDate.toIso8601String(),
-            'endDate': task.endDate.toIso8601String(),
+            'startDate': task.startDate != null ? task.startDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
+            'endDate': task.endDate != null ? task.endDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
             'ifDone': task.done,
             'priority': task.priority,
             'tags': task.tags.map((tag) => tag.toJson()).toList(),
@@ -447,46 +442,6 @@ class TaskProvider with ChangeNotifier {
           'accept': 'application/json',
         },
       );
-
-      if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
-        task.endDate = null;
-      }
-
-      if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
-        task.startDate = null;
-      }
-
-      this.deleteFromLocalization(task);
-
-      task.localization = newLocation;
-
-      this.addToLocalication(task);
-
-      if (task.localization == 'INBOX') {
-        this.sortByPosition(this._inboxTasks);
-      } else if (task.localization == 'ANYTIME') {
-        this.sortByPosition(this._anytimeTasks);
-      } else if (task.localization == 'SCHEDULED') {
-        this.sortByPosition(this._scheduledTasks);
-      } else if (task.localization == 'DELEGATED') {
-        this.sortByPosition(this._delegatedTasks);
-      }
-
-      if (newLocation != 'TRASH' && newLocation != 'COMPLETED') {
-        this.notificationChange(
-          task.id,
-          task.notificationLocalizationId,
-          task.notificationLocalizationRadius,
-          task.notificationOnExit,
-          task.notificationOnEnter,
-          latitude,
-          longitude,
-          task.title,
-          task.description,
-        );
-      }
-
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
@@ -638,7 +593,9 @@ class TaskProvider with ChangeNotifier {
       final response = await http.get(url);
       final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
-      for (var element in responseBody) {
+      await TaskDatabase.deleteAll();
+
+      for (final element in responseBody) {
         List<Tag> taskTags = [];
         String taskStatus;
         String supervisorEmail;
@@ -686,11 +643,7 @@ class TaskProvider with ChangeNotifier {
 
         final notificationExists = await Notifications.checkIfGeofenceExists(task.id);
 
-        if (task.localization != 'COMPLETED' &&
-            task.localization != 'TRASH' &&
-            !task.done &&
-            task.notificationLocalizationId != null &&
-            !notificationExists) {
+        if (task.localization != 'COMPLETED' && task.localization != 'TRASH' && !task.done && task.notificationLocalizationId != null && !notificationExists) {
           this.addGeofenceFromOtherDevice(task);
         }
 
@@ -703,6 +656,7 @@ class TaskProvider with ChangeNotifier {
         }
 
         loadedTasks.add(task);
+        await TaskDatabase.create(task);
       }
 
       this.taskList = loadedTasks;
@@ -767,15 +721,17 @@ class TaskProvider with ChangeNotifier {
 
     var tmpProduct = this.taskList.firstWhere((element) => element.id == id);
 
+    await TaskDatabase.delete(id);
+
+    this.deleteFromLocalization(tmpProduct);
+    this.taskList.removeWhere((element) => element.id == id);
+
+    tmpProduct = null;
+
+    notifyListeners();
+
     try {
       await http.delete(url);
-
-      this.deleteFromLocalization(tmpProduct);
-      this.taskList.removeWhere((element) => element.id == id);
-
-      tmpProduct = null;
-
-      notifyListeners();
     } catch (error) {
       print(error);
       this.taskList.add(tmpProduct);
@@ -808,36 +764,38 @@ class TaskProvider with ChangeNotifier {
   Future<void> toggleTaskStatusWithGeolocation(Task task, double latitude, double longitude) async {
     String url = this._serverUrl + 'task/done/${task.id}';
 
+    this.localizationTaskStatus(task);
+
+    if (task.done) {
+      Notifications.removeGeofence(task.id);
+    } else {
+      Notifications.addGeofence(
+        task.id,
+        latitude,
+        longitude,
+        task.notificationLocalizationRadius,
+        task.notificationOnEnter,
+        task.notificationOnExit,
+        task.title,
+        task.description,
+      );
+    }
+
+    await TaskDatabase.update(task);
+
+    notifyListeners();
+
     try {
       final response = await http.post(url);
 
       if (response != null && task.localization == 'DELEGATED') {
         final newStatus = response.body;
         this.updateTaskStatus(task.id, newStatus);
+
+        notifyListeners();
       }
-
-      this.localizationTaskStatus(task);
-
-      if (task.done) {
-        Notifications.removeGeofence(task.id);
-      } else {
-        Notifications.addGeofence(
-          task.id,
-          latitude,
-          longitude,
-          task.notificationLocalizationRadius,
-          task.notificationOnEnter,
-          task.notificationOnExit,
-          task.title,
-          task.description,
-        );
-      }
-
-      notifyListeners();
     } catch (error) {
       print(error);
-
-      this.taskList[task.id - 1] = task;
       throw error;
     }
   }
@@ -964,9 +922,10 @@ class TaskProvider with ChangeNotifier {
 
   void editTag(String oldName, String newName) {
     this._inboxTasks.forEach((task) {
-      task.tags.forEach((tag) {
+      task.tags.forEach((tag) async {
         if (tag.name == oldName) {
           tag.name = newName;
+          await TaskDatabase.update(task);
         }
       });
     });
@@ -1028,10 +987,8 @@ class TaskProvider with ChangeNotifier {
         if (element.notificationLocalizationId == null) {
           this.updateTask(element, newLocation);
         } else {
-          final longitude =
-              locations.firstWhere((location) => location.id == element.notificationLocalizationId).longitude;
-          final latitude =
-              locations.firstWhere((location) => location.id == element.notificationLocalizationId).latitude;
+          final longitude = locations.firstWhere((location) => location.id == element.notificationLocalizationId).longitude;
+          final latitude = locations.firstWhere((location) => location.id == element.notificationLocalizationId).latitude;
 
           this.updateTaskWithGeolocation(element, newLocation, longitude, latitude);
         }
@@ -1052,17 +1009,15 @@ class TaskProvider with ChangeNotifier {
             (element.startDate.difference(DateTime.now()).inDays < 0 ||
                 (element.startDate.difference(DateTime.now()).inDays == 0 &&
                     ((element.startDate.month < DateTime.now().month) ||
-                        (element.startDate.day < DateTime.now().day &&
-                            element.startDate.month <= DateTime.now().month))))))
+                        (element.startDate.day < DateTime.now().day && element.startDate.month <= DateTime.now().month))))))
         .toList();
   }
 
   List<Task> tasksToday() {
     return this
         ._scheduledTasks
-        .where((element) => (element.startDate != null &&
-            element.startDate.difference(DateTime.now()).inDays == 0 &&
-            element.startDate.day == DateTime.now().day))
+        .where(
+            (element) => (element.startDate != null && element.startDate.difference(DateTime.now()).inDays == 0 && element.startDate.day == DateTime.now().day))
         .toList();
   }
 
@@ -1073,8 +1028,7 @@ class TaskProvider with ChangeNotifier {
             (element.startDate.difference(DateTime.now()).inDays > 0 ||
                 (element.startDate.difference(DateTime.now()).inDays == 0 &&
                     ((element.startDate.month > DateTime.now().month) ||
-                        (element.startDate.day > DateTime.now().day &&
-                            element.startDate.month >= DateTime.now().month))))))
+                        (element.startDate.day > DateTime.now().day && element.startDate.month >= DateTime.now().month))))))
         .toList();
   }
 
@@ -1092,23 +1046,17 @@ class TaskProvider with ChangeNotifier {
 
   List<Task> filterCollaboratorEmail(List<Task> listToFilter, List<String> filterEmails) {
     return [
-      ...listToFilter.where((element) =>
-          ((element.delegatedEmail != null && filterEmails.contains(element.delegatedEmail)) ||
-              (element.supervisorEmail != null && filterEmails.contains(element.supervisorEmail))))
+      ...listToFilter.where((element) => ((element.delegatedEmail != null && filterEmails.contains(element.delegatedEmail)) ||
+          (element.supervisorEmail != null && filterEmails.contains(element.supervisorEmail))))
     ];
   }
 
   List<Task> filterPriority(List<Task> listToFilter, List<String> filterPriorities) {
-    return [
-      ...listToFilter.where((element) => ((element.priority != null && filterPriorities.contains(element.priority))))
-    ];
+    return [...listToFilter.where((element) => ((element.priority != null && filterPriorities.contains(element.priority))))];
   }
 
   List<Task> filterLocations(List<Task> listToFilter, List<int> filterLocations) {
-    return [
-      ...listToFilter.where((element) =>
-          (element.notificationLocalizationId != null && filterLocations.contains(element.notificationLocalizationId)))
-    ];
+    return [...listToFilter.where((element) => (element.notificationLocalizationId != null && filterLocations.contains(element.notificationLocalizationId)))];
   }
 
   List<Task> filterTags(List<Task> listToFilter, List<String> filterTags) {

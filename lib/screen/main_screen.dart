@@ -35,9 +35,9 @@ class _MainScreenState extends State<MainScreen> {
 
   void listenNotifications() => Notifications.onNotifications.stream.listen(onClickedNotification);
 
-  void listenInternetChanges() => Connectivity().onConnectivityChanged.listen((connectionResult) {
+  void listenInternetChanges() => Connectivity().onConnectivityChanged.listen((connectionResult) async {
         if (checkInternetConnection(connectionResult)) {
-          this.loadData();
+          await this.loadData(context);
         }
       });
 
@@ -45,7 +45,7 @@ class _MainScreenState extends State<MainScreen> {
     return result != ConnectivityResult.none;
   }
 
-  Future<void> loadData() async {
+  Future<void> loadData(BuildContext context) async {
     await Data.synchronizeData(context);
     await Data.loadData(context);
   }
@@ -54,7 +54,7 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   void initState() {
-    future = loadData();
+    future = loadData(context);
     Provider.of<ThemeProvider>(context, listen: false).getUserMode();
 
     Notifications.initLocalization();

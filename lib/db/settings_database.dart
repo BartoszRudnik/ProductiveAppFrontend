@@ -15,7 +15,7 @@ class SettingsDatabase {
     if (maps.isNotEmpty) {
       return Settings.fromJson(maps.first);
     } else {
-      return null;
+      return Settings();
     }
   }
 
