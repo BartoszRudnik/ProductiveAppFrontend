@@ -3,6 +3,7 @@ import 'package:productive_app/model/collaboratorTask.dart';
 import 'package:productive_app/model/location.dart';
 import 'package:productive_app/model/settings.dart';
 import 'package:productive_app/model/tag.dart';
+import 'package:productive_app/model/task.dart';
 import 'package:productive_app/model/user.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -123,6 +124,32 @@ class InitDatabase {
       ${CollaboratorTaskFields.startDate} $textType,
       ${CollaboratorTaskFields.endDate} $textType,
       ${CollaboratorTaskFields.lastUpdated} $textType
+    )
+    ''');
+    await db.execute('''
+    CREATE TABLE $tableTask(
+      ${TaskFields.id} $idType,
+      ${TaskFields.position} $doubleType,
+      ${TaskFields.title} $textType,
+      ${TaskFields.description} $textType,
+      ${TaskFields.priority} $textType,
+      ${TaskFields.localization} $textType,
+      ${TaskFields.delegatedEmail} $textType,
+      ${TaskFields.taskStatus} $textType,
+      ${TaskFields.supervisorEmail} $textType,
+      ${TaskFields.startDate} $textType,
+      ${TaskFields.endDate} $textType,
+      ${TaskFields.tags} $textType,
+      ${TaskFields.done} $boolType,
+      ${TaskFields.isDelegated} $boolType,
+      ${TaskFields.isCanceled} $boolType,
+      ${TaskFields.parentId} $integerType,
+      ${TaskFields.childId} $integerType,
+      ${TaskFields.notificationLocalizationId} $integerType,
+      ${TaskFields.notificationLocalizationRadius} $doubleType,
+      ${TaskFields.notificationOnEnter} $boolType,
+      ${TaskFields.notificationOnExit} $boolType,
+      ${TaskFields.lastUpdated} $textType
     )
     ''');
   }
