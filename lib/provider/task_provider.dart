@@ -466,7 +466,9 @@ class TaskProvider with ChangeNotifier {
         ));
       }
 
-      supervisorEmail = responseBody['supervisorEmail'];
+      if(responseBody['supervisorEmail'] != null) {
+        supervisorEmail = responseBody['supervisorEmail'];
+      }
 
       if (responseBody['tasks']['taskStatus'] != null) {
         taskStatus = responseBody['tasks']['taskStatus'];
@@ -478,8 +480,8 @@ class TaskProvider with ChangeNotifier {
           description: responseBody['tasks']['description'],
           done: responseBody['tasks']['ifDone'],
           priority: responseBody['tasks']['priority'],
-          endDate: DateTime.parse(responseBody['tasks']['endDate']),
-          startDate: DateTime.parse(responseBody['tasks']['startDate']),
+          endDate: responseBody['tasks']['endDate'] == null ? null : DateTime.tryParse(responseBody['tasks']['endDate']),
+          startDate: responseBody['tasks']['startDate'] == null ? null : DateTime.tryParse(responseBody['tasks']['startDate']),
           tags: taskTags,
           localization: responseBody['tasks']['taskList'],
           position: responseBody['tasks']['position'],
@@ -500,11 +502,11 @@ class TaskProvider with ChangeNotifier {
         task.notificationLocalizationId = null;
       }
 
-      if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+      if (task.endDate != null && task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
         task.endDate = null;
       }
 
-      if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+      if (task.startDate != null && task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
         task.startDate = null;
       }
 
@@ -587,6 +589,8 @@ class TaskProvider with ChangeNotifier {
   Future<void> fetchTasks() async {
     String url = this._serverUrl + 'task/getAll/${this.userMail}';
 
+    print('fetching tasks');
+
     final List<Task> loadedTasks = [];
 
     try {
@@ -594,6 +598,8 @@ class TaskProvider with ChangeNotifier {
       final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
       await TaskDatabase.deleteAll();
+
+      print(responseBody);
 
       for (final element in responseBody) {
         List<Tag> taskTags = [];
@@ -607,7 +613,9 @@ class TaskProvider with ChangeNotifier {
           ));
         }
 
-        supervisorEmail = element['supervisorEmail'];
+        if(element['tasks']['supervisorEmail'] != null) {
+          supervisorEmail = element['supervisorEmail'];
+        }
 
         if (element['tasks']['taskStatus'] != null) {
           taskStatus = element['tasks']['taskStatus'];
@@ -619,8 +627,8 @@ class TaskProvider with ChangeNotifier {
             description: element['tasks']['description'],
             done: element['tasks']['ifDone'],
             priority: element['tasks']['priority'],
-            endDate: DateTime.parse(element['tasks']['endDate']),
-            startDate: DateTime.parse(element['tasks']['startDate']),
+            endDate: element['tasks']['endDate'] != null ? DateTime.tryParse(element['tasks']['endDate']) : null,
+            startDate: element['tasks']['endDate'] != null ? DateTime.tryParse(element['tasks']['startDate']) : null,
             tags: taskTags,
             localization: element['tasks']['taskList'],
             position: element['tasks']['position'],
@@ -647,11 +655,11 @@ class TaskProvider with ChangeNotifier {
           this.addGeofenceFromOtherDevice(task);
         }
 
-        if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+        if (task.endDate != null && task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
           task.endDate = null;
         }
 
-        if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+        if (task.startDate != null && task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
           task.startDate = null;
         }
 
@@ -734,7 +742,6 @@ class TaskProvider with ChangeNotifier {
       await http.delete(url);
     } catch (error) {
       print(error);
-      this.taskList.add(tmpProduct);
       throw error;
     }
   }

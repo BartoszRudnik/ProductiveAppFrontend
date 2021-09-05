@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
-import 'package:productive_app/model/deleteCollaborator.dart';
 import 'package:productive_app/provider/synchronize_provider.dart';
 import '../config/images.dart';
 import '../widget/switch_list_tile/grant_access_list_tile.dart';

@@ -84,7 +84,8 @@ class LocationProvider with ChangeNotifier {
   Future<void> getLocations() async {
     final url = this._serverUrl + "localization/getLocalizations/${this.userMail}";
     final List<models.Location> loadedLocations = [];
-    LocationDatabase.deleteAll();
+
+    await LocationDatabase.deleteAll();
 
     try {
       final response = await http.get(url);
@@ -102,7 +103,7 @@ class LocationProvider with ChangeNotifier {
         );
 
         loadedLocations.add(loc);
-        LocationDatabase.create(loc);
+        await LocationDatabase.create(loc);
       }
 
       this.locationList = loadedLocations;

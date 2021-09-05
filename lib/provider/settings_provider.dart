@@ -27,6 +27,8 @@ class SettingsProvider with ChangeNotifier {
   Future<void> getFilterSettings() async {
     final finalUrl = this._serverUrl + 'filterSettings/getFilterSettings/${this.userMail}';
 
+    await SettingsDatabase.delete();
+
     try {
       final response = await http.get(finalUrl);
 
@@ -64,6 +66,8 @@ class SettingsProvider with ChangeNotifier {
         sortingMode: responseBody['sortingMode'],
       );
       this.userSettings = newSettings;
+
+      await SettingsDatabase.create(newSettings);
 
       notifyListeners();
     } catch (error) {

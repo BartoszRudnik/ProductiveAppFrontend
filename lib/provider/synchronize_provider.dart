@@ -7,6 +7,7 @@ import 'package:productive_app/model/collaborator.dart';
 import 'package:productive_app/model/deleteCollaborator.dart';
 import 'package:productive_app/model/deleteLocation.dart';
 import 'package:productive_app/model/deleteTag.dart';
+import 'package:productive_app/model/deleteTask.dart';
 import 'package:productive_app/model/location.dart';
 import 'package:productive_app/model/settings.dart';
 import 'package:productive_app/model/tag.dart';
@@ -20,6 +21,7 @@ class SynchronizeProvider with ChangeNotifier {
   List<DeleteCollaborator> collaboratorsToDelete;
   List<DeleteTag> tagsToDelete;
   List<DeleteLocation> locationsToDelete;
+  List<DeleteTask> tasksToDelete;
 
   SynchronizeProvider({
     @required this.userMail,
@@ -27,6 +29,7 @@ class SynchronizeProvider with ChangeNotifier {
     @required this.collaboratorsToDelete,
     @required this.tagsToDelete,
     @required this.locationsToDelete,
+    @required this.tasksToDelete,
   });
 
   String _serverUrl = GlobalConfiguration().getValue("serverUrl");
@@ -58,30 +61,34 @@ class SynchronizeProvider with ChangeNotifier {
     this.collaboratorsToDelete.add(newToDelete);
   }
 
+  void addTaskToDelete(int taskId){
+    DeleteTask newToDelete = DeleteTask(ownerEmail: this.userMail, taskId: taskId,);
+
+    this.tasksToDelete.add(newToDelete);
+  }
+
   Future<void> synchronizeTasks(List<Task> tasks) async {
     final finalUrl = this._serverUrl + "synchronize/synchronizeTasks/${this.userMail}";
 
-    print(
-      json.encode(
-        {
-          "taskList": tasks,
-        },
-      ),
-    );
+    print(json.encode({
+      'taskList': tasks,
+      'deleteList': this.tasksToDelete,
+    },),);
 
     try {
       await http.post(
         finalUrl,
-        body: json.encode(
-          {
-            "taskList": tasks,
-          },
-        ),
+        body: json.encode({
+          'taskList': tasks,
+          'deleteList': this.tasksToDelete,
+        },),
         headers: {
           'content-type': 'application/json',
           'accept': 'application/json',
         },
       );
+
+      this.tasksToDelete = [];
     } catch (error) {
       print(error);
       throw (error);

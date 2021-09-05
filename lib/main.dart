@@ -63,6 +63,7 @@ class MyApp extends StatelessWidget {
           update: (ctx, auth, previousSynchronize) => SynchronizeProvider(
             authToken: auth.token,
             userMail: auth.email,
+            tasksToDelete: previousSynchronize == null ? [] : previousSynchronize.tasksToDelete,
             collaboratorsToDelete: previousSynchronize == null ? [] : previousSynchronize.collaboratorsToDelete,
             tagsToDelete: previousSynchronize == null ? [] : previousSynchronize.tagsToDelete,
             locationsToDelete: previousSynchronize == null ? [] : previousSynchronize.locationsToDelete,

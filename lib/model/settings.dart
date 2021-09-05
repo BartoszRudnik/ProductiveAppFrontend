@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 
 final String tableSettings = "settings";
 

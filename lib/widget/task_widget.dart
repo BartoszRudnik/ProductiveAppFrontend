@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_app/config/const_values.dart';
+import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../model/task.dart';
@@ -136,6 +137,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                                   }
                                   Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
                                 } else {
+                                  Provider.of<SynchronizeProvider>(context, listen: false).addTaskToDelete(this.widget.task.id);
                                   Provider.of<TaskProvider>(context, listen: false).deleteTask(this.widget.task.id);
                                 }
 

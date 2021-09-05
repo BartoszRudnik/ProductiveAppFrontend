@@ -76,7 +76,7 @@ class TagProvider with ChangeNotifier {
           name: element['name'],
         );
 
-        newTag = await TagDatabase.create(newTag);
+        await TagDatabase.create(newTag);
 
         loadedTags.add(newTag);
       }

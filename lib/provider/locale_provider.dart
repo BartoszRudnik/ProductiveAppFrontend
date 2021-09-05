@@ -20,12 +20,16 @@ class LocaleProvider with ChangeNotifier {
   Future<void> getLocale() async {
     final requestUrl = this._serverUrl + "locale/get/${this.email}";
 
+    await LocaleDatabase.deleteAll();
+
     try {
       final response = await http.get(requestUrl);
 
       final responseBody = json.decode(response.body);
 
       this.locale = Locale(responseBody['languageCode']);
+
+      await LocaleDatabase.create(this.locale.languageCode);
 
       notifyListeners();
     } catch (error) {

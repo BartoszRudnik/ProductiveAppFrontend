@@ -267,6 +267,8 @@ class DelegateProvider with ChangeNotifier {
 
     List<Collaborator> loadedCollaborators = [];
 
+    await CollaboratorDatabase.deleteAll();
+
     try {
       final response = await http.get(requestUrl);
 
@@ -312,6 +314,7 @@ class DelegateProvider with ChangeNotifier {
         );
 
         loadedCollaborators.add(newCollaborator);
+        await CollaboratorDatabase.create(newCollaborator);
       }
 
       this.collaborators = loadedCollaborators;
