@@ -5,12 +5,13 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:productive_app/db/user_database.dart';
 import 'package:productive_app/utils/google_sign_in_api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/painting.dart';
+
 import '../exception/HttpException.dart';
 import '../model/user.dart';
 
@@ -92,7 +93,7 @@ class AuthProvider with ChangeNotifier {
   Future<void> deleteAccount(String token) async {
     String url = this._serverUrl + 'account/deleteAccount/${this._email}/$token';
 
-    UserDatabase.delete();
+    UserDatabase.delete(this.email);
 
     try {
       await http.post(
@@ -167,7 +168,7 @@ class AuthProvider with ChangeNotifier {
         lastName: lastName,
       );
 
-      final user = await UserDatabase.read();
+      final user = await UserDatabase.read(this.email);
 
       if (user == null) {
         UserDatabase.create(this._user);

@@ -1,20 +1,24 @@
 import 'package:productive_app/db/init_database.dart';
 
 class LocaleDatabase {
-  static Future<void> deleteAll() async {
+  static Future<void> deleteAll(String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    await db.delete('LOCALE');
+    await db.delete(
+      'LOCALE',
+      where: 'userMail = ?',
+      whereArgs: [userMail],
+    );
   }
 
-  static Future<List<String>> read() async {
+  static Future<List<String>> read(String userMail) async {
     final db = await InitDatabase.instance.database;
 
     final maps = await db.query(
       'LOCALE',
       columns: ['localeName', 'lastUpdated'],
-      where: 'id = ?',
-      whereArgs: [1],
+      where: 'userMail = ?',
+      whereArgs: [userMail],
     );
 
     if (maps.isNotEmpty) {
@@ -24,7 +28,7 @@ class LocaleDatabase {
     }
   }
 
-  static Future<int> update(String locale) async {
+  static Future<int> update(String locale, String userMail) async {
     final db = await InitDatabase.instance.database;
 
     return await db.update(
@@ -32,25 +36,27 @@ class LocaleDatabase {
       {
         'localeName': locale,
         'lastUpdated': DateTime.now().toIso8601String(),
+        'userMail': userMail,
       },
-      where: 'id = ?',
-      whereArgs: [1],
+      where: 'userMail = ?',
+      whereArgs: [userMail],
     );
   }
 
-  static Future<void> create(String locale) async {
+  static Future<void> create(String locale, String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    final existing = await read();
+    final existing = await read(userMail);
 
     if (existing != null) {
-      update(locale);
+      update(locale, userMail);
     } else {
       db.insert(
         'LOCALE',
         {
           'localeName': locale,
           'lastUpdated': DateTime.now().toIso8601String(),
+          'userMail': userMail,
         },
       );
     }

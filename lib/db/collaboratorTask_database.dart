@@ -2,16 +2,24 @@ import 'package:productive_app/db/init_database.dart';
 import 'package:productive_app/model/collaboratorTask.dart';
 
 class CollaboratorTaskDatabase {
-  static Future<void> deleteAll() async {
+  static Future<void> deleteAll(String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    db.delete(tableCollaboratorTask);
+    db.delete(
+      tableCollaboratorTask,
+      where: 'userMail = ?',
+      whereArgs: [userMail],
+    );
   }
 
-  static Future<void> create(CollaboratorTask collaboratorTask) async {
+  static Future<void> create(CollaboratorTask collaboratorTask, String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    await db.insert(tableCollaboratorTask, collaboratorTask.toJson());
+    Map collaboratorTaskMap = collaboratorTask.toJson();
+
+    collaboratorTaskMap['userMail'] = userMail;
+
+    await db.insert(tableCollaboratorTask, collaboratorTaskMap);
   }
 
   static Future<CollaboratorTask> read(int id) async {
@@ -31,10 +39,14 @@ class CollaboratorTaskDatabase {
     }
   }
 
-  static Future<List<CollaboratorTask>> readAll() async {
+  static Future<List<CollaboratorTask>> readAll(String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    final result = await db.query(tableCollaboratorTask);
+    final result = await db.query(
+      tableCollaboratorTask,
+      where: 'userMail = ?',
+      whereArgs: [userMail],
+    );
 
     return result.map((collaboratorTask) => CollaboratorTask.fromJson(collaboratorTask)).toList();
   }

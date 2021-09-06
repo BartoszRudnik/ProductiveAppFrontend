@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
@@ -14,13 +15,13 @@ class LocaleProvider with ChangeNotifier {
     @required this.locale,
     @required this.email,
   }) {
-    LocaleDatabase.create(this.locale.languageCode);
+    LocaleDatabase.create(this.locale.languageCode, this.email);
   }
 
   Future<void> getLocale() async {
     final requestUrl = this._serverUrl + "locale/get/${this.email}";
 
-    await LocaleDatabase.deleteAll();
+    await LocaleDatabase.deleteAll(this.email);
 
     try {
       final response = await http.get(requestUrl);
@@ -29,7 +30,7 @@ class LocaleProvider with ChangeNotifier {
 
       this.locale = Locale(responseBody['languageCode']);
 
-      await LocaleDatabase.create(this.locale.languageCode);
+      await LocaleDatabase.create(this.locale.languageCode, this.email);
 
       notifyListeners();
     } catch (error) {
@@ -41,7 +42,7 @@ class LocaleProvider with ChangeNotifier {
   void setLocale(Locale locale) async {
     final requestUrl = this._serverUrl + "locale/set/${this.email}";
 
-    LocaleDatabase.create(locale.languageCode);
+    LocaleDatabase.create(locale.languageCode, this.email);
     this.locale = locale;
 
     notifyListeners();

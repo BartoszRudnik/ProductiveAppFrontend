@@ -3,16 +3,24 @@ import 'package:productive_app/db/init_database.dart';
 import 'package:productive_app/model/task.dart';
 
 class TaskDatabase {
-  static Future<void> deleteAll() async {
+  static Future<void> deleteAll(String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    db.delete(tableTask);
+    db.delete(
+      tableTask,
+      where: 'userMail = ?',
+      whereArgs: [userMail],
+    );
   }
 
-  static Future<Task> create(Task task) async {
+  static Future<Task> create(Task task, String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    final id = await db.insert(tableTask, task.toJson());
+    Map taskMap = task.toJson();
+
+    taskMap['userMail'] = userMail;
+
+    final id = await db.insert(tableTask, taskMap);
 
     return task.copy(id: id);
   }
@@ -34,22 +42,30 @@ class TaskDatabase {
     }
   }
 
-  static Future<List<Task>> readAll(BuildContext context) async {
+  static Future<List<Task>> readAll(BuildContext context, String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    final result = await db.query(tableTask);
+    final result = await db.query(
+      tableTask,
+      where: 'userMail = ?',
+      whereArgs: [userMail],
+    );
 
     return result.map((e) => Task.fromJson(e, context)).toList();
   }
 
-  static Future<int> update(Task task) async {
+  static Future<int> update(Task task, String userMail) async {
     final db = await InitDatabase.instance.database;
 
     task.lastUpdated = DateTime.now();
 
+    Map taskMap = task.toJson();
+
+    taskMap['userMail'] = userMail;
+
     return await db.update(
       tableTask,
-      task.toJson(),
+      taskMap,
       where: '${TaskFields.id} = ?',
       whereArgs: [task.id],
     );

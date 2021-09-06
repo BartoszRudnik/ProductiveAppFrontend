@@ -19,7 +19,7 @@ class ThemeProvider with ChangeNotifier {
     @required this.userEmail,
     @required this.userToken,
   }) {
-    GraphicDatabase.create(this._getColorMode());
+    GraphicDatabase.create(this._getColorMode(), this.userEmail);
   }
 
   bool get isDarkMode {
@@ -61,7 +61,7 @@ class ThemeProvider with ChangeNotifier {
     this.themeMode = isOn ? ThemeMode.dark : ThemeMode.light;
 
     final modeToSend = this._getColorMode();
-    GraphicDatabase.create(modeToSend);
+    GraphicDatabase.create(modeToSend, this.userEmail);
 
     notifyListeners();
 

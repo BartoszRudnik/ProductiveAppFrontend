@@ -1,3 +1,4 @@
+import 'package:path/path.dart';
 import 'package:productive_app/model/collaborator.dart';
 import 'package:productive_app/model/collaboratorTask.dart';
 import 'package:productive_app/model/location.dart';
@@ -6,7 +7,6 @@ import 'package:productive_app/model/tag.dart';
 import 'package:productive_app/model/task.dart';
 import 'package:productive_app/model/user.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
 
 class InitDatabase {
   static final InitDatabase instance = InitDatabase._init();
@@ -38,13 +38,15 @@ class InitDatabase {
     final textType = 'TEXT';
     final doubleType = 'REAL';
     final blob = 'BLOB';
+    final userEmail = 'userMail';
 
     await db.execute('''
     CREATE TABLE $tableTags (
       ${TagFields.id} $idType,
       ${TagFields.name} $textType,
       ${TagFields.isSelected} $boolType,
-      ${TagFields.lastUpdated} $textType
+      ${TagFields.lastUpdated} $textType,
+      $userEmail $textType
     )
     ''');
     await db.execute('''
@@ -57,7 +59,8 @@ class InitDatabase {
       ${LocationFields.street} $textType,
       ${LocationFields.latitude} $doubleType,
       ${LocationFields.longitude} $doubleType,
-      ${LocationFields.isSelected} $boolType
+      ${LocationFields.isSelected} $boolType,
+      $userEmail $textType
     )
     ''');
     await db.execute('''
@@ -72,21 +75,24 @@ class InitDatabase {
       ${CollaboratorsFields.relationState} $textType,
       ${CollaboratorsFields.receivedPermission} $boolType,
       ${CollaboratorsFields.received} $boolType,
-      ${CollaboratorsFields.sentPermission} $boolType
+      ${CollaboratorsFields.sentPermission} $boolType,
+      $userEmail $textType
     )
     ''');
     await db.execute('''
     CREATE TABLE LOCALE(
       'id' $idType,
       'localeName' $textType,
-      'lastUpdated' $textType
+      'lastUpdated' $textType,
+      $userEmail $textType
     )
     ''');
     await db.execute('''
     CREATE TABLE GRAPHIC(
       'id' $idType,
       'mode' $textType,
-      'lastUpdated' $textType
+      'lastUpdated' $textType,
+      $userEmail $textType
     )
     ''');
     await db.execute('''
@@ -99,7 +105,8 @@ class InitDatabase {
       ${UserFields.lastUpdatedName} $textType,
       ${UserFields.userType} $textType,
       ${UserFields.localImage} $blob,
-      ${UserFields.removed} $boolType
+      ${UserFields.removed} $boolType,
+      $userEmail $textType
     )
     ''');
     await db.execute('''
@@ -113,7 +120,8 @@ class InitDatabase {
       ${SettingsFields.showOnlyDelegated} $boolType,
       ${SettingsFields.showOnlyUnfinished} $boolType,
       ${SettingsFields.showOnlyWithLocalization} $boolType,
-      ${SettingsFields.sortingMode} $integerType      
+      ${SettingsFields.sortingMode} $integerType,
+      $userEmail $textType      
     )
     ''');
     await db.execute('''
@@ -123,7 +131,8 @@ class InitDatabase {
       ${CollaboratorTaskFields.description} $textType,
       ${CollaboratorTaskFields.startDate} $textType,
       ${CollaboratorTaskFields.endDate} $textType,
-      ${CollaboratorTaskFields.lastUpdated} $textType
+      ${CollaboratorTaskFields.lastUpdated} $textType,
+      $userEmail $textType
     )
     ''');
     await db.execute('''
@@ -149,7 +158,8 @@ class InitDatabase {
       ${TaskFields.notificationLocalizationRadius} $doubleType,
       ${TaskFields.notificationOnEnter} $boolType,
       ${TaskFields.notificationOnExit} $boolType,
-      ${TaskFields.lastUpdated} $textType
+      ${TaskFields.lastUpdated} $textType,
+      $userEmail $textType
     )
     ''');
   }

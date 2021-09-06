@@ -17,6 +17,7 @@ import 'package:productive_app/provider/locale_provider.dart';
 import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:productive_app/provider/theme_provider.dart';
 import 'package:provider/provider.dart';
+
 import '../model/task.dart';
 import '../provider/attachment_provider.dart';
 import '../provider/auth_provider.dart';
@@ -39,16 +40,17 @@ class Data {
       List<Task> tasks = [];
 
       final provider = Provider.of<SynchronizeProvider>(context, listen: false);
+      final userEmail = Provider.of<AuthProvider>(context, listen: false).email;
 
       await Future.wait([
-        TagDatabase.readAll().then((value) => tags = value),
-        CollaboratorDatabase.readAll().then((value) => collaborators = value),
-        LocationDatabase.readAll().then((value) => locations = value),
-        LocaleDatabase.read().then((value) => locale = value),
-        GraphicDatabase.read().then((value) => graphic = value),
-        UserDatabase.read().then((value) => user = value),
-        SettingsDatabase.read().then((value) => settings = value),
-        TaskDatabase.readAll(context).then((value) => tasks = value),
+        TagDatabase.readAll(userEmail).then((value) => tags = value),
+        CollaboratorDatabase.readAll(userEmail).then((value) => collaborators = value),
+        LocationDatabase.readAll(userEmail).then((value) => locations = value),
+        LocaleDatabase.read(userEmail).then((value) => locale = value),
+        GraphicDatabase.read(userEmail).then((value) => graphic = value),
+        UserDatabase.read(userEmail).then((value) => user = value),
+        SettingsDatabase.read(userEmail).then((value) => settings = value),
+        TaskDatabase.readAll(context, userEmail).then((value) => tasks = value),
       ]);
 
       await Future.wait([
@@ -88,7 +90,8 @@ class Data {
       print(error);
     }
 
-    final List<Task> delegatedTasks = Provider.of<TaskProvider>(context, listen: false).taskList.where((element) => element.parentId != null).toList();
+    final List<Task> delegatedTasks =
+        Provider.of<TaskProvider>(context, listen: false).taskList.where((element) => element.parentId != null).toList();
 
     if (delegatedTasks != null && delegatedTasks.length > 0) {
       List<int> delegatedTasksId = [];

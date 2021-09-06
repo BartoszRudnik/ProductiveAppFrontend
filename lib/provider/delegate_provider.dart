@@ -65,7 +65,10 @@ class DelegateProvider with ChangeNotifier {
 
   List<Collaborator> get send {
     if (this.searchingText != null && this.searchingText.length >= 1) {
-      return this._send.where((collaborator) => collaborator.email.contains(searchingText) || collaborator.collaboratorName.contains(searchingText)).toList();
+      return this
+          ._send
+          .where((collaborator) => collaborator.email.contains(searchingText) || collaborator.collaboratorName.contains(searchingText))
+          .toList();
     } else {
       return [...this._send];
     }
@@ -267,7 +270,7 @@ class DelegateProvider with ChangeNotifier {
 
     List<Collaborator> loadedCollaborators = [];
 
-    await CollaboratorDatabase.deleteAll();
+    await CollaboratorDatabase.deleteAll(this.userEmail);
 
     try {
       final response = await http.get(requestUrl);
@@ -314,7 +317,7 @@ class DelegateProvider with ChangeNotifier {
         );
 
         loadedCollaborators.add(newCollaborator);
-        await CollaboratorDatabase.create(newCollaborator);
+        await CollaboratorDatabase.create(newCollaborator, this.userEmail);
       }
 
       this.collaborators = loadedCollaborators;
@@ -324,7 +327,7 @@ class DelegateProvider with ChangeNotifier {
       for (Collaborator collaborator in this.collaborators) {
         final col = await CollaboratorDatabase.read(collaborator.id);
         if (col == null) {
-          await CollaboratorDatabase.create(collaborator);
+          await CollaboratorDatabase.create(collaborator, this.userEmail);
         }
       }
 
@@ -458,7 +461,7 @@ class DelegateProvider with ChangeNotifier {
       this.collaborators.insert(0, collaborator);
       this._send.insert(0, collaborator);
 
-      await CollaboratorDatabase.create(collaborator);
+      await CollaboratorDatabase.create(collaborator, this.userEmail);
 
       notifyListeners();
     } catch (error) {

@@ -2,16 +2,28 @@ import 'package:productive_app/db/init_database.dart';
 import 'package:productive_app/model/location.dart';
 
 class LocationDatabase {
-  static Future<void> deleteAll() async {
+  static Future<void> deleteAll(String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    db.delete(tableLocations);
+    db.delete(
+      tableLocations,
+      where: 'userMail = ?',
+      whereArgs: [userMail],
+    );
   }
 
-  static Future<void> create(Location location) async {
+  static Future<Location> create(Location location, String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    await db.insert(tableLocations, location.toJson());
+    Map locationMap = location.toJson();
+
+    locationMap['userMail'] = userMail;
+
+    final id = await db.insert(tableLocations, locationMap);
+
+    print(id);
+
+    return location.copy(id: id);
   }
 
   static Future<Location> read(int id) async {
@@ -31,22 +43,30 @@ class LocationDatabase {
     }
   }
 
-  static Future<List<Location>> readAll() async {
+  static Future<List<Location>> readAll(String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    final result = await db.query(tableLocations);
+    final result = await db.query(
+      tableLocations,
+      where: 'userMail = ?',
+      whereArgs: [userMail],
+    );
 
     return result.map((location) => Location.fromJson(location)).toList();
   }
 
-  static Future<int> update(Location location) async {
+  static Future<int> update(Location location, String userMail) async {
     final db = await InitDatabase.instance.database;
 
     location.lastUpdated = DateTime.now();
 
+    Map locationMap = location.toJson();
+
+    locationMap['userMail'] = userMail;
+
     return await db.update(
       tableLocations,
-      location.toJson(),
+      locationMap,
       where: '${LocationFields.id} = ?',
       whereArgs: [location.id],
     );

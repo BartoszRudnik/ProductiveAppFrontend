@@ -61,8 +61,11 @@ class SynchronizeProvider with ChangeNotifier {
     this.collaboratorsToDelete.add(newToDelete);
   }
 
-  void addTaskToDelete(int taskId){
-    DeleteTask newToDelete = DeleteTask(ownerEmail: this.userMail, taskId: taskId,);
+  void addTaskToDelete(int taskId) {
+    DeleteTask newToDelete = DeleteTask(
+      ownerEmail: this.userMail,
+      taskId: taskId,
+    );
 
     this.tasksToDelete.add(newToDelete);
   }
@@ -70,18 +73,15 @@ class SynchronizeProvider with ChangeNotifier {
   Future<void> synchronizeTasks(List<Task> tasks) async {
     final finalUrl = this._serverUrl + "synchronize/synchronizeTasks/${this.userMail}";
 
-    print(json.encode({
-      'taskList': tasks,
-      'deleteList': this.tasksToDelete,
-    },),);
-
     try {
       await http.post(
         finalUrl,
-        body: json.encode({
-          'taskList': tasks,
-          'deleteList': this.tasksToDelete,
-        },),
+        body: json.encode(
+          {
+            'taskList': tasks,
+            'deleteList': this.tasksToDelete,
+          },
+        ),
         headers: {
           'content-type': 'application/json',
           'accept': 'application/json',
@@ -112,7 +112,8 @@ class SynchronizeProvider with ChangeNotifier {
             "locations": settings.locations,
             "sortingMode": settings.sortingMode,
             "taskName": settings.taskName,
-            "lastUpdated": settings.lastUpdated != null ? settings.lastUpdated.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
+            "lastUpdated":
+                settings.lastUpdated != null ? settings.lastUpdated.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
           },
         ),
         headers: {

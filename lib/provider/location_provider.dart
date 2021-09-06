@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:global_configuration/global_configuration.dart';
-import 'package:http/http.dart' as http;
 import 'package:geocoding/geocoding.dart' as geocoding;
+import 'package:global_configuration/global_configuration.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:productive_app/db/location_database.dart';
 
 import '../model/location.dart' as models;
@@ -85,7 +85,7 @@ class LocationProvider with ChangeNotifier {
     final url = this._serverUrl + "localization/getLocalizations/${this.userMail}";
     final List<models.Location> loadedLocations = [];
 
-    await LocationDatabase.deleteAll();
+    await LocationDatabase.deleteAll(this.userMail);
 
     try {
       final response = await http.get(url);
@@ -103,7 +103,7 @@ class LocationProvider with ChangeNotifier {
         );
 
         loadedLocations.add(loc);
-        await LocationDatabase.create(loc);
+        await LocationDatabase.create(loc, this.userMail);
       }
 
       this.locationList = loadedLocations;
@@ -117,8 +117,10 @@ class LocationProvider with ChangeNotifier {
   Future<void> addLocation(models.Location newLocation) async {
     final url = this._serverUrl + "localization/addLocalization/${this.userMail}";
 
+    newLocation.id = null;
+    newLocation = await LocationDatabase.create(newLocation, this.userMail);
+
     this.locationList.insert(0, newLocation);
-    await LocationDatabase.create(newLocation);
 
     notifyListeners();
 
@@ -149,7 +151,7 @@ class LocationProvider with ChangeNotifier {
   Future<void> updateLocation(models.Location location) async {
     final url = this._serverUrl + "localization/updateLocalization/${location.id}";
 
-    await LocationDatabase.update(location);
+    await LocationDatabase.update(location, this.userMail);
     notifyListeners();
 
     try {

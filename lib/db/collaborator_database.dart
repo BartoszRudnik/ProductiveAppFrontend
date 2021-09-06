@@ -2,16 +2,24 @@ import 'package:productive_app/db/init_database.dart';
 import 'package:productive_app/model/collaborator.dart';
 
 class CollaboratorDatabase {
-  static Future<void> deleteAll() async {
+  static Future<void> deleteAll(String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    await db.delete(tableCollaborators);
+    await db.delete(
+      tableCollaborators,
+      where: 'userMail = ?',
+      whereArgs: [userMail],
+    );
   }
 
-  static Future<void> create(Collaborator collaborator) async {
+  static Future<void> create(Collaborator collaborator, String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    await db.insert(tableCollaborators, collaborator.toJson());
+    Map collaboratorMap = collaborator.toJson();
+
+    collaboratorMap['userMail'] = userMail;
+
+    await db.insert(tableCollaborators, collaboratorMap);
   }
 
   static Future<Collaborator> read(int id) async {
@@ -31,10 +39,14 @@ class CollaboratorDatabase {
     }
   }
 
-  static Future<List<Collaborator>> readAll() async {
+  static Future<List<Collaborator>> readAll(String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    final result = await db.query(tableCollaborators);
+    final result = await db.query(
+      tableCollaborators,
+      where: 'userMail = ?',
+      whereArgs: [userMail],
+    );
 
     return result.map((collaborator) => Collaborator.fromJson(collaborator)).toList();
   }

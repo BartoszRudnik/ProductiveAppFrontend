@@ -39,10 +39,10 @@ class Tag {
       );
 
   static Tag fromJson(Map<String, Object> json) => Tag(
-        id: json[TagFields.id] as int,
-        name: json[TagFields.name] as String,
-        isSelected: json[TagFields.isSelected] == 1,
-        lastUpdated: DateTime.parse(json[TagFields.lastUpdated] as String),
+        id: json[TagFields.id] == null ? null : json[TagFields.id] as int,
+        name: json[TagFields.name] == null ? null : json[TagFields.name] as String,
+        isSelected: json[TagFields.isSelected] == null ? null : json[TagFields.isSelected] == 1,
+        lastUpdated: json[TagFields.lastUpdated] == null ? null : DateTime.parse(json[TagFields.lastUpdated] as String),
       );
 
   Map<String, dynamic> toJson() {
@@ -50,8 +50,7 @@ class Tag {
       TagFields.id: this.id,
       TagFields.name: this.name,
       TagFields.isSelected: this.isSelected ? 1 : 0,
-      TagFields.lastUpdated:
-          this.lastUpdated != null ? this.lastUpdated.toIso8601String() : DateTime.now().toIso8601String()
+      TagFields.lastUpdated: this.lastUpdated != null ? this.lastUpdated.toIso8601String() : DateTime.now().toIso8601String()
     };
   }
 }

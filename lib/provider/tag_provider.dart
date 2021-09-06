@@ -63,7 +63,7 @@ class TagProvider with ChangeNotifier {
     final url = this._serverUrl + "tag/getAll/${this.userMail}";
 
     final List<Tag> loadedTags = [];
-    TagDatabase.deleteAll();
+    TagDatabase.deleteAll(this.userMail);
 
     try {
       final response = await http.get(url);
@@ -76,7 +76,7 @@ class TagProvider with ChangeNotifier {
           name: element['name'],
         );
 
-        await TagDatabase.create(newTag);
+        newTag = await TagDatabase.create(newTag, this.userMail);
 
         loadedTags.add(newTag);
       }
@@ -112,7 +112,7 @@ class TagProvider with ChangeNotifier {
     this.tagList.forEach((tag) async {
       if (tag.name == oldName) {
         tag.name = newName;
-        await TagDatabase.update(tag);
+        await TagDatabase.update(tag, this.userMail);
       }
     });
 
@@ -139,12 +139,12 @@ class TagProvider with ChangeNotifier {
   Future<void> addTag(Tag newTag) async {
     final url = this._serverUrl + "tag/add";
 
+    newTag.id = null;
+    newTag = await TagDatabase.create(newTag, this.userMail);
+
     this.tagList.insert(0, newTag);
-    await TagDatabase.create(newTag);
 
     notifyListeners();
-
-    newTag.id = this.tagList.length + 1;
 
     try {
       await http.post(

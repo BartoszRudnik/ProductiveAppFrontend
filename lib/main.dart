@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:global_configuration/global_configuration.dart';
-import 'package:productive_app/provider/attachment_provider.dart';
 import 'package:productive_app/l10n/L10n.dart';
+import 'package:productive_app/provider/attachment_provider.dart';
 import 'package:productive_app/provider/locale_provider.dart';
 import 'package:productive_app/provider/synchronize_provider.dart';
-import 'utils/notifications.dart';
 import 'package:provider/provider.dart';
+
 import 'config/color_themes.dart';
 import 'config/my_routes.dart';
 import 'model/settings.dart';
@@ -19,10 +21,9 @@ import 'provider/tag_provider.dart';
 import 'provider/task_provider.dart';
 import 'provider/theme_provider.dart';
 import 'screen/entry_screen.dart';
-import 'screen/main_screen.dart';
 import 'screen/loading_auth_screen.dart';
-import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'screen/main_screen.dart';
+import 'utils/notifications.dart';
 
 void headlessTask(bg.HeadlessEvent headlessEvent) async {
   switch (headlessEvent.name) {
@@ -65,7 +66,7 @@ class MyApp extends StatelessWidget {
             userMail: auth.email,
             tasksToDelete: previousSynchronize == null ? [] : previousSynchronize.tasksToDelete,
             collaboratorsToDelete: previousSynchronize == null ? [] : previousSynchronize.collaboratorsToDelete,
-            tagsToDelete: previousSynchronize == null ? [] : previousSynchronize.tagsToDelete,
+            tagsToDelete: previousSynchronize == null || previousSynchronize.tagsToDelete == null ? [] : previousSynchronize.tagsToDelete,
             locationsToDelete: previousSynchronize == null ? [] : previousSynchronize.locationsToDelete,
           ),
         ),

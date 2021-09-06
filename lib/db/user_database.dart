@@ -2,18 +2,22 @@ import 'package:productive_app/db/init_database.dart';
 import 'package:productive_app/model/user.dart';
 
 class UserDatabase {
-  static Future<User> read() async {
-    final db = await InitDatabase.instance.database;
+  static Future<User> read(String userMail) async {
+    if (userMail != null) {
+      final db = await InitDatabase.instance.database;
 
-    final maps = await db.query(
-      tableUser,
-      columns: UserFields.values,
-      where: '${UserFields.id} = ?',
-      whereArgs: [1],
-    );
+      final maps = await db.query(
+        tableUser,
+        columns: UserFields.values,
+        where: '${UserFields.email} = ?',
+        whereArgs: [userMail],
+      );
 
-    if (maps.isNotEmpty) {
-      return User.fromJson(maps.first);
+      if (maps.isNotEmpty) {
+        return User.fromJson(maps.first);
+      } else {
+        return null;
+      }
     } else {
       return null;
     }
@@ -22,37 +26,35 @@ class UserDatabase {
   static Future<int> update(User user) async {
     final db = await InitDatabase.instance.database;
 
-    user.id = 1;
-
     return await db.update(
       tableUser,
       user.toJson(),
-      where: '${UserFields.id} = ?',
-      whereArgs: [1],
+      where: '${UserFields.email} = ?',
+      whereArgs: [user.email],
     );
   }
 
-  static Future<int> delete() async {
+  static Future<int> delete(String userMail) async {
     final db = await InitDatabase.instance.database;
 
     return db.delete(
       tableUser,
-      where: '${UserFields.id} = ?',
-      whereArgs: [1],
+      where: '${UserFields.email} = ?',
+      whereArgs: [userMail],
     );
   }
 
-  static Future<void> create(User user) async {
+  static Future<User> create(User user) async {
     final db = await InitDatabase.instance.database;
 
-    final existing = await read();
-
-    user.id = 1;
+    final existing = await read(user.email);
 
     if (existing != null) {
-      update(user);
+      await update(user);
+      return user;
     } else {
-      db.insert(tableUser, user.toJson());
+      final id = await db.insert(tableUser, user.toJson());
+      return user.copy(id: id);
     }
   }
 }

@@ -1,12 +1,14 @@
 import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:productive_app/db/task_database.dart';
 import 'package:productive_app/model/location.dart';
-import '../utils/notifications.dart';
+
 import '../model/tag.dart';
 import '../model/task.dart';
+import '../utils/notifications.dart';
 
 class TaskProvider with ChangeNotifier {
   List<Task> _trashTasks = [];
@@ -146,7 +148,7 @@ class TaskProvider with ChangeNotifier {
   Future<int> addTaskWithGeolocation(Task task, double latitude, double longitude) async {
     String url = this._serverUrl + 'task/add';
 
-    task = await TaskDatabase.create(task);
+    task = await TaskDatabase.create(task, this.userMail);
 
     task.position = task.id + 1000.0;
 
@@ -211,7 +213,7 @@ class TaskProvider with ChangeNotifier {
   Future<int> addTask(Task task) async {
     String url = this._serverUrl + 'task/add';
 
-    task = await TaskDatabase.create(task);
+    task = await TaskDatabase.create(task, this.userMail);
 
     task.position = task.id + 1000.0;
 
@@ -273,7 +275,7 @@ class TaskProvider with ChangeNotifier {
       this.sortByPosition(this._scheduledTasks);
     }
 
-    await TaskDatabase.update(task);
+    await TaskDatabase.update(task, this.userMail);
 
     notifyListeners();
 
@@ -327,7 +329,7 @@ class TaskProvider with ChangeNotifier {
       this.sortByPosition(this._delegatedTasks);
     }
 
-    await TaskDatabase.update(task);
+    await TaskDatabase.update(task, this.userMail);
 
     notifyListeners();
 
@@ -410,7 +412,7 @@ class TaskProvider with ChangeNotifier {
       );
     }
 
-    await TaskDatabase.update(task);
+    await TaskDatabase.update(task, this.userMail);
 
     notifyListeners();
 
@@ -466,7 +468,7 @@ class TaskProvider with ChangeNotifier {
         ));
       }
 
-      if(responseBody['supervisorEmail'] != null) {
+      if (responseBody['supervisorEmail'] != null) {
         supervisorEmail = responseBody['supervisorEmail'];
       }
 
@@ -589,31 +591,29 @@ class TaskProvider with ChangeNotifier {
   Future<void> fetchTasks() async {
     String url = this._serverUrl + 'task/getAll/${this.userMail}';
 
-    print('fetching tasks');
-
     final List<Task> loadedTasks = [];
 
     try {
       final response = await http.get(url);
       final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
-      await TaskDatabase.deleteAll();
-
-      print(responseBody);
+      await TaskDatabase.deleteAll(this.userMail);
 
       for (final element in responseBody) {
         List<Tag> taskTags = [];
         String taskStatus;
         String supervisorEmail;
 
-        for (var tagElement in element['tags']) {
-          taskTags.add(Tag(
-            id: tagElement['id'],
-            name: tagElement['name'],
-          ));
+        if (element['tags'] != null) {
+          for (var tagElement in element['tags']) {
+            taskTags.add(Tag(
+              id: tagElement['id'],
+              name: tagElement['name'],
+            ));
+          }
         }
 
-        if(element['tasks']['supervisorEmail'] != null) {
+        if (element['tasks']['supervisorEmail'] != null) {
           supervisorEmail = element['supervisorEmail'];
         }
 
@@ -651,7 +651,11 @@ class TaskProvider with ChangeNotifier {
 
         final notificationExists = await Notifications.checkIfGeofenceExists(task.id);
 
-        if (task.localization != 'COMPLETED' && task.localization != 'TRASH' && !task.done && task.notificationLocalizationId != null && !notificationExists) {
+        if (task.localization != 'COMPLETED' &&
+            task.localization != 'TRASH' &&
+            !task.done &&
+            task.notificationLocalizationId != null &&
+            !notificationExists) {
           this.addGeofenceFromOtherDevice(task);
         }
 
@@ -664,7 +668,7 @@ class TaskProvider with ChangeNotifier {
         }
 
         loadedTasks.add(task);
-        await TaskDatabase.create(task);
+        await TaskDatabase.create(task, this.userMail);
       }
 
       this.taskList = loadedTasks;
@@ -727,7 +731,7 @@ class TaskProvider with ChangeNotifier {
   Future<void> deleteTask(int id) async {
     final url = this._serverUrl + 'task/delete/$id';
 
-    var tmpProduct = this.taskList.firstWhere((element) => element.id == id);
+    Task tmpProduct = this.taskList.firstWhere((element) => element.id == id);
 
     await TaskDatabase.delete(id);
 
@@ -788,7 +792,7 @@ class TaskProvider with ChangeNotifier {
       );
     }
 
-    await TaskDatabase.update(task);
+    await TaskDatabase.update(task, this.userMail);
 
     notifyListeners();
 
@@ -906,7 +910,14 @@ class TaskProvider with ChangeNotifier {
 
   void clearTagFromTasks(String tagName) {
     this._inboxTasks.forEach((task) {
-      task.tags.removeWhere((tag) => tag.name == tagName);
+      task.tags.removeWhere((tag) {
+        if (tag.name == tagName) {
+          TaskDatabase.update(task, this.userMail);
+
+          return true;
+        }
+        return false;
+      });
     });
     this._anytimeTasks.forEach((task) {
       task.tags.removeWhere((tag) => tag.name == tagName);
@@ -932,7 +943,7 @@ class TaskProvider with ChangeNotifier {
       task.tags.forEach((tag) async {
         if (tag.name == oldName) {
           tag.name = newName;
-          await TaskDatabase.update(task);
+          await TaskDatabase.update(task, this.userMail);
         }
       });
     });
@@ -1023,8 +1034,8 @@ class TaskProvider with ChangeNotifier {
   List<Task> tasksToday() {
     return this
         ._scheduledTasks
-        .where(
-            (element) => (element.startDate != null && element.startDate.difference(DateTime.now()).inDays == 0 && element.startDate.day == DateTime.now().day))
+        .where((element) =>
+            (element.startDate != null && element.startDate.difference(DateTime.now()).inDays == 0 && element.startDate.day == DateTime.now().day))
         .toList();
   }
 
@@ -1063,7 +1074,9 @@ class TaskProvider with ChangeNotifier {
   }
 
   List<Task> filterLocations(List<Task> listToFilter, List<int> filterLocations) {
-    return [...listToFilter.where((element) => (element.notificationLocalizationId != null && filterLocations.contains(element.notificationLocalizationId)))];
+    return [
+      ...listToFilter.where((element) => (element.notificationLocalizationId != null && filterLocations.contains(element.notificationLocalizationId)))
+    ];
   }
 
   List<Task> filterTags(List<Task> listToFilter, List<String> filterTags) {

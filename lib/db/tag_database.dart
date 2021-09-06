@@ -2,20 +2,24 @@ import 'package:productive_app/db/init_database.dart';
 import 'package:productive_app/model/tag.dart';
 
 class TagDatabase {
-  static Future<void> deleteAll() async {
+  static Future<void> deleteAll(String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    db.delete(tableTags);
+    db.delete(
+      tableTags,
+      where: 'userMail = ?',
+      whereArgs: [userMail],
+    );
   }
 
-  static Future<Tag> create(Tag tag) async {
+  static Future<Tag> create(Tag tag, String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    if (tag.id != null) {
-      tag.id = null;
-    }
+    Map tagMap = tag.toJson();
 
-    final id = await db.insert(tableTags, tag.toJson());
+    tagMap['userMail'] = userMail;
+
+    final id = await db.insert(tableTags, tagMap);
 
     return tag.copy(id: id, lastUpdated: DateTime.now());
   }
@@ -37,22 +41,30 @@ class TagDatabase {
     }
   }
 
-  static Future<List<Tag>> readAll() async {
+  static Future<List<Tag>> readAll(String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    final result = await db.query(tableTags);
+    final result = await db.query(
+      tableTags,
+      where: 'userMail = ?',
+      whereArgs: [userMail],
+    );
 
     return result.map((tag) => Tag.fromJson(tag)).toList();
   }
 
-  static Future<int> update(Tag tag) async {
+  static Future<int> update(Tag tag, String userMail) async {
     final db = await InitDatabase.instance.database;
 
     tag.lastUpdated = DateTime.now();
 
+    Map tagMap = tag.toJson();
+
+    tagMap['userMail'] = userMail;
+
     return await db.update(
       tableTags,
-      tag.toJson(),
+      tagMap,
       where: '${TagFields.id} = ?',
       whereArgs: [tag.id],
     );
