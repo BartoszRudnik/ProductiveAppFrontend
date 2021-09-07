@@ -7,19 +7,26 @@ class CollaboratorDatabase {
 
     await db.delete(
       tableCollaborators,
-      where: 'userMail = ?',
+      where: '${CollaboratorsFields.email} = ? OR userMail = ?',
       whereArgs: [userMail],
     );
   }
 
-  static Future<void> create(Collaborator collaborator, String userMail) async {
+  static Future<Collaborator> create(Collaborator collaborator, String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    Map collaboratorMap = collaborator.toJson();
+    final map = collaborator.toJson();
+    map['userMail'] = userMail;
 
-    collaboratorMap['userMail'] = userMail;
+    final existing = read(collaborator.id);
 
-    await db.insert(tableCollaborators, collaboratorMap);
+    if (existing == null) {
+      final id = await db.insert(tableCollaborators, map);
+      return collaborator.copy(id: id);
+    } else {
+      update(collaborator);
+      return collaborator;
+    }
   }
 
   static Future<Collaborator> read(int id) async {
@@ -44,8 +51,8 @@ class CollaboratorDatabase {
 
     final result = await db.query(
       tableCollaborators,
-      where: 'userMail = ?',
-      whereArgs: [userMail],
+      where: '${CollaboratorsFields.email} = ? OR userMail = ?',
+      whereArgs: [userMail, userMail],
     );
 
     return result.map((collaborator) => Collaborator.fromJson(collaborator)).toList();

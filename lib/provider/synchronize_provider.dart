@@ -205,6 +205,15 @@ class SynchronizeProvider with ChangeNotifier {
   Future<void> synchronizeCollaborators(List<Collaborator> collaboratorList) async {
     final finalUrl = this._serverUrl + "synchronize/synchronizeCollaborators/${this.userMail}";
 
+    print(
+      json.encode(
+        {
+          'collaboratorList': collaboratorList,
+          'deleteList': this.collaboratorsToDelete,
+        },
+      ),
+    );
+
     try {
       await http.post(
         finalUrl,

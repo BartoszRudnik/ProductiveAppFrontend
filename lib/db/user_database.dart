@@ -44,17 +44,13 @@ class UserDatabase {
     );
   }
 
-  static Future<User> create(User user) async {
+  static Future<void> create(User user) async {
     final db = await InitDatabase.instance.database;
 
     final existing = await read(user.email);
 
-    if (existing != null) {
-      await update(user);
-      return user;
-    } else {
-      final id = await db.insert(tableUser, user.toJson());
-      return user.copy(id: id);
+    if (existing == null) {
+      await db.insert(tableUser, user.toJson());
     }
   }
 }

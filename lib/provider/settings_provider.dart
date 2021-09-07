@@ -5,6 +5,7 @@ import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:productive_app/db/settings_database.dart';
 import 'package:productive_app/model/settings.dart';
+import 'package:productive_app/utils/internet_connection.dart';
 
 class SettingsProvider with ChangeNotifier {
   Settings userSettings;
@@ -29,50 +30,52 @@ class SettingsProvider with ChangeNotifier {
 
     await SettingsDatabase.delete(this.userMail);
 
-    try {
-      final response = await http.get(finalUrl);
+    if (await InternetConnection.internetConnection()) {
+      try {
+        final response = await http.get(finalUrl);
 
-      final responseBody = json.decode(utf8.decode(response.bodyBytes));
+        final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
-      List<String> collaborators = [];
-      List<String> priorities = [];
-      List<String> tags = [];
-      List<int> locations = [];
+        List<String> collaborators = [];
+        List<String> priorities = [];
+        List<String> tags = [];
+        List<int> locations = [];
 
-      for (var element in responseBody['locations']) {
-        locations.add(element);
+        for (var element in responseBody['locations']) {
+          locations.add(element);
+        }
+
+        for (var element in responseBody['tags']) {
+          tags.add(element);
+        }
+
+        for (var element in responseBody['priorities']) {
+          priorities.add(element);
+        }
+
+        for (var element in responseBody['collaboratorEmail']) {
+          collaborators.add(element);
+        }
+
+        Settings newSettings = Settings(
+          showOnlyUnfinished: responseBody['showOnlyUnfinished'],
+          showOnlyDelegated: responseBody['showOnlyDelegated'],
+          showOnlyWithLocalization: responseBody['showOnlyWithLocalization'],
+          collaborators: collaborators,
+          priorities: priorities,
+          tags: tags,
+          locations: locations,
+          sortingMode: responseBody['sortingMode'],
+        );
+        this.userSettings = newSettings;
+
+        await SettingsDatabase.create(newSettings, this.userMail);
+
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        throw (error);
       }
-
-      for (var element in responseBody['tags']) {
-        tags.add(element);
-      }
-
-      for (var element in responseBody['priorities']) {
-        priorities.add(element);
-      }
-
-      for (var element in responseBody['collaboratorEmail']) {
-        collaborators.add(element);
-      }
-
-      Settings newSettings = Settings(
-        showOnlyUnfinished: responseBody['showOnlyUnfinished'],
-        showOnlyDelegated: responseBody['showOnlyDelegated'],
-        showOnlyWithLocalization: responseBody['showOnlyWithLocalization'],
-        collaborators: collaborators,
-        priorities: priorities,
-        tags: tags,
-        locations: locations,
-        sortingMode: responseBody['sortingMode'],
-      );
-      this.userSettings = newSettings;
-
-      await SettingsDatabase.create(newSettings, this.userMail);
-
-      notifyListeners();
-    } catch (error) {
-      print(error);
-      throw (error);
     }
   }
 
@@ -99,22 +102,24 @@ class SettingsProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.post(
-        finalUrl,
-        body: json.encode(
-          {
-            'locations': locations,
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          finalUrl,
+          body: json.encode(
+            {
+              'locations': locations,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
@@ -129,22 +134,24 @@ class SettingsProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.post(
-        finalUrl,
-        body: json.encode(
-          {
-            'tags': tags,
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          finalUrl,
+          body: json.encode(
+            {
+              'tags': tags,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
@@ -159,22 +166,24 @@ class SettingsProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.post(
-        finalUrl,
-        body: json.encode(
-          {
-            'priorities': priorities,
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          finalUrl,
+          body: json.encode(
+            {
+              'priorities': priorities,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
@@ -189,22 +198,24 @@ class SettingsProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.post(
-        finalUrl,
-        body: json.encode(
-          {
-            'collaboratorEmail': collaboratorEmail,
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          finalUrl,
+          body: json.encode(
+            {
+              'collaboratorEmail': collaboratorEmail,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
@@ -219,22 +230,24 @@ class SettingsProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.post(
-        finalUrl,
-        body: json.encode(
-          {
-            'location': location,
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          finalUrl,
+          body: json.encode(
+            {
+              'location': location,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
@@ -249,22 +262,24 @@ class SettingsProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.post(
-        finalUrl,
-        body: json.encode(
-          {
-            'tag': tag,
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          finalUrl,
+          body: json.encode(
+            {
+              'tag': tag,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
@@ -279,22 +294,24 @@ class SettingsProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.post(
-        finalUrl,
-        body: json.encode(
-          {
-            'priority': priority,
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          finalUrl,
+          body: json.encode(
+            {
+              'priority': priority,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
@@ -309,22 +326,24 @@ class SettingsProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.post(
-        finalUrl,
-        body: json.encode(
-          {
-            'collaboratorEmail': collaboratorEmail,
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          finalUrl,
+          body: json.encode(
+            {
+              'collaboratorEmail': collaboratorEmail,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
@@ -337,17 +356,19 @@ class SettingsProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.post(
-        finalUrl,
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          finalUrl,
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
@@ -360,17 +381,19 @@ class SettingsProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.post(
-        finalUrl,
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          finalUrl,
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
@@ -383,17 +406,19 @@ class SettingsProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.post(
-        finalUrl,
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          finalUrl,
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
@@ -406,17 +431,19 @@ class SettingsProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.post(
-        finalUrl,
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          finalUrl,
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
@@ -429,17 +456,19 @@ class SettingsProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.post(
-        finalUrl,
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          finalUrl,
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
@@ -452,17 +481,19 @@ class SettingsProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.post(
-        finalUrl,
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          finalUrl,
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
@@ -475,17 +506,19 @@ class SettingsProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.post(
-        finalUrl,
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          finalUrl,
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
@@ -498,20 +531,22 @@ class SettingsProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.post(
-        finalUrl,
-        body: json.encode({
-          'sortingMode': newMode,
-        }),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          finalUrl,
+          body: json.encode({
+            'sortingMode': newMode,
+          }),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 }

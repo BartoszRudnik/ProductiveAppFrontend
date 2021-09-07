@@ -6,6 +6,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:productive_app/db/graphic_database.dart';
+import 'package:productive_app/utils/internet_connection.dart';
 
 class ThemeProvider with ChangeNotifier {
   ThemeMode themeMode;
@@ -33,25 +34,32 @@ class ThemeProvider with ChangeNotifier {
   }
 
   Future<void> getUserMode() async {
-    final requestUrl = this._serverUrl + 'themeMode/get/${this.userEmail}';
+    if (await InternetConnection.internetConnection()) {
+      final requestUrl = this._serverUrl + 'themeMode/get/${this.userEmail}';
 
-    try {
-      final response = await http.get(
-        requestUrl,
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
+      try {
+        final response = await http.get(
+          requestUrl,
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
 
-      final responseBody = json.decode(response.body);
+        final responseBody = json.decode(response.body);
 
-      this.themeMode = this._selectColorMode(responseBody['backgroundType']);
+        this.themeMode = this._selectColorMode(responseBody['backgroundType']);
 
-      notifyListeners();
-    } catch (error) {
-      print(error);
-      throw (error);
+        await GraphicDatabase.create(
+          this._getColorMode(),
+          this.userEmail,
+        );
+
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
@@ -65,23 +73,25 @@ class ThemeProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.post(
-        requestUrl,
-        body: json.encode(
-          {
-            'backgroundType': modeToSend,
-            'userMail': this.userEmail,
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          requestUrl,
+          body: json.encode(
+            {
+              'backgroundType': modeToSend,
+              'userMail': this.userEmail,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 

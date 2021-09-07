@@ -1,6 +1,16 @@
 import 'package:productive_app/db/init_database.dart';
 
 class GraphicDatabase {
+  static Future<void> deleteAll(String userMail) async {
+    final db = await InitDatabase.instance.database;
+
+    await db.delete(
+      'GRAPHIC',
+      where: 'userMail = ?',
+      whereArgs: [userMail],
+    );
+  }
+
   static Future<List<String>> read(String userMail) async {
     final db = await InitDatabase.instance.database;
 

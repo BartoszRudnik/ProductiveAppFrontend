@@ -6,6 +6,7 @@ import 'package:global_configuration/global_configuration.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:productive_app/db/location_database.dart';
+import 'package:productive_app/utils/internet_connection.dart';
 
 import '../model/location.dart' as models;
 
@@ -82,35 +83,37 @@ class LocationProvider with ChangeNotifier {
   }
 
   Future<void> getLocations() async {
-    final url = this._serverUrl + "localization/getLocalizations/${this.userMail}";
-    final List<models.Location> loadedLocations = [];
+    if (await InternetConnection.internetConnection()) {
+      final url = this._serverUrl + "localization/getLocalizations/${this.userMail}";
+      final List<models.Location> loadedLocations = [];
 
-    await LocationDatabase.deleteAll(this.userMail);
+      await LocationDatabase.deleteAll(this.userMail);
 
-    try {
-      final response = await http.get(url);
-      final responseBody = json.decode(utf8.decode(response.bodyBytes));
+      try {
+        final response = await http.get(url);
+        final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
-      for (var element in responseBody) {
-        models.Location loc = models.Location(
-          id: element['id'],
-          localizationName: element["localizationName"],
-          longitude: element["longitude"],
-          latitude: element["latitude"],
-          country: element["country"],
-          locality: element["locality"],
-          street: element["street"],
-        );
+        for (var element in responseBody) {
+          models.Location loc = models.Location(
+            id: element['id'],
+            localizationName: element["localizationName"],
+            longitude: element["longitude"],
+            latitude: element["latitude"],
+            country: element["country"],
+            locality: element["locality"],
+            street: element["street"],
+          );
 
-        loadedLocations.add(loc);
-        await LocationDatabase.create(loc, this.userMail);
+          loadedLocations.add(loc);
+          await LocationDatabase.create(loc, this.userMail);
+        }
+
+        this.locationList = loadedLocations;
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        throw error;
       }
-
-      this.locationList = loadedLocations;
-      notifyListeners();
-    } catch (error) {
-      print(error);
-      throw error;
     }
   }
 
@@ -124,27 +127,29 @@ class LocationProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.post(
-        url,
-        body: json.encode(
-          {
-            'localizationName': newLocation.localizationName,
-            'longitude': newLocation.longitude,
-            'latitude': newLocation.latitude,
-            'street': newLocation.street,
-            'country': newLocation.country,
-            'locality': newLocation.locality,
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          url,
+          body: json.encode(
+            {
+              'localizationName': newLocation.localizationName,
+              'longitude': newLocation.longitude,
+              'latitude': newLocation.latitude,
+              'street': newLocation.street,
+              'country': newLocation.country,
+              'locality': newLocation.locality,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw error;
+        );
+      } catch (error) {
+        print(error);
+        throw error;
+      }
     }
   }
 
@@ -154,25 +159,27 @@ class LocationProvider with ChangeNotifier {
     await LocationDatabase.update(location, this.userMail);
     notifyListeners();
 
-    try {
-      await http.put(
-        url,
-        body: json.encode({
-          'localizationName': location.localizationName,
-          'longitude': location.longitude,
-          'latitude': location.latitude,
-          'street': location.street,
-          'locality': location.locality,
-          'country': location.country,
-        }),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw error;
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.put(
+          url,
+          body: json.encode({
+            'localizationName': location.localizationName,
+            'longitude': location.longitude,
+            'latitude': location.latitude,
+            'street': location.street,
+            'locality': location.locality,
+            'country': location.country,
+          }),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+        throw error;
+      }
     }
   }
 
@@ -184,45 +191,49 @@ class LocationProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.delete(url);
-    } catch (error) {
-      print(error);
-      throw error;
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.delete(url);
+      } catch (error) {
+        print(error);
+        throw error;
+      }
     }
   }
 
   Future<void> findGlobalLocationsFromQuery(String query) async {
-    final url = "https://nominatim.openstreetmap.org/search?q=$query&format=json";
-    List<MapEntry<geocoding.Placemark, LatLng>> loadedMarks = [];
+    if (await InternetConnection.internetConnection()) {
+      final url = "https://nominatim.openstreetmap.org/search?q=$query&format=json";
+      List<MapEntry<geocoding.Placemark, LatLng>> loadedMarks = [];
 
-    if (query.length >= 3) {
-      try {
-        final response = await http.get(url);
-        final responseBody = json.decode(utf8.decode(response.bodyBytes));
+      if (query.length >= 3) {
+        try {
+          final response = await http.get(url);
+          final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
-        for (var element in responseBody) {
-          models.Location loc = models.Location(
-            id: -1,
-            localizationName: element["name"],
-            longitude: double.parse(element["lon"]),
-            latitude: double.parse(element["lat"]),
-            country: " ",
-            locality: " ",
-            street: " ",
-          );
-          List<geocoding.Placemark> newMarks = await geocoding.placemarkFromCoordinates(loc.latitude, loc.longitude);
+          for (var element in responseBody) {
+            models.Location loc = models.Location(
+              id: -1,
+              localizationName: element["name"],
+              longitude: double.parse(element["lon"]),
+              latitude: double.parse(element["lat"]),
+              country: " ",
+              locality: " ",
+              street: " ",
+            );
+            List<geocoding.Placemark> newMarks = await geocoding.placemarkFromCoordinates(loc.latitude, loc.longitude);
 
-          for (var mark in newMarks) {
-            LatLng position = LatLng(double.parse(element["lat"]), double.parse(element["lon"]));
-            loadedMarks.add(MapEntry(mark, position));
+            for (var mark in newMarks) {
+              LatLng position = LatLng(double.parse(element["lat"]), double.parse(element["lon"]));
+              loadedMarks.add(MapEntry(mark, position));
+            }
           }
+          this.placemarks = loadedMarks;
+          notifyListeners();
+        } catch (error) {
+          print(error);
+          throw error;
         }
-        this.placemarks = loadedMarks;
-        notifyListeners();
-      } catch (error) {
-        print(error);
-        throw error;
       }
     }
   }

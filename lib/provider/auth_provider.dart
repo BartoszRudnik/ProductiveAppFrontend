@@ -10,6 +10,7 @@ import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:productive_app/db/user_database.dart';
 import 'package:productive_app/utils/google_sign_in_api.dart';
+import 'package:productive_app/utils/internet_connection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../exception/HttpException.dart';
@@ -22,7 +23,7 @@ class AuthProvider with ChangeNotifier {
   String _email;
   User _user;
 
-  String _serverUrl = GlobalConfiguration().getValue("serverUrl"); //computer IP address
+  String _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
   bool get isAuth {
     return token != null;
@@ -44,18 +45,20 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> getUserData() async {
-    String url = this._serverUrl + 'userData/get/${this._email}';
+    if (await InternetConnection.internetConnection()) {
+      String url = this._serverUrl + 'userData/get/${this._email}';
 
-    try {
-      final response = await http.get(url);
+      try {
+        final response = await http.get(url);
 
-      final responseBody = json.decode(utf8.decode(response.bodyBytes));
+        final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
-      this.user.firstName = responseBody['firstName'];
-      this.user.lastName = responseBody['lastName'];
-    } catch (error) {
-      print(error);
-      throw (error);
+        this.user.firstName = responseBody['firstName'];
+        this.user.lastName = responseBody['lastName'];
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
@@ -70,23 +73,25 @@ class AuthProvider with ChangeNotifier {
 
     this.notifyListeners();
 
-    try {
-      await http.post(
-        url,
-        body: json.encode(
-          {
-            "firstName": firstName,
-            "lastName": lastName,
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          url,
+          body: json.encode(
+            {
+              "firstName": firstName,
+              "lastName": lastName,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
@@ -95,200 +100,218 @@ class AuthProvider with ChangeNotifier {
 
     UserDatabase.delete(this.email);
 
-    try {
-      await http.post(
-        url,
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          url,
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
 
-      this.logout();
-    } catch (error) {
-      print(error);
-      throw (error);
+        this.logout();
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
   Future<void> getDeleteToken() async {
-    String url = this._serverUrl + 'account/deleteAccountToken/${this._email}';
+    if (await InternetConnection.internetConnection()) {
+      String url = this._serverUrl + 'account/deleteAccountToken/${this._email}';
 
-    try {
-      await http.post(
-        url,
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+      try {
+        await http.post(
+          url,
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
   Future<void> googleAuthenticate() async {
-    final googleUser = await GoogleSignInApi.login();
+    if (await InternetConnection.internetConnection()) {
+      final googleUser = await GoogleSignInApi.login();
 
-    final url = this._serverUrl + 'login/googleLogin';
+      final url = this._serverUrl + 'login/googleLogin';
 
-    try {
-      final firstName = googleUser.displayName.split(" ")[0];
-      final lastName = googleUser.displayName.split(" ")[1];
+      try {
+        final firstName = googleUser.displayName.split(" ")[0];
+        final lastName = googleUser.displayName.split(" ")[1];
 
-      final response = await http.post(
-        url,
-        body: json.encode(
-          {
-            'firstName': firstName,
-            'lastName': lastName,
-            'password': '',
-            'email': googleUser.email,
-            'userType': 'google',
+        final response = await http.post(
+          url,
+          body: json.encode(
+            {
+              'firstName': firstName,
+              'lastName': lastName,
+              'password': '',
+              'email': googleUser.email,
+              'userType': 'google',
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
+        );
 
-      final responseData = json.decode(response.body);
+        final responseData = json.decode(response.body);
 
-      if (responseData['error']?.isNotEmpty == true) {
-        print(responseData['message']);
-        throw HttpException(responseData['message']);
+        if (responseData['error']?.isNotEmpty == true) {
+          print(responseData['message']);
+          throw HttpException(responseData['message']);
+        }
+
+        this._user = User(
+          id: responseData['userId'],
+          email: googleUser.email,
+          userType: 'google',
+          firstName: firstName,
+          lastName: lastName,
+        );
+
+        await UserDatabase.create(this._user);
+
+        this._email = googleUser.email;
+        this._token = responseData['token'];
+        this._expiryDate = DateTime.now().add(
+          Duration(
+            milliseconds: responseData['tokenDuration'],
+          ),
+        );
+
+        this._autoLogout();
+
+        notifyListeners();
+
+        this._saveLocalData();
+      } catch (error) {
+        print(error);
+        throw (error);
       }
-
-      this._user = new User(
-        email: googleUser.email,
-        userType: 'google',
-        firstName: firstName,
-        lastName: lastName,
-      );
-
-      final user = await UserDatabase.read(this.email);
-
-      if (user == null) {
-        UserDatabase.create(this._user);
-      }
-
-      this._email = googleUser.email;
-      this._token = responseData['token'];
-      this._expiryDate = DateTime.now().add(
-        Duration(
-          milliseconds: responseData['tokenDuration'],
-        ),
-      );
-
-      this._autoLogout();
-
-      notifyListeners();
-
-      this._saveLocalData();
-    } catch (error) {
-      print(error);
-      throw (error);
     }
   }
 
   Future<void> _authenticate(String email, String password, String urlSegment) async {
-    String url = this._serverUrl + '$urlSegment';
+    if (await InternetConnection.internetConnection()) {
+      String url = this._serverUrl + '$urlSegment';
 
-    try {
-      final response = await http.post(
-        url,
-        body: json.encode(
-          {
-            'firstName': '',
-            'lastName': '',
-            'password': password,
-            'email': email,
-            'userType': 'mail',
+      try {
+        final response = await http.post(
+          url,
+          body: json.encode(
+            {
+              'firstName': '',
+              'lastName': '',
+              'password': password,
+              'email': email,
+              'userType': 'mail',
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
+        );
 
-      final responseData = json.decode(response.body);
+        final responseData = json.decode(response.body);
 
-      if (responseData['error']?.isNotEmpty == true) {
-        print(responseData['message']);
-        throw HttpException(responseData['message']);
+        if (responseData['error']?.isNotEmpty == true) {
+          print(responseData['message']);
+          throw HttpException(responseData['message']);
+        }
+
+        this._user = User(
+          id: responseData['userId'],
+          email: email,
+          userType: 'mail',
+        );
+
+        this._email = email;
+        this._token = responseData['token'];
+        this._expiryDate = DateTime.now().add(
+          Duration(
+            milliseconds: responseData['tokenDuration'],
+          ),
+        );
+
+        this._autoLogout();
+        notifyListeners();
+
+        await UserDatabase.create(this._user);
+
+        this._saveLocalData();
+      } catch (error) {
+        throw error;
       }
-
-      this._user = new User(
-        email: email,
-        userType: 'mail',
-      );
-
-      this._email = email;
-      this._token = responseData['token'];
-      this._expiryDate = DateTime.now().add(
-        Duration(
-          milliseconds: responseData['tokenDuration'],
-        ),
-      );
-
-      this._autoLogout();
-      notifyListeners();
-
-      this._saveLocalData();
-    } catch (error) {
-      throw error;
     }
   }
 
   Future<void> checkIfAvatarExists() async {
-    final finalUrl = this._serverUrl + 'userImage/checkIfExists/${this._user.email}';
+    if (await InternetConnection.internetConnection()) {
+      final finalUrl = this._serverUrl + 'userImage/checkIfExists/${this._user.email}';
 
-    try {
-      final response = await http.get(finalUrl);
+      try {
+        final response = await http.get(finalUrl);
 
-      if (this._user != null) {
-        response.body == 'true' ? this._user.removed = false : this._user.removed = true;
+        if (this._user != null) {
+          response.body == 'true' ? this._user.removed = false : this._user.removed = true;
+        }
+      } catch (error) {
+        print(error);
+        throw (error);
       }
-    } catch (error) {
-      print(error);
-      throw (error);
     }
   }
 
   Future<void> removeAvatar() async {
     final finalUrl = this._serverUrl + 'userImage/deleteImage/${this._user.email}';
 
+    this.evictImage();
+
     this._user.userImage = null;
     this._user.localImage = null;
     this._user.removed = true;
     this._user.lastUpdatedImage = DateTime.now();
-    this.evictImage();
 
     await UserDatabase.update(this._user);
 
     notifyListeners();
 
-    try {
-      http.post(
-        finalUrl,
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+    if (await InternetConnection.internetConnection()) {
+      try {
+        http.post(
+          finalUrl,
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
   void evictImage() {
     this._user.userImage = NetworkImage(this._serverUrl + 'userImage/getImage/${this._user.email}');
-    this._user.userImage.evict().then<void>((bool success) {});
-    this._user.userImage = null;
+    if (this._user.userImage != null) {
+      this._user.userImage.evict().then<void>((bool success) {
+        print('evict: ');
+        print(success);
+      });
+      this._user.userImage = null;
+    }
   }
 
   Future<void> changeUserImage(File userImage) async {
@@ -296,31 +319,33 @@ class AuthProvider with ChangeNotifier {
 
     final bytes = await userImage.readAsBytes();
 
+    this.evictImage();
+
     this._user.localImage = bytes;
     this._user.userImage = null;
     this._user.removed = false;
     this._user.lastUpdatedImage = DateTime.now();
-    this.evictImage();
 
     await UserDatabase.update(this._user);
 
     notifyListeners();
 
-    try {
-      final uri = Uri.parse(finalUrl);
+    if (await InternetConnection.internetConnection()) {
+      try {
+        final uri = Uri.parse(finalUrl);
 
-      final request = http.MultipartRequest('POST', uri);
-      final multipartFile = await http.MultipartFile.fromPath('multipartFile', userImage.path, filename: userImage.path);
+        final request = http.MultipartRequest('POST', uri);
+        final multipartFile = await http.MultipartFile.fromPath('multipartFile', userImage.path, filename: userImage.path);
 
-      request.files.add(multipartFile);
+        request.files.add(multipartFile);
 
-      await request.send();
-      await this.getUserImage();
+        await request.send();
 
-      notifyListeners();
-    } catch (error) {
-      print(error);
-      throw (error);
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
@@ -337,85 +362,93 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> signUp(String email, String password) async {
-    this._authenticate(email, password, 'registration');
-    UserDatabase.create(this._user);
+    if (await InternetConnection.internetConnection()) {
+      this._authenticate(email, password, 'registration');
+      UserDatabase.create(this._user);
+    }
   }
 
   Future<void> signIn(String email, String password) async {
-    return this._authenticate(email, password, 'login');
+    if (await InternetConnection.internetConnection()) {
+      return this._authenticate(email, password, 'login');
+    }
   }
 
   Future<void> resetPassword(String email) async {
-    String url = this._serverUrl + 'resetToken';
+    if (await InternetConnection.internetConnection()) {
+      String url = this._serverUrl + 'resetToken';
 
-    try {
-      final response = await http.post(
-        url,
-        body: json.encode(
-          {
-            'email': email,
+      try {
+        final response = await http.post(
+          url,
+          body: json.encode(
+            {
+              'email': email,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
+        );
 
-      if (response != null) {
-        try {
-          final responseData = json.decode(response.body);
+        if (response != null) {
+          try {
+            final responseData = json.decode(response.body);
 
-          if (responseData['error']?.isNotEmpty == true) {
-            throw HttpException(responseData['message']);
-          }
-        } catch (error) {}
+            if (responseData['error']?.isNotEmpty == true) {
+              throw HttpException(responseData['message']);
+            }
+          } catch (error) {}
+        }
+      } catch (error) {
+        throw error;
       }
-    } catch (error) {
-      throw error;
     }
   }
 
   Future<void> newPassword(String email, String token, String newPassword) async {
-    String url = this._serverUrl + 'newPassword';
+    if (await InternetConnection.internetConnection()) {
+      String url = this._serverUrl + 'newPassword';
 
-    try {
-      final response = await http.post(
-        url,
-        body: json.encode(
-          {
-            'email': email,
-            'token': token,
-            'newPassword': newPassword,
+      try {
+        final response = await http.post(
+          url,
+          body: json.encode(
+            {
+              'email': email,
+              'token': token,
+              'newPassword': newPassword,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
+        );
 
-      final responseData = json.decode(response.body);
+        final responseData = json.decode(response.body);
 
-      if (responseData['error']?.isNotEmpty == true) {
-        print(responseData['message']);
-        throw HttpException(responseData['message']);
+        if (responseData['error']?.isNotEmpty == true) {
+          print(responseData['message']);
+          throw HttpException(responseData['message']);
+        }
+
+        this._email = email;
+        this._token = responseData['token'];
+        this._expiryDate = DateTime.now().add(
+          Duration(
+            milliseconds: responseData['tokenDuration'],
+          ),
+        );
+
+        this._autoLogout();
+        notifyListeners();
+
+        this._saveLocalData();
+      } catch (error) {
+        throw error;
       }
-
-      this._email = email;
-      this._token = responseData['token'];
-      this._expiryDate = DateTime.now().add(
-        Duration(
-          milliseconds: responseData['tokenDuration'],
-        ),
-      );
-
-      this._autoLogout();
-      notifyListeners();
-
-      this._saveLocalData();
-    } catch (error) {
-      throw error;
     }
   }
 
@@ -423,6 +456,7 @@ class AuthProvider with ChangeNotifier {
     final preferences = await SharedPreferences.getInstance();
     final userData = json.encode(
       {
+        'id': this._user.id,
         'email': this._email,
         'token': this._token,
         'expiryDate': this._expiryDate.toIso8601String(),
@@ -499,6 +533,7 @@ class AuthProvider with ChangeNotifier {
       this._user = User(
         email: this._email,
         userType: userType,
+        id: extractedUserData['id'],
       );
 
       UserDatabase.create(this._user);

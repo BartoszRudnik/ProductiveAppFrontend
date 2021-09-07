@@ -3,10 +3,11 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:global_configuration/global_configuration.dart';
-import 'package:productive_app/model/attachment.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:productive_app/model/attachment.dart';
+import 'package:productive_app/utils/internet_connection.dart';
 
 class AttachmentProvider with ChangeNotifier {
   List<Attachment> attachments;
@@ -65,140 +66,149 @@ class AttachmentProvider with ChangeNotifier {
   }
 
   Future<void> getDelegatedAttachments(List<int> delegatedTasksId) async {
-    final finalUrl = this._serverUrl + 'attachment/getDelegatedAttachments';
+    if (await InternetConnection.internetConnection()) {
+      final finalUrl = this._serverUrl + 'attachment/getDelegatedAttachments';
 
-    List<Attachment> loadedAttachments = [];
-
-    try {
-      final response = await http.post(
-        finalUrl,
-        body: json.encode({
-          "tasksId": delegatedTasksId,
-        }),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-
-      final responseBody = json.decode(response.body);
-
-      for (var element in responseBody) {
-        final newAttachment = Attachment(
-          fileName: element['fileName'],
-          id: element['id'],
-          taskId: element['taskId'],
+      List<Attachment> loadedAttachments = [];
+      try {
+        final response = await http.post(
+          finalUrl,
+          body: json.encode({
+            "tasksId": delegatedTasksId,
+          }),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
         );
 
-        loadedAttachments.add(newAttachment);
-      }
+        final responseBody = json.decode(response.body);
 
-      if (loadedAttachments.length > 0) {
-        this.delegatedAttachments = loadedAttachments;
-      }
+        for (var element in responseBody) {
+          final newAttachment = Attachment(
+            fileName: element['fileName'],
+            id: element['id'],
+            taskId: element['taskId'],
+          );
 
-      notifyListeners();
-    } catch (error) {
-      print(error);
-      throw (error);
+          loadedAttachments.add(newAttachment);
+        }
+
+        if (loadedAttachments.length > 0) {
+          this.delegatedAttachments = loadedAttachments;
+        }
+
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
   Future<void> getAttachments() async {
-    final finalUrl = this._serverUrl + 'attachment/getUserAttachments/${this.userMail}';
+    if (await InternetConnection.internetConnection()) {
+      final finalUrl = this._serverUrl + 'attachment/getUserAttachments/${this.userMail}';
 
-    List<Attachment> loadedAttachments = [];
+      List<Attachment> loadedAttachments = [];
 
-    try {
-      final response = await http.get(finalUrl);
+      try {
+        final response = await http.get(finalUrl);
 
-      final responseBody = json.decode(response.body);
+        final responseBody = json.decode(response.body);
 
-      for (var element in responseBody) {
-        final newAttachment = Attachment(
-          fileName: element['fileName'],
-          id: element['id'],
-          taskId: element['taskId'],
-        );
+        for (var element in responseBody) {
+          final newAttachment = Attachment(
+            fileName: element['fileName'],
+            id: element['id'],
+            taskId: element['taskId'],
+          );
 
-        loadedAttachments.add(newAttachment);
+          loadedAttachments.add(newAttachment);
+        }
+
+        if (loadedAttachments.length > 0) {
+          this.attachments = loadedAttachments;
+        }
+
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        throw (error);
       }
-
-      if (loadedAttachments.length > 0) {
-        this.attachments = loadedAttachments;
-      }
-
-      notifyListeners();
-    } catch (error) {
-      print(error);
-      throw (error);
     }
   }
 
   Future<void> _deleteAttachment(int attachmentId) async {
-    final finalUrl = this._serverUrl + 'attachment/deleteAttachment/$attachmentId';
+    if (await InternetConnection.internetConnection()) {
+      final finalUrl = this._serverUrl + 'attachment/deleteAttachment/$attachmentId';
 
-    try {
-      http.delete(
-        finalUrl,
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+      try {
+        http.delete(
+          finalUrl,
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
-  Future<void> setAttachments(List<File> attachments, int taskId, bool editMode) {
-    try {
-      attachments.forEach((attachment) async {
-        final fileName = basename(attachment.path);
-        final finalUrl = this._serverUrl + 'attachment/addAttachment/${this.userMail}/$taskId/$fileName';
-        final uri = Uri.parse(finalUrl);
+  Future<void> setAttachments(List<File> attachments, int taskId, bool editMode) async {
+    if (await InternetConnection.internetConnection()) {
+      try {
+        attachments.forEach((attachment) async {
+          final fileName = basename(attachment.path);
+          final finalUrl = this._serverUrl + 'attachment/addAttachment/${this.userMail}/$taskId/$fileName';
+          final uri = Uri.parse(finalUrl);
 
-        final request = http.MultipartRequest('POST', uri);
-        final multipartFile = await http.MultipartFile.fromPath('multipartFile', attachment.path, filename: attachment.path);
+          final request = http.MultipartRequest('POST', uri);
+          final multipartFile = await http.MultipartFile.fromPath('multipartFile', attachment.path, filename: attachment.path);
 
-        request.files.add(multipartFile);
+          request.files.add(multipartFile);
 
-        final response = await request.send();
-        final respStr = await response.stream.bytesToString();
+          final response = await request.send();
+          final respStr = await response.stream.bytesToString();
 
-        final newAttachment = Attachment(
-          id: int.parse(respStr),
-          taskId: taskId,
-          fileName: basename(attachment.path),
-        );
+          final newAttachment = Attachment(
+            id: int.parse(respStr),
+            taskId: taskId,
+            fileName: basename(attachment.path),
+          );
 
-        this.attachments.add(newAttachment);
+          this.attachments.add(newAttachment);
 
-        if (editMode) {
-          this.notSavedAttachments.add(newAttachment);
-        }
+          if (editMode) {
+            this.notSavedAttachments.add(newAttachment);
+          }
 
-        notifyListeners();
-      });
-    } catch (error) {
-      print(error);
-      throw (error);
+          notifyListeners();
+        });
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
   Future<File> loadAttachments(int attachmentId) async {
-    final finalUrl = this._serverUrl + 'attachment/getAttachment/$attachmentId';
+    if (await InternetConnection.internetConnection()) {
+      final finalUrl = this._serverUrl + 'attachment/getAttachment/$attachmentId';
 
-    try {
-      final response = await http.get(finalUrl);
+      try {
+        final response = await http.get(finalUrl);
 
-      final bytes = response.bodyBytes;
+        final bytes = response.bodyBytes;
 
-      return this._storeFile(finalUrl, bytes, attachmentId);
-    } catch (error) {
-      print(error);
-      throw (error);
+        return this._storeFile(finalUrl, bytes, attachmentId);
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 

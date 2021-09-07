@@ -1,8 +1,11 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:productive_app/widget/settings_language.dart';
 import 'package:provider/provider.dart';
+
 import '../provider/auth_provider.dart';
 import '../utils/dialogs.dart';
 import '../widget/appBar/task_appBar.dart';
@@ -10,7 +13,6 @@ import '../widget/settings_account_information.dart';
 import '../widget/settings_graphic_settings.dart';
 import '../widget/settings_manage_account.dart';
 import '../widget/settings_user_avatar.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SettingsScreen extends StatefulWidget {
   static const routeName = "/collaborators";
@@ -285,7 +287,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final picker = ImagePicker();
       final pickedImage = await picker.getImage(
         source: imageSource,
-        imageQuality: 20,
       );
       final pickedImageFile = File(pickedImage.path);
 

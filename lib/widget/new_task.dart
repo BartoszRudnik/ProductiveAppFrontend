@@ -1,8 +1,9 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:productive_app/utils/dialogs.dart';
 import 'package:productive_app/utils/task_validate.dart';
 import 'package:provider/provider.dart';
+
 import '../model/tag.dart';
 import '../model/task.dart';
 import '../model/taskLocation.dart';
@@ -21,7 +22,6 @@ import 'task_description.dart';
 import 'task_localization.dart';
 import 'task_priority.dart';
 import 'task_title.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NewTask extends StatefulWidget {
   final String localization;
@@ -144,9 +144,33 @@ class _NewTaskState extends State<NewTask> {
     this._finalTags = newTags;
   }
 
+  void clearForm() {
+    this.newTaskTitleKey.currentState.reset();
+    this.newTaskDescriptionKey.currentState.reset();
+    setState(() {
+      this._startDate = null;
+      this._endDate = null;
+      this._startTime = null;
+      this._endTime = null;
+      this._localization = this.widget.localization;
+      this._isDone = false;
+      this._priority = 'NORMAL';
+      this._finalTags.forEach((element) {
+        element.isSelected = false;
+      });
+      this._finalTags = [];
+      this._notificationLocalizationId = null;
+      this._notificationLocalizationRadius = null;
+      this._notificationOnEnter = null;
+      this._notificationOnExit = null;
+      this._delegatedEmail = null;
+    });
+  }
+
   Future<void> _addNewTask() async {
     bool isValidTitle = this.newTaskTitleKey.currentState.validate();
-    bool isValidRest = await TaskValidate.validateNewTask(this._startDate, this._endDate, this._localization, this._isDone, this._delegatedEmail, context);
+    bool isValidRest =
+        await TaskValidate.validateNewTask(this._startDate, this._endDate, this._localization, this._isDone, this._delegatedEmail, context);
 
     if (!isValidRest || !isValidTitle) {
       this._isValid = false;
@@ -210,30 +234,13 @@ class _NewTaskState extends State<NewTask> {
         await Provider.of<AttachmentProvider>(context, listen: false).setAttachments(this._files, taskId, false);
       }
 
-      this.newTaskTitleKey.currentState.reset();
-      this.newTaskDescriptionKey.currentState.reset();
+      this.clearForm();
+
       setState(() {
-        this._startDate = null;
-        this._endDate = null;
-        this._startTime = null;
-        this._endTime = null;
-        this._localization = this.widget.localization;
-        this._isDone = false;
-        this._priority = 'NORMAL';
-        this._finalTags.forEach((element) {
-          element.isSelected = false;
-        });
-        this._finalTags = [];
-        this._notificationLocalizationId = null;
-        this._notificationLocalizationRadius = null;
-        this._notificationOnEnter = null;
-        this._notificationOnExit = null;
-        this._delegatedEmail = null;
+        this._waiting = false;
       });
     } on SocketException catch (_) {
-      final message = AppLocalizations.of(context).connectionFailed;
-
-      Dialogs.showWarningDialog(context, message);
+      this.clearForm();
 
       setState(() {
         this._waiting = false;
@@ -245,10 +252,6 @@ class _NewTaskState extends State<NewTask> {
       print(error);
       throw (error);
     }
-
-    setState(() {
-      this._waiting = false;
-    });
   }
 
   @override

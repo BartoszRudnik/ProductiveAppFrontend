@@ -5,6 +5,7 @@ import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:productive_app/db/task_database.dart';
 import 'package:productive_app/model/location.dart';
+import 'package:productive_app/utils/internet_connection.dart';
 
 import '../model/tag.dart';
 import '../model/task.dart';
@@ -166,47 +167,49 @@ class TaskProvider with ChangeNotifier {
     }
 
     this.taskList.add(task);
-    this.addToLocalication(task);
+    this.addToLocalization(task);
 
     notifyListeners();
 
-    try {
-      final response = await http.post(
-        url,
-        body: json.encode(
-          {
-            'taskName': task.title,
-            'taskDescription': task.description,
-            'userEmail': this.userMail,
-            'startDate': task.startDate != null ? task.startDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
-            'endDate': task.endDate != null ? task.endDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
-            'ifDone': task.done,
-            'priority': task.priority,
-            'tags': task.tags.map((tag) => tag.toJson()).toList(),
-            'localization': task.localization,
-            'delegatedEmail': task.delegatedEmail,
-            'isCanceled': task.isCanceled,
-            'localizationId': task.notificationLocalizationId,
-            'localizationRadius': task.notificationLocalizationRadius,
-            'notificationOnEnter': task.notificationOnEnter,
-            'notificationOnExit': task.notificationOnExit,
+    if (await InternetConnection.internetConnection()) {
+      try {
+        final response = await http.post(
+          url,
+          body: json.encode(
+            {
+              'taskName': task.title,
+              'taskDescription': task.description,
+              'userEmail': this.userMail,
+              'startDate': task.startDate != null ? task.startDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
+              'endDate': task.endDate != null ? task.endDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
+              'ifDone': task.done,
+              'priority': task.priority,
+              'tags': task.tags.map((tag) => tag.toJson()).toList(),
+              'localization': task.localization,
+              'delegatedEmail': task.delegatedEmail,
+              'isCanceled': task.isCanceled,
+              'localizationId': task.notificationLocalizationId,
+              'localizationRadius': task.notificationLocalizationRadius,
+              'notificationOnEnter': task.notificationOnEnter,
+              'notificationOnExit': task.notificationOnExit,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
+        );
 
-      task.id = int.parse(response.body);
-      task.position = int.parse(response.body) + 1000.0;
+        task.id = int.parse(response.body);
+        task.position = int.parse(response.body) + 1000.0;
 
-      notifyListeners();
+        notifyListeners();
 
-      return task.id;
-    } catch (error) {
-      print(error);
-      throw error;
+        return task.id;
+      } catch (error) {
+        print(error);
+        throw error;
+      }
     }
   }
 
@@ -218,47 +221,49 @@ class TaskProvider with ChangeNotifier {
     task.position = task.id + 1000.0;
 
     this.taskList.add(task);
-    this.addToLocalication(task);
+    this.addToLocalization(task);
 
     notifyListeners();
 
-    try {
-      final response = await http.post(
-        url,
-        body: json.encode(
-          {
-            'taskName': task.title,
-            'taskDescription': task.description,
-            'userEmail': this.userMail,
-            'startDate': task.startDate != null ? task.startDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
-            'endDate': task.endDate != null ? task.endDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
-            'ifDone': task.done,
-            'priority': task.priority,
-            'tags': task.tags.map((tag) => tag.toJson()).toList(),
-            'localization': task.localization,
-            'delegatedEmail': task.delegatedEmail,
-            'isCanceled': task.isCanceled,
-            'localizationId': task.notificationLocalizationId,
-            'localizationRadius': task.notificationLocalizationRadius,
-            'notificationOnEnter': task.notificationOnEnter,
-            'notificationOnExit': task.notificationOnExit,
+    if (await InternetConnection.internetConnection()) {
+      try {
+        final response = await http.post(
+          url,
+          body: json.encode(
+            {
+              'taskName': task.title,
+              'taskDescription': task.description,
+              'userEmail': this.userMail,
+              'startDate': task.startDate != null ? task.startDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
+              'endDate': task.endDate != null ? task.endDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
+              'ifDone': task.done,
+              'priority': task.priority,
+              'tags': task.tags.map((tag) => tag.toJson()).toList(),
+              'localization': task.localization,
+              'delegatedEmail': task.delegatedEmail,
+              'isCanceled': task.isCanceled,
+              'localizationId': task.notificationLocalizationId,
+              'localizationRadius': task.notificationLocalizationRadius,
+              'notificationOnEnter': task.notificationOnEnter,
+              'notificationOnExit': task.notificationOnExit,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
+        );
 
-      task.id = int.parse(response.body);
-      task.position = int.parse(response.body) + 1000.0;
+        task.id = int.parse(response.body);
+        task.position = int.parse(response.body) + 1000.0;
 
-      notifyListeners();
+        notifyListeners();
 
-      return task.id;
-    } catch (error) {
-      print(error);
-      throw error;
+        return task.id;
+      } catch (error) {
+        print(error);
+        throw error;
+      }
     }
   }
 
@@ -279,22 +284,24 @@ class TaskProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.put(
-        url,
-        body: json.encode(
-          {
-            'position': newPosition,
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.put(
+          url,
+          body: json.encode(
+            {
+              'position': newPosition,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
@@ -317,7 +324,7 @@ class TaskProvider with ChangeNotifier {
 
     task.localization = newLocation;
 
-    this.addToLocalication(task);
+    this.addToLocalization(task);
 
     if (task.localization == 'INBOX') {
       this.sortByPosition(this._inboxTasks);
@@ -333,37 +340,39 @@ class TaskProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.put(
-        url,
-        body: json.encode(
-          {
-            'taskName': task.title,
-            'taskDescription': task.description,
-            'userEmail': this.userMail,
-            'startDate': task.startDate != null ? task.startDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
-            'endDate': task.endDate != null ? task.endDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
-            'ifDone': task.done,
-            'priority': task.priority,
-            'tags': task.tags.map((tag) => tag.toJson()).toList(),
-            'localization': newLocation,
-            'position': task.position,
-            'delegatedEmail': task.delegatedEmail,
-            'isCanceled': task.isCanceled,
-            'localizationId': task.notificationLocalizationId,
-            'localizationRadius': task.notificationLocalizationRadius,
-            'notificationOnEnter': task.notificationOnEnter,
-            'notificationOnExit': task.notificationOnExit,
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.put(
+          url,
+          body: json.encode(
+            {
+              'taskName': task.title,
+              'taskDescription': task.description,
+              'userEmail': this.userMail,
+              'startDate': task.startDate != null ? task.startDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
+              'endDate': task.endDate != null ? task.endDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
+              'ifDone': task.done,
+              'priority': task.priority,
+              'tags': task.tags.map((tag) => tag.toJson()).toList(),
+              'localization': newLocation,
+              'position': task.position,
+              'delegatedEmail': task.delegatedEmail,
+              'isCanceled': task.isCanceled,
+              'localizationId': task.notificationLocalizationId,
+              'localizationRadius': task.notificationLocalizationRadius,
+              'notificationOnEnter': task.notificationOnEnter,
+              'notificationOnExit': task.notificationOnExit,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
@@ -386,7 +395,7 @@ class TaskProvider with ChangeNotifier {
 
     task.localization = newLocation;
 
-    this.addToLocalication(task);
+    this.addToLocalization(task);
 
     if (task.localization == 'INBOX') {
       this.sortByPosition(this._inboxTasks);
@@ -416,247 +425,95 @@ class TaskProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.put(
-        url,
-        body: json.encode(
-          {
-            'taskName': task.title,
-            'taskDescription': task.description,
-            'userEmail': this.userMail,
-            'startDate': task.startDate != null ? task.startDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
-            'endDate': task.endDate != null ? task.endDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
-            'ifDone': task.done,
-            'priority': task.priority,
-            'tags': task.tags.map((tag) => tag.toJson()).toList(),
-            'localization': newLocation,
-            'position': task.position,
-            'delegatedEmail': task.delegatedEmail,
-            'isCanceled': task.isCanceled,
-            'localizationId': task.notificationLocalizationId,
-            'localizationRadius': task.notificationLocalizationRadius,
-            'notificationOnEnter': task.notificationOnEnter,
-            'notificationOnExit': task.notificationOnExit,
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.put(
+          url,
+          body: json.encode(
+            {
+              'taskName': task.title,
+              'taskDescription': task.description,
+              'userEmail': this.userMail,
+              'startDate': task.startDate != null ? task.startDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
+              'endDate': task.endDate != null ? task.endDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
+              'ifDone': task.done,
+              'priority': task.priority,
+              'tags': task.tags.map((tag) => tag.toJson()).toList(),
+              'localization': newLocation,
+              'position': task.position,
+              'delegatedEmail': task.delegatedEmail,
+              'isCanceled': task.isCanceled,
+              'localizationId': task.notificationLocalizationId,
+              'localizationRadius': task.notificationLocalizationRadius,
+              'notificationOnEnter': task.notificationOnEnter,
+              'notificationOnExit': task.notificationOnExit,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
   Future<void> fetchSingleTaskFull(int taskId) async {
-    String url = this._serverUrl + 'task/getSingleTaskFull/${this.userMail}/$taskId';
+    if (await InternetConnection.internetConnection()) {
+      String url = this._serverUrl + 'task/getSingleTaskFull/${this.userMail}/$taskId';
 
-    try {
-      final response = await http.get(url);
-      final responseBody = json.decode(utf8.decode(response.bodyBytes));
+      try {
+        final response = await http.get(url);
+        final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
-      List<Tag> taskTags = [];
-      String taskStatus;
-      String supervisorEmail;
-
-      for (var tagElement in responseBody['tags']) {
-        taskTags.add(Tag(
-          id: tagElement['id'],
-          name: tagElement['name'],
-        ));
-      }
-
-      if (responseBody['supervisorEmail'] != null) {
-        supervisorEmail = responseBody['supervisorEmail'];
-      }
-
-      if (responseBody['tasks']['taskStatus'] != null) {
-        taskStatus = responseBody['tasks']['taskStatus'];
-      }
-
-      Task task = Task(
-          id: responseBody['tasks']['id'],
-          title: responseBody['tasks']['taskName'],
-          description: responseBody['tasks']['description'],
-          done: responseBody['tasks']['ifDone'],
-          priority: responseBody['tasks']['priority'],
-          endDate: responseBody['tasks']['endDate'] == null ? null : DateTime.tryParse(responseBody['tasks']['endDate']),
-          startDate: responseBody['tasks']['startDate'] == null ? null : DateTime.tryParse(responseBody['tasks']['startDate']),
-          tags: taskTags,
-          localization: responseBody['tasks']['taskList'],
-          position: responseBody['tasks']['position'],
-          delegatedEmail: responseBody['tasks']['delegatedEmail'],
-          isDelegated: responseBody['tasks']['isDelegated'],
-          taskStatus: taskStatus,
-          isCanceled: responseBody['tasks']['isCanceled'],
-          supervisorEmail: supervisorEmail,
-          childId: responseBody['childId'],
-          parentId: responseBody['parentId']);
-
-      if (responseBody['tasks']['notificationLocalization'] != null) {
-        task.notificationLocalizationId = responseBody['tasks']['notificationLocalization']['id'];
-        task.notificationLocalizationRadius = responseBody['tasks']['localizationRadius'];
-        task.notificationOnEnter = responseBody['tasks']['notificationOnEnter'];
-        task.notificationOnExit = responseBody['tasks']['notificationOnExit'];
-      } else {
-        task.notificationLocalizationId = null;
-      }
-
-      if (task.endDate != null && task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
-        task.endDate = null;
-      }
-
-      if (task.startDate != null && task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
-        task.startDate = null;
-      }
-
-      this.taskList.add(task);
-
-      notifyListeners();
-    } catch (error) {
-      print(error);
-      throw (error);
-    }
-  }
-
-  Future<void> fetchSingleTask(int taskId) async {
-    String url = this._serverUrl + 'task/getSingleTask/${this.userMail}/$taskId';
-    String supervisorEmail;
-    Task mockTask = Task(
-      id: -1,
-      title: 'Mock task',
-      description: 'Mock task desc',
-      done: false,
-      priority: 'HIGH',
-      endDate: DateTime.parse('2021-01-01'),
-      startDate: DateTime.parse('2021-01-01'),
-      supervisorEmail: 'mock@mock.com',
-    );
-    try {
-      final response = await http.get(url);
-      final responseBody = json.decode(utf8.decode(response.bodyBytes));
-
-      supervisorEmail = responseBody['ownerEmail'];
-
-      Task task = Task(
-        id: responseBody['taskId'],
-        title: responseBody['taskName'],
-        description: responseBody['description'],
-        priority: responseBody['priority'],
-        endDate: DateTime.parse(responseBody['endDate']),
-        startDate: DateTime.parse(responseBody['startDate']),
-        supervisorEmail: supervisorEmail,
-      );
-      singleTask = task;
-      notifyListeners();
-    } catch (error) {
-      singleTask = mockTask;
-      notifyListeners();
-      print(error);
-      throw error;
-    }
-  }
-
-  Future<void> addGeofenceFromOtherDevice(Task task) async {
-    String url = this._serverUrl + 'localization/getCoordinates/${task.notificationLocalizationId}';
-
-    double latitude;
-    double longitude;
-
-    try {
-      final response = await http.get(url);
-      final responseBody = json.decode(response.body);
-
-      latitude = responseBody['latitude'];
-      longitude = responseBody['longitude'];
-
-      Notifications.addGeofence(
-        task.id,
-        latitude,
-        longitude,
-        task.notificationLocalizationRadius,
-        task.notificationOnEnter,
-        task.notificationOnExit,
-        task.title,
-        task.description,
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
-    }
-  }
-
-  Future<void> fetchTasks() async {
-    String url = this._serverUrl + 'task/getAll/${this.userMail}';
-
-    final List<Task> loadedTasks = [];
-
-    try {
-      final response = await http.get(url);
-      final responseBody = json.decode(utf8.decode(response.bodyBytes));
-
-      await TaskDatabase.deleteAll(this.userMail);
-
-      for (final element in responseBody) {
         List<Tag> taskTags = [];
         String taskStatus;
         String supervisorEmail;
 
-        if (element['tags'] != null) {
-          for (var tagElement in element['tags']) {
-            taskTags.add(Tag(
-              id: tagElement['id'],
-              name: tagElement['name'],
-            ));
-          }
+        for (var tagElement in responseBody['tags']) {
+          taskTags.add(Tag(
+            id: tagElement['id'],
+            name: tagElement['name'],
+          ));
         }
 
-        if (element['tasks']['supervisorEmail'] != null) {
-          supervisorEmail = element['supervisorEmail'];
+        if (responseBody['supervisorEmail'] != null) {
+          supervisorEmail = responseBody['supervisorEmail'];
         }
 
-        if (element['tasks']['taskStatus'] != null) {
-          taskStatus = element['tasks']['taskStatus'];
+        if (responseBody['tasks']['taskStatus'] != null) {
+          taskStatus = responseBody['tasks']['taskStatus'];
         }
 
         Task task = Task(
-            id: element['tasks']['id'],
-            title: element['tasks']['taskName'],
-            description: element['tasks']['description'],
-            done: element['tasks']['ifDone'],
-            priority: element['tasks']['priority'],
-            endDate: element['tasks']['endDate'] != null ? DateTime.tryParse(element['tasks']['endDate']) : null,
-            startDate: element['tasks']['endDate'] != null ? DateTime.tryParse(element['tasks']['startDate']) : null,
+            id: responseBody['tasks']['id'],
+            title: responseBody['tasks']['taskName'],
+            description: responseBody['tasks']['description'],
+            done: responseBody['tasks']['ifDone'],
+            priority: responseBody['tasks']['priority'],
+            endDate: responseBody['tasks']['endDate'] == null ? null : DateTime.tryParse(responseBody['tasks']['endDate']),
+            startDate: responseBody['tasks']['startDate'] == null ? null : DateTime.tryParse(responseBody['tasks']['startDate']),
             tags: taskTags,
-            localization: element['tasks']['taskList'],
-            position: element['tasks']['position'],
-            delegatedEmail: element['tasks']['delegatedEmail'],
-            isDelegated: element['tasks']['isDelegated'],
+            localization: responseBody['tasks']['taskList'],
+            position: responseBody['tasks']['position'],
+            delegatedEmail: responseBody['tasks']['delegatedEmail'],
+            isDelegated: responseBody['tasks']['isDelegated'],
             taskStatus: taskStatus,
-            isCanceled: element['tasks']['isCanceled'],
+            isCanceled: responseBody['tasks']['isCanceled'],
             supervisorEmail: supervisorEmail,
-            childId: element['childId'],
-            parentId: element['parentId']);
+            childId: responseBody['childId'],
+            parentId: responseBody['parentId']);
 
-        if (element['tasks']['notificationLocalization'] != null) {
-          task.notificationLocalizationId = element['tasks']['notificationLocalization']['id'];
-          task.notificationLocalizationRadius = element['tasks']['localizationRadius'];
-          task.notificationOnEnter = element['tasks']['notificationOnEnter'];
-          task.notificationOnExit = element['tasks']['notificationOnExit'];
+        if (responseBody['tasks']['notificationLocalization'] != null) {
+          task.notificationLocalizationId = responseBody['tasks']['notificationLocalization']['id'];
+          task.notificationLocalizationRadius = responseBody['tasks']['localizationRadius'];
+          task.notificationOnEnter = responseBody['tasks']['notificationOnEnter'];
+          task.notificationOnExit = responseBody['tasks']['notificationOnExit'];
         } else {
           task.notificationLocalizationId = null;
-        }
-
-        final notificationExists = await Notifications.checkIfGeofenceExists(task.id);
-
-        if (task.localization != 'COMPLETED' &&
-            task.localization != 'TRASH' &&
-            !task.done &&
-            task.notificationLocalizationId != null &&
-            !notificationExists) {
-          this.addGeofenceFromOtherDevice(task);
         }
 
         if (task.endDate != null && task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
@@ -667,25 +524,188 @@ class TaskProvider with ChangeNotifier {
           task.startDate = null;
         }
 
-        loadedTasks.add(task);
-        await TaskDatabase.create(task, this.userMail);
+        this.taskList.add(task);
+
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        throw (error);
       }
-
-      this.taskList = loadedTasks;
-      this.divideTasks();
-
-      this.sortByPosition(this._anytimeTasks);
-      this.sortByPosition(this._scheduledTasks);
-      this.sortByPosition(this._inboxTasks);
-      this.sortByPosition(this._delegatedTasks);
-
-      notifyListeners();
-    } catch (error) {
-      print(error);
-      throw error;
     }
   }
 
+  Future<void> fetchSingleTask(int taskId) async {
+    if (await InternetConnection.internetConnection()) {
+      String url = this._serverUrl + 'task/getSingleTask/${this.userMail}/$taskId';
+      String supervisorEmail;
+      Task mockTask = Task(
+        id: -1,
+        title: 'Mock task',
+        description: 'Mock task desc',
+        done: false,
+        priority: 'HIGH',
+        endDate: DateTime.parse('2021-01-01'),
+        startDate: DateTime.parse('2021-01-01'),
+        supervisorEmail: 'mock@mock.com',
+      );
+      try {
+        final response = await http.get(url);
+        final responseBody = json.decode(utf8.decode(response.bodyBytes));
+
+        supervisorEmail = responseBody['ownerEmail'];
+
+        Task task = Task(
+          id: responseBody['taskId'],
+          title: responseBody['taskName'],
+          description: responseBody['description'],
+          priority: responseBody['priority'],
+          endDate: DateTime.parse(responseBody['endDate']),
+          startDate: DateTime.parse(responseBody['startDate']),
+          supervisorEmail: supervisorEmail,
+        );
+        singleTask = task;
+        notifyListeners();
+      } catch (error) {
+        singleTask = mockTask;
+        notifyListeners();
+        print(error);
+        throw error;
+      }
+    }
+  }
+
+  Future<void> addGeofenceFromOtherDevice(Task task) async {
+    if (await InternetConnection.internetConnection()) {
+      String url = this._serverUrl + 'localization/getCoordinates/${task.notificationLocalizationId}';
+
+      double latitude;
+      double longitude;
+
+      try {
+        final response = await http.get(url);
+        final responseBody = json.decode(response.body);
+
+        latitude = responseBody['latitude'];
+        longitude = responseBody['longitude'];
+
+        Notifications.addGeofence(
+          task.id,
+          latitude,
+          longitude,
+          task.notificationLocalizationRadius,
+          task.notificationOnEnter,
+          task.notificationOnExit,
+          task.title,
+          task.description,
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
+    }
+  }
+
+  Future<void> fetchTasks() async {
+    if (await InternetConnection.internetConnection()) {
+      String url = this._serverUrl + 'task/getAll/${this.userMail}';
+
+      final List<Task> loadedTasks = [];
+
+      try {
+        final response = await http.get(url);
+        final responseBody = json.decode(utf8.decode(response.bodyBytes));
+
+        await TaskDatabase.deleteAll(this.userMail);
+
+        for (final element in responseBody) {
+          List<Tag> taskTags = [];
+          String taskStatus;
+          String supervisorEmail;
+
+          if (element['tags'] != null) {
+            for (var tagElement in element['tags']) {
+              taskTags.add(Tag(
+                id: tagElement['id'],
+                name: tagElement['name'],
+              ));
+            }
+          }
+
+          if (element['tasks']['supervisorEmail'] != null) {
+            supervisorEmail = element['supervisorEmail'];
+          }
+
+          if (element['tasks']['taskStatus'] != null) {
+            taskStatus = element['tasks']['taskStatus'];
+          }
+
+          Task task = Task(
+              id: element['tasks']['id'],
+              title: element['tasks']['taskName'],
+              description: element['tasks']['description'],
+              done: element['tasks']['ifDone'],
+              priority: element['tasks']['priority'],
+              endDate: element['tasks']['endDate'] != null ? DateTime.tryParse(element['tasks']['endDate']) : null,
+              startDate: element['tasks']['endDate'] != null ? DateTime.tryParse(element['tasks']['startDate']) : null,
+              tags: taskTags,
+              localization: element['tasks']['taskList'],
+              position: element['tasks']['position'],
+              delegatedEmail: element['tasks']['delegatedEmail'],
+              isDelegated: element['tasks']['isDelegated'],
+              taskStatus: taskStatus,
+              isCanceled: element['tasks']['isCanceled'],
+              supervisorEmail: supervisorEmail,
+              childId: element['childId'],
+              parentId: element['parentId']);
+
+          if (element['tasks']['notificationLocalization'] != null) {
+            task.notificationLocalizationId = element['tasks']['notificationLocalization']['id'];
+            task.notificationLocalizationRadius = element['tasks']['localizationRadius'];
+            task.notificationOnEnter = element['tasks']['notificationOnEnter'];
+            task.notificationOnExit = element['tasks']['notificationOnExit'];
+          } else {
+            task.notificationLocalizationId = null;
+          }
+
+          final notificationExists = await Notifications.checkIfGeofenceExists(task.id);
+
+          if (task.localization != 'COMPLETED' &&
+              task.localization != 'TRASH' &&
+              !task.done &&
+              task.notificationLocalizationId != null &&
+              !notificationExists) {
+            this.addGeofenceFromOtherDevice(task);
+          }
+
+          if (task.endDate != null && task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+            task.endDate = null;
+          }
+
+          if (task.startDate != null && task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+            task.startDate = null;
+          }
+
+          loadedTasks.add(task);
+          await TaskDatabase.create(task, this.userMail);
+        }
+
+        this.taskList = loadedTasks;
+        this.divideTasks();
+
+        this.sortByPosition(this._anytimeTasks);
+        this.sortByPosition(this._scheduledTasks);
+        this.sortByPosition(this._inboxTasks);
+        this.sortByPosition(this._delegatedTasks);
+
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        throw error;
+      }
+    }
+  }
+
+  //Todo
   Future<void> deleteAllTasks(String listName) async {
     final url = this._serverUrl + 'task/deleteAllFromList';
 
@@ -742,14 +762,17 @@ class TaskProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.delete(url);
-    } catch (error) {
-      print(error);
-      throw error;
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.delete(url);
+      } catch (error) {
+        print(error);
+        throw error;
+      }
     }
   }
 
+  //Todo
   Future<void> toggleTaskStatus(Task task) async {
     String url = this._serverUrl + 'task/done/${task.id}';
 
@@ -796,38 +819,42 @@ class TaskProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      final response = await http.post(url);
+    if (await InternetConnection.internetConnection()) {
+      try {
+        final response = await http.post(url);
 
-      if (response != null && task.localization == 'DELEGATED') {
-        final newStatus = response.body;
-        this.updateTaskStatus(task.id, newStatus);
+        if (response != null && task.localization == 'DELEGATED') {
+          final newStatus = response.body;
+          this.updateTaskStatus(task.id, newStatus);
 
-        notifyListeners();
+          notifyListeners();
+        }
+      } catch (error) {
+        print(error);
+        throw error;
       }
-    } catch (error) {
-      print(error);
-      throw error;
     }
   }
 
   Future<void> getPriorities() async {
-    this.taskPriorities = [];
-    String url = this._serverUrl + 'task/priorities';
+    if (await InternetConnection.internetConnection()) {
+      this.taskPriorities = [];
+      String url = this._serverUrl + 'task/priorities';
 
-    try {
-      final response = await http.get(url);
+      try {
+        final response = await http.get(url);
 
-      final responseBody = json.decode(response.body);
+        final responseBody = json.decode(response.body);
 
-      for (var element in responseBody) {
-        this.taskPriorities.add(element.toString());
+        for (var element in responseBody) {
+          this.taskPriorities.add(element.toString());
+        }
+
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        throw error;
       }
-
-      notifyListeners();
-    } catch (error) {
-      print(error);
-      throw error;
     }
   }
 
@@ -851,7 +878,7 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
-  void addToLocalication(Task task) {
+  void addToLocalization(Task task) {
     if (task.localization == 'INBOX') {
       this._inboxTasks.add(task);
     } else if (task.localization == 'ANYTIME') {

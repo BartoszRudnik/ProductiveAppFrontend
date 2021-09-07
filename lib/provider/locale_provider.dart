@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:productive_app/db/locale_database.dart';
+import 'package:productive_app/utils/internet_connection.dart';
 
 class LocaleProvider with ChangeNotifier {
   Locale locale;
@@ -19,23 +20,23 @@ class LocaleProvider with ChangeNotifier {
   }
 
   Future<void> getLocale() async {
-    final requestUrl = this._serverUrl + "locale/get/${this.email}";
+    if (await InternetConnection.internetConnection()) {
+      final requestUrl = this._serverUrl + "locale/get/${this.email}";
 
-    await LocaleDatabase.deleteAll(this.email);
+      try {
+        final response = await http.get(requestUrl);
 
-    try {
-      final response = await http.get(requestUrl);
+        final responseBody = json.decode(response.body);
 
-      final responseBody = json.decode(response.body);
+        this.locale = Locale(responseBody['languageCode']);
 
-      this.locale = Locale(responseBody['languageCode']);
+        await LocaleDatabase.create(this.locale.languageCode, this.email);
 
-      await LocaleDatabase.create(this.locale.languageCode, this.email);
-
-      notifyListeners();
-    } catch (error) {
-      print(error);
-      throw error;
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        throw error;
+      }
     }
   }
 
@@ -47,22 +48,24 @@ class LocaleProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.post(
-        requestUrl,
-        body: json.encode(
-          {
-            "languageCode": locale.languageCode,
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          requestUrl,
+          body: json.encode(
+            {
+              "languageCode": locale.languageCode,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 

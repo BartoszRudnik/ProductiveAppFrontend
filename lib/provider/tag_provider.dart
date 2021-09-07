@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:productive_app/db/tag_database.dart';
+import 'package:productive_app/utils/internet_connection.dart';
 
 import '../model/tag.dart';
 
@@ -60,32 +61,34 @@ class TagProvider with ChangeNotifier {
   }
 
   Future<void> getTags() async {
-    final url = this._serverUrl + "tag/getAll/${this.userMail}";
+    if (await InternetConnection.internetConnection()) {
+      final url = this._serverUrl + "tag/getAll/${this.userMail}";
 
-    final List<Tag> loadedTags = [];
-    TagDatabase.deleteAll(this.userMail);
+      final List<Tag> loadedTags = [];
+      TagDatabase.deleteAll(this.userMail);
 
-    try {
-      final response = await http.get(url);
+      try {
+        final response = await http.get(url);
 
-      final responseBody = json.decode(utf8.decode(response.bodyBytes));
+        final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
-      for (var element in responseBody) {
-        Tag newTag = Tag(
-          id: element['id'],
-          name: element['name'],
-        );
+        for (var element in responseBody) {
+          Tag newTag = Tag(
+            id: element['id'],
+            name: element['name'],
+          );
 
-        newTag = await TagDatabase.create(newTag, this.userMail);
+          newTag = await TagDatabase.create(newTag, this.userMail);
 
-        loadedTags.add(newTag);
+          loadedTags.add(newTag);
+        }
+
+        this.tagList = loadedTags;
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        throw error;
       }
-
-      this.tagList = loadedTags;
-      notifyListeners();
-    } catch (error) {
-      print(error);
-      throw error;
     }
   }
 
@@ -98,11 +101,13 @@ class TagProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.delete(url);
-    } catch (error) {
-      print(error);
-      throw error;
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.delete(url);
+      } catch (error) {
+        print(error);
+        throw error;
+      }
     }
   }
 
@@ -118,21 +123,23 @@ class TagProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.put(
-        url,
-        body: json.encode({
-          'oldName': oldName,
-          'newName': newName,
-        }),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.put(
+          url,
+          body: json.encode({
+            'oldName': oldName,
+            'newName': newName,
+          }),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
@@ -146,25 +153,27 @@ class TagProvider with ChangeNotifier {
 
     notifyListeners();
 
-    try {
-      await http.post(
-        url,
-        body: json.encode(
-          {
-            'id': newTag.id,
-            'name': newTag.name,
-            'taskId': null,
-            'ownerEmail': this.userMail,
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          url,
+          body: json.encode(
+            {
+              'id': newTag.id,
+              'name': newTag.name,
+              'taskId': null,
+              'ownerEmail': this.userMail,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw error;
+        );
+      } catch (error) {
+        print(error);
+        throw error;
+      }
     }
   }
 }
