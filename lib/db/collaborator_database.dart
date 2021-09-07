@@ -18,15 +18,9 @@ class CollaboratorDatabase {
     final map = collaborator.toJson();
     map['userMail'] = userMail;
 
-    final existing = read(collaborator.id);
+    final id = await db.insert(tableCollaborators, map);
 
-    if (existing == null) {
-      final id = await db.insert(tableCollaborators, map);
-      return collaborator.copy(id: id);
-    } else {
-      update(collaborator);
-      return collaborator;
-    }
+    return collaborator.copy(id: id);
   }
 
   static Future<Collaborator> read(int id) async {

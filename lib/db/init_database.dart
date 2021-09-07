@@ -1,4 +1,5 @@
 import 'package:path/path.dart';
+import 'package:productive_app/model/attachment.dart';
 import 'package:productive_app/model/collaborator.dart';
 import 'package:productive_app/model/collaboratorTask.dart';
 import 'package:productive_app/model/location.dart';
@@ -46,6 +47,17 @@ class InitDatabase {
       ${TagFields.name} $textType,
       ${TagFields.isSelected} $boolType,
       ${TagFields.lastUpdated} $textType,
+      $userEmail $textType
+    )
+    ''');
+    await db.execute('''
+    CREATE TABLE $tableAttachment (
+      ${AttachmentFields.id} $idType,
+      ${AttachmentFields.taskId} $integerType,
+      ${AttachmentFields.fileName} $textType,
+      ${AttachmentFields.toDelete} $boolType,
+      ${AttachmentFields.lastUpdated} $textType,
+      ${AttachmentFields.localFile} $blob,
       $userEmail $textType
     )
     ''');

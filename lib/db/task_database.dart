@@ -6,7 +6,7 @@ class TaskDatabase {
   static Future<void> deleteAll(String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    db.delete(
+    await db.delete(
       tableTask,
       where: 'userMail = ?',
       whereArgs: [userMail],
