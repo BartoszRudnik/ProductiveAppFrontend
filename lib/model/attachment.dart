@@ -31,7 +31,7 @@ class Attachment {
   Uint8List localFile;
 
   Attachment({
-    @required this.id,
+    this.id,
     @required this.taskId,
     @required this.fileName,
     this.lastUpdated,

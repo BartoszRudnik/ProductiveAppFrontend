@@ -210,6 +210,8 @@ class TaskProvider with ChangeNotifier {
         print(error);
         throw error;
       }
+    } else {
+      return task.id;
     }
   }
 
@@ -264,6 +266,8 @@ class TaskProvider with ChangeNotifier {
         print(error);
         throw error;
       }
+    } else {
+      return task.id;
     }
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:productive_app/db/attachment_database.dart';
 import 'package:productive_app/db/collaborator_database.dart';
 import 'package:productive_app/db/graphic_database.dart';
 import 'package:productive_app/db/locale_database.dart';
@@ -8,6 +9,7 @@ import 'package:productive_app/db/settings_database.dart';
 import 'package:productive_app/db/tag_database.dart';
 import 'package:productive_app/db/task_database.dart';
 import 'package:productive_app/db/user_database.dart';
+import 'package:productive_app/model/attachment.dart';
 import 'package:productive_app/model/collaborator.dart';
 import 'package:productive_app/model/location.dart';
 import 'package:productive_app/model/settings.dart';
@@ -38,6 +40,7 @@ class Data {
       User user;
       Settings settings;
       List<Task> tasks = [];
+      List<Attachment> attachments = [];
 
       final provider = Provider.of<SynchronizeProvider>(context, listen: false);
       final userEmail = Provider.of<AuthProvider>(context, listen: false).email;
@@ -51,6 +54,7 @@ class Data {
         UserDatabase.read(userEmail).then((value) => user = value),
         SettingsDatabase.read(userEmail).then((value) => settings = value),
         TaskDatabase.readAll(context, userEmail).then((value) => tasks = value),
+        AttachmentDatabase.readAll(userEmail).then((value) => attachments = value),
       ]);
 
       await Future.wait([
@@ -61,7 +65,7 @@ class Data {
         provider.synchronizeGraphic(graphic),
         provider.synchronizeUser(user),
         provider.synchronizeSettings(settings),
-        provider.synchronizeTasks(tasks),
+        provider.synchronizeTasks(tasks, attachments),
       ]);
     } catch (error) {
       print(error);

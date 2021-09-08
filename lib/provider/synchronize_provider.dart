@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
+import 'package:productive_app/model/attachment.dart';
 import 'package:productive_app/model/collaborator.dart';
+import 'package:productive_app/model/deleteAttachment.dart';
 import 'package:productive_app/model/deleteCollaborator.dart';
 import 'package:productive_app/model/deleteLocation.dart';
 import 'package:productive_app/model/deleteTag.dart';
@@ -22,6 +24,7 @@ class SynchronizeProvider with ChangeNotifier {
   List<DeleteTag> tagsToDelete;
   List<DeleteLocation> locationsToDelete;
   List<DeleteTask> tasksToDelete;
+  List<DeleteAttachment> attachmentsToDelete;
 
   SynchronizeProvider({
     @required this.userMail,
@@ -30,9 +33,16 @@ class SynchronizeProvider with ChangeNotifier {
     @required this.tagsToDelete,
     @required this.locationsToDelete,
     @required this.tasksToDelete,
+    @required this.attachmentsToDelete,
   });
 
   String _serverUrl = GlobalConfiguration().getValue("serverUrl");
+
+  void addAttachmentToDelete(int attachmentId, String fileName) {
+    DeleteAttachment newToDelete = DeleteAttachment(attachmentId: attachmentId, fileName: fileName);
+
+    this.attachmentsToDelete.add(newToDelete);
+  }
 
   void addLocationToDelete(String locationName) {
     DeleteLocation newToDelete = DeleteLocation(
@@ -61,17 +71,26 @@ class SynchronizeProvider with ChangeNotifier {
     this.collaboratorsToDelete.add(newToDelete);
   }
 
-  void addTaskToDelete(int taskId) {
+  void addTaskToDelete(int taskId, String taskName) {
     DeleteTask newToDelete = DeleteTask(
       ownerEmail: this.userMail,
       taskId: taskId,
+      taskName: taskName,
     );
 
     this.tasksToDelete.add(newToDelete);
   }
 
-  Future<void> synchronizeTasks(List<Task> tasks) async {
+  Future<void> synchronizeTasks(List<Task> tasks, List<Attachment> attachments) async {
     final finalUrl = this._serverUrl + "synchronize/synchronizeTasks/${this.userMail}";
+
+    print(
+      json.encode(
+        {
+          'deleteListAttachments': this.attachmentsToDelete,
+        },
+      ),
+    );
 
     try {
       await http.post(
@@ -80,6 +99,8 @@ class SynchronizeProvider with ChangeNotifier {
           {
             'taskList': tasks,
             'deleteList': this.tasksToDelete,
+            'attachmentList': attachments,
+            'deleteListAttachments': this.attachmentsToDelete,
           },
         ),
         headers: {
@@ -89,6 +110,7 @@ class SynchronizeProvider with ChangeNotifier {
       );
 
       this.tasksToDelete = [];
+      this.attachmentsToDelete = [];
     } catch (error) {
       print(error);
       throw (error);
@@ -204,15 +226,6 @@ class SynchronizeProvider with ChangeNotifier {
 
   Future<void> synchronizeCollaborators(List<Collaborator> collaboratorList) async {
     final finalUrl = this._serverUrl + "synchronize/synchronizeCollaborators/${this.userMail}";
-
-    print(
-      json.encode(
-        {
-          'collaboratorList': collaboratorList,
-          'deleteList': this.collaboratorsToDelete,
-        },
-      ),
-    );
 
     try {
       await http.post(

@@ -24,6 +24,19 @@ class AttachmentDatabase {
     return result.map((e) => Attachment.fromJson(e)).toList();
   }
 
+  static Future<bool> checkIfExists(int attachmentId, String fileName, int taskId) async {
+    final db = await InitDatabase.instance.database;
+
+    final maps = await db.query(
+      tableAttachment,
+      columns: AttachmentFields.values,
+      where: '${AttachmentFields.id} = ? AND ${AttachmentFields.fileName} = ? AND ${AttachmentFields.taskId} = ?',
+      whereArgs: [attachmentId, fileName, taskId],
+    );
+
+    return maps.isNotEmpty;
+  }
+
   static Future<Attachment> read(int attachmentId) async {
     final db = await InitDatabase.instance.database;
 
@@ -41,6 +54,17 @@ class AttachmentDatabase {
     }
   }
 
+  static Future<void> updateId(int oldId, int newId) async {
+    final db = await InitDatabase.instance.database;
+
+    await db.update(
+      tableAttachment,
+      {'id': newId},
+      where: '${AttachmentFields.id} = ?',
+      whereArgs: [oldId],
+    );
+  }
+
   static Future<int> update(Attachment attachment, String userMail) async {
     final db = await InitDatabase.instance.database;
 
@@ -50,7 +74,7 @@ class AttachmentDatabase {
     return await db.update(
       tableAttachment,
       map,
-      where: '$AttachmentFields.id = ?',
+      where: '${AttachmentFields.id} = ?',
       whereArgs: [attachment.id],
     );
   }
@@ -60,24 +84,23 @@ class AttachmentDatabase {
 
     return db.delete(
       tableAttachment,
-      where: '$AttachmentFields.id = ?',
+      where: '${AttachmentFields.id} = ?',
       whereArgs: [id],
     );
   }
 
-  static Future<void> create(Attachment attachment, String userMail) async {
+  static Future<Attachment> create(Attachment attachment, String userMail) async {
     final db = await InitDatabase.instance.database;
-
-    final existing = await read(attachment.id);
 
     Map map = attachment.toJson();
     map['userMail'] = userMail;
 
-    if (existing == null) {
-      await db.insert(
-        tableAttachment,
-        map,
-      );
+    if (attachment.id != null && read(attachment.id) != null) {
+      update(attachment, userMail);
+      return attachment;
+    } else {
+      final id = await db.insert(tableAttachment, map);
+      return attachment.copy(id: id);
     }
   }
 }

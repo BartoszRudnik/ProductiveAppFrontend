@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_app/config/const_values.dart';
+import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:productive_app/utils/task_validate.dart';
 import 'package:provider/provider.dart';
 
@@ -459,6 +460,14 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
             this.saveTask,
             () {},
           );
+        }
+
+        final notSaved = Provider.of<AttachmentProvider>(context, listen: false).notSavedAttachments;
+
+        if (notSaved != null) {
+          notSaved.forEach((element) {
+            Provider.of<SynchronizeProvider>(context, listen: false).addAttachmentToDelete(element.id, element.fileName);
+          });
         }
 
         await Provider.of<AttachmentProvider>(context, listen: false).deleteNotSavedAttachments();

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:open_file/open_file.dart';
+import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:productive_app/utils/file_type_helper.dart';
 import 'package:productive_app/widget/image_viewer.dart';
 import 'package:provider/provider.dart';
-import 'package:open_file/open_file.dart';
+
 import '../model/attachment.dart';
 import '../provider/attachment_provider.dart';
 import 'dialog/attachment_dialog.dart';
 import 'pdf_viewer.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TaskDetailsAttachments extends StatelessWidget {
   final List<Attachment> attachments;
@@ -85,6 +87,10 @@ class TaskDetailsAttachments extends StatelessWidget {
                             IconButton(
                               icon: Icon(Icons.cancel_outlined, color: Theme.of(context).primaryColor),
                               onPressed: () {
+                                Provider.of<SynchronizeProvider>(context, listen: false).addAttachmentToDelete(
+                                  this.attachments[index].id,
+                                  this.attachments[index].fileName,
+                                );
                                 Provider.of<AttachmentProvider>(context, listen: false).setToDelete(this.attachments[index].id);
                               },
                             ),

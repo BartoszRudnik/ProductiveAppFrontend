@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:productive_app/db/attachment_database.dart';
 import 'package:productive_app/model/attachment.dart';
 import 'package:productive_app/utils/internet_connection.dart';
 
@@ -110,26 +112,30 @@ class AttachmentProvider with ChangeNotifier {
     if (await InternetConnection.internetConnection()) {
       final finalUrl = this._serverUrl + 'attachment/getUserAttachments/${this.userMail}';
 
-      List<Attachment> loadedAttachments = [];
-
       try {
         final response = await http.get(finalUrl);
 
         final responseBody = json.decode(response.body);
 
         for (var element in responseBody) {
-          final newAttachment = Attachment(
+          Attachment newAttachment = Attachment(
             fileName: element['fileName'],
             id: element['id'],
             taskId: element['taskId'],
           );
 
-          loadedAttachments.add(newAttachment);
+          if (!await AttachmentDatabase.checkIfExists(newAttachment.id, newAttachment.fileName, newAttachment.taskId)) {
+            final file = await this.getFileBytes(newAttachment.id);
+
+            if (file != null) {
+              newAttachment.localFile = file;
+            }
+
+            newAttachment = await AttachmentDatabase.create(newAttachment, this.userMail);
+          }
         }
 
-        if (loadedAttachments.length > 0) {
-          this.attachments = loadedAttachments;
-        }
+        this.attachments = await AttachmentDatabase.readAll(this.userMail);
 
         notifyListeners();
       } catch (error) {
@@ -140,6 +146,8 @@ class AttachmentProvider with ChangeNotifier {
   }
 
   Future<void> _deleteAttachment(int attachmentId) async {
+    await AttachmentDatabase.delete(attachmentId);
+
     if (await InternetConnection.internetConnection()) {
       final finalUrl = this._serverUrl + 'attachment/deleteAttachment/$attachmentId';
 
@@ -159,60 +167,84 @@ class AttachmentProvider with ChangeNotifier {
   }
 
   Future<void> setAttachments(List<File> attachments, int taskId, bool editMode) async {
-    if (await InternetConnection.internetConnection()) {
-      try {
-        attachments.forEach((attachment) async {
-          final fileName = basename(attachment.path);
-          final finalUrl = this._serverUrl + 'attachment/addAttachment/${this.userMail}/$taskId/$fileName';
-          final uri = Uri.parse(finalUrl);
+    attachments.forEach(
+      (attachment) async {
+        final attachmentBytes = await attachment.readAsBytes();
 
-          final request = http.MultipartRequest('POST', uri);
-          final multipartFile = await http.MultipartFile.fromPath('multipartFile', attachment.path, filename: attachment.path);
+        Attachment newAttachment = Attachment(
+          taskId: taskId,
+          fileName: basename(attachment.path),
+          localFile: attachmentBytes,
+        );
 
-          request.files.add(multipartFile);
+        newAttachment = await AttachmentDatabase.create(newAttachment, this.userMail);
 
-          final response = await request.send();
-          final respStr = await response.stream.bytesToString();
+        this.attachments.add(newAttachment);
 
-          final newAttachment = Attachment(
-            id: int.parse(respStr),
-            taskId: taskId,
-            fileName: basename(attachment.path),
-          );
+        if (editMode) {
+          this.notSavedAttachments.add(newAttachment);
+        }
 
-          this.attachments.add(newAttachment);
+        notifyListeners();
 
-          if (editMode) {
-            this.notSavedAttachments.add(newAttachment);
+        if (await InternetConnection.internetConnection()) {
+          try {
+            final fileName = basename(attachment.path);
+            final uri = Uri.parse(this._serverUrl + 'attachment/addAttachment/${this.userMail}/$taskId/$fileName');
+
+            final request = http.MultipartRequest('POST', uri);
+            final multipartFile = await http.MultipartFile.fromPath('multipartFile', attachment.path, filename: attachment.path);
+
+            request.files.add(multipartFile);
+
+            final response = await request.send();
+            final respStr = await response.stream.bytesToString();
+
+            if (newAttachment.id != int.parse(respStr)) {
+              await AttachmentDatabase.updateId(newAttachment.id, int.parse(respStr));
+
+              newAttachment.id = int.parse(respStr);
+              notifyListeners();
+            }
+          } catch (error) {
+            print(error);
+            throw (error);
           }
-
-          notifyListeners();
-        });
-      } catch (error) {
-        print(error);
-        throw (error);
-      }
-    }
+        }
+      },
+    );
   }
 
-  Future<File> loadAttachments(int attachmentId) async {
+  Future<Uint8List> getFileBytes(int attachmentId) async {
     if (await InternetConnection.internetConnection()) {
       final finalUrl = this._serverUrl + 'attachment/getAttachment/$attachmentId';
 
       try {
         final response = await http.get(finalUrl);
 
-        final bytes = response.bodyBytes;
-
-        return this._storeFile(finalUrl, bytes, attachmentId);
+        return response.bodyBytes;
       } catch (error) {
         print(error);
         throw (error);
       }
+    } else {
+      return null;
     }
   }
 
-  Future<File> _storeFile(String url, List<int> bytes, int attachmentId) async {
+  Future<File> loadAttachments(int attachmentId) async {
+    try {
+      return this._storeFile(
+        List.from(this.attachments.firstWhere((element) => element.id == attachmentId).localFile),
+        attachmentId,
+      );
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  Future<File> _storeFile(List<int> bytes, int attachmentId) async {
     final allAttachments = this.attachments + this.delegatedAttachments;
 
     String fileName = allAttachments.firstWhere((element) => element.id == attachmentId).fileName;
