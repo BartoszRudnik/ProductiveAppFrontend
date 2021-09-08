@@ -420,7 +420,11 @@ class DelegateProvider with ChangeNotifier {
         },
       );
 
-      this._received.removeWhere((collaborator) => collaborator.id == id);
+      Collaborator collaborator =
+      this.collaborators.firstWhere((element) => element.id == id);
+      this._received.remove(collaborator);
+      this._send.remove(collaborator);
+      this.collaborators.remove(collaborator);
 
       notifyListeners();
     } catch (error) {
