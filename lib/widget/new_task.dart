@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:productive_app/utils/task_validate.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 
 import '../model/tag.dart';
 import '../model/task.dart';
@@ -197,7 +198,10 @@ class _NewTaskState extends State<NewTask> {
       this._endDate = DateTime(this._endDate.year, this._endDate.month, this._endDate.day, this._endTime.hour, this._endTime.minute);
     }
 
+    final uuid = Uuid();
+
     final newTask = Task(
+      uuid: uuid.v1(),
       id: null,
       title: this._taskName,
       startDate: this._startDate,

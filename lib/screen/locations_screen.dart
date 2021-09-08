@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import '../widget/appBar/search_appBar.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:productive_app/widget/single_location.dart';
 import 'package:provider/provider.dart';
+
 import '../model/location.dart';
 import '../provider/location_provider.dart';
 import '../utils/dialogs.dart';
+import '../widget/appBar/search_appBar.dart';
 import '../widget/dialog/location_dialog.dart';
-import '../widget/single_location.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LocationsScreen extends StatefulWidget {
   static const routeName = '/locations-screen';
@@ -41,7 +42,8 @@ class _LocationScreenState extends State<LocationsScreen> {
     print(locationToEdit == null);
 
     if (locationToEdit != null) {
-      String name = await Dialogs.showTextFieldDialogWithInitialValue(context, AppLocalizations.of(context).enterLocationName, locationToEdit.localizationName);
+      String name =
+          await Dialogs.showTextFieldDialogWithInitialValue(context, AppLocalizations.of(context).enterLocationName, locationToEdit.localizationName);
       if (name == null || name.isEmpty) {
         return;
       }
@@ -78,6 +80,7 @@ class _LocationScreenState extends State<LocationsScreen> {
               builder: (context) {
                 return LocationDialog(
                   choosenLocation: Location(
+                    uuid: '',
                     id: -1,
                     latitude: 0.0,
                     longitude: 0.0,

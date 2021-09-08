@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:productive_app/model/tag.dart';
 import 'package:productive_app/provider/tag_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:uuid/uuid.dart';
 
 class TagsDialog extends StatefulWidget {
   static const routeName = "/tags-dialog";
@@ -85,7 +86,12 @@ class _TagsDialogState extends State<TagsDialog> {
                   },
                   onSaved: (value) {
                     setState(() {
-                      final newTag = Tag(id: (tags.length + 1), name: value);
+                      final uuid = Uuid();
+                      final newTag = Tag(
+                        id: (tags.length + 1),
+                        name: value,
+                        uuid: uuid.v1(),
+                      );
                       final alreadyExists = tags.where((element) => element.name == newTag.name);
                       if (alreadyExists.isEmpty) {
                         Provider.of<TagProvider>(context, listen: false).addTag(newTag);

@@ -7,6 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:productive_app/db/location_database.dart';
 import 'package:productive_app/utils/internet_connection.dart';
+import 'package:uuid/uuid.dart';
 
 import '../model/location.dart' as models;
 
@@ -95,6 +96,7 @@ class LocationProvider with ChangeNotifier {
 
         for (var element in responseBody) {
           models.Location loc = models.Location(
+            uuid: element['uuid'],
             id: element['id'],
             localizationName: element["localizationName"],
             longitude: element["longitude"],
@@ -120,6 +122,9 @@ class LocationProvider with ChangeNotifier {
   Future<void> addLocation(models.Location newLocation) async {
     final url = this._serverUrl + "localization/addLocalization/${this.userMail}";
 
+    final uuid = Uuid();
+
+    newLocation.uuid = uuid.v1();
     newLocation.id = null;
     newLocation = await LocationDatabase.create(newLocation, this.userMail);
 
@@ -133,6 +138,7 @@ class LocationProvider with ChangeNotifier {
           url,
           body: json.encode(
             {
+              'uuid': newLocation.uuid,
               'localizationName': newLocation.localizationName,
               'longitude': newLocation.longitude,
               'latitude': newLocation.latitude,
@@ -164,6 +170,7 @@ class LocationProvider with ChangeNotifier {
         await http.put(
           url,
           body: json.encode({
+            'uuid': location.uuid,
             'localizationName': location.localizationName,
             'longitude': location.longitude,
             'latitude': location.latitude,
@@ -183,8 +190,8 @@ class LocationProvider with ChangeNotifier {
     }
   }
 
-  Future<void> deleteLocation(int id) async {
-    final url = this._serverUrl + "localization/deleteLocalization/$id";
+  Future<void> deleteLocation(String uuid, int id) async {
+    final url = this._serverUrl + "localization/deleteLocalization/$uuid";
 
     this.locationList.removeWhere((element) => element.id == id);
     await LocationDatabase.delete(id);
@@ -213,6 +220,7 @@ class LocationProvider with ChangeNotifier {
 
           for (var element in responseBody) {
             models.Location loc = models.Location(
+              uuid: '',
               id: -1,
               localizationName: element["name"],
               longitude: double.parse(element["lon"]),

@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:productive_app/db/attachment_database.dart';
 import 'package:productive_app/model/attachment.dart';
 import 'package:productive_app/utils/internet_connection.dart';
+import 'package:uuid/uuid.dart';
 
 class AttachmentProvider with ChangeNotifier {
   List<Attachment> attachments;
@@ -88,6 +89,7 @@ class AttachmentProvider with ChangeNotifier {
 
         for (var element in responseBody) {
           final newAttachment = Attachment(
+            uuid: element['uuid'],
             fileName: element['fileName'],
             id: element['id'],
             taskId: element['taskId'],
@@ -119,13 +121,14 @@ class AttachmentProvider with ChangeNotifier {
 
         for (var element in responseBody) {
           Attachment newAttachment = Attachment(
+            uuid: element['uuid'],
             fileName: element['fileName'],
             id: element['id'],
             taskId: element['taskId'],
           );
 
           if (!await AttachmentDatabase.checkIfExists(newAttachment.id, newAttachment.fileName, newAttachment.taskId)) {
-            final file = await this.getFileBytes(newAttachment.id);
+            final file = await this.getFileBytes(newAttachment.uuid);
 
             if (file != null) {
               newAttachment.localFile = file;
@@ -170,8 +173,10 @@ class AttachmentProvider with ChangeNotifier {
     attachments.forEach(
       (attachment) async {
         final attachmentBytes = await attachment.readAsBytes();
+        final uuid = Uuid();
 
         Attachment newAttachment = Attachment(
+          uuid: uuid.v1(),
           taskId: taskId,
           fileName: basename(attachment.path),
           localFile: attachmentBytes,
@@ -190,7 +195,7 @@ class AttachmentProvider with ChangeNotifier {
         if (await InternetConnection.internetConnection()) {
           try {
             final fileName = basename(attachment.path);
-            final uri = Uri.parse(this._serverUrl + 'attachment/addAttachment/${this.userMail}/$taskId/$fileName');
+            final uri = Uri.parse(this._serverUrl + 'attachment/addAttachment/${this.userMail}/$taskId/$fileName/${newAttachment.uuid}');
 
             final request = http.MultipartRequest('POST', uri);
             final multipartFile = await http.MultipartFile.fromPath('multipartFile', attachment.path, filename: attachment.path);
@@ -215,9 +220,9 @@ class AttachmentProvider with ChangeNotifier {
     );
   }
 
-  Future<Uint8List> getFileBytes(int attachmentId) async {
+  Future<Uint8List> getFileBytes(String uuid) async {
     if (await InternetConnection.internetConnection()) {
-      final finalUrl = this._serverUrl + 'attachment/getAttachment/$attachmentId';
+      final finalUrl = this._serverUrl + 'attachment/getAttachment/$uuid';
 
       try {
         final response = await http.get(finalUrl);

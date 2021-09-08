@@ -13,6 +13,7 @@ class LocationFields {
     latitude,
     lastUpdated,
     isSelected,
+    uuid,
   ];
 
   static final String id = "id";
@@ -24,6 +25,7 @@ class LocationFields {
   static final String latitude = "latitude";
   static final String lastUpdated = "lastUpdated";
   static final String isSelected = "isSelected";
+  static final String uuid = "uuid";
 }
 
 class Location {
@@ -34,10 +36,9 @@ class Location {
   String country;
   double longitude;
   double latitude;
-
   DateTime lastUpdated;
-
   bool isSelected;
+  String uuid;
 
   Location({
     this.lastUpdated,
@@ -48,6 +49,7 @@ class Location {
     @required this.country,
     @required this.locality,
     @required this.street,
+    @required this.uuid,
     this.isSelected = false,
   });
 
@@ -61,8 +63,10 @@ class Location {
     double latitude,
     DateTime lastUpdated,
     bool isSelected,
+    String uuid,
   }) =>
       Location(
+        uuid: uuid ?? this.uuid,
         id: id ?? this.id,
         localizationName: localizationName ?? this.localizationName,
         longitude: longitude ?? this.longitude,
@@ -75,6 +79,7 @@ class Location {
       );
 
   static Location fromJson(Map<String, Object> json) => Location(
+        uuid: json[LocationFields.uuid] as String,
         id: json[LocationFields.id] as int,
         localizationName: json[LocationFields.localizationName] as String,
         longitude: json[LocationFields.longitude] as double,
@@ -88,6 +93,7 @@ class Location {
 
   Map<String, dynamic> toJson() {
     return {
+      LocationFields.uuid: this.uuid,
       LocationFields.id: this.id,
       LocationFields.localizationName: this.localizationName,
       LocationFields.longitude: this.longitude,

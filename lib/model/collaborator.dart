@@ -15,6 +15,7 @@ class CollaboratorsFields {
     received,
     isSelected,
     lastUpdated,
+    uuid,
   ];
 
   static final String id = "id";
@@ -28,6 +29,7 @@ class CollaboratorsFields {
   static final String received = "received";
   static final String isSelected = "isSelected";
   static final String lastUpdated = "lastUpdated";
+  static final String uuid = "uuid";
 }
 
 class Collaborator {
@@ -41,8 +43,8 @@ class Collaborator {
   bool receivedPermission;
   bool received;
   bool isSelected;
-
   DateTime lastUpdated;
+  String uuid;
 
   Collaborator({
     this.lastUpdated,
@@ -52,6 +54,7 @@ class Collaborator {
     this.collaboratorName,
     @required this.email,
     @required this.relationState,
+    @required this.uuid,
     this.isSelected = false,
     this.received = false,
     this.isAskingForPermission = false,
@@ -59,6 +62,7 @@ class Collaborator {
   });
 
   Collaborator copy({
+    String uuid,
     int id,
     String email,
     String relationState,
@@ -72,6 +76,7 @@ class Collaborator {
     DateTime lastUpdated,
   }) =>
       Collaborator(
+        uuid: uuid ?? this.uuid,
         email: email ?? this.email,
         relationState: relationState ?? this.relationState,
         id: id ?? this.id,
@@ -86,6 +91,7 @@ class Collaborator {
       );
 
   static Collaborator fromJson(Map<String, Object> json) => Collaborator(
+        uuid: json[CollaboratorsFields.uuid] as String,
         id: json[CollaboratorsFields.id] as int,
         email: json[CollaboratorsFields.email] as String,
         relationState: json[CollaboratorsFields.relationState] as String,
@@ -101,6 +107,7 @@ class Collaborator {
 
   Map<String, dynamic> toJson() {
     return {
+      CollaboratorsFields.uuid: this.uuid,
       CollaboratorsFields.id: this.id,
       CollaboratorsFields.email: this.email,
       CollaboratorsFields.relationState: this.relationState,

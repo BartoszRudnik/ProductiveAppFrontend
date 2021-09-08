@@ -177,6 +177,7 @@ class TaskProvider with ChangeNotifier {
           url,
           body: json.encode(
             {
+              'uuid': task.uuid,
               'taskName': task.title,
               'taskDescription': task.description,
               'userEmail': this.userMail,
@@ -233,6 +234,7 @@ class TaskProvider with ChangeNotifier {
           url,
           body: json.encode(
             {
+              'uuid': task.uuid,
               'taskName': task.title,
               'taskDescription': task.description,
               'userEmail': this.userMail,
@@ -350,6 +352,7 @@ class TaskProvider with ChangeNotifier {
           url,
           body: json.encode(
             {
+              'uuid': task.uuid,
               'taskName': task.title,
               'taskDescription': task.description,
               'userEmail': this.userMail,
@@ -435,6 +438,7 @@ class TaskProvider with ChangeNotifier {
           url,
           body: json.encode(
             {
+              'uuid': task.uuid,
               'taskName': task.title,
               'taskDescription': task.description,
               'userEmail': this.userMail,
@@ -479,6 +483,7 @@ class TaskProvider with ChangeNotifier {
 
         for (var tagElement in responseBody['tags']) {
           taskTags.add(Tag(
+            uuid: tagElement['uuid'],
             id: tagElement['id'],
             name: tagElement['name'],
           ));
@@ -493,6 +498,7 @@ class TaskProvider with ChangeNotifier {
         }
 
         Task task = Task(
+            uuid: responseBody['tasks']['uuid'],
             id: responseBody['tasks']['id'],
             title: responseBody['tasks']['taskName'],
             description: responseBody['tasks']['description'],
@@ -543,6 +549,7 @@ class TaskProvider with ChangeNotifier {
       String url = this._serverUrl + 'task/getSingleTask/${this.userMail}/$taskId';
       String supervisorEmail;
       Task mockTask = Task(
+        uuid: '',
         id: -1,
         title: 'Mock task',
         description: 'Mock task desc',
@@ -559,6 +566,7 @@ class TaskProvider with ChangeNotifier {
         supervisorEmail = responseBody['ownerEmail'];
 
         Task task = Task(
+          uuid: responseBody['uuid'],
           id: responseBody['taskId'],
           title: responseBody['taskName'],
           description: responseBody['description'],
@@ -629,6 +637,7 @@ class TaskProvider with ChangeNotifier {
           if (element['tags'] != null) {
             for (var tagElement in element['tags']) {
               taskTags.add(Tag(
+                uuid: tagElement['uuid'],
                 id: tagElement['id'],
                 name: tagElement['name'],
               ));
@@ -644,6 +653,7 @@ class TaskProvider with ChangeNotifier {
           }
 
           Task task = Task(
+              uuid: element['tasks']['uuid'],
               id: element['tasks']['id'],
               title: element['tasks']['taskName'],
               description: element['tasks']['description'],

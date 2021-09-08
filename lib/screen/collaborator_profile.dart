@@ -1,14 +1,15 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:productive_app/provider/synchronize_provider.dart';
-import '../config/images.dart';
-import '../widget/switch_list_tile/grant_access_list_tile.dart';
 import 'package:provider/provider.dart';
+
+import '../config/images.dart';
 import '../model/collaborator.dart';
 import '../provider/delegate_provider.dart';
 import '../widget/appBar/collaborator_profile_appBar.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:auto_size_text/auto_size_text.dart';
+import '../widget/switch_list_tile/grant_access_list_tile.dart';
 
 class CollaboratorProfile extends StatelessWidget {
   final int collaboratorId;
@@ -199,7 +200,7 @@ class CollaboratorProfile extends StatelessWidget {
                                     ElevatedButton(
                                         onPressed: () async {
                                           Provider.of<SynchronizeProvider>(context, listen: false).addCollaboratorToDelete(collaborator.email);
-                                          await Provider.of<DelegateProvider>(context, listen: false).deleteCollaborator(collaborator.id);
+                                          await Provider.of<DelegateProvider>(context, listen: false).deleteCollaborator(collaborator.uuid);
                                           Navigator.of(context).pop(true);
                                           Navigator.of(context).pop(true);
                                         },

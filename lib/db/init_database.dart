@@ -47,6 +47,7 @@ class InitDatabase {
       ${TagFields.name} $textType,
       ${TagFields.isSelected} $boolType,
       ${TagFields.lastUpdated} $textType,
+      ${TagFields.uuid} $textType,
       $userEmail $textType
     )
     ''');
@@ -58,6 +59,7 @@ class InitDatabase {
       ${AttachmentFields.toDelete} $boolType,
       ${AttachmentFields.lastUpdated} $textType,
       ${AttachmentFields.localFile} $blob,
+      ${AttachmentFields.uuid} $textType,
       $userEmail $textType
     )
     ''');
@@ -72,6 +74,7 @@ class InitDatabase {
       ${LocationFields.latitude} $doubleType,
       ${LocationFields.longitude} $doubleType,
       ${LocationFields.isSelected} $boolType,
+      ${LocationFields.uuid} $textType,
       $userEmail $textType
     )
     ''');
@@ -88,6 +91,7 @@ class InitDatabase {
       ${CollaboratorsFields.receivedPermission} $boolType,
       ${CollaboratorsFields.received} $boolType,
       ${CollaboratorsFields.sentPermission} $boolType,
+      ${CollaboratorsFields.uuid} $textType,
       $userEmail $textType
     )
     ''');
@@ -171,6 +175,7 @@ class InitDatabase {
       ${TaskFields.notificationOnEnter} $boolType,
       ${TaskFields.notificationOnExit} $boolType,
       ${TaskFields.lastUpdated} $textType,
+      ${TaskFields.uuid} $textType,
       $userEmail $textType
     )
     ''');

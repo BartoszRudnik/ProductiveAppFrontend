@@ -138,8 +138,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                                   Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
                                 } else {
                                   Provider.of<SynchronizeProvider>(context, listen: false).addTaskToDelete(
-                                    this.widget.task.id,
-                                    this.widget.task.title,
+                                    this.widget.task.uuid,
                                   );
                                   Provider.of<TaskProvider>(context, listen: false).deleteTask(this.widget.task.id);
                                 }

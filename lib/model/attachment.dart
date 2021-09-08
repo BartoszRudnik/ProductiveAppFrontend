@@ -12,6 +12,7 @@ class AttachmentFields {
     toDelete,
     lastUpdated,
     localFile,
+    uuid,
   ];
 
   static final String id = "id";
@@ -20,6 +21,7 @@ class AttachmentFields {
   static final String toDelete = "toDelete";
   static final String lastUpdated = "lastUpdated";
   static final String localFile = "localFile";
+  static final String uuid = "uuid";
 }
 
 class Attachment {
@@ -29,11 +31,13 @@ class Attachment {
   bool toDelete;
   DateTime lastUpdated;
   Uint8List localFile;
+  String uuid;
 
   Attachment({
     this.id,
     @required this.taskId,
     @required this.fileName,
+    @required this.uuid,
     this.lastUpdated,
     this.localFile,
     this.toDelete = false,
@@ -46,8 +50,10 @@ class Attachment {
     bool toDelete,
     DateTime lastUpdated,
     Uint8List localFile,
+    String uuid,
   }) =>
       Attachment(
+        uuid: uuid ?? this.uuid,
         id: id ?? this.id,
         taskId: taskId ?? this.taskId,
         fileName: fileName ?? this.fileName,
@@ -58,6 +64,7 @@ class Attachment {
 
   Map<String, dynamic> toJson() {
     return {
+      AttachmentFields.uuid: this.uuid,
       AttachmentFields.id: this.id,
       AttachmentFields.taskId: this.taskId,
       AttachmentFields.fileName: this.fileName,
@@ -68,6 +75,7 @@ class Attachment {
   }
 
   static Attachment fromJson(Map<String, Object> json) => Attachment(
+        uuid: json[AttachmentFields.uuid] as String,
         id: json[AttachmentFields.id] as int,
         taskId: json[AttachmentFields.taskId] as int,
         fileName: json[AttachmentFields.fileName] as String,

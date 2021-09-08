@@ -29,6 +29,7 @@ class TaskFields {
     notificationOnEnter,
     notificationOnExit,
     lastUpdated,
+    uuid,
   ];
 
   static final String id = "id";
@@ -53,6 +54,7 @@ class TaskFields {
   static final String notificationOnEnter = "notificationOnEnter";
   static final String notificationOnExit = "notificationOnExit";
   static final String lastUpdated = "lastUpdated";
+  static final String uuid = "uuid";
 }
 
 class Task with ChangeNotifier {
@@ -80,6 +82,7 @@ class Task with ChangeNotifier {
   bool notificationOnExit;
 
   DateTime lastUpdated;
+  String uuid;
 
   String joinTagList(List<Tag> tagList) {
     if (tagList != null && tagList.length > 0) {
@@ -144,6 +147,7 @@ class Task with ChangeNotifier {
     this.notificationOnEnter = false,
     this.notificationOnExit = false,
     this.lastUpdated,
+    @required this.uuid,
   });
 
   Task copy({
@@ -169,6 +173,7 @@ class Task with ChangeNotifier {
     bool notificationOnEnter,
     bool notificationOnExit,
     DateTime lastUpdated,
+    String uuid,
   }) =>
       Task(
         id: id ?? this.id,
@@ -192,11 +197,13 @@ class Task with ChangeNotifier {
         notificationLocalizationRadius: notificationLocalizationRadius ?? this.notificationLocalizationRadius,
         notificationOnEnter: notificationOnEnter ?? this.notificationOnEnter,
         notificationOnExit: notificationOnExit ?? this.notificationOnExit,
+        uuid: uuid ?? this.uuid,
         lastUpdated: DateTime.now(),
       );
 
   static Task fromJson(Map<String, Object> json, BuildContext context) {
     return Task(
+      uuid: json[TaskFields.uuid] == null ? null : json[TaskFields.uuid] as String,
       id: json[TaskFields.id] == null ? null : json[TaskFields.id] as int,
       title: json[TaskFields.title] == null ? null : json[TaskFields.title] as String,
       childId: json[TaskFields.childId] == null ? null : json[TaskFields.childId] as int,
@@ -225,6 +232,7 @@ class Task with ChangeNotifier {
 
   Map<String, dynamic> toJson() {
     return {
+      TaskFields.uuid: this.uuid,
       TaskFields.id: this.id,
       TaskFields.title: this.title,
       TaskFields.childId: this.childId,

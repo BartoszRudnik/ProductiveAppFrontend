@@ -71,11 +71,9 @@ class SynchronizeProvider with ChangeNotifier {
     this.collaboratorsToDelete.add(newToDelete);
   }
 
-  void addTaskToDelete(int taskId, String taskName) {
+  void addTaskToDelete(String uuid) {
     DeleteTask newToDelete = DeleteTask(
-      ownerEmail: this.userMail,
-      taskId: taskId,
-      taskName: taskName,
+      uuid: uuid,
     );
 
     this.tasksToDelete.add(newToDelete);

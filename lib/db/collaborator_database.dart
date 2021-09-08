@@ -74,4 +74,14 @@ class CollaboratorDatabase {
       whereArgs: [id],
     );
   }
+
+  static Future<int> deleteByUuid(String uuid) async {
+    final db = await InitDatabase.instance.database;
+
+    return db.delete(
+      tableCollaborators,
+      where: '${CollaboratorsFields.uuid} = ?',
+      whereArgs: [uuid],
+    );
+  }
 }

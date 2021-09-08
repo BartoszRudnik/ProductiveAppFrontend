@@ -1,21 +1,15 @@
 import 'package:flutter/material.dart';
 
 class DeleteTask {
-  String ownerEmail;
-  String taskName;
-  int taskId;
+  String uuid;
 
   DeleteTask({
-    @required this.ownerEmail,
-    @required this.taskId,
-    @required this.taskName,
+    @required this.uuid,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      "ownerEmail": this.ownerEmail,
-      "taskId": this.taskId,
-      "taskName": this.taskName,
+      "uuid": this.uuid,
     };
   }
 }

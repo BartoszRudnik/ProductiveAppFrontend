@@ -7,6 +7,7 @@ import 'package:productive_app/db/collaborator_database.dart';
 import 'package:productive_app/model/collaborator.dart';
 import 'package:productive_app/model/collaboratorTask.dart';
 import 'package:productive_app/utils/internet_connection.dart';
+import 'package:uuid/uuid.dart';
 
 class DelegateProvider with ChangeNotifier {
   List<Collaborator> collaborators = [];
@@ -322,6 +323,7 @@ class DelegateProvider with ChangeNotifier {
           }
 
           Collaborator newCollaborator = Collaborator(
+            uuid: element['uuid'],
             id: element['id'],
             email: collaboratorEmail,
             collaboratorName: collaboratorName,
@@ -350,10 +352,10 @@ class DelegateProvider with ChangeNotifier {
     }
   }
 
-  Future<void> deleteCollaborator(int id) async {
-    final requestUrl = this._serverUrl + 'delegate/deleteCollaborator/$id';
+  Future<void> deleteCollaborator(String uuid) async {
+    final requestUrl = this._serverUrl + 'delegate/deleteCollaborator/$uuid';
 
-    Collaborator collaborator = this.collaborators.firstWhere((element) => element.id == id);
+    Collaborator collaborator = this.collaborators.firstWhere((element) => element.uuid == uuid);
 
     if (collaborator.relationState == 'WAITING') {
       this._send.remove(collaborator);
@@ -362,7 +364,7 @@ class DelegateProvider with ChangeNotifier {
     }
 
     this.collaborators.remove(collaborator);
-    await CollaboratorDatabase.delete(id);
+    await CollaboratorDatabase.deleteByUuid(uuid);
 
     notifyListeners();
 
@@ -454,12 +456,17 @@ class DelegateProvider with ChangeNotifier {
           throw Exception("You cannot invite yourself");
         }
 
+        final uuid = Uuid();
+
+        final uuidCode = uuid.v1();
+
         final response = await http.post(
           requestUrl,
           body: json.encode(
             {
               'userEmail': this.userEmail,
               'collaboratorEmail': newCollaborator,
+              'uuid': uuidCode,
             },
           ),
           headers: {
@@ -469,6 +476,7 @@ class DelegateProvider with ChangeNotifier {
         );
 
         Collaborator collaborator = Collaborator(
+          uuid: uuidCode,
           id: int.parse(response.body),
           email: newCollaborator,
           relationState: 'WAITING',

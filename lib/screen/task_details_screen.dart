@@ -390,6 +390,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     }
 
     taskToEdit = new Task(
+      uuid: argTask.uuid,
       id: argTask.id,
       title: argTask.title,
       description: argTask.description,

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:productive_app/config/color_themes.dart';
 import 'package:provider/provider.dart';
+
 import '../../model/location.dart';
 import '../../model/taskLocation.dart';
 import '../../provider/location_provider.dart';
 import '../../utils/dialogs.dart';
 import '../../utils/notifications.dart';
 import 'location_dialog.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NotificationLocationDialog extends StatefulWidget {
   final Key key;
@@ -130,6 +131,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                                       builder: (context) {
                                         return LocationDialog(
                                           choosenLocation: Location(
+                                            uuid: '',
                                             id: -1,
                                             latitude: 0.0,
                                             longitude: 0.0,

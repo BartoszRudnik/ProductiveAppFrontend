@@ -74,6 +74,7 @@ class TagProvider with ChangeNotifier {
 
         for (var element in responseBody) {
           Tag newTag = Tag(
+            uuid: element['uuid'],
             id: element['id'],
             name: element['name'],
           );
@@ -159,6 +160,7 @@ class TagProvider with ChangeNotifier {
           url,
           body: json.encode(
             {
+              'uuid': newTag.uuid,
               'id': newTag.id,
               'name': newTag.name,
               'taskId': null,

@@ -95,7 +95,7 @@ class MyApp extends StatelessWidget {
             authToken: auth.token,
             taskList: previousTasks == null ? [] : previousTasks.taskList,
             taskPriorities: previousTasks == null ? [] : previousTasks.priorities,
-            singleTask: previousTasks == null ? Task(id: -1, title: '') : previousTasks.singleTask,
+            singleTask: previousTasks == null ? Task(id: -1, title: '', uuid: '') : previousTasks.singleTask,
           ),
         ),
         ChangeNotifierProxyProvider<AuthProvider, TagProvider>(

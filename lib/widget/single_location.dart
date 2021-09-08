@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:productive_app/db/location_database.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:productive_app/model/location.dart';
 import 'package:productive_app/provider/synchronize_provider.dart';
+import 'package:provider/provider.dart';
+
 import '../provider/location_provider.dart';
 import '../provider/task_provider.dart';
 import '../utils/dialogs.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SingleLocation extends StatelessWidget {
   final Location location;
@@ -64,7 +64,7 @@ class SingleLocation extends StatelessWidget {
           if (hasAgreed) {
             Provider.of<TaskProvider>(context, listen: false).clearLocationFromTasks(location.id);
             Provider.of<SynchronizeProvider>(context, listen: false).addLocationToDelete(location.localizationName);
-            Provider.of<LocationProvider>(context, listen: false).deleteLocation(location.id);
+            Provider.of<LocationProvider>(context, listen: false).deleteLocation(location.uuid, location.id);
           }
         }
         if (direction == DismissDirection.startToEnd) {
