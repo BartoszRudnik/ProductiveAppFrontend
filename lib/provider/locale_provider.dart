@@ -37,6 +37,12 @@ class LocaleProvider with ChangeNotifier {
         print(error);
         throw error;
       }
+    } else {
+      final result = await LocaleDatabase.read(this.email);
+
+      this.locale = Locale(result[0]);
+
+      notifyListeners();
     }
   }
 

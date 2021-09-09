@@ -351,6 +351,12 @@ class DelegateProvider with ChangeNotifier {
         print(error);
         throw (error);
       }
+    } else {
+      this.collaborators = await CollaboratorDatabase.readAll(this.userEmail);
+
+      this.divideCollaborators(this.collaborators);
+
+      notifyListeners();
     }
   }
 

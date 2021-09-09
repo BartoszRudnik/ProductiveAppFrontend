@@ -38,7 +38,7 @@ class TaskDetailsAttachments extends StatelessWidget {
                     itemCount: this.attachments.length,
                     itemBuilder: (ctx, index) => TextButton(
                       onPressed: () async {
-                        final file = await Provider.of<AttachmentProvider>(context, listen: false).loadAttachments(this.attachments[index].id);
+                        final file = await Provider.of<AttachmentProvider>(context, listen: false).loadAttachment(this.attachments[index].id);
 
                         if (FileTypeHelper.isImage(file.path) || FileTypeHelper.isPDF(file.path)) {
                           String routeName = '';

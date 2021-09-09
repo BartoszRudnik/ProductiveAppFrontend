@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
@@ -617,7 +618,7 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
-  Future<void> fetchTasks() async {
+  Future<void> fetchTasks(BuildContext context) async {
     if (await InternetConnection.internetConnection()) {
       String url = this._serverUrl + 'task/getAll/${this.userMail}';
 
@@ -716,6 +717,16 @@ class TaskProvider with ChangeNotifier {
         print(error);
         throw error;
       }
+    } else {
+      this.taskList = await TaskDatabase.readAll(context, this.userMail);
+      this.divideTasks();
+
+      this.sortByPosition(this._anytimeTasks);
+      this.sortByPosition(this._scheduledTasks);
+      this.sortByPosition(this._inboxTasks);
+      this.sortByPosition(this._delegatedTasks);
+
+      notifyListeners();
     }
   }
 
@@ -850,6 +861,7 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
+  //Todo
   Future<void> getPriorities() async {
     if (await InternetConnection.internetConnection()) {
       this.taskPriorities = [];

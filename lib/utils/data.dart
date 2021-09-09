@@ -76,7 +76,7 @@ class Data {
     try {
       await Future.wait(
         [
-          Provider.of<TaskProvider>(context, listen: false).fetchTasks(),
+          Provider.of<TaskProvider>(context, listen: false).fetchTasks(context),
           Provider.of<TaskProvider>(context, listen: false).getPriorities(),
           Provider.of<TagProvider>(context, listen: false).getTags(),
           Provider.of<LocationProvider>(context, listen: false).getLocations(),

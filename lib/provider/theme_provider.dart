@@ -60,6 +60,12 @@ class ThemeProvider with ChangeNotifier {
         print(error);
         throw (error);
       }
+    } else {
+      final result = await GraphicDatabase.read(this.userEmail);
+
+      this.themeMode = this._selectColorMode(result[0]);
+
+      notifyListeners();
     }
   }
 

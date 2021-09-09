@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../model/task.dart';
@@ -8,7 +9,6 @@ import '../utils/manage_filters.dart';
 import '../widget/empty_list.dart';
 import '../widget/reorderable_task_list.dart';
 import '../widget/tasks_list.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class DelegatedScreen extends StatelessWidget {
   void onReorder(int newIndex, int oldIndex, List<Task> tasks, BuildContext context) {
@@ -54,7 +54,7 @@ class DelegatedScreen extends StatelessWidget {
           Expanded(
             child: RefreshIndicator(
               backgroundColor: Theme.of(context).primaryColor,
-              onRefresh: () => Provider.of<TaskProvider>(context, listen: false).fetchTasks(),
+              onRefresh: () => Provider.of<TaskProvider>(context, listen: false).fetchTasks(context),
               child: tasks.length == 0
                   ? EmptyList(message: AppLocalizations.of(context).emptyDelegated)
                   : userSettings.sortingMode == 6

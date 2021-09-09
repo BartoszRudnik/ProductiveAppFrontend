@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+
 import '../model/task.dart';
 import '../provider/settings_provider.dart';
 import '../provider/task_provider.dart';
 import '../utils/manage_filters.dart';
 import '../widget/empty_list.dart';
 import '../widget/task_widget.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ScheduledScreen extends StatelessWidget {
   @override
@@ -23,7 +24,7 @@ class ScheduledScreen extends StatelessWidget {
 
     return RefreshIndicator(
       backgroundColor: Theme.of(context).primaryColor,
-      onRefresh: () => Provider.of<TaskProvider>(context, listen: false).fetchTasks(),
+      onRefresh: () => Provider.of<TaskProvider>(context, listen: false).fetchTasks(context),
       child: before.length == 0 && today.length == 0 && after.length == 0
           ? EmptyList(message: AppLocalizations.of(context).emptyScheduled)
           : SingleChildScrollView(

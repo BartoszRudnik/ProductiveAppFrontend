@@ -24,14 +24,14 @@ class AttachmentDatabase {
     return result.map((e) => Attachment.fromJson(e)).toList();
   }
 
-  static Future<bool> checkIfExists(int attachmentId, String fileName, int taskId) async {
+  static Future<bool> checkIfExists(String uuid) async {
     final db = await InitDatabase.instance.database;
 
     final maps = await db.query(
       tableAttachment,
       columns: AttachmentFields.values,
-      where: '${AttachmentFields.id} = ? AND ${AttachmentFields.fileName} = ? AND ${AttachmentFields.taskId} = ?',
-      whereArgs: [attachmentId, fileName, taskId],
+      where: '${AttachmentFields.uuid} = ?',
+      whereArgs: [uuid],
     );
 
     return maps.isNotEmpty;

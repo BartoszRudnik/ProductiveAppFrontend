@@ -26,12 +26,8 @@ class SettingsProvider with ChangeNotifier {
   String _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
   void deleteTag(String tagName) async {
-    print('usuwanie');
-
     if (this.userSettings.tags.contains(tagName)) {
       this.userSettings.tags.removeWhere((element) => element == tagName);
-
-      print('usuwanie udane');
 
       await SettingsDatabase.update(this.userSettings, this.userMail);
 
@@ -53,9 +49,9 @@ class SettingsProvider with ChangeNotifier {
   Future<void> getFilterSettings() async {
     final finalUrl = this._serverUrl + 'filterSettings/getFilterSettings/${this.userMail}';
 
-    await SettingsDatabase.delete(this.userMail);
-
     if (await InternetConnection.internetConnection()) {
+      await SettingsDatabase.delete(this.userMail);
+
       try {
         final response = await http.get(finalUrl);
 
@@ -101,6 +97,10 @@ class SettingsProvider with ChangeNotifier {
         print(error);
         throw (error);
       }
+    } else {
+      this.userSettings = await SettingsDatabase.read(this.userMail);
+
+      notifyListeners();
     }
   }
 

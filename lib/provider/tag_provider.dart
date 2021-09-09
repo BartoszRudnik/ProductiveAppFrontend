@@ -91,6 +91,11 @@ class TagProvider with ChangeNotifier {
         throw error;
       }
     }
+    {
+      this.tagList = await TagDatabase.readAll(this.userMail);
+
+      notifyListeners();
+    }
   }
 
   Future<void> deleteTagPermanently(String tagName) async {

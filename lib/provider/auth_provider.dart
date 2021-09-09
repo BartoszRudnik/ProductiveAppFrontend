@@ -55,10 +55,19 @@ class AuthProvider with ChangeNotifier {
 
         this.user.firstName = responseBody['firstName'];
         this.user.lastName = responseBody['lastName'];
+
+        notifyListeners();
       } catch (error) {
         print(error);
         throw (error);
       }
+    } else {
+      final user = await UserDatabase.read(this.user.email);
+
+      this.user.firstName = user.firstName;
+      this.user.lastName = user.lastName;
+
+      notifyListeners();
     }
   }
 
@@ -270,6 +279,10 @@ class AuthProvider with ChangeNotifier {
         print(error);
         throw (error);
       }
+    } else {
+      final user = await UserDatabase.read(this.user.email);
+
+      this._user.removed = user.removed;
     }
   }
 
@@ -355,6 +368,10 @@ class AuthProvider with ChangeNotifier {
 
       if (result != ConnectivityResult.none) {
         this._user.userImage = NetworkImage(this._serverUrl + 'userImage/getImage/${this._user.email}');
+      } else {
+        final user = await UserDatabase.read(this._user.email);
+
+        this._user.localImage = user.localImage;
       }
     } catch (error) {
       print(error);

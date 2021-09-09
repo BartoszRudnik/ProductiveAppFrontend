@@ -116,6 +116,9 @@ class LocationProvider with ChangeNotifier {
         print(error);
         throw error;
       }
+    } else {
+      this.locationList = await LocationDatabase.readAll(this.userMail);
+      notifyListeners();
     }
   }
 

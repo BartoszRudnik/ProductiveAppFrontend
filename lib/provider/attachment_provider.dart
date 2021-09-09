@@ -88,12 +88,22 @@ class AttachmentProvider with ChangeNotifier {
         final responseBody = json.decode(response.body);
 
         for (var element in responseBody) {
-          final newAttachment = Attachment(
+          Attachment newAttachment = Attachment(
             uuid: element['uuid'],
             fileName: element['fileName'],
             id: element['id'],
             taskId: element['taskId'],
           );
+
+          if (!await AttachmentDatabase.checkIfExists(newAttachment.uuid)) {
+            final file = await this.getFileBytes(newAttachment.uuid);
+
+            if (file != null) {
+              newAttachment.localFile = file;
+            }
+
+            newAttachment = await AttachmentDatabase.create(newAttachment, this.userMail);
+          }
 
           loadedAttachments.add(newAttachment);
         }
@@ -127,7 +137,7 @@ class AttachmentProvider with ChangeNotifier {
             taskId: element['taskId'],
           );
 
-          if (!await AttachmentDatabase.checkIfExists(newAttachment.id, newAttachment.fileName, newAttachment.taskId)) {
+          if (!await AttachmentDatabase.checkIfExists(newAttachment.uuid)) {
             final file = await this.getFileBytes(newAttachment.uuid);
 
             if (file != null) {
@@ -145,6 +155,10 @@ class AttachmentProvider with ChangeNotifier {
         print(error);
         throw (error);
       }
+    } else {
+      this.attachments = await AttachmentDatabase.readAll(this.userMail);
+
+      notifyListeners();
     }
   }
 
@@ -237,7 +251,7 @@ class AttachmentProvider with ChangeNotifier {
     }
   }
 
-  Future<File> loadAttachments(int attachmentId) async {
+  Future<File> loadAttachment(int attachmentId) async {
     try {
       return this._storeFile(
         List.from(this.attachments.firstWhere((element) => element.id == attachmentId).localFile),
