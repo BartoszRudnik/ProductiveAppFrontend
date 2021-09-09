@@ -1,18 +1,15 @@
 import 'package:flutter/cupertino.dart';
 
 class DeleteAttachment {
-  int attachmentId;
-  String fileName;
+  String uuid;
 
   DeleteAttachment({
-    @required this.attachmentId,
-    @required this.fileName,
+    @required this.uuid,
   });
 
-  Map<String, dynamic> toJson(){
-    return{
-      "attachmentId": this.attachmentId,
-      "fileName": this.fileName,
+  Map<String, dynamic> toJson() {
+    return {
+      "uuid": this.uuid,
     };
   }
 }

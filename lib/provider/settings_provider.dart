@@ -25,6 +25,31 @@ class SettingsProvider with ChangeNotifier {
 
   String _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
+  void deleteTag(String tagName) async {
+    print('usuwanie');
+
+    if (this.userSettings.tags.contains(tagName)) {
+      this.userSettings.tags.removeWhere((element) => element == tagName);
+
+      print('usuwanie udane');
+
+      await SettingsDatabase.update(this.userSettings, this.userMail);
+
+      notifyListeners();
+    }
+  }
+
+  void editTag(String oldName, String newName) async {
+    if (this.userSettings.tags.contains(oldName)) {
+      this.userSettings.tags.removeWhere((element) => element == oldName);
+      this.userSettings.tags.add(newName);
+
+      await SettingsDatabase.update(this.userSettings, this.userMail);
+
+      notifyListeners();
+    }
+  }
+
   Future<void> getFilterSettings() async {
     final finalUrl = this._serverUrl + 'filterSettings/getFilterSettings/${this.userMail}';
 

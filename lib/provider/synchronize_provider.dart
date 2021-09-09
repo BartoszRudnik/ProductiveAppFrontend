@@ -38,16 +38,15 @@ class SynchronizeProvider with ChangeNotifier {
 
   String _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
-  void addAttachmentToDelete(int attachmentId, String fileName) {
-    DeleteAttachment newToDelete = DeleteAttachment(attachmentId: attachmentId, fileName: fileName);
+  void addAttachmentToDelete(String uuid) {
+    DeleteAttachment newToDelete = DeleteAttachment(uuid: uuid);
 
     this.attachmentsToDelete.add(newToDelete);
   }
 
-  void addLocationToDelete(String locationName) {
+  void addLocationToDelete(String uuid) {
     DeleteLocation newToDelete = DeleteLocation(
-      ownerEmail: this.userMail,
-      locationName: locationName,
+      uuid: uuid,
     );
 
     this.locationsToDelete.add(newToDelete);
@@ -62,10 +61,9 @@ class SynchronizeProvider with ChangeNotifier {
     this.tagsToDelete.add(newToDelete);
   }
 
-  void addCollaboratorToDelete(String collaboratorEmail) {
+  void addCollaboratorToDelete(String uuid) {
     DeleteCollaborator newToDelete = DeleteCollaborator(
-      user1Mail: this.userMail,
-      user2Mail: collaboratorEmail,
+      uuid: uuid,
     );
 
     this.collaboratorsToDelete.add(newToDelete);
@@ -81,14 +79,6 @@ class SynchronizeProvider with ChangeNotifier {
 
   Future<void> synchronizeTasks(List<Task> tasks, List<Attachment> attachments) async {
     final finalUrl = this._serverUrl + "synchronize/synchronizeTasks/${this.userMail}";
-
-    print(
-      json.encode(
-        {
-          'deleteListAttachments': this.attachmentsToDelete,
-        },
-      ),
-    );
 
     try {
       await http.post(

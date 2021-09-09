@@ -199,7 +199,7 @@ class CollaboratorProfile extends StatelessWidget {
                                   children: [
                                     ElevatedButton(
                                         onPressed: () async {
-                                          Provider.of<SynchronizeProvider>(context, listen: false).addCollaboratorToDelete(collaborator.email);
+                                          Provider.of<SynchronizeProvider>(context, listen: false).addCollaboratorToDelete(collaborator.uuid);
                                           await Provider.of<DelegateProvider>(context, listen: false).deleteCollaborator(collaborator.uuid);
                                           Navigator.of(context).pop(true);
                                           Navigator.of(context).pop(true);

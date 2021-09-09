@@ -232,6 +232,7 @@ class DelegateProvider with ChangeNotifier {
 
         for (var element in responseBody) {
           CollaboratorTask collaboratorTask = CollaboratorTask(
+            uuid: element['uuid'],
             id: element['id'],
             title: element['taskName'],
             description: element['description'],
@@ -264,6 +265,7 @@ class DelegateProvider with ChangeNotifier {
 
         for (var element in responseBody) {
           CollaboratorTask collaboratorTask = CollaboratorTask(
+            uuid: element['uuid'],
             id: element['id'],
             title: element['taskName'],
             description: element['description'],
@@ -384,10 +386,10 @@ class DelegateProvider with ChangeNotifier {
     }
   }
 
-  Future<void> acceptInvitation(int id) async {
-    final requestUrl = this._serverUrl + 'delegate/acceptInvitation/$id';
+  Future<void> acceptInvitation(String uuid) async {
+    final requestUrl = this._serverUrl + 'delegate/acceptInvitation/$uuid';
 
-    Collaborator collaborator = this._received.firstWhere((collaborator) => collaborator.id == id);
+    Collaborator collaborator = this._received.firstWhere((collaborator) => collaborator.uuid == uuid);
     collaborator.relationState = "ACCEPTED";
 
     this._received.remove(collaborator);
@@ -413,11 +415,11 @@ class DelegateProvider with ChangeNotifier {
     }
   }
 
-  Future<void> declineInvitation(int id) async {
-    final requestUrl = this._serverUrl + 'delegate/declineInvitation/$id';
+  Future<void> declineInvitation(String uuid) async {
+    final requestUrl = this._serverUrl + 'delegate/declineInvitation/$uuid';
 
-    this._received.removeWhere((collaborator) => collaborator.id == id);
-    await CollaboratorDatabase.delete(id);
+    this._received.removeWhere((collaborator) => collaborator.uuid == uuid);
+    await CollaboratorDatabase.deleteByUuid(uuid);
 
     notifyListeners();
 

@@ -88,8 +88,7 @@ class TaskDetailsAttachments extends StatelessWidget {
                               icon: Icon(Icons.cancel_outlined, color: Theme.of(context).primaryColor),
                               onPressed: () {
                                 Provider.of<SynchronizeProvider>(context, listen: false).addAttachmentToDelete(
-                                  this.attachments[index].id,
-                                  this.attachments[index].fileName,
+                                  this.attachments[index].uuid,
                                 );
                                 Provider.of<AttachmentProvider>(context, listen: false).setToDelete(this.attachments[index].id);
                               },

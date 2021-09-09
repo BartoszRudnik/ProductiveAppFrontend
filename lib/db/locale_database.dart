@@ -14,15 +14,19 @@ class LocaleDatabase {
   static Future<List<String>> read(String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    final maps = await db.query(
-      'LOCALE',
-      columns: ['localeName', 'lastUpdated'],
-      where: 'userMail = ?',
-      whereArgs: [userMail],
-    );
+    if (userMail != null) {
+      final maps = await db.query(
+        'LOCALE',
+        columns: ['localeName', 'lastUpdated'],
+        where: 'userMail = ?',
+        whereArgs: [userMail],
+      );
 
-    if (maps.isNotEmpty) {
-      return [maps.first['localeName'] as String, maps.first['lastUpdated'] as String];
+      if (maps.isNotEmpty) {
+        return [maps.first['localeName'] as String, maps.first['lastUpdated'] as String];
+      } else {
+        return null;
+      }
     } else {
       return null;
     }

@@ -10,8 +10,10 @@ class CollaboratorTaskFields {
     startDate,
     endDate,
     lastUpdated,
+    uuid,
   ];
 
+  static final String uuid = "uuid";
   static final String id = "id";
   static final String title = "title";
   static final String description = "description";
@@ -27,6 +29,7 @@ class CollaboratorTask {
   DateTime startDate;
   DateTime endDate;
   DateTime lastUpdated;
+  String uuid;
 
   CollaboratorTask({
     @required this.id,
@@ -35,9 +38,11 @@ class CollaboratorTask {
     @required this.startDate,
     @required this.endDate,
     @required this.lastUpdated,
+    @required this.uuid,
   });
 
   CollaboratorTask copy({
+    String uuid,
     int id,
     String title,
     String description,
@@ -46,6 +51,7 @@ class CollaboratorTask {
     DateTime lastUpdated,
   }) =>
       CollaboratorTask(
+        uuid: uuid ?? this.uuid,
         id: id ?? this.id,
         title: title ?? this.title,
         description: description ?? this.description,
@@ -55,6 +61,7 @@ class CollaboratorTask {
       );
 
   static CollaboratorTask fromJson(Map<String, Object> json) => CollaboratorTask(
+        uuid: json[CollaboratorTaskFields.uuid] as String,
         id: json[CollaboratorTaskFields.id] as int,
         title: json[CollaboratorTaskFields.title] as String,
         description: json[CollaboratorTaskFields.description] as String,
@@ -65,6 +72,7 @@ class CollaboratorTask {
 
   Map<String, dynamic> toJson() {
     return {
+      CollaboratorTaskFields.uuid: this.uuid,
       CollaboratorTaskFields.id: this.id,
       CollaboratorTaskFields.title: this.title,
       CollaboratorTaskFields.description: this.description,

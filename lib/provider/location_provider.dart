@@ -160,7 +160,7 @@ class LocationProvider with ChangeNotifier {
   }
 
   Future<void> updateLocation(models.Location location) async {
-    final url = this._serverUrl + "localization/updateLocalization/${location.id}";
+    final url = this._serverUrl + "localization/updateLocalization/${location.uuid}";
 
     await LocationDatabase.update(location, this.userMail);
     notifyListeners();
@@ -190,11 +190,11 @@ class LocationProvider with ChangeNotifier {
     }
   }
 
-  Future<void> deleteLocation(String uuid, int id) async {
+  Future<void> deleteLocation(String uuid) async {
     final url = this._serverUrl + "localization/deleteLocalization/$uuid";
 
-    this.locationList.removeWhere((element) => element.id == id);
-    await LocationDatabase.delete(id);
+    this.locationList.removeWhere((element) => element.uuid == uuid);
+    await LocationDatabase.deleteByUuid(uuid);
 
     notifyListeners();
 

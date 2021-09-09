@@ -30,7 +30,7 @@ class AttachmentProvider with ChangeNotifier {
 
   Future<void> deleteFlaggedAttachments() async {
     this.attachments.where((element) => element.toDelete).toList().forEach((element) {
-      this._deleteAttachment(element.id);
+      this._deleteAttachment(element.uuid);
       this.attachments.remove(element);
     });
 
@@ -41,7 +41,7 @@ class AttachmentProvider with ChangeNotifier {
 
   Future<void> deleteNotSavedAttachments() async {
     this.notSavedAttachments.forEach((attachment) {
-      this._deleteAttachment(attachment.id);
+      this._deleteAttachment(attachment.uuid);
       this.attachments.remove(attachment);
     });
 
@@ -148,11 +148,11 @@ class AttachmentProvider with ChangeNotifier {
     }
   }
 
-  Future<void> _deleteAttachment(int attachmentId) async {
-    await AttachmentDatabase.delete(attachmentId);
+  Future<void> _deleteAttachment(String uuid) async {
+    await AttachmentDatabase.deleteByUuid(uuid);
 
     if (await InternetConnection.internetConnection()) {
-      final finalUrl = this._serverUrl + 'attachment/deleteAttachment/$attachmentId';
+      final finalUrl = this._serverUrl + 'attachment/deleteAttachment/$uuid';
 
       try {
         http.delete(

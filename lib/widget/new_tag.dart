@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:productive_app/model/tag.dart';
+import 'package:productive_app/provider/settings_provider.dart';
 import 'package:productive_app/provider/tag_provider.dart';
 import 'package:productive_app/provider/task_provider.dart';
 import 'package:productive_app/utils/dialogs.dart';
@@ -56,6 +57,7 @@ class _NewTagState extends State<NewTag> {
               } else {
                 Provider.of<TagProvider>(context, listen: false).updateTag(value, widget.initialValue);
                 Provider.of<TaskProvider>(context, listen: false).editTag(widget.initialValue, value);
+                Provider.of<SettingsProvider>(context, listen: false).editTag(this.widget.initialValue, value);
                 Navigator.of(context).pop();
               }
             },

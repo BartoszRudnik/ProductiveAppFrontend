@@ -79,6 +79,16 @@ class AttachmentDatabase {
     );
   }
 
+  static Future<int> deleteByUuid(String uuid) async {
+    final db = await InitDatabase.instance.database;
+
+    return db.delete(
+      tableAttachment,
+      where: '${AttachmentFields.uuid} = ?',
+      whereArgs: [uuid],
+    );
+  }
+
   static Future<int> delete(int id) async {
     final db = await InitDatabase.instance.database;
 

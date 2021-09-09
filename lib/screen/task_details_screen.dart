@@ -467,7 +467,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
 
         if (notSaved != null) {
           notSaved.forEach((element) {
-            Provider.of<SynchronizeProvider>(context, listen: false).addAttachmentToDelete(element.id, element.fileName);
+            Provider.of<SynchronizeProvider>(context, listen: false).addAttachmentToDelete(element.uuid);
           });
         }
 

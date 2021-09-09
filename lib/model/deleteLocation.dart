@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 
 class DeleteLocation {
-  String ownerEmail;
-  String locationName;
+  String uuid;
 
   DeleteLocation({
-    @required this.ownerEmail,
-    @required this.locationName,
+    @required this.uuid,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      "ownerEmail": this.ownerEmail,
-      "locationName": this.locationName,
+      "uuid": this.uuid,
     };
   }
 }

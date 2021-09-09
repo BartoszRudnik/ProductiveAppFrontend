@@ -63,8 +63,8 @@ class SingleLocation extends StatelessWidget {
           bool hasAgreed = await Dialogs.showChoiceDialog(context, AppLocalizations.of(context).areSureDeleteLocation);
           if (hasAgreed) {
             Provider.of<TaskProvider>(context, listen: false).clearLocationFromTasks(location.id);
-            Provider.of<SynchronizeProvider>(context, listen: false).addLocationToDelete(location.localizationName);
-            Provider.of<LocationProvider>(context, listen: false).deleteLocation(location.uuid, location.id);
+            Provider.of<SynchronizeProvider>(context, listen: false).addLocationToDelete(location.uuid);
+            Provider.of<LocationProvider>(context, listen: false).deleteLocation(location.uuid);
           }
         }
         if (direction == DismissDirection.startToEnd) {

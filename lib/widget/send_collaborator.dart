@@ -66,7 +66,7 @@ class SendCollaborator extends StatelessWidget {
                           Provider.of<TaskProvider>(context, listen: false).deleteCollaboratorFromTasks(this.collaborator.email, locations);
                           Provider.of<TaskProvider>(context, listen: false).deleteReceivedFromCollaborator(this.collaborator.email, locations);
 
-                          Provider.of<SynchronizeProvider>(context, listen: false).addCollaboratorToDelete(this.collaborator.email);
+                          Provider.of<SynchronizeProvider>(context, listen: false).addCollaboratorToDelete(this.collaborator.uuid);
                           Provider.of<DelegateProvider>(context, listen: false).deleteCollaborator(this.collaborator.uuid);
                           Navigator.of(context).pop(true);
                         },

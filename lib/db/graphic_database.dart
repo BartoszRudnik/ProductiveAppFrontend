@@ -4,25 +4,31 @@ class GraphicDatabase {
   static Future<void> deleteAll(String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    await db.delete(
-      'GRAPHIC',
-      where: 'userMail = ?',
-      whereArgs: [userMail],
-    );
+    if (userMail != null) {
+      await db.delete(
+        'GRAPHIC',
+        where: 'userMail = ?',
+        whereArgs: [userMail],
+      );
+    }
   }
 
   static Future<List<String>> read(String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    final maps = await db.query(
-      'GRAPHIC',
-      columns: ['mode', 'lastUpdated'],
-      where: 'userMail = ?',
-      whereArgs: [userMail],
-    );
+    if (userMail != null) {
+      final maps = await db.query(
+        'GRAPHIC',
+        columns: ['mode', 'lastUpdated'],
+        where: 'userMail = ?',
+        whereArgs: [userMail],
+      );
 
-    if (maps.isNotEmpty) {
-      return [maps.first['mode'] as String, maps.first['lastUpdated'] as String];
+      if (maps.isNotEmpty) {
+        return [maps.first['mode'] as String, maps.first['lastUpdated'] as String];
+      } else {
+        return null;
+      }
     } else {
       return null;
     }

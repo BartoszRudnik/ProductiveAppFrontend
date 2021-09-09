@@ -67,7 +67,7 @@ class AcceptedCollaborator extends StatelessWidget {
                           Provider.of<TaskProvider>(context, listen: false).deleteCollaboratorFromTasks(this.collaborator.email, locations);
                           Provider.of<TaskProvider>(context, listen: false).deleteReceivedFromCollaborator(this.collaborator.email, locations);
                           Navigator.of(context).pop(true);
-                          Provider.of<SynchronizeProvider>(context, listen: false).addCollaboratorToDelete(collaborator.email);
+                          Provider.of<SynchronizeProvider>(context, listen: false).addCollaboratorToDelete(collaborator.uuid);
                           await Provider.of<DelegateProvider>(context, listen: false).deleteCollaborator(this.collaborator.uuid);
                         },
                         child: Text(AppLocalizations.of(context).yes),
