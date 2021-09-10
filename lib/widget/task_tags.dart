@@ -9,7 +9,7 @@ class TaskTags extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return (this.tags.length > 0)
+    return (this.tags != null && this.tags.length > 0)
         ? Container(
             alignment: Alignment.centerLeft,
             height: 20,

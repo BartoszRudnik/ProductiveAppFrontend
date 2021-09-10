@@ -15,9 +15,7 @@ class LocaleProvider with ChangeNotifier {
   LocaleProvider({
     @required this.locale,
     @required this.email,
-  }) {
-    LocaleDatabase.create(this.locale.languageCode, this.email);
-  }
+  });
 
   Future<void> getLocale() async {
     if (await InternetConnection.internetConnection()) {
@@ -30,6 +28,7 @@ class LocaleProvider with ChangeNotifier {
 
         this.locale = Locale(responseBody['languageCode']);
 
+        await LocaleDatabase.deleteAll(this.email);
         await LocaleDatabase.create(this.locale.languageCode, this.email);
 
         notifyListeners();
@@ -38,11 +37,16 @@ class LocaleProvider with ChangeNotifier {
         throw error;
       }
     } else {
-      final result = await LocaleDatabase.read(this.email);
+      try {
+        final result = await LocaleDatabase.read(this.email);
 
-      this.locale = Locale(result[0]);
+        this.locale = Locale(result[0]);
 
-      notifyListeners();
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 

@@ -71,6 +71,16 @@ class TaskDatabase {
     );
   }
 
+  static Future<void> deleteAllFromList(String listName) async {
+    final db = await InitDatabase.instance.database;
+
+    return await db.delete(
+      tableTask,
+      where: '${TaskFields.localization} = ?',
+      whereArgs: [listName],
+    );
+  }
+
   static Future<int> delete(int id) async {
     final db = await InitDatabase.instance.database;
 

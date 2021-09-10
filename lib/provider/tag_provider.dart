@@ -90,11 +90,15 @@ class TagProvider with ChangeNotifier {
         print(error);
         throw error;
       }
-    }
-    {
-      this.tagList = await TagDatabase.readAll(this.userMail);
+    } else {
+      try {
+        this.tagList = await TagDatabase.readAll(this.userMail);
 
-      notifyListeners();
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 

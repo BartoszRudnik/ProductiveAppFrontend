@@ -153,6 +153,7 @@ class TaskProvider with ChangeNotifier {
     task = await TaskDatabase.create(task, this.userMail);
 
     task.position = task.id + 1000.0;
+    await TaskDatabase.update(task, this.userMail);
 
     if (task.notificationLocalizationId != null) {
       Notifications.addGeofence(
@@ -223,6 +224,7 @@ class TaskProvider with ChangeNotifier {
     task = await TaskDatabase.create(task, this.userMail);
 
     task.position = task.id + 1000.0;
+    await TaskDatabase.update(task, this.userMail);
 
     this.taskList.add(task);
     this.addToLocalization(task);
@@ -718,58 +720,66 @@ class TaskProvider with ChangeNotifier {
         throw error;
       }
     } else {
-      this.taskList = await TaskDatabase.readAll(context, this.userMail);
-      this.divideTasks();
+      try {
+        this.taskList = await TaskDatabase.readAll(context, this.userMail);
+        this.divideTasks();
 
-      this.sortByPosition(this._anytimeTasks);
-      this.sortByPosition(this._scheduledTasks);
-      this.sortByPosition(this._inboxTasks);
-      this.sortByPosition(this._delegatedTasks);
+        this.sortByPosition(this._anytimeTasks);
+        this.sortByPosition(this._scheduledTasks);
+        this.sortByPosition(this._inboxTasks);
+        this.sortByPosition(this._delegatedTasks);
 
-      notifyListeners();
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
-  //Todo
   Future<void> deleteAllTasks(String listName) async {
-    final url = this._serverUrl + 'task/deleteAllFromList';
-
-    List<int> toDelete = [];
-
     if (listName == 'Completed') {
-      this._completedTasks.forEach((element) {
-        toDelete.add(element.id);
-      });
+      this._completedTasks = [];
     } else if (listName == 'Trash') {
-      this._trashTasks.forEach((element) {
-        toDelete.add(element.id);
-      });
+      this._trashTasks = [];
     }
 
-    try {
-      await http.post(
-        url,
-        body: json.encode(
-          {
-            'tasks': toDelete,
-          },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
+    notifyListeners();
+
+    if (await InternetConnection.internetConnection()) {
+      final url = this._serverUrl + 'task/deleteAllFromList';
+
+      List<int> toDelete = [];
 
       if (listName == 'Completed') {
-        this._completedTasks = [];
+        this._completedTasks.forEach((element) {
+          toDelete.add(element.id);
+        });
       } else if (listName == 'Trash') {
-        this._trashTasks = [];
+        this._trashTasks.forEach((element) {
+          toDelete.add(element.id);
+        });
       }
 
-      notifyListeners();
-    } catch (error) {
-      print(error);
-      throw (error);
+      try {
+        await http.post(
+          url,
+          body: json.encode(
+            {
+              'tasks': toDelete,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
+    } else {
+      await TaskDatabase.deleteAllFromList(listName.toUpperCase());
     }
   }
 
@@ -861,27 +871,10 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
-  //Todo
   Future<void> getPriorities() async {
-    if (await InternetConnection.internetConnection()) {
-      this.taskPriorities = [];
-      String url = this._serverUrl + 'task/priorities';
+    this.taskPriorities = ['LOW', 'NORMAL', 'HIGH', 'HIGHER', 'CRITICAL'];
 
-      try {
-        final response = await http.get(url);
-
-        final responseBody = json.decode(response.body);
-
-        for (var element in responseBody) {
-          this.taskPriorities.add(element.toString());
-        }
-
-        notifyListeners();
-      } catch (error) {
-        print(error);
-        throw error;
-      }
-    }
+    notifyListeners();
   }
 
   void updateTaskStatus(int id, String newStatus) {

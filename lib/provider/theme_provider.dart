@@ -19,9 +19,7 @@ class ThemeProvider with ChangeNotifier {
     @required this.themeMode,
     @required this.userEmail,
     @required this.userToken,
-  }) {
-    GraphicDatabase.create(this._getColorMode(), this.userEmail);
-  }
+  });
 
   bool get isDarkMode {
     if (this.themeMode == ThemeMode.system) {
@@ -50,6 +48,7 @@ class ThemeProvider with ChangeNotifier {
 
         this.themeMode = this._selectColorMode(responseBody['backgroundType']);
 
+        await GraphicDatabase.deleteAll(this.userEmail);
         await GraphicDatabase.create(
           this._getColorMode(),
           this.userEmail,
@@ -61,11 +60,16 @@ class ThemeProvider with ChangeNotifier {
         throw (error);
       }
     } else {
-      final result = await GraphicDatabase.read(this.userEmail);
+      try {
+        final result = await GraphicDatabase.read(this.userEmail);
 
-      this.themeMode = this._selectColorMode(result[0]);
+        this.themeMode = this._selectColorMode(result[0]);
 
-      notifyListeners();
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 

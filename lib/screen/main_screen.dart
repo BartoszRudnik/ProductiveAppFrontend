@@ -1,16 +1,17 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:productive_app/utils/internet_connection.dart';
 import 'package:provider/provider.dart';
+
 import '../model/task.dart';
 import '../provider/location_provider.dart';
 import '../provider/task_provider.dart';
-import '../provider/theme_provider.dart';
 import '../utils/data.dart';
 import '../utils/notifications.dart';
 import '../widget/drawer/main_drawer.dart';
 import 'loading_task_screen.dart';
 import 'tabs_screen.dart';
 import 'task_details_screen.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 
 class MainScreen extends StatefulWidget {
   static const routeName = '/main-screen';
@@ -21,7 +22,8 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   void onClickedNotification(String payload) async {
-    Task task = Provider.of<TaskProvider>(context, listen: false).taskList.firstWhere((element) => element.id == int.parse(payload), orElse: () => null);
+    Task task =
+        Provider.of<TaskProvider>(context, listen: false).taskList.firstWhere((element) => element.id == int.parse(payload), orElse: () => null);
 
     if (task == null) {
       await Provider.of<LocationProvider>(context, listen: false).getLocations();
@@ -46,7 +48,9 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Future<void> loadData(BuildContext context) async {
-    await Data.synchronizeData(context);
+    if (await InternetConnection.internetConnection()) {
+      await Data.synchronizeData(context);
+    }
     await Data.loadData(context);
   }
 
@@ -55,7 +59,6 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     future = loadData(context);
-    Provider.of<ThemeProvider>(context, listen: false).getUserMode();
 
     Notifications.initLocalization();
     Notifications.initNotification();

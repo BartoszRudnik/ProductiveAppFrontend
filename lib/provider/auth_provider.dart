@@ -55,19 +55,20 @@ class AuthProvider with ChangeNotifier {
 
         this.user.firstName = responseBody['firstName'];
         this.user.lastName = responseBody['lastName'];
-
-        notifyListeners();
       } catch (error) {
         print(error);
         throw (error);
       }
     } else {
-      final user = await UserDatabase.read(this.user.email);
+      try {
+        final user = await UserDatabase.read(this.user.email);
 
-      this.user.firstName = user.firstName;
-      this.user.lastName = user.lastName;
-
-      notifyListeners();
+        this.user.firstName = user.firstName;
+        this.user.lastName = user.lastName;
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
@@ -107,7 +108,7 @@ class AuthProvider with ChangeNotifier {
   Future<void> deleteAccount(String token) async {
     String url = this._serverUrl + 'account/deleteAccount/${this._email}/$token';
 
-    UserDatabase.delete(this.email);
+    await UserDatabase.delete(this.email);
 
     if (await InternetConnection.internetConnection()) {
       try {
@@ -280,9 +281,14 @@ class AuthProvider with ChangeNotifier {
         throw (error);
       }
     } else {
-      final user = await UserDatabase.read(this.user.email);
+      try {
+        final user = await UserDatabase.read(this.user.email);
 
-      this._user.removed = user.removed;
+        this._user.removed = user.removed;
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
@@ -381,7 +387,7 @@ class AuthProvider with ChangeNotifier {
   Future<void> signUp(String email, String password) async {
     if (await InternetConnection.internetConnection()) {
       this._authenticate(email, password, 'registration');
-      UserDatabase.create(this._user);
+      await UserDatabase.create(this._user);
     }
   }
 
@@ -553,7 +559,7 @@ class AuthProvider with ChangeNotifier {
         id: extractedUserData['id'],
       );
 
-      UserDatabase.create(this._user);
+      await UserDatabase.create(this._user);
     }
 
     notifyListeners();

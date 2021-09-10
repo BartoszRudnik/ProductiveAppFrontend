@@ -156,9 +156,14 @@ class AttachmentProvider with ChangeNotifier {
         throw (error);
       }
     } else {
-      this.attachments = await AttachmentDatabase.readAll(this.userMail);
+      try {
+        this.attachments = await AttachmentDatabase.readAll(this.userMail);
 
-      notifyListeners();
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 

@@ -73,21 +73,24 @@ class Data {
   }
 
   static Future<void> loadData(BuildContext context) async {
+    print('loading data');
+
     try {
+      await Provider.of<TagProvider>(context, listen: false).getTags();
+
       await Future.wait(
         [
           Provider.of<TaskProvider>(context, listen: false).fetchTasks(context),
           Provider.of<TaskProvider>(context, listen: false).getPriorities(),
-          Provider.of<TagProvider>(context, listen: false).getTags(),
           Provider.of<LocationProvider>(context, listen: false).getLocations(),
           Provider.of<DelegateProvider>(context, listen: false).getCollaborators(),
           Provider.of<SettingsProvider>(context, listen: false).getFilterSettings(),
           Provider.of<AuthProvider>(context, listen: false).getUserData(),
           Provider.of<AuthProvider>(context, listen: false).checkIfAvatarExists(),
           Provider.of<AttachmentProvider>(context, listen: false).getAttachments(),
+          Provider.of<AuthProvider>(context, listen: false).getUserImage(),
           Provider.of<LocaleProvider>(context, listen: false).getLocale(),
           Provider.of<ThemeProvider>(context, listen: false).getUserMode(),
-          Provider.of<AuthProvider>(context, listen: false).getUserImage(),
         ],
       );
     } catch (error) {
@@ -106,5 +109,6 @@ class Data {
 
       await Provider.of<AttachmentProvider>(context, listen: false).getDelegatedAttachments(delegatedTasksId);
     }
+    print('loading data finish');
   }
 }

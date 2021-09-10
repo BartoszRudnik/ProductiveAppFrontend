@@ -117,8 +117,13 @@ class LocationProvider with ChangeNotifier {
         throw error;
       }
     } else {
-      this.locationList = await LocationDatabase.readAll(this.userMail);
-      notifyListeners();
+      try {
+        this.locationList = await LocationDatabase.readAll(this.userMail);
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 

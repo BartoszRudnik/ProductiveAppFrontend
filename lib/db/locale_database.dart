@@ -6,8 +6,8 @@ class LocaleDatabase {
 
     await db.delete(
       'LOCALE',
-      where: 'userMail = ?',
-      whereArgs: [userMail],
+      where: 'userMail = ? OR userMail = ?',
+      whereArgs: [userMail, null],
     );
   }
 
@@ -35,16 +35,18 @@ class LocaleDatabase {
   static Future<int> update(String locale, String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    return await db.update(
-      'LOCALE',
-      {
-        'localeName': locale,
-        'lastUpdated': DateTime.now().toIso8601String(),
-        'userMail': userMail,
-      },
-      where: 'userMail = ?',
-      whereArgs: [userMail],
-    );
+    if (userMail != null) {
+      return await db.update(
+        'LOCALE',
+        {
+          'localeName': locale,
+          'lastUpdated': DateTime.now().toIso8601String(),
+          'userMail': userMail,
+        },
+        where: 'userMail = ?',
+        whereArgs: [userMail],
+      );
+    }
   }
 
   static Future<void> create(String locale, String userMail) async {

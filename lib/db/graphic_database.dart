@@ -7,8 +7,8 @@ class GraphicDatabase {
     if (userMail != null) {
       await db.delete(
         'GRAPHIC',
-        where: 'userMail = ?',
-        whereArgs: [userMail],
+        where: 'userMail = ? OR userMail = ?',
+        whereArgs: [userMail, null],
       );
     }
   }
@@ -37,16 +37,18 @@ class GraphicDatabase {
   static Future<int> update(String mode, String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    return await db.update(
-      'GRAPHIC',
-      {
-        'mode': mode,
-        'lastUpdated': DateTime.now().toIso8601String(),
-        'userMail': userMail,
-      },
-      where: 'userMail = ?',
-      whereArgs: [userMail],
-    );
+    if (userMail != null) {
+      return await db.update(
+        'GRAPHIC',
+        {
+          'mode': mode,
+          'lastUpdated': DateTime.now().toIso8601String(),
+          'userMail': userMail,
+        },
+        where: 'userMail = ?',
+        whereArgs: [userMail],
+      );
+    }
   }
 
   static Future<void> create(String mode, String userMail) async {

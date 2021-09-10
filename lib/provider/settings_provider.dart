@@ -98,9 +98,14 @@ class SettingsProvider with ChangeNotifier {
         throw (error);
       }
     } else {
-      this.userSettings = await SettingsDatabase.read(this.userMail);
+      try {
+        this.userSettings = await SettingsDatabase.read(this.userMail);
 
-      notifyListeners();
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
