@@ -26,8 +26,8 @@ class _TagsDialogState extends State<TagsDialog> {
 
   @override
   void initState() {
-    initValues();
     super.initState();
+    initValues();
   }
 
   void organizeFinalList(int index) {

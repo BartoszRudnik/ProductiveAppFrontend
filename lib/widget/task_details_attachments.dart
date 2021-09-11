@@ -13,11 +13,11 @@ import 'pdf_viewer.dart';
 
 class TaskDetailsAttachments extends StatelessWidget {
   final List<Attachment> attachments;
-  final int taskId;
+  final String taskUuid;
 
   TaskDetailsAttachments({
     @required this.attachments,
-    @required this.taskId,
+    @required this.taskUuid,
   });
 
   @override
@@ -114,7 +114,7 @@ class TaskDetailsAttachments extends StatelessWidget {
                       return AttachmentDialog(files: []);
                     });
 
-                Provider.of<AttachmentProvider>(context, listen: false).setAttachments(newAttachments, taskId, true);
+                Provider.of<AttachmentProvider>(context, listen: false).setAttachments(newAttachments, this.taskUuid, true);
               },
               child: Center(
                 child: Text(

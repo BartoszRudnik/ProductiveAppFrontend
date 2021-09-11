@@ -3,6 +3,9 @@ import 'package:productive_app/model/settings.dart';
 
 class SettingsDatabase {
   static Future<Settings> read(String userMail) async {
+    if (userMail == null) {
+      return null;
+    }
     final db = await InitDatabase.instance.database;
 
     final maps = await db.query(

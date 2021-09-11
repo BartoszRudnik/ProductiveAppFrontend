@@ -35,7 +35,7 @@ class InitDatabase {
   Future _createDB(Database db, int version) async {
     final idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
     final integerType = 'INTEGER';
-    final boolType = 'BOOLEAN';
+    final boolType = 'INTEGER';
     final textType = 'TEXT';
     final doubleType = 'REAL';
     final blob = 'BLOB';
@@ -54,7 +54,7 @@ class InitDatabase {
     await db.execute('''
     CREATE TABLE $tableAttachment (
       ${AttachmentFields.id} $idType,
-      ${AttachmentFields.taskId} $integerType,
+      ${AttachmentFields.taskUuid} $integerType,
       ${AttachmentFields.fileName} $textType,
       ${AttachmentFields.toDelete} $boolType,
       ${AttachmentFields.lastUpdated} $textType,

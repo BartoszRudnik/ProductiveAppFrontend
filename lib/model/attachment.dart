@@ -7,7 +7,7 @@ final String tableAttachment = "attachment";
 class AttachmentFields {
   static final List<String> values = [
     id,
-    taskId,
+    taskUuid,
     fileName,
     toDelete,
     lastUpdated,
@@ -16,7 +16,7 @@ class AttachmentFields {
   ];
 
   static final String id = "id";
-  static final String taskId = "taskId";
+  static final String taskUuid = "taskUuid";
   static final String fileName = "fileName";
   static final String toDelete = "toDelete";
   static final String lastUpdated = "lastUpdated";
@@ -26,7 +26,7 @@ class AttachmentFields {
 
 class Attachment {
   int id;
-  int taskId;
+  String taskUuid;
   String fileName;
   bool toDelete;
   DateTime lastUpdated;
@@ -35,7 +35,7 @@ class Attachment {
 
   Attachment({
     this.id,
-    @required this.taskId,
+    @required this.taskUuid,
     @required this.fileName,
     @required this.uuid,
     this.lastUpdated,
@@ -45,7 +45,7 @@ class Attachment {
 
   Attachment copy({
     int id,
-    int taskId,
+    String taskId,
     String fileName,
     bool toDelete,
     DateTime lastUpdated,
@@ -55,7 +55,7 @@ class Attachment {
       Attachment(
         uuid: uuid ?? this.uuid,
         id: id ?? this.id,
-        taskId: taskId ?? this.taskId,
+        taskUuid: taskId ?? this.taskUuid,
         fileName: fileName ?? this.fileName,
         lastUpdated: lastUpdated ?? this.lastUpdated,
         localFile: localFile ?? this.localFile,
@@ -66,7 +66,7 @@ class Attachment {
     return {
       AttachmentFields.uuid: this.uuid,
       AttachmentFields.id: this.id,
-      AttachmentFields.taskId: this.taskId,
+      AttachmentFields.taskUuid: this.taskUuid,
       AttachmentFields.fileName: this.fileName,
       AttachmentFields.toDelete: this.toDelete ? 1 : 0,
       AttachmentFields.lastUpdated: this.lastUpdated != null ? this.lastUpdated.toIso8601String() : DateTime.now().toIso8601String(),
@@ -77,7 +77,7 @@ class Attachment {
   static Attachment fromJson(Map<String, Object> json) => Attachment(
         uuid: json[AttachmentFields.uuid] as String,
         id: json[AttachmentFields.id] as int,
-        taskId: json[AttachmentFields.taskId] as int,
+        taskUuid: json[AttachmentFields.taskUuid] as String,
         fileName: json[AttachmentFields.fileName] as String,
         toDelete: json[AttachmentFields.toDelete] == 1 ? true : false,
         localFile: json[AttachmentFields.localFile],

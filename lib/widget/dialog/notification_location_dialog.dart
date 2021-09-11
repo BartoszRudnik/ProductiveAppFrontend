@@ -53,6 +53,8 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
 
   @override
   void initState() {
+    super.initState();
+
     if (this.widget.notificationRadius != null) {
       this.notificationRadius = this.widget.notificationRadius;
     }
@@ -62,8 +64,6 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
     if (this.widget.notificationOnExit != null) {
       this.notificationOnExit = this.widget.notificationOnExit;
     }
-
-    super.initState();
   }
 
   @override

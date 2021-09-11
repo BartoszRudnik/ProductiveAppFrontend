@@ -50,15 +50,19 @@ class _MainScreenState extends State<MainScreen> {
   Future<void> loadData(BuildContext context) async {
     if (await InternetConnection.internetConnection()) {
       await Data.synchronizeData(context);
+      await Data.loadData(context);
+    } else {
+      await Data.loadDataOffline(context);
     }
-    await Data.loadData(context);
   }
 
   Future future;
 
   @override
   void initState() {
-    future = loadData(context);
+    super.initState();
+
+    this.future = this.loadData(context);
 
     Notifications.initLocalization();
     Notifications.initNotification();
@@ -66,7 +70,7 @@ class _MainScreenState extends State<MainScreen> {
     listenNotifications();
     listenInternetChanges();
 
-    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => Data.notify(context));
   }
 
   @override

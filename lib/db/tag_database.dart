@@ -46,6 +46,7 @@ class TagDatabase {
 
     final result = await db.query(
       tableTags,
+      columns: TagFields.values,
       where: 'userMail = ?',
       whereArgs: [userMail],
     );

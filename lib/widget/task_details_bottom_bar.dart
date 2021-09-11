@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import '../model/task.dart';
 
 class TaskDetailsBottomBar extends StatefulWidget {
@@ -32,13 +33,17 @@ class _TaskDetailsBottomBarState extends State<TaskDetailsBottomBar> {
                 onPrimary: Theme.of(context).primaryColor,
               ),
               icon: Icon(Icons.delete),
-              label: Flexible(
-                child: AutoSizeText(
-                  AppLocalizations.of(context).archive,
-                  minFontSize: 10,
-                  maxFontSize: 16,
-                  maxLines: 1,
-                ),
+              label: Row(
+                children: [
+                  Flexible(
+                    child: AutoSizeText(
+                      AppLocalizations.of(context).archive,
+                      minFontSize: 10,
+                      maxFontSize: 16,
+                      maxLines: 1,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -54,13 +59,17 @@ class _TaskDetailsBottomBarState extends State<TaskDetailsBottomBar> {
                 onPrimary: Theme.of(context).primaryColor,
               ),
               icon: Icon(this.widget.taskToEdit.done ? Icons.cancel : Icons.done),
-              label: Flexible(
-                child: AutoSizeText(
-                  this.widget.taskToEdit.done ? AppLocalizations.of(context).unmarkAsDone : AppLocalizations.of(context).markAsDone,
-                  minFontSize: 10,
-                  maxFontSize: 16,
-                  maxLines: 1,
-                ),
+              label: Row(
+                children: [
+                  Flexible(
+                    child: AutoSizeText(
+                      this.widget.taskToEdit.done ? AppLocalizations.of(context).unmarkAsDone : AppLocalizations.of(context).markAsDone,
+                      minFontSize: 10,
+                      maxFontSize: 16,
+                      maxLines: 1,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -72,13 +81,17 @@ class _TaskDetailsBottomBarState extends State<TaskDetailsBottomBar> {
                 onPrimary: Theme.of(context).primaryColor,
               ),
               icon: Icon(Icons.save),
-              label: Flexible(
-                child: AutoSizeText(
-                  AppLocalizations.of(context).save,
-                  minFontSize: 10,
-                  maxFontSize: 16,
-                  maxLines: 1,
-                ),
+              label: Row(
+                children: [
+                  Flexible(
+                    child: AutoSizeText(
+                      AppLocalizations.of(context).save,
+                      minFontSize: 10,
+                      maxFontSize: 16,
+                      maxLines: 1,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

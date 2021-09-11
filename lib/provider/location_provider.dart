@@ -83,47 +83,50 @@ class LocationProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void notify() {
+    notifyListeners();
+  }
+
+  Future<void> getLocationsOffline() async {
+    try {
+      this.locationList = await LocationDatabase.readAll(this.userMail);
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
   Future<void> getLocations() async {
-    if (await InternetConnection.internetConnection()) {
-      final url = this._serverUrl + "localization/getLocalizations/${this.userMail}";
-      final List<models.Location> loadedLocations = [];
+    final url = this._serverUrl + "localization/getLocalizations/${this.userMail}";
+    final List<models.Location> loadedLocations = [];
 
-      await LocationDatabase.deleteAll(this.userMail);
+    await LocationDatabase.deleteAll(this.userMail);
 
-      try {
-        final response = await http.get(url);
-        final responseBody = json.decode(utf8.decode(response.bodyBytes));
+    try {
+      final response = await http.get(url);
+      final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
-        for (var element in responseBody) {
-          models.Location loc = models.Location(
-            uuid: element['uuid'],
-            id: element['id'],
-            localizationName: element["localizationName"],
-            longitude: element["longitude"],
-            latitude: element["latitude"],
-            country: element["country"],
-            locality: element["locality"],
-            street: element["street"],
-          );
+      for (var element in responseBody) {
+        models.Location loc = models.Location(
+          uuid: element['uuid'],
+          id: element['id'],
+          localizationName: element["localizationName"],
+          longitude: element["longitude"],
+          latitude: element["latitude"],
+          country: element["country"],
+          locality: element["locality"],
+          street: element["street"],
+        );
 
-          loadedLocations.add(loc);
-          await LocationDatabase.create(loc, this.userMail);
-        }
-
-        this.locationList = loadedLocations;
-        notifyListeners();
-      } catch (error) {
-        print(error);
-        throw error;
+        loadedLocations.add(loc);
+        await LocationDatabase.create(loc, this.userMail);
       }
-    } else {
-      try {
-        this.locationList = await LocationDatabase.readAll(this.userMail);
-        notifyListeners();
-      } catch (error) {
-        print(error);
-        throw (error);
-      }
+
+      this.locationList = loadedLocations;
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw error;
     }
   }
 

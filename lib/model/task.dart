@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:productive_app/model/tag.dart';
-import 'package:productive_app/provider/tag_provider.dart';
-import 'package:provider/provider.dart';
 
 final String tableTask = "task";
 
@@ -57,9 +55,9 @@ class TaskFields {
   static final String uuid = "uuid";
 }
 
-class Task with ChangeNotifier {
+class Task {
   int id;
-  double position;
+  num position;
   String title;
   String description;
   String priority;
@@ -77,7 +75,7 @@ class Task with ChangeNotifier {
   int childId;
 
   int notificationLocalizationId;
-  double notificationLocalizationRadius;
+  num notificationLocalizationRadius;
   bool notificationOnEnter;
   bool notificationOnExit;
 
@@ -98,8 +96,8 @@ class Task with ChangeNotifier {
     }
   }
 
-  static List<Tag> splitTagList(String toSplit, BuildContext context) {
-    if (toSplit != null && toSplit.length > 0) {
+  static List<Tag> splitTagList(String toSplit, List<Tag> tags) {
+    if (toSplit != null && toSplit.length > 0 && tags != null) {
       final stringList = toSplit.split('|');
 
       List<String> idList = [];
@@ -108,13 +106,11 @@ class Task with ChangeNotifier {
         idList.add(element);
       });
 
-      final tagList = Provider.of<TagProvider>(context, listen: false).tagList;
-
       List<Tag> result = [];
 
       idList.forEach(
         (element) {
-          result.add(tagList.firstWhere((tag) => tag.name == element, orElse: () => null));
+          result.add(tags.firstWhere((tag) => tag.name == element, orElse: () => null));
         },
       );
 
@@ -160,7 +156,7 @@ class Task with ChangeNotifier {
     List<Tag> tags,
     bool done,
     String localization,
-    double position,
+    num position,
     String delegatedEmail,
     bool isDelegated,
     String taskStatus,
@@ -169,7 +165,7 @@ class Task with ChangeNotifier {
     int childId,
     int parentId,
     int notificationLocalizationId,
-    double notificationLocalizationRadius,
+    num notificationLocalizationRadius,
     bool notificationOnEnter,
     bool notificationOnExit,
     DateTime lastUpdated,
@@ -201,7 +197,7 @@ class Task with ChangeNotifier {
         lastUpdated: DateTime.now(),
       );
 
-  static Task fromJson(Map<String, Object> json, BuildContext context) {
+  static Task fromJson(Map<String, Object> json, List<Tag> tags) {
     return Task(
       uuid: json[TaskFields.uuid] == null ? null : json[TaskFields.uuid] as String,
       id: json[TaskFields.id] == null ? null : json[TaskFields.id] as int,
@@ -209,12 +205,12 @@ class Task with ChangeNotifier {
       childId: json[TaskFields.childId] == null ? null : json[TaskFields.childId] as int,
       priority: json[TaskFields.priority] == null ? null : json[TaskFields.priority] as String,
       description: json[TaskFields.description] == null ? null : json[TaskFields.description] as String,
-      startDate: json[TaskFields.startDate] == null ? null : DateTime.tryParse(json[TaskFields.startDate] as String),
-      endDate: json[TaskFields.endDate] == null ? null : DateTime.tryParse(json[TaskFields.endDate] as String),
-      tags: json[TaskFields.tags] == null ? null : splitTagList(json[TaskFields.tags] as String, context),
+      startDate: json[TaskFields.startDate] == null ? null : DateTime.parse(json[TaskFields.startDate] as String),
+      endDate: json[TaskFields.endDate] == null ? null : DateTime.parse(json[TaskFields.endDate] as String),
+      tags: json[TaskFields.tags] == null ? null : splitTagList(json[TaskFields.tags] as String, tags),
       done: json[TaskFields.done] == null ? false : json[TaskFields.done] == 1,
       localization: json[TaskFields.localization] == null ? null : json[TaskFields.localization] as String,
-      position: json[TaskFields.position] == null ? null : json[TaskFields.position] as double,
+      position: json[TaskFields.position] == null ? null : json[TaskFields.position],
       delegatedEmail: json[TaskFields.delegatedEmail] == null ? null : json[TaskFields.delegatedEmail] as String,
       isDelegated: json[TaskFields.isDelegated] == null ? false : json[TaskFields.isDelegated] == 1,
       isCanceled: json[TaskFields.isCanceled] == null ? false : json[TaskFields.isCanceled] == 1,
@@ -226,7 +222,7 @@ class Task with ChangeNotifier {
           json[TaskFields.notificationLocalizationRadius] == null ? null : json[TaskFields.notificationLocalizationRadius] as double,
       notificationOnEnter: json[TaskFields.notificationOnEnter] == null ? false : json[TaskFields.notificationOnEnter] == 1,
       notificationOnExit: json[TaskFields.notificationOnExit] == null ? false : json[TaskFields.notificationOnExit] == 1,
-      lastUpdated: json[TaskFields.lastUpdated] == null ? null : DateTime.tryParse(json[TaskFields.lastUpdated] as String),
+      lastUpdated: json[TaskFields.lastUpdated] == null ? null : DateTime.parse(json[TaskFields.lastUpdated] as String),
     );
   }
 

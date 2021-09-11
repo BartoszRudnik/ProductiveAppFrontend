@@ -17,36 +17,36 @@ class LocaleProvider with ChangeNotifier {
     @required this.email,
   });
 
+  Future<void> getLocaleOffline() async {
+    try {
+      final result = await LocaleDatabase.read(this.email);
+
+      this.locale = Locale(result[0]);
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
   Future<void> getLocale() async {
-    if (await InternetConnection.internetConnection()) {
-      final requestUrl = this._serverUrl + "locale/get/${this.email}";
+    final requestUrl = this._serverUrl + "locale/get/${this.email}";
 
-      try {
-        final response = await http.get(requestUrl);
+    try {
+      final response = await http.get(requestUrl);
 
-        final responseBody = json.decode(response.body);
+      final responseBody = json.decode(response.body);
 
-        this.locale = Locale(responseBody['languageCode']);
+      this.locale = Locale(responseBody['languageCode']);
 
-        await LocaleDatabase.deleteAll(this.email);
-        await LocaleDatabase.create(this.locale.languageCode, this.email);
+      await LocaleDatabase.deleteAll(this.email);
+      await LocaleDatabase.create(this.locale.languageCode, this.email);
 
-        notifyListeners();
-      } catch (error) {
-        print(error);
-        throw error;
-      }
-    } else {
-      try {
-        final result = await LocaleDatabase.read(this.email);
-
-        this.locale = Locale(result[0]);
-
-        notifyListeners();
-      } catch (error) {
-        print(error);
-        throw (error);
-      }
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw error;
     }
   }
 

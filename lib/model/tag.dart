@@ -53,7 +53,7 @@ class Tag {
         id: json[TagFields.id] == null ? null : json[TagFields.id] as int,
         name: json[TagFields.name] == null ? null : json[TagFields.name] as String,
         isSelected: json[TagFields.isSelected] == null ? null : json[TagFields.isSelected] == 1,
-        lastUpdated: json[TagFields.lastUpdated] == null ? null : DateTime.parse(json[TagFields.lastUpdated] as String),
+        lastUpdated: json[TagFields.lastUpdated] == null ? null : DateTime.tryParse(json[TagFields.lastUpdated] as String),
       );
 
   Map<String, dynamic> toJson() {

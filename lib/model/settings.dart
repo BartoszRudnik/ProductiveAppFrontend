@@ -1,4 +1,3 @@
-
 final String tableSettings = "settings";
 
 class SettingsFields {
@@ -55,10 +54,16 @@ class Settings {
   });
 
   String joinStringList(List<String> listToFlatten) {
+    if (listToFlatten == null) {
+      return '';
+    }
     return listToFlatten.join('|');
   }
 
   String joinIntList(List<int> listToFlatten) {
+    if (listToFlatten == null) {
+      return '';
+    }
     return listToFlatten.join('|');
   }
 
@@ -127,14 +132,26 @@ class Settings {
   Map<String, dynamic> toJson() {
     return {
       SettingsFields.id: this.id,
-      SettingsFields.showOnlyUnfinished: this.showOnlyUnfinished ? 1 : 0,
-      SettingsFields.showOnlyDelegated: this.showOnlyDelegated ? 1 : 0,
-      SettingsFields.showOnlyWithLocalization: this.showOnlyWithLocalization ? 1 : 0,
+      SettingsFields.showOnlyUnfinished: this.showOnlyUnfinished == null
+          ? 0
+          : this.showOnlyUnfinished
+              ? 1
+              : 0,
+      SettingsFields.showOnlyDelegated: this.showOnlyDelegated == null
+          ? 0
+          : this.showOnlyDelegated
+              ? 1
+              : 0,
+      SettingsFields.showOnlyWithLocalization: this.showOnlyWithLocalization == null
+          ? 0
+          : this.showOnlyWithLocalization
+              ? 1
+              : 0,
       SettingsFields.collaborators: this.joinStringList(this.collaborators),
       SettingsFields.priorities: this.joinStringList(this.priorities),
       SettingsFields.tags: this.joinStringList(this.tags),
       SettingsFields.locations: this.joinIntList(this.locations),
-      SettingsFields.sortingMode: this.sortingMode,
+      SettingsFields.sortingMode: this.sortingMode == null ? 0 : this.sortingMode,
       SettingsFields.lastUpdated: this.lastUpdated != null ? this.lastUpdated.toIso8601String() : DateTime.now().toIso8601String(),
     };
   }

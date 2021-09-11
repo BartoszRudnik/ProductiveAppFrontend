@@ -60,45 +60,51 @@ class TagProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void notify() {
+    notifyListeners();
+  }
+
+  Future<List<Tag>> getTagsOffline() async {
+    try {
+      final tags = await TagDatabase.readAll(this.userMail);
+
+      this.tagList = tags;
+
+      return tags;
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
   Future<void> getTags() async {
-    if (await InternetConnection.internetConnection()) {
-      final url = this._serverUrl + "tag/getAll/${this.userMail}";
+    final url = this._serverUrl + "tag/getAll/${this.userMail}";
 
-      final List<Tag> loadedTags = [];
-      TagDatabase.deleteAll(this.userMail);
+    final List<Tag> loadedTags = [];
+    await TagDatabase.deleteAll(this.userMail);
 
-      try {
-        final response = await http.get(url);
+    try {
+      final response = await http.get(url);
 
-        final responseBody = json.decode(utf8.decode(response.bodyBytes));
+      final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
-        for (var element in responseBody) {
-          Tag newTag = Tag(
-            uuid: element['uuid'],
-            id: element['id'],
-            name: element['name'],
-          );
+      for (var element in responseBody) {
+        Tag newTag = Tag(
+          uuid: element['uuid'],
+          id: element['id'],
+          name: element['name'],
+        );
 
-          newTag = await TagDatabase.create(newTag, this.userMail);
+        newTag = await TagDatabase.create(newTag, this.userMail);
 
-          loadedTags.add(newTag);
-        }
-
-        this.tagList = loadedTags;
-        notifyListeners();
-      } catch (error) {
-        print(error);
-        throw error;
+        loadedTags.add(newTag);
       }
-    } else {
-      try {
-        this.tagList = await TagDatabase.readAll(this.userMail);
 
-        notifyListeners();
-      } catch (error) {
-        print(error);
-        throw (error);
-      }
+      this.tagList = loadedTags;
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw error;
     }
   }
 

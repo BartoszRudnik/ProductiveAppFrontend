@@ -44,31 +44,31 @@ class AuthProvider with ChangeNotifier {
     return null;
   }
 
+  Future<void> getUserDataOffline() async {
+    try {
+      final user = await UserDatabase.read(this.user.email);
+
+      this.user.firstName = user.firstName;
+      this.user.lastName = user.lastName;
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
   Future<void> getUserData() async {
-    if (await InternetConnection.internetConnection()) {
-      String url = this._serverUrl + 'userData/get/${this._email}';
+    String url = this._serverUrl + 'userData/get/${this._email}';
 
-      try {
-        final response = await http.get(url);
+    try {
+      final response = await http.get(url);
 
-        final responseBody = json.decode(utf8.decode(response.bodyBytes));
+      final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
-        this.user.firstName = responseBody['firstName'];
-        this.user.lastName = responseBody['lastName'];
-      } catch (error) {
-        print(error);
-        throw (error);
-      }
-    } else {
-      try {
-        final user = await UserDatabase.read(this.user.email);
-
-        this.user.firstName = user.firstName;
-        this.user.lastName = user.lastName;
-      } catch (error) {
-        print(error);
-        throw (error);
-      }
+      this.user.firstName = responseBody['firstName'];
+      this.user.lastName = responseBody['lastName'];
+    } catch (error) {
+      print(error);
+      throw (error);
     }
   }
 
@@ -266,29 +266,29 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  Future<void> checkIfAvatarExistsOffline() async {
+    try {
+      final user = await UserDatabase.read(this.user.email);
+
+      this._user.removed = user.removed;
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
   Future<void> checkIfAvatarExists() async {
-    if (await InternetConnection.internetConnection()) {
-      final finalUrl = this._serverUrl + 'userImage/checkIfExists/${this._user.email}';
+    final finalUrl = this._serverUrl + 'userImage/checkIfExists/${this._user.email}';
 
-      try {
-        final response = await http.get(finalUrl);
+    try {
+      final response = await http.get(finalUrl);
 
-        if (this._user != null) {
-          response.body == 'true' ? this._user.removed = false : this._user.removed = true;
-        }
-      } catch (error) {
-        print(error);
-        throw (error);
+      if (this._user != null) {
+        response.body == 'true' ? this._user.removed = false : this._user.removed = true;
       }
-    } else {
-      try {
-        final user = await UserDatabase.read(this.user.email);
-
-        this._user.removed = user.removed;
-      } catch (error) {
-        print(error);
-        throw (error);
-      }
+    } catch (error) {
+      print(error);
+      throw (error);
     }
   }
 
@@ -368,16 +368,22 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  void notify() {
+    notifyListeners();
+  }
+
+  Future<void> getUserImageOffline() async {
+    final user = await UserDatabase.read(this._user.email);
+
+    this._user.localImage = user.localImage;
+  }
+
   Future<void> getUserImage() async {
     try {
       final result = await Connectivity().checkConnectivity();
 
       if (result != ConnectivityResult.none) {
         this._user.userImage = NetworkImage(this._serverUrl + 'userImage/getImage/${this._user.email}');
-      } else {
-        final user = await UserDatabase.read(this._user.email);
-
-        this._user.localImage = user.localImage;
       }
     } catch (error) {
       print(error);

@@ -24,7 +24,7 @@ class ScheduledScreen extends StatelessWidget {
 
     return RefreshIndicator(
       backgroundColor: Theme.of(context).primaryColor,
-      onRefresh: () => Provider.of<TaskProvider>(context, listen: false).fetchTasks(context),
+      onRefresh: () => Provider.of<TaskProvider>(context, listen: false).fetchTasks(),
       child: before.length == 0 && today.length == 0 && after.length == 0
           ? EmptyList(message: AppLocalizations.of(context).emptyScheduled)
           : SingleChildScrollView(
@@ -56,13 +56,9 @@ class ScheduledScreen extends StatelessWidget {
                               physics: const NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               itemCount: before.length,
-                              itemBuilder: (ctx, index) => ChangeNotifierProvider.value(
+                              itemBuilder: (ctx, index) => TaskWidget(
+                                task: before[index],
                                 key: ValueKey(before[index]),
-                                value: before[index],
-                                child: TaskWidget(
-                                  task: before[index],
-                                  key: ValueKey(before[index]),
-                                ),
                               ),
                               onReorder: (int oldIndex, int newIndex) {
                                 if (newIndex > before.length) newIndex = before.length;
@@ -100,13 +96,9 @@ class ScheduledScreen extends StatelessWidget {
                                 physics: const NeverScrollableScrollPhysics(),
                                 shrinkWrap: true,
                                 itemCount: before.length,
-                                itemBuilder: (ctx, index) => ChangeNotifierProvider.value(
+                                itemBuilder: (ctx, index) => TaskWidget(
+                                  task: before[index],
                                   key: ValueKey(before[index]),
-                                  value: before[index],
-                                  child: TaskWidget(
-                                    task: before[index],
-                                    key: ValueKey(before[index]),
-                                  ),
                                 ),
                               ),
                             ),
@@ -134,13 +126,9 @@ class ScheduledScreen extends StatelessWidget {
                               physics: const NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               itemCount: today.length,
-                              itemBuilder: (ctx, index) => ChangeNotifierProvider.value(
+                              itemBuilder: (ctx, index) => TaskWidget(
+                                task: today[index],
                                 key: ValueKey(today[index]),
-                                value: today[index],
-                                child: TaskWidget(
-                                  task: today[index],
-                                  key: ValueKey(today[index]),
-                                ),
                               ),
                               onReorder: (int oldIndex, int newIndex) {
                                 if (newIndex > today.length) newIndex = today.length;
@@ -178,13 +166,9 @@ class ScheduledScreen extends StatelessWidget {
                                 physics: const NeverScrollableScrollPhysics(),
                                 shrinkWrap: true,
                                 itemCount: today.length,
-                                itemBuilder: (ctx, index) => ChangeNotifierProvider.value(
+                                itemBuilder: (ctx, index) => TaskWidget(
+                                  task: today[index],
                                   key: ValueKey(today[index]),
-                                  value: today[index],
-                                  child: TaskWidget(
-                                    task: today[index],
-                                    key: ValueKey(today[index]),
-                                  ),
                                 ),
                               ),
                             ),
@@ -212,13 +196,9 @@ class ScheduledScreen extends StatelessWidget {
                               physics: const NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               itemCount: after.length,
-                              itemBuilder: (ctx, index) => ChangeNotifierProvider.value(
+                              itemBuilder: (ctx, index) => TaskWidget(
+                                task: after[index],
                                 key: ValueKey(after[index]),
-                                value: after[index],
-                                child: TaskWidget(
-                                  task: after[index],
-                                  key: ValueKey(after[index]),
-                                ),
                               ),
                               onReorder: (int oldIndex, int newIndex) {
                                 if (newIndex > after.length) newIndex = after.length;
@@ -256,13 +236,9 @@ class ScheduledScreen extends StatelessWidget {
                                 physics: const NeverScrollableScrollPhysics(),
                                 shrinkWrap: true,
                                 itemCount: after.length,
-                                itemBuilder: (ctx, index) => ChangeNotifierProvider.value(
+                                itemBuilder: (ctx, index) => TaskWidget(
+                                  task: after[index],
                                   key: ValueKey(after[index]),
-                                  value: after[index],
-                                  child: TaskWidget(
-                                    task: after[index],
-                                    key: ValueKey(after[index]),
-                                  ),
                                 ),
                               ),
                             ),

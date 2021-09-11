@@ -31,6 +31,17 @@ class ThemeProvider with ChangeNotifier {
     }
   }
 
+  Future<void> getUserModeOffline() async {
+    try {
+      final result = await GraphicDatabase.read(this.userEmail);
+
+      this.themeMode = this._selectColorMode(result[0]);
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
   Future<void> getUserMode() async {
     if (await InternetConnection.internetConnection()) {
       final requestUrl = this._serverUrl + 'themeMode/get/${this.userEmail}';
@@ -59,18 +70,7 @@ class ThemeProvider with ChangeNotifier {
         print(error);
         throw (error);
       }
-    } else {
-      try {
-        final result = await GraphicDatabase.read(this.userEmail);
-
-        this.themeMode = this._selectColorMode(result[0]);
-
-        notifyListeners();
-      } catch (error) {
-        print(error);
-        throw (error);
-      }
-    }
+    } else {}
   }
 
   Future<void> toggleTheme(bool isOn) async {

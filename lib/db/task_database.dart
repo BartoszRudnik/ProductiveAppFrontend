@@ -1,5 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:productive_app/db/init_database.dart';
+import 'package:productive_app/model/tag.dart';
 import 'package:productive_app/model/task.dart';
 
 class TaskDatabase {
@@ -16,6 +16,7 @@ class TaskDatabase {
   static Future<Task> create(Task task, String userMail) async {
     final db = await InitDatabase.instance.database;
 
+    task.id = null;
     Map taskMap = task.toJson();
 
     taskMap['userMail'] = userMail;
@@ -25,7 +26,7 @@ class TaskDatabase {
     return task.copy(id: id);
   }
 
-  static Future<Task> read(int id, BuildContext context) async {
+  static Future<Task> read(int id, List<Tag> tags) async {
     final db = await InitDatabase.instance.database;
 
     final maps = await db.query(
@@ -36,22 +37,25 @@ class TaskDatabase {
     );
 
     if (maps.isNotEmpty) {
-      return Task.fromJson(maps.first, context);
+      return Task.fromJson(maps.first, tags);
     } else {
       return null;
     }
   }
 
-  static Future<List<Task>> readAll(BuildContext context, String userMail) async {
-    final db = await InitDatabase.instance.database;
+  static Future<List<Task>> readAll(List<Tag> tags, String userMail) async {
+    if (userMail != null) {
+      final db = await InitDatabase.instance.database;
 
-    final result = await db.query(
-      tableTask,
-      where: 'userMail = ?',
-      whereArgs: [userMail],
-    );
+      final result = await db.query(
+        tableTask,
+        where: 'userMail = ?',
+        whereArgs: [userMail],
+      );
 
-    return result.map((e) => Task.fromJson(e, context)).toList();
+      return result.map((e) => Task.fromJson(e, tags)).toList();
+    }
+    return [];
   }
 
   static Future<int> update(Task task, String userMail) async {

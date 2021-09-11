@@ -285,83 +285,85 @@ class DelegateProvider with ChangeNotifier {
     }
   }
 
+  void notify() {
+    notifyListeners();
+  }
+
+  Future<void> getCollaboratorsOffline() async {
+    try {
+      this.collaborators = await CollaboratorDatabase.readAll(this.userEmail);
+
+      this.divideCollaborators(this.collaborators);
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
   Future<void> getCollaborators() async {
-    if (await InternetConnection.internetConnection()) {
-      final requestUrl = this._serverUrl + 'delegate/getAllCollaborators/${this.userEmail}';
+    final requestUrl = this._serverUrl + 'delegate/getAllCollaborators/${this.userEmail}';
 
-      List<Collaborator> loadedCollaborators = [];
+    List<Collaborator> loadedCollaborators = [];
 
-      await CollaboratorDatabase.deleteAll(this.userEmail);
+    await CollaboratorDatabase.deleteAll(this.userEmail);
 
-      try {
-        final response = await http.get(requestUrl);
+    try {
+      final response = await http.get(requestUrl);
 
-        final responseBody = json.decode(utf8.decode(response.bodyBytes));
+      final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
-        for (var element in responseBody) {
-          bool isAskingForPermission = false;
-          bool alreadyAsked = false;
-          bool receivedPermission = false;
-          bool sentPermission = false;
-          bool isReceived = false;
-          String collaboratorEmail = '';
-          String collaboratorName = '';
+      for (var element in responseBody) {
+        bool isAskingForPermission = false;
+        bool alreadyAsked = false;
+        bool receivedPermission = false;
+        bool sentPermission = false;
+        bool isReceived = false;
+        String collaboratorEmail = '';
+        String collaboratorName = '';
 
-          if (element['invitationSender'] == this.userEmail) {
-            collaboratorEmail = element['invitationReceiver'];
-            collaboratorName = element['invitationReceiverName'];
-            sentPermission = element['user2Permission'];
-            receivedPermission = element['user1Permission'];
-            isAskingForPermission = element['user2AskForPermission'];
-            alreadyAsked = element['user1AskForPermission'];
-          } else {
-            isReceived = true;
-            collaboratorEmail = element['invitationSender'];
-            collaboratorName = element['invitationSenderName'];
-            sentPermission = element['user1Permission'];
-            receivedPermission = element['user2Permission'];
-            isAskingForPermission = element['user1AskForPermission'];
-            alreadyAsked = element['user2AskForPermission'];
-          }
-
-          Collaborator newCollaborator = Collaborator(
-            uuid: element['uuid'],
-            id: element['id'],
-            email: collaboratorEmail,
-            collaboratorName: collaboratorName,
-            relationState: element['relationState'],
-            isSelected: false,
-            received: isReceived,
-            sentPermission: sentPermission,
-            receivedPermission: receivedPermission,
-            alreadyAsked: alreadyAsked,
-            isAskingForPermission: isAskingForPermission,
-          );
-
-          loadedCollaborators.add(newCollaborator);
-          await CollaboratorDatabase.create(newCollaborator, this.userEmail);
+        if (element['invitationSender'] == this.userEmail) {
+          collaboratorEmail = element['invitationReceiver'];
+          collaboratorName = element['invitationReceiverName'];
+          sentPermission = element['user2Permission'];
+          receivedPermission = element['user1Permission'];
+          isAskingForPermission = element['user2AskForPermission'];
+          alreadyAsked = element['user1AskForPermission'];
+        } else {
+          isReceived = true;
+          collaboratorEmail = element['invitationSender'];
+          collaboratorName = element['invitationSenderName'];
+          sentPermission = element['user1Permission'];
+          receivedPermission = element['user2Permission'];
+          isAskingForPermission = element['user1AskForPermission'];
+          alreadyAsked = element['user2AskForPermission'];
         }
 
-        this.collaborators = loadedCollaborators;
+        Collaborator newCollaborator = Collaborator(
+          uuid: element['uuid'],
+          id: element['id'],
+          email: collaboratorEmail,
+          collaboratorName: collaboratorName,
+          relationState: element['relationState'],
+          isSelected: false,
+          received: isReceived,
+          sentPermission: sentPermission,
+          receivedPermission: receivedPermission,
+          alreadyAsked: alreadyAsked,
+          isAskingForPermission: isAskingForPermission,
+        );
 
-        this.divideCollaborators(this.collaborators);
-
-        notifyListeners();
-      } catch (error) {
-        print(error);
-        throw (error);
+        loadedCollaborators.add(newCollaborator);
+        await CollaboratorDatabase.create(newCollaborator, this.userEmail);
       }
-    } else {
-      try {
-        this.collaborators = await CollaboratorDatabase.readAll(this.userEmail);
 
-        this.divideCollaborators(this.collaborators);
+      this.collaborators = loadedCollaborators;
 
-        notifyListeners();
-      } catch (error) {
-        print(error);
-        throw (error);
-      }
+      this.divideCollaborators(this.collaborators);
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw (error);
     }
   }
 

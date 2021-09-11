@@ -67,7 +67,7 @@ class MyApp extends StatelessWidget {
             attachmentsToDelete: previousSynchronize == null ? [] : previousSynchronize.attachmentsToDelete,
             tasksToDelete: previousSynchronize == null ? [] : previousSynchronize.tasksToDelete,
             collaboratorsToDelete: previousSynchronize == null ? [] : previousSynchronize.collaboratorsToDelete,
-            tagsToDelete: previousSynchronize == null || previousSynchronize.tagsToDelete == null ? [] : previousSynchronize.tagsToDelete,
+            tagsToDelete: previousSynchronize == null ? [] : previousSynchronize.tagsToDelete,
             locationsToDelete: previousSynchronize == null ? [] : previousSynchronize.locationsToDelete,
           ),
         ),

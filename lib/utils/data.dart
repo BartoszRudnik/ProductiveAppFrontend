@@ -17,6 +17,7 @@ import 'package:productive_app/model/tag.dart';
 import 'package:productive_app/model/user.dart';
 import 'package:productive_app/provider/locale_provider.dart';
 import 'package:productive_app/provider/synchronize_provider.dart';
+import 'package:productive_app/provider/tag_provider.dart';
 import 'package:productive_app/provider/theme_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -26,7 +27,6 @@ import '../provider/auth_provider.dart';
 import '../provider/delegate_provider.dart';
 import '../provider/location_provider.dart';
 import '../provider/settings_provider.dart';
-import '../provider/tag_provider.dart';
 import '../provider/task_provider.dart';
 
 class Data {
@@ -53,9 +53,10 @@ class Data {
         GraphicDatabase.read(userEmail).then((value) => graphic = value),
         UserDatabase.read(userEmail).then((value) => user = value),
         SettingsDatabase.read(userEmail).then((value) => settings = value),
-        TaskDatabase.readAll(context, userEmail).then((value) => tasks = value),
         AttachmentDatabase.readAll(userEmail).then((value) => attachments = value),
       ]);
+
+      await TaskDatabase.readAll(tags, userEmail).then((value) => tasks = value);
 
       await Future.wait([
         provider.synchronizeTags(tags),
@@ -72,15 +73,47 @@ class Data {
     }
   }
 
-  static Future<void> loadData(BuildContext context) async {
-    print('loading data');
+  static void notify(BuildContext context) {
+    Provider.of<TagProvider>(context, listen: false).notify();
+    Provider.of<TaskProvider>(context, listen: false).notify();
+    Provider.of<SettingsProvider>(context, listen: false).notify();
+    Provider.of<DelegateProvider>(context, listen: false).notify();
+    Provider.of<LocationProvider>(context, listen: false).notify();
+    Provider.of<AttachmentProvider>(context, listen: false).notify();
+  }
 
+  static Future<void> loadDataOffline(BuildContext context) async {
     try {
-      await Provider.of<TagProvider>(context, listen: false).getTags();
+      final tags = await Provider.of<TagProvider>(context, listen: false).getTagsOffline();
 
       await Future.wait(
         [
-          Provider.of<TaskProvider>(context, listen: false).fetchTasks(context),
+          Provider.of<TaskProvider>(context, listen: false).fetchTasksOffline(tags),
+          Provider.of<TaskProvider>(context, listen: false).getPriorities(),
+          Provider.of<LocationProvider>(context, listen: false).getLocationsOffline(),
+          Provider.of<ThemeProvider>(context, listen: false).getUserModeOffline(),
+          Provider.of<DelegateProvider>(context, listen: false).getCollaboratorsOffline(),
+          Provider.of<SettingsProvider>(context, listen: false).getFilterSettingsOffline(),
+          Provider.of<AttachmentProvider>(context, listen: false).getAttachmentsOffline(),
+          Provider.of<AuthProvider>(context, listen: false).getUserDataOffline(),
+          Provider.of<AuthProvider>(context, listen: false).checkIfAvatarExistsOffline(),
+          Provider.of<AuthProvider>(context, listen: false).getUserImageOffline(),
+          Provider.of<TagProvider>(context, listen: false).getTagsOffline(),
+        ],
+      );
+
+      await Provider.of<LocaleProvider>(context, listen: false).getLocaleOffline();
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  static Future<void> loadData(BuildContext context) async {
+    try {
+      await Future.wait(
+        [
+          Provider.of<TagProvider>(context, listen: false).getTags(),
+          Provider.of<TaskProvider>(context, listen: false).fetchTasks(),
           Provider.of<TaskProvider>(context, listen: false).getPriorities(),
           Provider.of<LocationProvider>(context, listen: false).getLocations(),
           Provider.of<DelegateProvider>(context, listen: false).getCollaborators(),
@@ -109,6 +142,5 @@ class Data {
 
       await Provider.of<AttachmentProvider>(context, listen: false).getDelegatedAttachments(delegatedTasksId);
     }
-    print('loading data finish');
   }
 }

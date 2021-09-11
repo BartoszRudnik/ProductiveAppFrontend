@@ -46,66 +46,68 @@ class SettingsProvider with ChangeNotifier {
     }
   }
 
+  void notify() {
+    notifyListeners();
+  }
+
+  Future<void> getFilterSettingsOffline() async {
+    try {
+      this.userSettings = await SettingsDatabase.read(this.userMail);
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
   Future<void> getFilterSettings() async {
     final finalUrl = this._serverUrl + 'filterSettings/getFilterSettings/${this.userMail}';
 
-    if (await InternetConnection.internetConnection()) {
-      await SettingsDatabase.delete(this.userMail);
+    await SettingsDatabase.delete(this.userMail);
 
-      try {
-        final response = await http.get(finalUrl);
+    try {
+      final response = await http.get(finalUrl);
 
-        final responseBody = json.decode(utf8.decode(response.bodyBytes));
+      final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
-        List<String> collaborators = [];
-        List<String> priorities = [];
-        List<String> tags = [];
-        List<int> locations = [];
+      List<String> collaborators = [];
+      List<String> priorities = [];
+      List<String> tags = [];
+      List<int> locations = [];
 
-        for (var element in responseBody['locations']) {
-          locations.add(element);
-        }
-
-        for (var element in responseBody['tags']) {
-          tags.add(element);
-        }
-
-        for (var element in responseBody['priorities']) {
-          priorities.add(element);
-        }
-
-        for (var element in responseBody['collaboratorEmail']) {
-          collaborators.add(element);
-        }
-
-        Settings newSettings = Settings(
-          showOnlyUnfinished: responseBody['showOnlyUnfinished'],
-          showOnlyDelegated: responseBody['showOnlyDelegated'],
-          showOnlyWithLocalization: responseBody['showOnlyWithLocalization'],
-          collaborators: collaborators,
-          priorities: priorities,
-          tags: tags,
-          locations: locations,
-          sortingMode: responseBody['sortingMode'],
-        );
-        this.userSettings = newSettings;
-
-        await SettingsDatabase.create(newSettings, this.userMail);
-
-        notifyListeners();
-      } catch (error) {
-        print(error);
-        throw (error);
+      for (var element in responseBody['locations']) {
+        locations.add(element);
       }
-    } else {
-      try {
-        this.userSettings = await SettingsDatabase.read(this.userMail);
 
-        notifyListeners();
-      } catch (error) {
-        print(error);
-        throw (error);
+      for (var element in responseBody['tags']) {
+        tags.add(element);
       }
+
+      for (var element in responseBody['priorities']) {
+        priorities.add(element);
+      }
+
+      for (var element in responseBody['collaboratorEmail']) {
+        collaborators.add(element);
+      }
+
+      Settings newSettings = Settings(
+        showOnlyUnfinished: responseBody['showOnlyUnfinished'],
+        showOnlyDelegated: responseBody['showOnlyDelegated'],
+        showOnlyWithLocalization: responseBody['showOnlyWithLocalization'],
+        collaborators: collaborators,
+        priorities: priorities,
+        tags: tags,
+        locations: locations,
+        sortingMode: responseBody['sortingMode'],
+      );
+      this.userSettings = newSettings;
+
+      await SettingsDatabase.create(newSettings, this.userMail);
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw (error);
     }
   }
 

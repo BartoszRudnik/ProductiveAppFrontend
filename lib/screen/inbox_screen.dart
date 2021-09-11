@@ -53,7 +53,7 @@ class InboxScreen extends StatelessWidget {
           Expanded(
             child: RefreshIndicator(
                 backgroundColor: Theme.of(context).primaryColor,
-                onRefresh: () => Provider.of<TaskProvider>(context, listen: false).fetchTasks(context),
+                onRefresh: () => Provider.of<TaskProvider>(context, listen: false).fetchTasks(),
                 child: tasks.length == 0
                     ? EmptyList(message: AppLocalizations.of(context).emptyInbox)
                     : userSettings.sortingMode == 6

@@ -56,12 +56,12 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
 
   @override
   void initState() {
+    super.initState();
+
     _descriptionFocus.addListener(onDescriptionFocusChange);
     taskToEdit = null;
 
     Provider.of<AttachmentProvider>(context, listen: false).prepare();
-
-    super.initState();
   }
 
   void setNewAttachments(List<int> newAttachments) {
@@ -439,11 +439,11 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
 
     List<Attachment> attachments = Provider.of<AttachmentProvider>(context)
         .attachments
-        .where((attachment) => attachment.taskId == taskToEdit.id && !attachment.toDelete)
+        .where((attachment) => attachment.taskUuid == taskToEdit.uuid && !attachment.toDelete)
         .toList();
     attachments.addAll(Provider.of<AttachmentProvider>(context)
         .delegatedAttachments
-        .where((attachment) => attachment.taskId == taskToEdit.parentId && !attachment.toDelete)
+        .where((attachment) => attachment.taskUuid == taskToEdit.uuid && !attachment.toDelete)
         .toList());
 
     return WillPopScope(
@@ -595,7 +595,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                   ),
                   TaskDetailsAttachments(
                     attachments: attachments,
-                    taskId: taskToEdit.id,
+                    taskUuid: taskToEdit.uuid,
                   ),
                 ],
               ),
