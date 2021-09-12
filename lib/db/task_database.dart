@@ -26,14 +26,27 @@ class TaskDatabase {
     return task.copy(id: id);
   }
 
-  static Future<Task> read(int id, List<Tag> tags) async {
+  static Future<int> getIdByUuid(String uuid) async {
     final db = await InitDatabase.instance.database;
 
     final maps = await db.query(
       tableTask,
       columns: TaskFields.values,
-      where: '${TaskFields.id} = ?',
-      whereArgs: [id],
+      where: '${TaskFields.uuid} = ?',
+      whereArgs: [uuid],
+    );
+
+    return int.parse(maps.first['id'].toString());
+  }
+
+  static Future<Task> read(String uuid, List<Tag> tags) async {
+    final db = await InitDatabase.instance.database;
+
+    final maps = await db.query(
+      tableTask,
+      columns: TaskFields.values,
+      where: '${TaskFields.uuid} = ?',
+      whereArgs: [uuid],
     );
 
     if (maps.isNotEmpty) {
@@ -61,6 +74,12 @@ class TaskDatabase {
   static Future<int> update(Task task, String userMail) async {
     final db = await InitDatabase.instance.database;
 
+
+    if (task.id == null) {
+      task.id = await getIdByUuid(task.uuid);
+    }
+
+
     task.lastUpdated = DateTime.now();
 
     Map taskMap = task.toJson();
@@ -70,8 +89,8 @@ class TaskDatabase {
     return await db.update(
       tableTask,
       taskMap,
-      where: '${TaskFields.id} = ?',
-      whereArgs: [task.id],
+      where: '${TaskFields.uuid} = ?',
+      whereArgs: [task.uuid],
     );
   }
 

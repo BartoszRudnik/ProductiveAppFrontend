@@ -26,14 +26,14 @@ class TaskWidget extends StatefulWidget {
 }
 
 class _TaskWidgetState extends State<TaskWidget> {
-  void changeTaskStatus() {
+  void changeTaskStatus() async {
     if (this.widget.task.notificationLocalizationId == null) {
-      Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(this.widget.task);
+      await Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(this.widget.task);
     } else {
       final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.widget.task.notificationLocalizationId);
       final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.widget.task.notificationLocalizationId);
 
-      Provider.of<TaskProvider>(context, listen: false).toggleTaskStatusWithGeolocation(this.widget.task, latitude, longitude);
+      await Provider.of<TaskProvider>(context, listen: false).toggleTaskStatusWithGeolocation(this.widget.task, latitude, longitude);
     }
   }
 

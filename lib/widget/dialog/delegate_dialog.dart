@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:provider/provider.dart';
+
 import '../../model/collaborator.dart';
 import '../../provider/delegate_provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class DelegateDialog extends StatelessWidget {
   final _collaboratorKey = GlobalKey<FormState>();
@@ -52,7 +53,8 @@ class DelegateDialog extends StatelessWidget {
                     child: TextFormField(
                       onChanged: (value) {
                         setState(() {
-                          filteredCollaborators = collaborators.where((element) => element.email.toLowerCase().contains(value.toLowerCase())).toList();
+                          filteredCollaborators =
+                              collaborators.where((element) => element.email.toLowerCase().contains(value.toLowerCase())).toList();
                         });
                       },
                       validator: (value) {
@@ -163,12 +165,18 @@ class DelegateDialog extends StatelessWidget {
                                 child: FadeInImage(
                                   image: NetworkImage(this._serverUrl + 'userImage/getImage/${filteredCollaborators[collaboratorIndex].email}'),
                                   placeholder: AssetImage('assets/images/profile_placeholder.jpg'),
+                                  imageErrorBuilder: (ctx, error, stackTrace) =>
+                                      Image.asset('assets/images/profile_placeholder.jpg', fit: BoxFit.fitWidth),
                                 ),
                               ),
                               title: Text(
-                                filteredCollaborators[collaboratorIndex].collaboratorName.length > 1 ? filteredCollaborators[collaboratorIndex].collaboratorName : filteredCollaborators[collaboratorIndex].email,
+                                filteredCollaborators[collaboratorIndex].collaboratorName.length > 1
+                                    ? filteredCollaborators[collaboratorIndex].collaboratorName
+                                    : filteredCollaborators[collaboratorIndex].email,
                                 style: TextStyle(
-                                  color: filteredCollaborators[collaboratorIndex].isSelected ? Theme.of(context).accentColor : Theme.of(context).primaryColor,
+                                  color: filteredCollaborators[collaboratorIndex].isSelected
+                                      ? Theme.of(context).accentColor
+                                      : Theme.of(context).primaryColor,
                                 ),
                               ),
                             ),

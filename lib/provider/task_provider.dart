@@ -223,19 +223,9 @@ class TaskProvider with ChangeNotifier {
   }
 
   Future<int> addTask(Task task) async {
-    String url = this._serverUrl + 'task/add';
-
-    task = await TaskDatabase.create(task, this.userMail);
-
-    task.position = task.id + 1000.0;
-    await TaskDatabase.update(task, this.userMail);
-
-    this.taskList.add(task);
-    this.addToLocalization(task);
-
-    notifyListeners();
-
     if (await InternetConnection.internetConnection()) {
+      String url = this._serverUrl + 'task/add';
+
       try {
         final response = await http.post(
           url,
@@ -265,12 +255,13 @@ class TaskProvider with ChangeNotifier {
           },
         );
 
-        if (int.parse(response.body) != task.id) {
-          task.id = int.parse(response.body);
-          task.position = int.parse(response.body) + 1000.0;
+        task.id = int.parse(response.body);
+        task.position = int.parse(response.body) + 1000.0;
 
-          await TaskDatabase.update(task, this.userMail);
-        }
+        task = await TaskDatabase.create(task, this.userMail);
+
+        this.taskList.add(task);
+        this.addToLocalization(task);
 
         notifyListeners();
 
@@ -280,6 +271,16 @@ class TaskProvider with ChangeNotifier {
         throw error;
       }
     } else {
+      task = await TaskDatabase.create(task, this.userMail);
+
+      task.position = task.id + 1000.0;
+      await TaskDatabase.update(task, this.userMail);
+
+      this.taskList.add(task);
+      this.addToLocalization(task);
+
+      notifyListeners();
+
       return task.id;
     }
   }
@@ -350,6 +351,7 @@ class TaskProvider with ChangeNotifier {
     } else if (task.localization == 'SCHEDULED') {
       this.sortByPosition(this._scheduledTasks);
     } else if (task.localization == 'DELEGATED') {
+      task.taskStatus = 'Sent';
       this.sortByPosition(this._delegatedTasks);
     }
 
@@ -422,6 +424,7 @@ class TaskProvider with ChangeNotifier {
     } else if (task.localization == 'SCHEDULED') {
       this.sortByPosition(this._scheduledTasks);
     } else if (task.localization == 'DELEGATED') {
+      task.taskStatus = 'Sent';
       this.sortByPosition(this._delegatedTasks);
     }
 
@@ -821,23 +824,26 @@ class TaskProvider with ChangeNotifier {
   Future<void> toggleTaskStatus(Task task) async {
     this.localizationTaskStatus(task);
 
-    await TaskDatabase.update(task, this.userMail);
-    notifyListeners();
-
     if (await InternetConnection.internetConnection()) {
-      String url = this._serverUrl + 'task/done/${task.id}';
+      String url = this._serverUrl + 'task/done/${task.uuid}';
 
       try {
         final response = await http.post(url);
 
         if (response != null && task.localization == 'DELEGATED') {
           final newStatus = response.body;
-          this.updateTaskStatus(task.id, newStatus);
+          this.updateTaskStatus(task.uuid, newStatus);
         }
+
+        await TaskDatabase.update(task, this.userMail);
+        notifyListeners();
       } catch (error) {
         print(error);
         throw error;
       }
+    } else {
+      await TaskDatabase.update(task, this.userMail);
+      notifyListeners();
     }
   }
 
@@ -859,26 +865,27 @@ class TaskProvider with ChangeNotifier {
       );
     }
 
-    await TaskDatabase.update(task, this.userMail);
-
-    notifyListeners();
-
     if (await InternetConnection.internetConnection()) {
-      String url = this._serverUrl + 'task/done/${task.id}';
+      String url = this._serverUrl + 'task/done/${task.uuid}';
 
       try {
         final response = await http.post(url);
 
         if (response != null && task.localization == 'DELEGATED') {
           final newStatus = response.body;
-          this.updateTaskStatus(task.id, newStatus);
-
-          notifyListeners();
+          this.updateTaskStatus(task.uuid, newStatus);
         }
+        await TaskDatabase.update(task, this.userMail);
+
+        notifyListeners();
       } catch (error) {
         print(error);
         throw error;
       }
+    } else {
+      await TaskDatabase.update(task, this.userMail);
+
+      notifyListeners();
     }
   }
 
@@ -888,8 +895,8 @@ class TaskProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void updateTaskStatus(int id, String newStatus) {
-    this._delegatedTasks.firstWhere((element) => element.id == id).taskStatus = newStatus;
+  void updateTaskStatus(String uuid, String newStatus) {
+    this._delegatedTasks.firstWhere((element) => element.uuid == uuid).taskStatus = newStatus;
   }
 
   void localizationTaskStatus(Task task) {

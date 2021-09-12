@@ -199,7 +199,6 @@ class Task {
 
   static Task fromJson(Map<String, Object> json, List<Tag> tags) {
     return Task(
-      uuid: json[TaskFields.uuid] == null ? null : json[TaskFields.uuid] as String,
       id: json[TaskFields.id] == null ? null : json[TaskFields.id] as int,
       title: json[TaskFields.title] == null ? null : json[TaskFields.title] as String,
       childId: json[TaskFields.childId] == null ? null : json[TaskFields.childId] as int,
@@ -223,12 +222,12 @@ class Task {
       notificationOnEnter: json[TaskFields.notificationOnEnter] == null ? false : json[TaskFields.notificationOnEnter] == 1,
       notificationOnExit: json[TaskFields.notificationOnExit] == null ? false : json[TaskFields.notificationOnExit] == 1,
       lastUpdated: json[TaskFields.lastUpdated] == null ? null : DateTime.parse(json[TaskFields.lastUpdated] as String),
+      uuid: json[TaskFields.uuid] == null ? null : json[TaskFields.uuid] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      TaskFields.uuid: this.uuid,
       TaskFields.id: this.id,
       TaskFields.title: this.title,
       TaskFields.childId: this.childId,
@@ -271,6 +270,7 @@ class Task {
               ? 1
               : 0,
       TaskFields.lastUpdated: this.lastUpdated != null ? this.lastUpdated.toIso8601String() : DateTime.now().toIso8601String(),
+      TaskFields.uuid: this.uuid,
     };
   }
 }
