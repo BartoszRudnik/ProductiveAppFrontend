@@ -40,7 +40,7 @@ class Settings {
   DateTime lastUpdated;
 
   Settings({
-    this.id = 1,
+    this.id,
     this.showOnlyUnfinished = false,
     this.showOnlyDelegated = false,
     this.showOnlyWithLocalization = false,
@@ -99,7 +99,7 @@ class Settings {
     List<String> priorities,
     List<String> tags,
     List<int> locations,
-    int sortingMode,
+    int sortingMode = 0,
     String taskName,
     DateTime lastUpdated,
   }) =>
@@ -118,15 +118,15 @@ class Settings {
 
   static Settings fromJson(Map<String, Object> json) => Settings(
         id: json[SettingsFields.id] as int,
-        showOnlyUnfinished: json[SettingsFields.showOnlyUnfinished] == 1,
-        showOnlyDelegated: json[SettingsFields.showOnlyDelegated] == 1,
-        showOnlyWithLocalization: json[SettingsFields.showOnlyWithLocalization] == 1,
-        collaborators: splitStringList(json[SettingsFields.collaborators] as String),
-        priorities: splitStringList(json[SettingsFields.priorities] as String),
-        tags: splitStringList(json[SettingsFields.tags] as String),
-        locations: splitIntList(json[SettingsFields.locations] as String),
-        sortingMode: json[SettingsFields.sortingMode] as int,
-        lastUpdated: DateTime.parse(json[SettingsFields.lastUpdated] as String),
+        showOnlyUnfinished: json[SettingsFields.showOnlyUnfinished] == null ? 0 : json[SettingsFields.showOnlyUnfinished] == 1,
+        showOnlyDelegated: json[SettingsFields.showOnlyDelegated] == null ? 0 : json[SettingsFields.showOnlyDelegated] == 1,
+        showOnlyWithLocalization: json[SettingsFields.showOnlyWithLocalization] == null ? 0 : json[SettingsFields.showOnlyWithLocalization] == 1,
+        collaborators: json[SettingsFields.collaborators] == null ? [] : splitStringList(json[SettingsFields.collaborators] as String),
+        priorities: json[SettingsFields.priorities] == null ? [] : splitStringList(json[SettingsFields.priorities] as String),
+        tags: json[SettingsFields.tags] == null ? [] : splitStringList(json[SettingsFields.tags] as String),
+        locations: json[SettingsFields.locations] == null ? [] : splitIntList(json[SettingsFields.locations] as String),
+        sortingMode: json[SettingsFields.sortingMode] == null ? 0 : json[SettingsFields.sortingMode] as int,
+        lastUpdated: json[SettingsFields.lastUpdated] == null ? DateTime.now() : DateTime.parse(json[SettingsFields.lastUpdated] as String),
       );
 
   Map<String, dynamic> toJson() {

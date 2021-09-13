@@ -16,12 +16,7 @@ class SettingsProvider with ChangeNotifier {
     this.userSettings,
     this.userMail,
     this.authToken,
-  }) {
-    this.userSettings.collaborators = [];
-    this.userSettings.priorities = [];
-    this.userSettings.tags = [];
-    this.userSettings.sortingMode = 0;
-  }
+  });
 
   String _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
@@ -74,23 +69,24 @@ class SettingsProvider with ChangeNotifier {
       List<String> tags = [];
       List<int> locations = [];
 
-      for (var element in responseBody['locations']) {
+      for (final element in responseBody['locations']) {
         locations.add(element);
       }
 
-      for (var element in responseBody['tags']) {
+      for (final element in responseBody['tags']) {
         tags.add(element);
       }
 
-      for (var element in responseBody['priorities']) {
+      for (final element in responseBody['priorities']) {
         priorities.add(element);
       }
 
-      for (var element in responseBody['collaboratorEmail']) {
+      for (final element in responseBody['collaboratorEmail']) {
         collaborators.add(element);
       }
 
       Settings newSettings = Settings(
+        id: responseBody['id'],
         showOnlyUnfinished: responseBody['showOnlyUnfinished'],
         showOnlyDelegated: responseBody['showOnlyDelegated'],
         showOnlyWithLocalization: responseBody['showOnlyWithLocalization'],
@@ -130,7 +126,7 @@ class SettingsProvider with ChangeNotifier {
       this.userSettings.locations = locations;
     }
 
-    SettingsDatabase.create(this.userSettings, this.userMail);
+    await SettingsDatabase.create(this.userSettings, this.userMail);
 
     notifyListeners();
 
@@ -162,7 +158,7 @@ class SettingsProvider with ChangeNotifier {
       this.userSettings.tags = tags;
     }
 
-    SettingsDatabase.create(this.userSettings, this.userMail);
+    await SettingsDatabase.create(this.userSettings, this.userMail);
 
     notifyListeners();
 
@@ -194,7 +190,7 @@ class SettingsProvider with ChangeNotifier {
       this.userSettings.priorities = priorities;
     }
 
-    SettingsDatabase.create(this.userSettings, this.userMail);
+    await SettingsDatabase.create(this.userSettings, this.userMail);
 
     notifyListeners();
 
@@ -226,7 +222,7 @@ class SettingsProvider with ChangeNotifier {
       this.userSettings.collaborators = collaboratorEmail;
     }
 
-    SettingsDatabase.create(this.userSettings, this.userMail);
+    await SettingsDatabase.create(this.userSettings, this.userMail);
 
     notifyListeners();
 
@@ -258,7 +254,7 @@ class SettingsProvider with ChangeNotifier {
       this.userSettings.locations.remove(location);
     }
 
-    SettingsDatabase.create(this.userSettings, this.userMail);
+    await SettingsDatabase.create(this.userSettings, this.userMail);
 
     notifyListeners();
 
@@ -290,7 +286,7 @@ class SettingsProvider with ChangeNotifier {
       this.userSettings.tags.remove(tag);
     }
 
-    SettingsDatabase.create(this.userSettings, this.userMail);
+    await SettingsDatabase.create(this.userSettings, this.userMail);
 
     notifyListeners();
 
@@ -322,7 +318,7 @@ class SettingsProvider with ChangeNotifier {
       this.userSettings.priorities.remove(priority);
     }
 
-    SettingsDatabase.create(this.userSettings, this.userMail);
+    await SettingsDatabase.create(this.userSettings, this.userMail);
 
     notifyListeners();
 
@@ -354,7 +350,7 @@ class SettingsProvider with ChangeNotifier {
       this.userSettings.collaborators.remove(collaboratorEmail);
     }
 
-    SettingsDatabase.create(this.userSettings, this.userMail);
+    await SettingsDatabase.create(this.userSettings, this.userMail);
 
     notifyListeners();
 
@@ -384,7 +380,7 @@ class SettingsProvider with ChangeNotifier {
 
     this.userSettings.locations = [];
 
-    SettingsDatabase.create(this.userSettings, this.userMail);
+    await SettingsDatabase.create(this.userSettings, this.userMail);
 
     notifyListeners();
 
@@ -409,7 +405,7 @@ class SettingsProvider with ChangeNotifier {
 
     this.userSettings.tags = [];
 
-    SettingsDatabase.create(this.userSettings, this.userMail);
+    await SettingsDatabase.create(this.userSettings, this.userMail);
 
     notifyListeners();
 
@@ -434,7 +430,7 @@ class SettingsProvider with ChangeNotifier {
 
     this.userSettings.priorities = [];
 
-    SettingsDatabase.create(this.userSettings, this.userMail);
+    await SettingsDatabase.create(this.userSettings, this.userMail);
 
     notifyListeners();
 
@@ -459,7 +455,7 @@ class SettingsProvider with ChangeNotifier {
 
     this.userSettings.collaborators = [];
 
-    SettingsDatabase.create(this.userSettings, this.userMail);
+    await SettingsDatabase.create(this.userSettings, this.userMail);
 
     notifyListeners();
 
@@ -484,7 +480,7 @@ class SettingsProvider with ChangeNotifier {
 
     this.userSettings.showOnlyWithLocalization = !this.userSettings.showOnlyWithLocalization;
 
-    SettingsDatabase.create(this.userSettings, this.userMail);
+    await SettingsDatabase.create(this.userSettings, this.userMail);
 
     notifyListeners();
 
@@ -509,7 +505,7 @@ class SettingsProvider with ChangeNotifier {
 
     this.userSettings.showOnlyDelegated = !this.userSettings.showOnlyDelegated;
 
-    SettingsDatabase.create(this.userSettings, this.userMail);
+    await SettingsDatabase.create(this.userSettings, this.userMail);
 
     notifyListeners();
 
@@ -534,7 +530,7 @@ class SettingsProvider with ChangeNotifier {
 
     this.userSettings.showOnlyUnfinished = !this.userSettings.showOnlyUnfinished;
 
-    SettingsDatabase.create(this.userSettings, this.userMail);
+    await SettingsDatabase.create(this.userSettings, this.userMail);
 
     notifyListeners();
 
@@ -559,7 +555,7 @@ class SettingsProvider with ChangeNotifier {
 
     this.userSettings.sortingMode = newMode;
 
-    SettingsDatabase.create(this.userSettings, this.userMail);
+    await SettingsDatabase.create(this.userSettings, this.userMail);
 
     notifyListeners();
 

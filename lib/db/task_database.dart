@@ -74,11 +74,9 @@ class TaskDatabase {
   static Future<int> update(Task task, String userMail) async {
     final db = await InitDatabase.instance.database;
 
-
     if (task.id == null) {
       task.id = await getIdByUuid(task.uuid);
     }
-
 
     task.lastUpdated = DateTime.now();
 
@@ -104,13 +102,13 @@ class TaskDatabase {
     );
   }
 
-  static Future<int> delete(int id) async {
+  static Future<int> delete(String uuid) async {
     final db = await InitDatabase.instance.database;
 
     return await db.delete(
       tableTask,
-      where: '${TaskFields.id} = ?',
-      whereArgs: [id],
+      where: '${TaskFields.uuid} = ?',
+      whereArgs: [uuid],
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:productive_app/config/color_themes.dart';
+import 'package:productive_app/utils/internet_connection.dart';
 import 'package:provider/provider.dart';
 
 import '../../model/location.dart';
@@ -126,25 +127,29 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                                 child: ElevatedButton(
                                   style: ColorThemes.newTaskDateButtonStyle(context),
                                   onPressed: () async {
-                                    Location choosenLocation = await showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return LocationDialog(
-                                          choosenLocation: Location(
-                                            uuid: '',
-                                            id: -1,
-                                            latitude: 0.0,
-                                            longitude: 0.0,
-                                            localizationName: 'test',
-                                            country: "",
-                                            locality: "",
-                                            street: "",
-                                          ),
-                                        );
-                                      },
-                                    );
+                                    if (await InternetConnection.internetConnection()) {
+                                      Location choosenLocation = await showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return LocationDialog(
+                                            choosenLocation: Location(
+                                              uuid: '',
+                                              id: -1,
+                                              latitude: 0.0,
+                                              longitude: 0.0,
+                                              localizationName: 'test',
+                                              country: "",
+                                              locality: "",
+                                              street: "",
+                                            ),
+                                          );
+                                        },
+                                      );
 
-                                    this._addNewLocationForm(context, choosenLocation);
+                                      this._addNewLocationForm(context, choosenLocation);
+                                    } else {
+                                      Dialogs.showWarningDialog(context, AppLocalizations.of(context).connectionFailed);
+                                    }
                                   },
                                   child: Text(AppLocalizations.of(context).newWord),
                                 ),

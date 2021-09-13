@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/config/images.dart';
 import 'package:productive_app/provider/locale_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -63,9 +64,7 @@ class _RecentTasksState extends State<RecentTasks> {
     try {
       List<CollaboratorTask> newPage = [];
 
-      await Provider.of<DelegateProvider>(context, listen: false)
-          .getCollaboratorRecentlyFinishedTasks(this.widget.collaborator.email, page, 50)
-          .then((value) {
+      await Provider.of<DelegateProvider>(context, listen: false).getCollaboratorRecentlyFinishedTasks(this.widget.collaborator.email, page, 50).then((value) {
         newPage = value;
       });
 
@@ -162,6 +161,20 @@ class _RecentTasksState extends State<RecentTasks> {
                         builderDelegate: PagedChildBuilderDelegate<CollaboratorTask>(
                           itemBuilder: (context, task, index) => SingleCollaboratorTask(task: task),
                           firstPageProgressIndicatorBuilder: (_) => ListShimmer(),
+                          firstPageErrorIndicatorBuilder: (_) => Container(
+                            child: Column(
+                              children: [
+                                Container(
+                                  height: MediaQuery.of(context).size.height * 0.3,
+                                  child: Image.asset(
+                                    Images.noInternet,
+                                    fit: BoxFit.fitHeight,
+                                  ),
+                                ),
+                                Text('No internet connection, try again later.')
+                              ],
+                            ),
+                          ),
                           noItemsFoundIndicatorBuilder: (_) => Container(
                             child: Center(
                               child: Text(AppLocalizations.of(context).emptyList),

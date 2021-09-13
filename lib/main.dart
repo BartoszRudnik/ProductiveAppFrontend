@@ -122,6 +122,10 @@ class MyApp extends StatelessWidget {
                     showOnlyWithLocalization: false,
                     showOnlyUnfinished: false,
                     showOnlyDelegated: false,
+                    collaborators: [],
+                    locations: [],
+                    tags: [],
+                    priorities: [],
                   )
                 : previousSettings.userSettings,
             userMail: auth.email,

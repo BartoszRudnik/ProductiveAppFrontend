@@ -52,15 +52,13 @@ class SettingsDatabase {
 
     final existing = await read(userMail);
 
-    settings.lastUpdated = DateTime.now();
-
-    Map settingsMap = settings.toJson();
-
-    settingsMap['userMail'] = userMail;
-
     if (existing != null) {
       update(settings, userMail);
     } else {
+      settings.lastUpdated = DateTime.now();
+      Map settingsMap = settings.toJson();
+      settingsMap['userMail'] = userMail;
+
       db.insert(tableSettings, settingsMap);
     }
   }

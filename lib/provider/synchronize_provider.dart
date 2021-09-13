@@ -106,109 +106,116 @@ class SynchronizeProvider with ChangeNotifier {
   }
 
   Future<void> synchronizeSettings(Settings settings) async {
-    final finalUrl = this._serverUrl + "synchronize/synchronizeSettings/${this.userMail}";
+    if (settings != null) {
+      final finalUrl = this._serverUrl + "synchronize/synchronizeSettings/${this.userMail}";
 
-    try {
-      await http.post(
-        finalUrl,
-        body: json.encode(
-          {
-            "showOnlyUnfinished": settings.showOnlyUnfinished,
-            "showOnlyDelegated": settings.showOnlyDelegated,
-            "showOnlyWithLocalization": settings.showOnlyWithLocalization,
-            "collaborators": settings.collaborators,
-            "priorities": settings.priorities,
-            "tags": settings.tags,
-            "locations": settings.locations,
-            "sortingMode": settings.sortingMode,
-            "taskName": settings.taskName,
-            "lastUpdated":
-                settings.lastUpdated != null ? settings.lastUpdated.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
+      try {
+        await http.post(
+          finalUrl,
+          body: json.encode(
+            {
+              "showOnlyUnfinished": settings.showOnlyUnfinished,
+              "showOnlyDelegated": settings.showOnlyDelegated,
+              "showOnlyWithLocalization": settings.showOnlyWithLocalization,
+              "collaborators": settings.collaborators,
+              "priorities": settings.priorities,
+              "tags": settings.tags,
+              "locations": settings.locations,
+              "sortingMode": settings.sortingMode,
+              "taskName": settings.taskName,
+              "lastUpdated": settings.lastUpdated != null ? settings.lastUpdated.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
   Future<void> synchronizeUser(User user) async {
-    final finalUrl = this._serverUrl + "synchronize/synchronizeUser";
+    if (user != null) {
+      final finalUrl = this._serverUrl + "synchronize/synchronizeUser";
 
-    try {
-      await http.post(
-        finalUrl,
-        body: json.encode(
-          {
-            "firstName": user.firstName,
-            "lastName": user.lastName,
-            "email": user.email,
-            "lastUpdatedImage": user.lastUpdatedImage.toIso8601String(),
-            "lastUpdatedName": user.lastUpdatedName.toIso8601String(),
-            "removed": user.removed ? 1 : 0,
-            "userType": user.userType,
-            "localImage": user.localImage,
+      try {
+        await http.post(
+          finalUrl,
+          body: json.encode(
+            {
+              "firstName": user.firstName,
+              "lastName": user.lastName,
+              "email": user.email,
+              "lastUpdatedImage": user.lastUpdatedImage.toIso8601String(),
+              "lastUpdatedName": user.lastUpdatedName.toIso8601String(),
+              "removed": user.removed ? 1 : 0,
+              "userType": user.userType,
+              "localImage": user.localImage,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
   Future<void> synchronizeGraphic(List<String> data) async {
-    final finalUrl = this._serverUrl + "synchronize/synchronizeGraphic/${this.userMail}";
+    if (data != null) {
+      final finalUrl = this._serverUrl + "synchronize/synchronizeGraphic/${this.userMail}";
 
-    try {
-      await http.post(
-        finalUrl,
-        body: json.encode(
-          {
-            'mode': data[0],
-            'lastUpdated': data[1],
+      try {
+        await http.post(
+          finalUrl,
+          body: json.encode(
+            {
+              'mode': data[0],
+              'lastUpdated': data[1],
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
   Future<void> synchronizeLocale(List<String> data) async {
-    final finalUrl = this._serverUrl + "synchronize/synchronizeLocale/${this.userMail}";
+    if (data != null) {
+      final finalUrl = this._serverUrl + "synchronize/synchronizeLocale/${this.userMail}";
 
-    try {
-      await http.post(
-        finalUrl,
-        body: json.encode(
-          {
-            'locale': data[0],
-            'lastUpdated': data[1],
+      try {
+        await http.post(
+          finalUrl,
+          body: json.encode(
+            {
+              'locale': data[0],
+              'lastUpdated': data[1],
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 

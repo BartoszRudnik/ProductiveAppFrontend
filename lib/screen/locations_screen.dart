@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:productive_app/utils/internet_connection.dart';
 import 'package:productive_app/widget/single_location.dart';
 import 'package:provider/provider.dart';
 
@@ -42,8 +43,7 @@ class _LocationScreenState extends State<LocationsScreen> {
     print(locationToEdit == null);
 
     if (locationToEdit != null) {
-      String name =
-          await Dialogs.showTextFieldDialogWithInitialValue(context, AppLocalizations.of(context).enterLocationName, locationToEdit.localizationName);
+      String name = await Dialogs.showTextFieldDialogWithInitialValue(context, AppLocalizations.of(context).enterLocationName, locationToEdit.localizationName);
       if (name == null || name.isEmpty) {
         return;
       }
@@ -75,25 +75,29 @@ class _LocationScreenState extends State<LocationsScreen> {
             size: 50,
           ),
           onPressed: () async {
-            Location choosenLocation = await showDialog(
-              context: context,
-              builder: (context) {
-                return LocationDialog(
-                  choosenLocation: Location(
-                    uuid: '',
-                    id: -1,
-                    latitude: 0.0,
-                    longitude: 0.0,
-                    localizationName: 'test',
-                    country: "",
-                    locality: "",
-                    street: "",
-                  ),
-                );
-              },
-            );
+            if (await InternetConnection.internetConnection()) {
+              Location choosenLocation = await showDialog(
+                context: context,
+                builder: (context) {
+                  return LocationDialog(
+                    choosenLocation: Location(
+                      uuid: '',
+                      id: -1,
+                      latitude: 0.0,
+                      longitude: 0.0,
+                      localizationName: 'test',
+                      country: "",
+                      locality: "",
+                      street: "",
+                    ),
+                  );
+                },
+              );
 
-            this._addNewLocationForm(context, choosenLocation);
+              this._addNewLocationForm(context, choosenLocation);
+            } else {
+              Dialogs.showWarningDialog(context, AppLocalizations.of(context).connectionFailed);
+            }
           },
         ),
         body: ListView.builder(

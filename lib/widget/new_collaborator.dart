@@ -1,7 +1,7 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:productive_app/provider/delegate_provider.dart';
 import 'package:productive_app/utils/dialogs.dart';
+import 'package:productive_app/utils/internet_connection.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -36,9 +36,7 @@ class _NewCollaboratorState extends State<NewCollaborator> {
             },
             onSaved: (value) async {
               try {
-                final connection = await Connectivity().checkConnectivity();
-
-                if (connection != ConnectivityResult.none) {
+                if (await InternetConnection.internetConnection()) {
                   await Provider.of<DelegateProvider>(context, listen: false).addCollaborator(value);
                 } else {
                   Dialogs.showWarningDialog(context, AppLocalizations.of(context).connectionFailed);

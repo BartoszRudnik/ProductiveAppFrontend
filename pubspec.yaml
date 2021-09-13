@@ -89,6 +89,7 @@ flutter:
     - assets/images/profile_placeholder.jpg
     - assets/images/EmptyTaskListDark.png
     - assets/images/EmptyTaskListLight.png
+    - assets/images/no_internet.png
     - assets/map/
 
   
