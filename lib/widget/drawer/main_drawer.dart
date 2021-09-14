@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:productive_app/config/images.dart';
@@ -35,11 +37,11 @@ class MainDrawer extends StatelessWidget {
                 height: 100,
                 child: CircleAvatar(
                   radius: 50,
-                  backgroundImage: user.userImage != null
-                      ? user.userImage
-                      : user.localImage != null
-                          ? MemoryImage(user.localImage)
-                          : null,
+                  backgroundImage: user.localImage != null
+                      ? FileImage(
+                          File(user.localImage),
+                        )
+                      : null,
                 ),
               )
             else

@@ -7,7 +7,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:global_configuration/global_configuration.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:productive_app/db/user_database.dart';
 import 'package:productive_app/utils/google_sign_in_api.dart';
 import 'package:productive_app/utils/internet_connection.dart';
@@ -187,9 +190,11 @@ class AuthProvider with ChangeNotifier {
           userType: 'google',
           firstName: firstName,
           lastName: lastName,
+          lastUpdatedImage: DateTime.now(),
+          lastUpdatedName: DateTime.now(),
         );
 
-        await UserDatabase.create(this._user);
+        this._user = await UserDatabase.create(this._user);
 
         this._email = googleUser.email;
         this._token = responseData['token'];
@@ -257,7 +262,7 @@ class AuthProvider with ChangeNotifier {
         this._autoLogout();
         notifyListeners();
 
-        await UserDatabase.create(this._user);
+        this._user = await UserDatabase.create(this._user);
 
         this._saveLocalData();
       } catch (error) {
@@ -295,9 +300,6 @@ class AuthProvider with ChangeNotifier {
   Future<void> removeAvatar() async {
     final finalUrl = this._serverUrl + 'userImage/deleteImage/${this._user.email}';
 
-    this.evictImage();
-
-    this._user.userImage = null;
     this._user.localImage = null;
     this._user.removed = true;
     this._user.lastUpdatedImage = DateTime.now();
@@ -322,34 +324,15 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  void evictImage() {
-    this._user.userImage = NetworkImage(this._serverUrl + 'userImage/getImage/${this._user.email}');
-    if (this._user.userImage != null) {
-      this._user.userImage.evict().then<void>((bool success) {
-        print('evict: ');
-        print(success);
-      });
-      this._user.userImage = null;
-    }
-  }
-
   Future<void> changeUserImage(File userImage) async {
-    final finalUrl = this._serverUrl + 'userImage/setImage/${this._user.email}';
-
-    final bytes = await userImage.readAsBytes();
-
-    this.evictImage();
-
-    this._user.localImage = bytes;
-    this._user.userImage = null;
-    this._user.removed = false;
-    this._user.lastUpdatedImage = DateTime.now();
-
-    await UserDatabase.update(this._user);
-
-    notifyListeners();
-
     if (await InternetConnection.internetConnection()) {
+      final finalUrl = this._serverUrl + 'userImage/setImage/${this._user.email}';
+
+      this._user.localImage = userImage.path;
+      this._user.removed = false;
+
+      notifyListeners();
+
       try {
         final uri = Uri.parse(finalUrl);
 
@@ -358,13 +341,23 @@ class AuthProvider with ChangeNotifier {
 
         request.files.add(multipartFile);
 
-        await request.send();
+        final response = await request.send();
 
-        notifyListeners();
+        this._user.lastUpdatedImage = DateTime.tryParse(json.decode(await response.stream.bytesToString()));
+
+        await UserDatabase.update(this._user);
       } catch (error) {
         print(error);
         throw (error);
       }
+    } else {
+      this._user.localImage = userImage.path;
+      this._user.removed = false;
+      this._user.lastUpdatedImage = DateTime.now();
+
+      UserDatabase.update(this._user);
+
+      notifyListeners();
     }
   }
 
@@ -380,10 +373,30 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> getUserImage() async {
     try {
-      final result = await Connectivity().checkConnectivity();
+      final lastUpdatedResponse = await http.get(this._serverUrl + 'userImage/getLastUpdated/${this._user.email}');
 
-      if (result != ConnectivityResult.none) {
-        this._user.userImage = NetworkImage(this._serverUrl + 'userImage/getImage/${this._user.email}');
+      final responseBody = json.decode(lastUpdatedResponse.body);
+
+      final lastUpdatedOnServer = DateTime.tryParse(responseBody['lastUpdated']);
+
+      if (lastUpdatedOnServer != null && this._user.lastUpdatedImage == null || this._user.lastUpdatedImage.isBefore(lastUpdatedOnServer)) {
+        imageCache.clear();
+
+        Directory documentDirectory = await getApplicationDocumentsDirectory();
+        File file = new File(join(documentDirectory.path, this.user.email));
+
+        final response = await http.get(this._serverUrl + 'userImage/getImage/${this._user.email}');
+
+        file.writeAsBytesSync(response.bodyBytes);
+
+        this._user.localImage = file.path;
+
+        this._user.lastUpdatedImage = DateTime.now();
+        await UserDatabase.update(this.user);
+      } else {
+        final user = await UserDatabase.read(this._user.email);
+
+        this._user.localImage = user.localImage;
       }
     } catch (error) {
       print(error);
@@ -393,7 +406,7 @@ class AuthProvider with ChangeNotifier {
   Future<void> signUp(String email, String password) async {
     if (await InternetConnection.internetConnection()) {
       this._authenticate(email, password, 'registration');
-      await UserDatabase.create(this._user);
+      this._user = await UserDatabase.create(this._user);
     }
   }
 
@@ -565,7 +578,7 @@ class AuthProvider with ChangeNotifier {
         id: extractedUserData['id'],
       );
 
-      await UserDatabase.create(this._user);
+      this._user = await UserDatabase.create(this._user);
     }
 
     notifyListeners();

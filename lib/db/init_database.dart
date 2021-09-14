@@ -120,7 +120,7 @@ class InitDatabase {
       ${UserFields.lastUpdatedImage} $textType,
       ${UserFields.lastUpdatedName} $textType,
       ${UserFields.userType} $textType,
-      ${UserFields.localImage} $blob,
+      ${UserFields.localImage} $textType,
       ${UserFields.removed} $boolType,
       $userEmail $textType
     )

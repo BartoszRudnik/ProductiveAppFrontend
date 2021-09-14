@@ -26,12 +26,22 @@ class UserDatabase {
   static Future<int> update(User user) async {
     final db = await InitDatabase.instance.database;
 
-    return await db.update(
-      tableUser,
-      user.toJson(),
-      where: '${UserFields.email} = ?',
-      whereArgs: [user.email],
-    );
+    if (user.id == null) {
+      final existingUser = await read(user.email);
+
+      if (existingUser != null) {
+        user.id = existingUser.id;
+      }
+    }
+
+    if (user.id != null) {
+      return await db.update(
+        tableUser,
+        user.toJson(),
+        where: '${UserFields.email} = ?',
+        whereArgs: [user.email],
+      );
+    }
   }
 
   static Future<int> delete(String userMail) async {
@@ -44,13 +54,19 @@ class UserDatabase {
     );
   }
 
-  static Future<void> create(User user) async {
+  static Future<User> create(User user) async {
     final db = await InitDatabase.instance.database;
 
     final existing = await read(user.email);
 
     if (existing == null) {
-      await db.insert(tableUser, user.toJson());
+      user.id = null;
+
+      final id = await db.insert(tableUser, user.toJson());
+
+      return user.copy(id: id);
+    } else {
+      return existing;
     }
   }
 }

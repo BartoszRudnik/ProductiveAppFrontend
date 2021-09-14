@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 
 final String tableUser = "user";
@@ -34,8 +32,7 @@ class User with ChangeNotifier {
   String lastName;
   String email;
   String userType;
-  NetworkImage userImage;
-  Uint8List localImage;
+  String localImage;
   DateTime lastUpdatedImage;
   DateTime lastUpdatedName;
   bool removed;
@@ -56,7 +53,7 @@ class User with ChangeNotifier {
     int id,
     String firstName,
     String lastName,
-    Uint8List localImage,
+    String localImage,
     String email,
     String userType,
     DateTime lastUpdatedImage,
@@ -69,8 +66,8 @@ class User with ChangeNotifier {
         firstName: firstName ?? this.firstName,
         lastName: lastName ?? this.lastName,
         id: id ?? this.id,
-        lastUpdatedImage: DateTime.now(),
-        lastUpdatedName: DateTime.now(),
+        lastUpdatedImage: lastUpdatedImage ?? this.lastUpdatedImage,
+        lastUpdatedName: lastUpdatedName ?? this.lastUpdatedName,
         localImage: localImage ?? this.localImage,
         removed: removed ?? this.removed,
       );
@@ -94,7 +91,7 @@ class User with ChangeNotifier {
         email: json[UserFields.email] as String,
         firstName: json[UserFields.firstName] as String,
         lastName: json[UserFields.lastName] as String,
-        localImage: json[UserFields.localImage],
+        localImage: json[UserFields.localImage] as String,
         userType: json[UserFields.userType] as String,
         removed: json[UserFields.removed] == 1 ? true : false,
         lastUpdatedImage: DateTime.parse(json[UserFields.lastUpdatedImage] as String),
