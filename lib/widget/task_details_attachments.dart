@@ -38,7 +38,7 @@ class TaskDetailsAttachments extends StatelessWidget {
                     itemCount: this.attachments.length,
                     itemBuilder: (ctx, index) => TextButton(
                       onPressed: () async {
-                        final file = await Provider.of<AttachmentProvider>(context, listen: false).loadAttachment(this.attachments[index].id);
+                        final file = await Provider.of<AttachmentProvider>(context, listen: false).loadAttachment(this.attachments[index].uuid);
 
                         if (FileTypeHelper.isImage(file.path) || FileTypeHelper.isPDF(file.path)) {
                           String routeName = '';
@@ -90,7 +90,7 @@ class TaskDetailsAttachments extends StatelessWidget {
                                 Provider.of<SynchronizeProvider>(context, listen: false).addAttachmentToDelete(
                                   this.attachments[index].uuid,
                                 );
-                                Provider.of<AttachmentProvider>(context, listen: false).setToDelete(this.attachments[index].id);
+                                Provider.of<AttachmentProvider>(context, listen: false).setToDelete(this.attachments[index].uuid);
                               },
                             ),
                           ],

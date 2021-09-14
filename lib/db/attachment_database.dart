@@ -29,12 +29,12 @@ class AttachmentDatabase {
 
     final maps = await db.query(
       tableAttachment,
-      columns: AttachmentFields.values,
+      columns: [AttachmentFields.localFile],
       where: '${AttachmentFields.uuid} = ?',
       whereArgs: [uuid],
     );
 
-    return maps.isNotEmpty;
+    return maps.isNotEmpty && maps.first[AttachmentFields.localFile] != null;
   }
 
   static Future<Attachment> read(int attachmentId) async {

@@ -20,8 +20,8 @@ class TaskFields {
     done,
     isDelegated,
     isCanceled,
-    parentId,
-    childId,
+    parentUuid,
+    childUuid,
     notificationLocalizationId,
     notificationLocalizationRadius,
     notificationOnEnter,
@@ -45,8 +45,8 @@ class TaskFields {
   static final String done = "done";
   static final String isDelegated = "isDelegated";
   static final String isCanceled = "isCanceled";
-  static final String parentId = "parentId";
-  static final String childId = "childId";
+  static final String parentUuid = "parentUuid";
+  static final String childUuid = "childUuid";
   static final String notificationLocalizationId = "notificationLocalizationId";
   static final String notificationLocalizationRadius = "notificationLocalizationRadius";
   static final String notificationOnEnter = "notificationOnEnter";
@@ -71,8 +71,8 @@ class Task {
   bool done;
   bool isDelegated;
   bool isCanceled;
-  int parentId;
-  int childId;
+  String parentUuid;
+  String childUuid;
 
   int notificationLocalizationId;
   num notificationLocalizationRadius;
@@ -136,8 +136,8 @@ class Task {
     this.taskStatus,
     this.isCanceled = false,
     this.supervisorEmail,
-    this.childId,
-    this.parentId,
+    this.childUuid,
+    this.parentUuid,
     this.notificationLocalizationId,
     this.notificationLocalizationRadius,
     this.notificationOnEnter = false,
@@ -162,8 +162,8 @@ class Task {
     String taskStatus,
     bool isCanceled,
     String supervisorEmail,
-    int childId,
-    int parentId,
+    String childUuid,
+    String parentUuid,
     int notificationLocalizationId,
     num notificationLocalizationRadius,
     bool notificationOnEnter,
@@ -174,7 +174,7 @@ class Task {
       Task(
         id: id ?? this.id,
         title: title ?? this.title,
-        childId: childId ?? this.childId,
+        childUuid: childUuid ?? this.childUuid,
         priority: priority ?? this.priority,
         description: description ?? this.description,
         startDate: startDate ?? this.startDate,
@@ -188,7 +188,7 @@ class Task {
         isCanceled: isCanceled ?? this.isCanceled,
         taskStatus: taskStatus ?? this.taskStatus,
         supervisorEmail: supervisorEmail ?? this.supervisorEmail,
-        parentId: parentId ?? this.parentId,
+        parentUuid: parentUuid ?? this.parentUuid,
         notificationLocalizationId: notificationLocalizationId ?? this.notificationLocalizationId,
         notificationLocalizationRadius: notificationLocalizationRadius ?? this.notificationLocalizationRadius,
         notificationOnEnter: notificationOnEnter ?? this.notificationOnEnter,
@@ -201,7 +201,7 @@ class Task {
     return Task(
       id: json[TaskFields.id] == null ? null : json[TaskFields.id] as int,
       title: json[TaskFields.title] == null ? null : json[TaskFields.title] as String,
-      childId: json[TaskFields.childId] == null ? null : json[TaskFields.childId] as int,
+      childUuid: json[TaskFields.childUuid] == null ? null : json[TaskFields.childUuid] as String,
       priority: json[TaskFields.priority] == null ? null : json[TaskFields.priority] as String,
       description: json[TaskFields.description] == null ? null : json[TaskFields.description] as String,
       startDate: json[TaskFields.startDate] == null ? null : DateTime.parse(json[TaskFields.startDate] as String),
@@ -215,7 +215,7 @@ class Task {
       isCanceled: json[TaskFields.isCanceled] == null ? false : json[TaskFields.isCanceled] == 1,
       taskStatus: json[TaskFields.taskStatus] == null ? null : json[TaskFields.taskStatus] as String,
       supervisorEmail: json[TaskFields.supervisorEmail] == null ? null : json[TaskFields.supervisorEmail] as String,
-      parentId: json[TaskFields.parentId] == null ? null : json[TaskFields.parentId] as int,
+      parentUuid: json[TaskFields.parentUuid] == null ? null : json[TaskFields.parentUuid] as String,
       notificationLocalizationId: json[TaskFields.notificationLocalizationId] == null ? null : json[TaskFields.notificationLocalizationId] as int,
       notificationLocalizationRadius:
           json[TaskFields.notificationLocalizationRadius] == null ? null : json[TaskFields.notificationLocalizationRadius] as double,
@@ -230,7 +230,7 @@ class Task {
     return {
       TaskFields.id: this.id,
       TaskFields.title: this.title,
-      TaskFields.childId: this.childId,
+      TaskFields.childUuid: this.childUuid,
       TaskFields.priority: this.priority,
       TaskFields.description: this.description,
       TaskFields.startDate: this.startDate != null ? this.startDate.toIso8601String() : null,
@@ -256,7 +256,7 @@ class Task {
               : 0,
       TaskFields.taskStatus: this.taskStatus,
       TaskFields.supervisorEmail: this.supervisorEmail,
-      TaskFields.parentId: this.parentId,
+      TaskFields.parentUuid: this.parentUuid,
       TaskFields.notificationLocalizationId: this.notificationLocalizationId,
       TaskFields.notificationLocalizationRadius: this.notificationLocalizationRadius,
       TaskFields.notificationOnEnter: this.notificationOnEnter == null

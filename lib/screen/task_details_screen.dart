@@ -176,8 +176,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       }
 
       if (this.endTime != null && taskToEdit.endDate != null) {
-        taskToEdit.endDate =
-            new DateTime(taskToEdit.endDate.year, taskToEdit.endDate.month, taskToEdit.endDate.day, this.endTime.hour, this.endTime.minute);
+        taskToEdit.endDate = new DateTime(taskToEdit.endDate.year, taskToEdit.endDate.month, taskToEdit.endDate.day, this.endTime.hour, this.endTime.minute);
       } else if (taskToEdit.endDate != null) {
         taskToEdit.endDate = new DateTime(taskToEdit.endDate.year, taskToEdit.endDate.month, taskToEdit.endDate.day, 0, 0);
       }
@@ -403,13 +402,13 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       position: argTask.position,
       delegatedEmail: argTask.delegatedEmail,
       isCanceled: argTask.isCanceled,
-      childId: argTask.childId,
+      childUuid: argTask.childUuid,
       isDelegated: argTask.isDelegated,
       notificationLocalizationId: argTask.notificationLocalizationId,
       notificationLocalizationRadius: argTask.notificationLocalizationRadius,
       notificationOnEnter: argTask.notificationOnEnter,
       notificationOnExit: argTask.notificationOnExit,
-      parentId: argTask.parentId,
+      parentUuid: argTask.parentUuid,
       supervisorEmail: argTask.supervisorEmail,
       taskStatus: argTask.taskStatus,
     );
@@ -437,13 +436,12 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.taskToEdit.notificationLocalizationId);
     }
 
-    List<Attachment> attachments = Provider.of<AttachmentProvider>(context)
-        .attachments
-        .where((attachment) => attachment.taskUuid == taskToEdit.uuid && !attachment.toDelete)
-        .toList();
+    List<Attachment> attachments =
+        Provider.of<AttachmentProvider>(context).attachments.where((attachment) => attachment.taskUuid == taskToEdit.uuid && !attachment.toDelete).toList();
+
     attachments.addAll(Provider.of<AttachmentProvider>(context)
         .delegatedAttachments
-        .where((attachment) => attachment.taskUuid == taskToEdit.uuid && !attachment.toDelete)
+        .where((attachment) => attachment.taskUuid == taskToEdit.parentUuid && !attachment.toDelete)
         .toList());
 
     return WillPopScope(
@@ -452,8 +450,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         this._formKey.currentState.save();
         bool result = false;
 
-        if ((!this.checkEquals(this.originalTask, this.taskToEdit) ||
-                Provider.of<AttachmentProvider>(context, listen: false).notSavedAttachments.length > 0) &&
+        if ((!this.checkEquals(this.originalTask, this.taskToEdit) || Provider.of<AttachmentProvider>(context, listen: false).notSavedAttachments.length > 0) &&
             !this.changesSaved) {
           result = await Dialogs.showActionDialog(
             context,

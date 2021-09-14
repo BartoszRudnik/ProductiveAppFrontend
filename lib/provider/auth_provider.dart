@@ -2,12 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:global_configuration/global_configuration.dart';
-import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -325,6 +323,10 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> changeUserImage(File userImage) async {
+    if (userImage.path == null) {
+      return;
+    }
+
     if (await InternetConnection.internetConnection()) {
       final finalUrl = this._serverUrl + 'userImage/setImage/${this._user.email}';
 
@@ -383,20 +385,20 @@ class AuthProvider with ChangeNotifier {
         imageCache.clear();
 
         Directory documentDirectory = await getApplicationDocumentsDirectory();
-        File file = new File(join(documentDirectory.path, this.user.email));
+        File file = new File(join(documentDirectory.path, this._user.email));
 
         final response = await http.get(this._serverUrl + 'userImage/getImage/${this._user.email}');
 
-        file.writeAsBytesSync(response.bodyBytes);
+        if (response != null) {
+          file.writeAsBytesSync(response.bodyBytes);
 
-        this._user.localImage = file.path;
+          this._user.localImage = file.path;
 
-        this._user.lastUpdatedImage = DateTime.now();
-        await UserDatabase.update(this.user);
+          this._user.lastUpdatedImage = DateTime.now();
+          await UserDatabase.update(this.user);
+        }
       } else {
-        final user = await UserDatabase.read(this._user.email);
-
-        this._user.localImage = user.localImage;
+        await this.getUserImageOffline();
       }
     } catch (error) {
       print(error);
@@ -536,8 +538,6 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> googleLogout() async {
-    await GoogleSignInApi.logout();
-
     this._token = null;
     this._expiryDate = null;
 
@@ -550,6 +550,8 @@ class AuthProvider with ChangeNotifier {
 
     final userPreferences = await SharedPreferences.getInstance();
     userPreferences.clear();
+
+    await GoogleSignInApi.logout();
   }
 
   Future<bool> tryAutoLogin() async {

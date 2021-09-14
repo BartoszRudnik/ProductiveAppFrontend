@@ -13,12 +13,31 @@ class TaskDatabase {
     );
   }
 
+  static Future<bool> idExist(int taskId) async {
+    if (taskId == null) {
+      return false;
+    }
+
+    final db = await InitDatabase.instance.database;
+
+    final maps = await db.query(
+      tableTask,
+      columns: TaskFields.values,
+      where: '${TaskFields.id} = ?',
+      whereArgs: [taskId],
+    );
+
+    return maps.isNotEmpty;
+  }
+
   static Future<Task> create(Task task, String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    task.id = null;
-    Map taskMap = task.toJson();
+    if (await idExist(task.id)) {
+      task.id = null;
+    }
 
+    Map taskMap = task.toJson();
     taskMap['userMail'] = userMail;
 
     final id = await db.insert(tableTask, taskMap);

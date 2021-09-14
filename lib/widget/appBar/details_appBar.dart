@@ -40,15 +40,16 @@ class _DetailsAppBarState extends State<DetailsAppBar> {
       backwardsCompatibility: false,
       leading: (widget.leadingButton != null) ? widget.leadingButton : null,
       actions: <Widget>[
-        if (this.widget.task.childId != null || this.widget.task.isDelegated)
+        if (this.widget.task.childUuid != null || this.widget.task.isDelegated)
           PopupMenuButton(
             onSelected: (value) {
               if (value == 'related') {
-                Navigator.of(context).pushNamed(RelatedTaskInfoScreen.routeName, arguments: this.widget.task.childId != null ? this.widget.task.childId : this.widget.task.parentId);
+                Navigator.of(context).pushNamed(RelatedTaskInfoScreen.routeName,
+                    arguments: this.widget.task.childUuid != null ? this.widget.task.childUuid : this.widget.task.parentUuid);
               }
             },
             icon: Icon(Icons.more_vert),
-            itemBuilder: (this.widget.task.childId != null || this.widget.task.isDelegated)
+            itemBuilder: (this.widget.task.childUuid != null || this.widget.task.isDelegated)
                 ? (_) => [
                       PopupMenuItem(
                         child: Text(AppLocalizations.of(context).relatedTask),

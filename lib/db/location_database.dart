@@ -21,8 +21,6 @@ class LocationDatabase {
 
     final id = await db.insert(tableLocations, locationMap);
 
-    print(id);
-
     return location.copy(id: id);
   }
 

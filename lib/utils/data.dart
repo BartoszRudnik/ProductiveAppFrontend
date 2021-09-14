@@ -130,13 +130,13 @@ class Data {
       print(error);
     }
 
-    final List<Task> delegatedTasks = Provider.of<TaskProvider>(context, listen: false).taskList.where((element) => element.parentId != null).toList();
+    final List<Task> delegatedTasks = Provider.of<TaskProvider>(context, listen: false).taskList.where((element) => element.parentUuid != null).toList();
 
     if (delegatedTasks != null && delegatedTasks.length > 0) {
-      List<int> delegatedTasksId = [];
+      List<String> delegatedTasksId = [];
 
       delegatedTasks.forEach((task) {
-        delegatedTasksId.add(task.parentId);
+        delegatedTasksId.add(task.parentUuid);
       });
 
       await Provider.of<AttachmentProvider>(context, listen: false).getDelegatedAttachments(delegatedTasksId);
