@@ -67,10 +67,7 @@ class DelegateProvider with ChangeNotifier {
 
   List<Collaborator> get send {
     if (this.searchingText != null && this.searchingText.length >= 1) {
-      return this
-          ._send
-          .where((collaborator) => collaborator.email.contains(searchingText) || collaborator.collaboratorName.contains(searchingText))
-          .toList();
+      return this._send.where((collaborator) => collaborator.email.contains(searchingText) || collaborator.collaboratorName.contains(searchingText)).toList();
     } else {
       return [...this._send];
     }
@@ -152,6 +149,13 @@ class DelegateProvider with ChangeNotifier {
         print(error);
         throw (error);
       }
+    } else {
+      Collaborator collaborator = this.collaborators.firstWhere((element) => element.email == collaboratorEmail);
+      collaborator.isAskingForPermission = false;
+
+      await CollaboratorDatabase.update(collaborator);
+
+      notifyListeners();
     }
   }
 
@@ -176,6 +180,13 @@ class DelegateProvider with ChangeNotifier {
         print(error);
         throw error;
       }
+    } else {
+      Collaborator collaborator = this.collaborators.firstWhere((collaborator) => collaborator.email == collaboratorEmail);
+      collaborator.sentPermission = !collaborator.sentPermission;
+
+      await CollaboratorDatabase.update(collaborator);
+
+      notifyListeners();
     }
   }
 
