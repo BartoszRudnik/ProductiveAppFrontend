@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
+
 import '../../model/tag.dart';
 import '../../provider/tag_provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FilterTagsDialog extends StatelessWidget {
   final _tagKey = GlobalKey<FormState>();
@@ -58,7 +60,14 @@ class FilterTagsDialog extends StatelessWidget {
                         final alreadyExists = tags.where((element) => element.name == value);
                         if (alreadyExists.isEmpty) {
                           try {
-                            await Provider.of<TagProvider>(context, listen: false).addTag(Tag(id: tags.length + 1, name: value));
+                            final uuid = Uuid();
+                            await Provider.of<TagProvider>(context, listen: false).addTag(
+                              Tag(
+                                id: tags.length + 1,
+                                name: value,
+                                uuid: uuid.v1(),
+                              ),
+                            );
                           } catch (error) {
                             print(error);
                           }

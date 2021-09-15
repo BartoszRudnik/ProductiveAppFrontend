@@ -4,11 +4,16 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:productive_app/db/user_database.dart';
 import 'package:productive_app/utils/google_sign_in_api.dart';
+import 'package:productive_app/utils/internet_connection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/painting.dart';
+
 import '../exception/HttpException.dart';
 import '../model/user.dart';
 
@@ -19,8 +24,7 @@ class AuthProvider with ChangeNotifier {
   String _email;
   User _user;
 
-  String _serverUrl =
-      GlobalConfiguration().getValue("serverUrl"); //computer IP address
+  String _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
   bool get isAuth {
     return token != null;
@@ -35,12 +39,22 @@ class AuthProvider with ChangeNotifier {
   }
 
   String get token {
-    if (this._expiryDate != null &&
-        this._expiryDate.isAfter(DateTime.now()) &&
-        this._token != null) {
+    if (this._expiryDate != null && this._expiryDate.isAfter(DateTime.now()) && this._token != null) {
       return this._token;
     }
     return null;
+  }
+
+  Future<void> getUserDataOffline() async {
+    try {
+      final user = await UserDatabase.read(this.user.email);
+
+      this.user.firstName = user.firstName;
+      this.user.lastName = user.lastName;
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
   }
 
   Future<void> getUserData() async {
@@ -53,10 +67,6 @@ class AuthProvider with ChangeNotifier {
 
       this.user.firstName = responseBody['firstName'];
       this.user.lastName = responseBody['lastName'];
-    } on SocketException catch (error) {
-      print(error);
-
-      await this._loadUsernameFromLocal();
     } catch (error) {
       print(error);
       throw (error);
@@ -66,190 +76,218 @@ class AuthProvider with ChangeNotifier {
   Future<void> updateUserData(String firstName, String lastName) async {
     String url = this._serverUrl + 'userData/update/${this._email}';
 
-    try {
-      await http.post(
-        url,
-        body: json.encode(
-          {
-            "firstName": firstName,
-            "lastName": lastName,
+    this._user.firstName = firstName;
+    this._user.lastName = lastName;
+    this._user.lastUpdatedName = DateTime.now();
+
+    await UserDatabase.update(this._user);
+
+    this.notifyListeners();
+
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          url,
+          body: json.encode(
+            {
+              "firstName": firstName,
+              "lastName": lastName,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-
-      this.user.firstName = firstName;
-      this.user.lastName = lastName;
-
-      this.notifyListeners();
-    } catch (error) {
-      print(error);
-      throw (error);
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
   Future<void> deleteAccount(String token) async {
-    String url =
-        this._serverUrl + 'account/deleteAccount/${this._email}/$token';
+    String url = this._serverUrl + 'account/deleteAccount/${this._email}/$token';
 
-    try {
-      await http.post(
-        url,
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
+    await UserDatabase.delete(this.email);
 
-      this.logout();
-    } catch (error) {
-      print(error);
-      throw (error);
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          url,
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+
+        this.logout();
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
   Future<void> getDeleteToken() async {
-    String url = this._serverUrl + 'account/deleteAccountToken/${this._email}';
+    if (await InternetConnection.internetConnection()) {
+      String url = this._serverUrl + 'account/deleteAccountToken/${this._email}';
 
-    try {
-      await http.post(
-        url,
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+      try {
+        await http.post(
+          url,
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
   Future<void> googleAuthenticate() async {
-    final googleUser = await GoogleSignInApi.login();
+    if (await InternetConnection.internetConnection()) {
+      final googleUser = await GoogleSignInApi.login();
 
-    final url = this._serverUrl + 'login/googleLogin';
+      final url = this._serverUrl + 'login/googleLogin';
 
-    try {
-      final firstName = googleUser.displayName.split(" ")[0];
-      final lastName = googleUser.displayName.split(" ")[1];
+      try {
+        final firstName = googleUser.displayName.split(" ")[0];
+        final lastName = googleUser.displayName.split(" ")[1];
 
-      final response = await http.post(
-        url,
-        body: json.encode(
-          {
-            'firstName': firstName,
-            'lastName': lastName,
-            'password': '',
-            'email': googleUser.email,
-            'userType': 'google',
+        final response = await http.post(
+          url,
+          body: json.encode(
+            {
+              'firstName': firstName,
+              'lastName': lastName,
+              'password': '',
+              'email': googleUser.email,
+              'userType': 'google',
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
+        );
 
-      final responseData = json.decode(response.body);
+        final responseData = json.decode(response.body);
 
-      if (responseData['error']?.isNotEmpty == true) {
-        print(responseData['message']);
-        throw HttpException(responseData['message']);
+        if (responseData['error']?.isNotEmpty == true) {
+          print(responseData['message']);
+          throw HttpException(responseData['message']);
+        }
+
+        this._user = User(
+          id: responseData['userId'],
+          email: googleUser.email,
+          userType: 'google',
+          firstName: firstName,
+          lastName: lastName,
+          lastUpdatedImage: DateTime.now(),
+          lastUpdatedName: DateTime.now(),
+        );
+
+        this._user = await UserDatabase.create(this._user);
+
+        this._email = googleUser.email;
+        this._token = responseData['token'];
+        this._expiryDate = DateTime.now().add(
+          Duration(
+            milliseconds: responseData['tokenDuration'],
+          ),
+        );
+
+        this._autoLogout();
+
+        notifyListeners();
+
+        this._saveLocalData();
+      } catch (error) {
+        print(error);
+        throw (error);
       }
+    }
+  }
 
-      this._user = new User(
-        email: googleUser.email,
-        userType: 'google',
-        firstName: firstName,
-        lastName: lastName,
-      );
+  Future<void> _authenticate(String email, String password, String urlSegment) async {
+    if (await InternetConnection.internetConnection()) {
+      String url = this._serverUrl + '$urlSegment';
 
-      this._email = googleUser.email;
-      this._token = responseData['token'];
-      this._expiryDate = DateTime.now().add(
-        Duration(
-          milliseconds: responseData['tokenDuration'],
-        ),
-      );
+      try {
+        final response = await http.post(
+          url,
+          body: json.encode(
+            {
+              'firstName': '',
+              'lastName': '',
+              'password': password,
+              'email': email,
+              'userType': 'mail',
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
 
-      this._autoLogout();
+        final responseData = json.decode(response.body);
 
-      notifyListeners();
+        if (responseData['error']?.isNotEmpty == true) {
+          print(responseData['message']);
+          throw HttpException(responseData['message']);
+        }
 
-      this._saveLocalData();
-      this._saveUsernameToLocal();
+        this._user = User(
+          id: responseData['userId'],
+          email: email,
+          userType: 'mail',
+        );
+
+        this._email = email;
+        this._token = responseData['token'];
+        this._expiryDate = DateTime.now().add(
+          Duration(
+            milliseconds: responseData['tokenDuration'],
+          ),
+        );
+
+        this._autoLogout();
+        notifyListeners();
+
+        this._user = await UserDatabase.create(this._user);
+
+        this._saveLocalData();
+      } catch (error) {
+        throw error;
+      }
+    }
+  }
+
+  Future<void> checkIfAvatarExistsOffline() async {
+    try {
+      final user = await UserDatabase.read(this.user.email);
+
+      this._user.removed = user.removed;
     } catch (error) {
       print(error);
       throw (error);
     }
   }
 
-  Future<void> _authenticate(
-      String email, String password, String urlSegment) async {
-    String url = this._serverUrl + '$urlSegment';
-
-    try {
-      final response = await http.post(
-        url,
-        body: json.encode(
-          {
-            'firstName': '',
-            'lastName': '',
-            'password': password,
-            'email': email,
-            'userType': 'mail',
-          },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-
-      final responseData = json.decode(response.body);
-
-      if (responseData['error']?.isNotEmpty == true) {
-        print(responseData['message']);
-        throw HttpException(responseData['message']);
-      }
-
-      this._user = new User(
-        email: email,
-        userType: 'mail',
-      );
-
-      this._email = email;
-      this._token = responseData['token'];
-      this._expiryDate = DateTime.now().add(
-        Duration(
-          milliseconds: responseData['tokenDuration'],
-        ),
-      );
-
-      this._autoLogout();
-      notifyListeners();
-
-      this._saveLocalData();
-    } catch (error) {
-      throw error;
-    }
-  }
-
   Future<void> checkIfAvatarExists() async {
-    final finalUrl =
-        this._serverUrl + 'userImage/checkIfExists/${this._user.email}';
+    final finalUrl = this._serverUrl + 'userImage/checkIfExists/${this._user.email}';
 
     try {
       final response = await http.get(finalUrl);
 
       if (this._user != null) {
-        response.body == 'true'
-            ? this._user.removed = false
-            : this._user.removed = true;
+        response.body == 'true' ? this._user.removed = false : this._user.removed = true;
       }
     } catch (error) {
       print(error);
@@ -258,197 +296,211 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> removeAvatar() async {
-    final finalUrl =
-        this._serverUrl + 'userImage/deleteImage/${this._user.email}';
+    final finalUrl = this._serverUrl + 'userImage/deleteImage/${this._user.email}';
 
-    try {
-      http.post(
-        finalUrl,
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
+    this._user.localImage = null;
+    this._user.removed = true;
+    this._user.lastUpdatedImage = DateTime.now();
 
-      this._user.userImage = null;
-      this._user.removed = true;
+    await UserDatabase.update(this._user);
 
-      this.evictImage();
+    notifyListeners();
 
-      notifyListeners();
-    } catch (error) {
-      print(error);
-      throw (error);
+    if (await InternetConnection.internetConnection()) {
+      try {
+        http.post(
+          finalUrl,
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
   Future<void> changeUserImage(File userImage) async {
-    final finalUrl = this._serverUrl + 'userImage/setImage/${this._user.email}';
+    if (userImage.path == null) {
+      return;
+    }
 
-    try {
-      final uri = Uri.parse(finalUrl);
+    if (await InternetConnection.internetConnection()) {
+      final finalUrl = this._serverUrl + 'userImage/setImage/${this._user.email}';
 
-      final request = http.MultipartRequest('POST', uri);
-      final multipartFile = await http.MultipartFile.fromPath(
-          'multipartFile', userImage.path,
-          filename: userImage.path);
-
-      request.files.add(multipartFile);
-
-      final response = await request.send();
-      final respStr = await response.stream.bytesToString();
-
-      print(respStr);
-
-      this.evictImage();
-      this.getUserImage();
+      this._user.localImage = userImage.path;
       this._user.removed = false;
 
       notifyListeners();
-    } catch (error) {
-      print(error);
-      throw (error);
+
+      try {
+        final uri = Uri.parse(finalUrl);
+
+        final request = http.MultipartRequest('POST', uri);
+        final multipartFile = await http.MultipartFile.fromPath('multipartFile', userImage.path, filename: userImage.path);
+
+        request.files.add(multipartFile);
+
+        final response = await request.send();
+
+        this._user.lastUpdatedImage = DateTime.tryParse(json.decode(await response.stream.bytesToString()));
+
+        await UserDatabase.update(this._user);
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
+    } else {
+      this._user.localImage = userImage.path;
+      this._user.removed = false;
+      this._user.lastUpdatedImage = DateTime.now();
+
+      UserDatabase.update(this._user);
+
+      notifyListeners();
     }
+  }
+
+  void notify() {
+    notifyListeners();
+  }
+
+  Future<void> getUserImageOffline() async {
+    final user = await UserDatabase.read(this._user.email);
+
+    this._user.localImage = user.localImage;
   }
 
   Future<void> getUserImage() async {
     try {
-      this._user.userImage = NetworkImage(
-          this._serverUrl + 'userImage/getImage/${this._user.email}');
+      final lastUpdatedResponse = await http.get(this._serverUrl + 'userImage/getLastUpdated/${this._user.email}');
+
+      final responseBody = json.decode(lastUpdatedResponse.body);
+
+      final lastUpdatedOnServer = DateTime.tryParse(responseBody['lastUpdated']);
+
+      if (lastUpdatedOnServer != null && this._user.lastUpdatedImage == null || this._user.lastUpdatedImage.isBefore(lastUpdatedOnServer)) {
+        imageCache.clear();
+
+        Directory documentDirectory = await getApplicationDocumentsDirectory();
+        File file = new File(join(documentDirectory.path, this._user.email));
+
+        final response = await http.get(this._serverUrl + 'userImage/getImage/${this._user.email}');
+
+        if (response != null) {
+          file.writeAsBytesSync(response.bodyBytes);
+
+          this._user.localImage = file.path;
+
+          this._user.lastUpdatedImage = DateTime.now();
+          await UserDatabase.update(this.user);
+        }
+      } else {
+        await this.getUserImageOffline();
+      }
     } catch (error) {
       print(error);
     }
   }
 
-  void evictImage() {
-    this._user.userImage = NetworkImage(
-        this._serverUrl + 'userImage/getImage/${this._user.email}');
-    this._user.userImage.evict().then<void>((bool success) {});
-  }
-
   Future<void> signUp(String email, String password) async {
-    return this._authenticate(email, password, 'registration');
+    if (await InternetConnection.internetConnection()) {
+      this._authenticate(email, password, 'registration');
+      this._user = await UserDatabase.create(this._user);
+    }
   }
 
   Future<void> signIn(String email, String password) async {
-    return this._authenticate(email, password, 'login');
+    if (await InternetConnection.internetConnection()) {
+      return this._authenticate(email, password, 'login');
+    }
   }
 
   Future<void> resetPassword(String email) async {
-    String url = this._serverUrl + 'resetToken';
+    if (await InternetConnection.internetConnection()) {
+      String url = this._serverUrl + 'resetToken';
 
-    try {
-      final response = await http.post(
-        url,
-        body: json.encode(
-          {
-            'email': email,
+      try {
+        final response = await http.post(
+          url,
+          body: json.encode(
+            {
+              'email': email,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
+        );
 
-      if (response != null) {
-        try {
-          final responseData = json.decode(response.body);
+        if (response != null) {
+          try {
+            final responseData = json.decode(response.body);
 
-          if (responseData['error']?.isNotEmpty == true) {
-            throw HttpException(responseData['message']);
-          }
-        } catch (error) {}
+            if (responseData['error']?.isNotEmpty == true) {
+              throw HttpException(responseData['message']);
+            }
+          } catch (error) {}
+        }
+      } catch (error) {
+        throw error;
       }
-    } catch (error) {
-      throw error;
     }
   }
 
-  Future<void> newPassword(
-      String email, String token, String newPassword) async {
-    String url = this._serverUrl + 'newPassword';
+  Future<void> newPassword(String email, String token, String newPassword) async {
+    if (await InternetConnection.internetConnection()) {
+      String url = this._serverUrl + 'newPassword';
 
-    try {
-      final response = await http.post(
-        url,
-        body: json.encode(
-          {
-            'email': email,
-            'token': token,
-            'newPassword': newPassword,
+      try {
+        final response = await http.post(
+          url,
+          body: json.encode(
+            {
+              'email': email,
+              'token': token,
+              'newPassword': newPassword,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
+        );
 
-      final responseData = json.decode(response.body);
+        final responseData = json.decode(response.body);
 
-      if (responseData['error']?.isNotEmpty == true) {
-        print(responseData['message']);
-        throw HttpException(responseData['message']);
+        if (responseData['error']?.isNotEmpty == true) {
+          print(responseData['message']);
+          throw HttpException(responseData['message']);
+        }
+
+        this._email = email;
+        this._token = responseData['token'];
+        this._expiryDate = DateTime.now().add(
+          Duration(
+            milliseconds: responseData['tokenDuration'],
+          ),
+        );
+
+        this._autoLogout();
+        notifyListeners();
+
+        this._saveLocalData();
+      } catch (error) {
+        throw error;
       }
-
-      this._email = email;
-      this._token = responseData['token'];
-      this._expiryDate = DateTime.now().add(
-        Duration(
-          milliseconds: responseData['tokenDuration'],
-        ),
-      );
-
-      this._autoLogout();
-      notifyListeners();
-
-      this._saveLocalData();
-    } catch (error) {
-      throw error;
     }
-  }
-
-  Future<bool> _loadUsernameFromLocal() async {
-    final getPreferences = await SharedPreferences.getInstance();
-
-    if (!getPreferences.containsKey('username') ||
-        !getPreferences.containsKey('userData')) {
-      return false;
-    }
-
-    final extractedUserData = json.decode(getPreferences.getString('userData'))
-        as Map<String, Object>;
-    final extractedUsername =
-        json.decode(getPreferences.get('username')) as Map<String, Object>;
-
-    this._user = User(
-      email: extractedUserData['email'],
-      userType: extractedUserData['userType'],
-      firstName: extractedUsername['firstName'],
-      lastName: extractedUsername['lastName'],
-    );
-
-    notifyListeners();
-    return true;
-  }
-
-  void _saveUsernameToLocal() async {
-    final preferences = await SharedPreferences.getInstance();
-    final userData = json.encode(
-      {
-        'firstName': this.user.firstName,
-        'lastName': this.user.lastName,
-      },
-    );
-
-    preferences.setString('username', userData);
   }
 
   void _saveLocalData() async {
     final preferences = await SharedPreferences.getInstance();
     final userData = json.encode(
       {
+        'id': this._user.id,
         'email': this._email,
         'token': this._token,
         'expiryDate': this._expiryDate.toIso8601String(),
@@ -486,8 +538,6 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> googleLogout() async {
-    await GoogleSignInApi.logout();
-
     this._token = null;
     this._expiryDate = null;
 
@@ -500,6 +550,8 @@ class AuthProvider with ChangeNotifier {
 
     final userPreferences = await SharedPreferences.getInstance();
     userPreferences.clear();
+
+    await GoogleSignInApi.logout();
   }
 
   Future<bool> tryAutoLogin() async {
@@ -509,8 +561,7 @@ class AuthProvider with ChangeNotifier {
       return false;
     }
 
-    final extractedUserData = json.decode(getPreferences.getString('userData'))
-        as Map<String, Object>;
+    final extractedUserData = json.decode(getPreferences.getString('userData')) as Map<String, Object>;
     final expiryDate = DateTime.parse(extractedUserData['expiryDate']);
 
     if (expiryDate.isBefore(DateTime.now())) {
@@ -526,7 +577,10 @@ class AuthProvider with ChangeNotifier {
       this._user = User(
         email: this._email,
         userType: userType,
+        id: extractedUserData['id'],
       );
+
+      this._user = await UserDatabase.create(this._user);
     }
 
     notifyListeners();

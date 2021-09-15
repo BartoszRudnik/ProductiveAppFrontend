@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+
 import '../model/task.dart';
 import '../provider/settings_provider.dart';
 import '../provider/task_provider.dart';
@@ -7,7 +9,6 @@ import '../utils/manage_filters.dart';
 import '../widget/empty_list.dart';
 import '../widget/reorderable_task_list.dart';
 import '../widget/tasks_list.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class InboxScreen extends StatelessWidget {
   void onReorder(int newIndex, int oldIndex, List<Task> tasks, BuildContext context) {

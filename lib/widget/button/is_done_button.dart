@@ -27,9 +27,9 @@ class _IsDoneButtonState extends State<IsDoneButton> {
             )
           : null,
       onPressed: () {
+        this.widget.changeIsDoneStatus();
         setState(() {
           this.widget.isDone = !this.widget.isDone;
-          this.widget.changeIsDoneStatus();
         });
       },
       constraints: BoxConstraints(minWidth: 20, minHeight: 18),

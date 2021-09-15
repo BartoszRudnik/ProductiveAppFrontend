@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_app/config/const_values.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import '../model/task.dart';
 import '../provider/task_provider.dart';
 import '../widget/appBar/task_appBar.dart';
@@ -36,11 +37,6 @@ class _RelatedTaskInfoScreenState extends State<RelatedTaskInfoScreen> {
     if (originalTask.priority == 'HIGHER') priorityIcon = Icons.arrow_upward_outlined;
     if (originalTask.priority == 'HIGHER') priorityIcon = Icons.arrow_upward_outlined;
     if (originalTask.priority == 'CRITICAL') priorityIcon = Icons.warning_amber_sharp;
-  }
-
-  @override
-  void initState() {
-    super.initState();
   }
 
   Future<void> a() async {}
@@ -202,7 +198,11 @@ class _RelatedTaskInfoScreenState extends State<RelatedTaskInfoScreen> {
                                     ),
                                   )
                                 : Text(
-                                    AppLocalizations.of(context).startDate + ": " + formatter.format(originalTask.startDate) + ', ' + startTime.format(context),
+                                    AppLocalizations.of(context).startDate +
+                                        ": " +
+                                        formatter.format(originalTask.startDate) +
+                                        ', ' +
+                                        startTime.format(context),
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400,
@@ -220,7 +220,11 @@ class _RelatedTaskInfoScreenState extends State<RelatedTaskInfoScreen> {
                                     ),
                                   )
                                 : Text(
-                                    AppLocalizations.of(context).endDate + ": " + formatter.format(originalTask.endDate) + ', ' + endTime.format(context),
+                                    AppLocalizations.of(context).endDate +
+                                        ": " +
+                                        formatter.format(originalTask.endDate) +
+                                        ', ' +
+                                        endTime.format(context),
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400,

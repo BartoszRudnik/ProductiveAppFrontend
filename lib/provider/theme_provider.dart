@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
+import 'package:productive_app/db/graphic_database.dart';
+import 'package:productive_app/utils/internet_connection.dart';
 
 class ThemeProvider with ChangeNotifier {
   ThemeMode themeMode;
@@ -29,27 +31,46 @@ class ThemeProvider with ChangeNotifier {
     }
   }
 
-  Future<void> getUserMode() async {
-    final requestUrl = this._serverUrl + 'themeMode/get/${this.userEmail}';
-
+  Future<void> getUserModeOffline() async {
     try {
-      final response = await http.get(
-        requestUrl,
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
+      final result = await GraphicDatabase.read(this.userEmail);
 
-      final responseBody = json.decode(response.body);
-
-      this.themeMode = this._selectColorMode(responseBody['backgroundType']);
-
-      notifyListeners();
+      this.themeMode = this._selectColorMode(result[0]);
     } catch (error) {
       print(error);
       throw (error);
     }
+  }
+
+  Future<void> getUserMode() async {
+    if (await InternetConnection.internetConnection()) {
+      final requestUrl = this._serverUrl + 'themeMode/get/${this.userEmail}';
+
+      try {
+        final response = await http.get(
+          requestUrl,
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+
+        final responseBody = json.decode(response.body);
+
+        this.themeMode = this._selectColorMode(responseBody['backgroundType']);
+
+        await GraphicDatabase.deleteAll(this.userEmail);
+        await GraphicDatabase.create(
+          this._getColorMode(),
+          this.userEmail,
+        );
+
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
+    } else {}
   }
 
   Future<void> toggleTheme(bool isOn) async {
@@ -58,26 +79,29 @@ class ThemeProvider with ChangeNotifier {
     this.themeMode = isOn ? ThemeMode.dark : ThemeMode.light;
 
     final modeToSend = this._getColorMode();
+    GraphicDatabase.create(modeToSend, this.userEmail);
 
-    try {
-      await http.post(
-        requestUrl,
-        body: json.encode(
-          {
-            'backgroundType': modeToSend,
-            'userMail': this.userEmail,
+    notifyListeners();
+
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          requestUrl,
+          body: json.encode(
+            {
+              'backgroundType': modeToSend,
+              'userMail': this.userEmail,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-
-      notifyListeners();
-    } catch (error) {
-      print(error);
-      throw (error);
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 

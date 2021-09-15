@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/config/images.dart';
 import 'package:productive_app/provider/locale_provider.dart';
 import 'package:productive_app/widget/chart/chart_shimmer.dart';
 import 'package:productive_app/widget/list_shimmer.dart';
@@ -168,11 +169,21 @@ class _ActiveTasksState extends State<ActiveTasks> {
                         builderDelegate: PagedChildBuilderDelegate<CollaboratorTask>(
                           itemBuilder: (context, task, index) => SingleCollaboratorTask(task: task),
                           firstPageProgressIndicatorBuilder: (_) => ListShimmer(),
-                          noItemsFoundIndicatorBuilder: (_) => Container(
-                            child: Center(
-                              child: Text(AppLocalizations.of(context).emptyList),
+                          firstPageErrorIndicatorBuilder: (_) => Container(
+                            child: Column(
+                              children: [
+                                Container(
+                                  height: MediaQuery.of(context).size.height * 0.3,
+                                  child: Image.asset(
+                                    Images.noInternet,
+                                    fit: BoxFit.fitHeight,
+                                  ),
+                                ),
+                                Text('No internet connection, try again later.')
+                              ],
                             ),
                           ),
+                          noItemsFoundIndicatorBuilder: (_) => Container(child: Center(child: Text(AppLocalizations.of(context).emptyList))),
                         ),
                         pagingController: this._pagingController,
                         padding: const EdgeInsets.all(12),

@@ -265,7 +265,7 @@ class Dialogs {
                       }
                       return null;
                     },
-                    onChanged: (value) {
+                    onSaved: (value) {
                       tempVal = value;
                     },
                   ),

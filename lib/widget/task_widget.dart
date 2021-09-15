@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_app/config/const_values.dart';
+import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../model/task.dart';
@@ -9,7 +11,6 @@ import '../provider/task_provider.dart';
 import '../screen/task_details_screen.dart';
 import 'button/is_done_button.dart';
 import 'task_tags.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TaskWidget extends StatefulWidget {
   final Task task;
@@ -25,14 +26,14 @@ class TaskWidget extends StatefulWidget {
 }
 
 class _TaskWidgetState extends State<TaskWidget> {
-  void changeTaskStatus() {
+  void changeTaskStatus() async {
     if (this.widget.task.notificationLocalizationId == null) {
-      Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(this.widget.task);
+      await Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(this.widget.task);
     } else {
       final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.widget.task.notificationLocalizationId);
       final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.widget.task.notificationLocalizationId);
 
-      Provider.of<TaskProvider>(context, listen: false).toggleTaskStatusWithGeolocation(this.widget.task, latitude, longitude);
+      await Provider.of<TaskProvider>(context, listen: false).toggleTaskStatusWithGeolocation(this.widget.task, latitude, longitude);
     }
   }
 
@@ -136,7 +137,10 @@ class _TaskWidgetState extends State<TaskWidget> {
                                   }
                                   Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
                                 } else {
-                                  Provider.of<TaskProvider>(context, listen: false).deleteTask(this.widget.task.id);
+                                  Provider.of<SynchronizeProvider>(context, listen: false).addTaskToDelete(
+                                    this.widget.task.uuid,
+                                  );
+                                  Provider.of<TaskProvider>(context, listen: false).deleteTask(this.widget.task.uuid, this.widget.task.id);
                                 }
 
                                 Navigator.of(context).pop(true);
@@ -198,14 +202,20 @@ class _TaskWidgetState extends State<TaskWidget> {
                           fontSize: 20,
                           fontWeight: FontWeight.w400,
                           fontFamily: 'RobotoCondensed',
-                          decoration: this.widget.task.done || (this.widget.task.isCanceled != null && this.widget.task.isCanceled) ? TextDecoration.lineThrough : null,
-                          color: this.widget.task.done || (this.widget.task.isCanceled != null && this.widget.task.isCanceled) ? Colors.grey : Theme.of(context).primaryColor,
+                          decoration: this.widget.task.done || (this.widget.task.isCanceled != null && this.widget.task.isCanceled)
+                              ? TextDecoration.lineThrough
+                              : null,
+                          color: this.widget.task.done || (this.widget.task.isCanceled != null && this.widget.task.isCanceled)
+                              ? Colors.grey
+                              : Theme.of(context).primaryColor,
                         ),
                       ),
                     ),
                     SizedBox(width: 7),
                     if (this.widget.task.isDelegated != null && this.widget.task.isDelegated) Icon(Icons.supervisor_account_outlined),
-                    if (this.widget.task.delegatedEmail != null && this.widget.task.localization == 'DELEGATED' && this.widget.task.taskStatus != null)
+                    if (this.widget.task.delegatedEmail != null &&
+                        this.widget.task.localization == 'DELEGATED' &&
+                        this.widget.task.taskStatus != null)
                       Container(
                         alignment: Alignment.center,
                         padding: EdgeInsets.symmetric(horizontal: 4),
@@ -280,21 +290,31 @@ class _TaskWidgetState extends State<TaskWidget> {
                             Container(
                               child: Row(
                                 children: [
-                                  if (taskEndDate.difference(today).inDays == 0 && this.widget.task.endDate.hour != 0 && this.widget.task.endDate.minute != 0) Icon(Icons.access_time_outlined),
-                                  if (taskEndDate.difference(today).inDays == 0 && this.widget.task.endDate.hour != 0 && this.widget.task.endDate.minute != 0)
+                                  if (taskEndDate.difference(today).inDays == 0 &&
+                                      this.widget.task.endDate.hour != 0 &&
+                                      this.widget.task.endDate.minute != 0)
+                                    Icon(Icons.access_time_outlined),
+                                  if (taskEndDate.difference(today).inDays == 0 &&
+                                      this.widget.task.endDate.hour != 0 &&
+                                      this.widget.task.endDate.minute != 0)
                                     Text(
                                       DateFormat('Hm').format(this.widget.task.endDate),
                                     ),
                                   if (taskEndDate.difference(today).inDays < 0) Icon(Icons.fireplace_outlined),
-                                  if (taskEndDate.difference(today).inDays < 0) Text(today.difference(taskEndDate).inDays.toString() + AppLocalizations.of(context).overdue),
+                                  if (taskEndDate.difference(today).inDays < 0)
+                                    Text(today.difference(taskEndDate).inDays.toString() + AppLocalizations.of(context).overdue),
                                   if (taskEndDate.difference(today).inDays > 0) Icon(Icons.hourglass_bottom_outlined),
-                                  if (taskEndDate.difference(today).inDays > 0) Text(AppLocalizations.of(context).left(taskEndDate.difference(today).inDays.toString())),
+                                  if (taskEndDate.difference(today).inDays > 0)
+                                    Text(AppLocalizations.of(context).left(taskEndDate.difference(today).inDays.toString())),
                                 ],
                               ),
                             )
                         ],
                       ),
-                    if (this.widget.task.priority != 'NORMAL' || this.widget.task.startDate != null || this.widget.task.endDate != null || this.widget.task.isDelegated != null)
+                    if (this.widget.task.priority != 'NORMAL' ||
+                        this.widget.task.startDate != null ||
+                        this.widget.task.endDate != null ||
+                        this.widget.task.isDelegated != null)
                       SizedBox(
                         height: 4,
                       ),

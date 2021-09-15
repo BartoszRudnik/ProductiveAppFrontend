@@ -1,7 +1,10 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+
 import '../provider/delegate_provider.dart';
 import '../provider/task_provider.dart';
 import '../widget/appBar/newTask_appBar.dart';
@@ -10,8 +13,6 @@ import 'anyTime_screen.dart';
 import 'delegated_screen.dart';
 import 'inbox_screen.dart';
 import 'scheduled_screen.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 
 class TabsScreen extends StatefulWidget {
   static const routeName = '/tabs-screen';
@@ -20,8 +21,7 @@ class TabsScreen extends StatefulWidget {
   _TabsScreenState createState() => _TabsScreenState();
 }
 
-class _TabsScreenState extends State<TabsScreen>
-    with TickerProviderStateMixin<TabsScreen> {
+class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<TabsScreen> {
   List<Map<String, Object>> _pages;
 
   AnimationController _hideFab;
@@ -92,8 +92,7 @@ class _TabsScreenState extends State<TabsScreen>
   void initState() {
     super.initState();
 
-    this._hideFab =
-        AnimationController(vsync: this, duration: kThemeAnimationDuration);
+    this._hideFab = AnimationController(vsync: this, duration: kThemeAnimationDuration);
     this._hideFab.forward();
   }
 
@@ -109,14 +108,12 @@ class _TabsScreenState extends State<TabsScreen>
         final UserScrollNotification userScroll = notification;
         switch (userScroll.direction) {
           case ScrollDirection.forward:
-            if (userScroll.metrics.maxScrollExtent !=
-                userScroll.metrics.minScrollExtent) {
+            if (userScroll.metrics.maxScrollExtent != userScroll.metrics.minScrollExtent) {
               this._hideFab.forward();
             }
             break;
           case ScrollDirection.reverse:
-            if (userScroll.metrics.maxScrollExtent !=
-                userScroll.metrics.minScrollExtent) {
+            if (userScroll.metrics.maxScrollExtent != userScroll.metrics.minScrollExtent) {
               this._hideFab.reverse();
             }
             break;
@@ -136,8 +133,7 @@ class _TabsScreenState extends State<TabsScreen>
       builder: (context) {
         return SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom),
+            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
             child: GestureDetector(
               onTap: () {},
               child: NewTask(
@@ -160,11 +156,9 @@ class _TabsScreenState extends State<TabsScreen>
     }
   }
 
-  Color _getBgColor(int index) =>
-      _selectedPageIndex == index ? _selectedBgColor : _unselectedBgColor;
+  Color _getBgColor(int index) => _selectedPageIndex == index ? _selectedBgColor : _unselectedBgColor;
 
-  Color _getItemColor(int index) =>
-      _selectedPageIndex == index ? _selectedItemColor : _unselectedItemColor;
+  Color _getItemColor(int index) => _selectedPageIndex == index ? _selectedItemColor : _unselectedItemColor;
 
   Widget _buildIcon(IconData iconData, String text, int index) => Container(
         width: double.infinity,
@@ -196,8 +190,7 @@ class _TabsScreenState extends State<TabsScreen>
         ),
       );
 
-  Widget _buildIconInbox(IconData iconData, String text, int index) =>
-      Container(
+  Widget _buildIconInbox(IconData iconData, String text, int index) => Container(
         width: double.infinity,
         height: 60,
         child: Material(
@@ -208,22 +201,13 @@ class _TabsScreenState extends State<TabsScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Badge(
-                  showBadge: Provider.of<TaskProvider>(context)
-                              .countInboxDelegated() !=
-                          null &&
-                      Provider.of<TaskProvider>(context).countInboxDelegated() >
-                          0,
-                  badgeColor: index == _selectedPageIndex
-                      ? Theme.of(context).accentColor
-                      : Theme.of(context).primaryColor,
+                  showBadge: Provider.of<TaskProvider>(context).countInboxDelegated() != null &&
+                      Provider.of<TaskProvider>(context).countInboxDelegated() > 0,
+                  badgeColor: index == _selectedPageIndex ? Theme.of(context).accentColor : Theme.of(context).primaryColor,
                   badgeContent: Text(
-                    Provider.of<TaskProvider>(context)
-                        .countInboxDelegated()
-                        .toString(),
+                    Provider.of<TaskProvider>(context).countInboxDelegated().toString(),
                     style: TextStyle(
-                      color: index == _selectedPageIndex
-                          ? Theme.of(context).primaryColor
-                          : Theme.of(context).accentColor,
+                      color: index == _selectedPageIndex ? Theme.of(context).primaryColor : Theme.of(context).accentColor,
                     ),
                   ),
                   child: Icon(iconData),
@@ -297,19 +281,13 @@ class _TabsScreenState extends State<TabsScreen>
               leadingButton: IconButton(
                 icon: Badge(
                   position: BadgePosition.topStart(),
-                  showBadge:
-                      Provider.of<DelegateProvider>(context).received.length >
-                              0 ||
-                          Provider.of<DelegateProvider>(context)
-                                  .numberOfPermissionRequest >
-                              0,
+                  showBadge: Provider.of<DelegateProvider>(context).received.length > 0 ||
+                      Provider.of<DelegateProvider>(context).numberOfPermissionRequest > 0,
                   badgeColor: Theme.of(context).primaryColor,
                   child: Icon(Icons.menu),
                 ),
                 onPressed: () {
-                  isDrawerVisible
-                      ? _changeTranform(0, 0, 1)
-                      : _changeTranform(230, 70, 0.8);
+                  isDrawerVisible ? _changeTranform(0, 0, 1) : _changeTranform(230, 70, 0.8);
                 },
               ),
             ),
@@ -334,23 +312,19 @@ class _TabsScreenState extends State<TabsScreen>
               type: BottomNavigationBarType.fixed,
               items: [
                 BottomNavigationBarItem(
-                  icon: _buildIconInbox(Icons.inbox_outlined,
-                      AppLocalizations.of(context).inbox, 0),
+                  icon: _buildIconInbox(Icons.inbox_outlined, AppLocalizations.of(context).inbox, 0),
                   title: SizedBox.shrink(),
                 ),
                 BottomNavigationBarItem(
-                  icon: _buildIcon(Icons.access_time,
-                      AppLocalizations.of(context).anytime, 1),
+                  icon: _buildIcon(Icons.access_time, AppLocalizations.of(context).anytime, 1),
                   title: SizedBox.shrink(),
                 ),
                 BottomNavigationBarItem(
-                  icon: _buildIcon(Icons.calendar_today,
-                      AppLocalizations.of(context).scheduled, 2),
+                  icon: _buildIcon(Icons.calendar_today, AppLocalizations.of(context).scheduled, 2),
                   title: SizedBox.shrink(),
                 ),
                 BottomNavigationBarItem(
-                  icon: _buildIcon(Icons.person_outline_outlined,
-                      AppLocalizations.of(context).delegated, 3),
+                  icon: _buildIcon(Icons.person_outline_outlined, AppLocalizations.of(context).delegated, 3),
                   title: SizedBox.shrink(),
                 ),
               ],

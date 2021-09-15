@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:productive_app/config/color_themes.dart';
+import 'package:productive_app/utils/internet_connection.dart';
 import 'package:provider/provider.dart';
+
 import '../../model/location.dart';
 import '../../model/taskLocation.dart';
 import '../../provider/location_provider.dart';
 import '../../utils/dialogs.dart';
 import '../../utils/notifications.dart';
 import 'location_dialog.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NotificationLocationDialog extends StatefulWidget {
   final Key key;
@@ -52,6 +54,8 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
 
   @override
   void initState() {
+    super.initState();
+
     if (this.widget.notificationRadius != null) {
       this.notificationRadius = this.widget.notificationRadius;
     }
@@ -61,8 +65,6 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
     if (this.widget.notificationOnExit != null) {
       this.notificationOnExit = this.widget.notificationOnExit;
     }
-
-    super.initState();
   }
 
   @override
@@ -125,24 +127,29 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                                 child: ElevatedButton(
                                   style: ColorThemes.newTaskDateButtonStyle(context),
                                   onPressed: () async {
-                                    Location choosenLocation = await showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return LocationDialog(
-                                          choosenLocation: Location(
-                                            id: -1,
-                                            latitude: 0.0,
-                                            longitude: 0.0,
-                                            localizationName: 'test',
-                                            country: "",
-                                            locality: "",
-                                            street: "",
-                                          ),
-                                        );
-                                      },
-                                    );
+                                    if (await InternetConnection.internetConnection()) {
+                                      Location choosenLocation = await showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return LocationDialog(
+                                            choosenLocation: Location(
+                                              uuid: '',
+                                              id: -1,
+                                              latitude: 0.0,
+                                              longitude: 0.0,
+                                              localizationName: 'test',
+                                              country: "",
+                                              locality: "",
+                                              street: "",
+                                            ),
+                                          );
+                                        },
+                                      );
 
-                                    this._addNewLocationForm(context, choosenLocation);
+                                      this._addNewLocationForm(context, choosenLocation);
+                                    } else {
+                                      Dialogs.showWarningDialog(context, AppLocalizations.of(context).connectionFailed);
+                                    }
                                   },
                                   child: Text(AppLocalizations.of(context).newWord),
                                 ),

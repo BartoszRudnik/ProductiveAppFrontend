@@ -1,13 +1,15 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:global_configuration/global_configuration.dart';
-import '../config/images.dart';
-import '../widget/switch_list_tile/grant_access_list_tile.dart';
+import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:provider/provider.dart';
+
+import '../config/images.dart';
 import '../model/collaborator.dart';
 import '../provider/delegate_provider.dart';
 import '../widget/appBar/collaborator_profile_appBar.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:auto_size_text/auto_size_text.dart';
+import '../widget/switch_list_tile/grant_access_list_tile.dart';
 
 class CollaboratorProfile extends StatelessWidget {
   final int collaboratorId;
@@ -20,9 +22,7 @@ class CollaboratorProfile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Collaborator collaborator = Provider.of<DelegateProvider>(context)
-        .accepted
-        .firstWhere((element) => element.id == this.collaboratorId);
+    final Collaborator collaborator = Provider.of<DelegateProvider>(context).accepted.firstWhere((element) => element.id == this.collaboratorId);
 
     return Scaffold(
       appBar: CollaboratorProfileAppBar(),
@@ -47,11 +47,9 @@ class CollaboratorProfile extends StatelessWidget {
                     fit: BoxFit.cover,
                     width: 220,
                     height: 220,
-                    image: NetworkImage(this._serverUrl +
-                        'userImage/getImage/${collaborator.email}'),
+                    image: NetworkImage(this._serverUrl + 'userImage/getImage/${collaborator.email}'),
                     placeholder: AssetImage(Images.profilePicturePlacholder),
-                    imageErrorBuilder: (ctx, obj, stackTrace) =>
-                        Image.asset(Images.profilePicturePlacholder),
+                    imageErrorBuilder: (ctx, obj, stackTrace) => Image.asset(Images.profilePicturePlacholder),
                   ),
                 ),
               ),
@@ -104,8 +102,7 @@ class CollaboratorProfile extends StatelessWidget {
                             initialValue: collaborator.collaboratorName,
                             style: TextStyle(fontSize: 18),
                             maxLines: 1,
-                            decoration: InputDecoration(
-                                hintText: AppLocalizations.of(context).name),
+                            decoration: InputDecoration(hintText: AppLocalizations.of(context).name),
                           ),
                         )
                       ],
@@ -127,8 +124,7 @@ class CollaboratorProfile extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    if (collaborator.isAskingForPermission &&
-                        !collaborator.sentPermission)
+                    if (collaborator.isAskingForPermission && !collaborator.sentPermission)
                       Container(
                         decoration: BoxDecoration(
                           color: Theme.of(context).primaryColorDark,
@@ -141,8 +137,7 @@ class CollaboratorProfile extends StatelessWidget {
                           children: [
                             Expanded(
                               child: AutoSizeText(
-                                AppLocalizations.of(context)
-                                    .isAskingForPermission,
+                                AppLocalizations.of(context).isAskingForPermission,
                                 maxLines: 2,
                                 minFontSize: 10,
                                 maxFontSize: 16,
@@ -152,10 +147,7 @@ class CollaboratorProfile extends StatelessWidget {
                             IconButton(
                               icon: Icon(Icons.cancel_outlined),
                               onPressed: () {
-                                Provider.of<DelegateProvider>(context,
-                                        listen: false)
-                                    .declineAskForPermission(
-                                        collaborator.email);
+                                Provider.of<DelegateProvider>(context, listen: false).declineAskForPermission(collaborator.email);
                               },
                             )
                           ],
@@ -200,31 +192,24 @@ class CollaboratorProfile extends StatelessWidget {
                             content: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(AppLocalizations.of(context)
-                                    .areYouSureDeleteCollab),
+                                Text(AppLocalizations.of(context).areYouSureDeleteCollab),
                                 SizedBox(height: 10),
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: [
                                     ElevatedButton(
                                         onPressed: () async {
-                                          await Provider.of<DelegateProvider>(
-                                                  context,
-                                                  listen: false)
-                                              .deleteCollaborator(
-                                                  collaborator.id);
+                                          Provider.of<SynchronizeProvider>(context, listen: false).addCollaboratorToDelete(collaborator.uuid);
+                                          await Provider.of<DelegateProvider>(context, listen: false).deleteCollaborator(collaborator.uuid);
                                           Navigator.of(context).pop(true);
                                           Navigator.of(context).pop(true);
                                         },
-                                        child: Text(
-                                            AppLocalizations.of(context).yes)),
+                                        child: Text(AppLocalizations.of(context).yes)),
                                     ElevatedButton(
                                       onPressed: () {
                                         Navigator.of(context).pop(false);
                                       },
-                                      child:
-                                          Text(AppLocalizations.of(context).no),
+                                      child: Text(AppLocalizations.of(context).no),
                                     ),
                                   ],
                                 )
@@ -233,8 +218,7 @@ class CollaboratorProfile extends StatelessWidget {
                           ),
                         );
                       },
-                      child: Text(
-                          AppLocalizations.of(context).deleteFromCollaborators),
+                      child: Text(AppLocalizations.of(context).deleteFromCollaborators),
                     ),
                   ],
                 ),

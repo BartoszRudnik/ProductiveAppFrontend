@@ -1,8 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_app/config/const_values.dart';
+import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:productive_app/utils/task_validate.dart';
 import 'package:provider/provider.dart';
+
 import '../config/color_themes.dart';
 import '../model/attachment.dart';
 import '../model/task.dart';
@@ -23,7 +28,6 @@ import '../widget/task_details_bottom_bar.dart';
 import '../widget/task_details_dates.dart';
 import '../widget/task_details_map.dart';
 import '../widget/task_tags_edit.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TaskDetailScreen extends StatefulWidget {
   static const routeName = "/task-details";
@@ -52,12 +56,12 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
 
   @override
   void initState() {
+    super.initState();
+
     _descriptionFocus.addListener(onDescriptionFocusChange);
     taskToEdit = null;
 
     Provider.of<AttachmentProvider>(context, listen: false).prepare();
-
-    super.initState();
   }
 
   void setNewAttachments(List<int> newAttachments) {
@@ -158,12 +162,15 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     this._formKey.currentState.save();
 
     try {
-      if (this.taskToEdit.delegatedEmail != null && this.taskToEdit.localization != 'DELEGATED' && (originalTask.localization == 'ANYTIME' || originalTask.localization == 'SCHEDULED')) {
+      if (this.taskToEdit.delegatedEmail != null &&
+          this.taskToEdit.localization != 'DELEGATED' &&
+          (originalTask.localization == 'ANYTIME' || originalTask.localization == 'SCHEDULED')) {
         this.taskToEdit.localization = 'DELEGATED';
       }
 
       if (this.startTime != null && taskToEdit.startDate != null) {
-        taskToEdit.startDate = new DateTime(taskToEdit.startDate.year, taskToEdit.startDate.month, taskToEdit.startDate.day, this.startTime.hour, this.startTime.minute);
+        taskToEdit.startDate =
+            new DateTime(taskToEdit.startDate.year, taskToEdit.startDate.month, taskToEdit.startDate.day, this.startTime.hour, this.startTime.minute);
       } else if (taskToEdit.startDate != null) {
         taskToEdit.startDate = new DateTime(taskToEdit.startDate.year, taskToEdit.startDate.month, taskToEdit.startDate.day, 0, 0);
       }
@@ -220,6 +227,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       await Provider.of<AttachmentProvider>(context, listen: false).deleteFlaggedAttachments();
       Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);
       this.changesSaved = true;
+    } on SocketException catch (error) {
+      print(error);
     } catch (error) {
       print(error);
       await Dialogs.showWarningDialog(context, AppLocalizations.of(context).errorOccurred);
@@ -380,6 +389,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     }
 
     taskToEdit = new Task(
+      uuid: argTask.uuid,
       id: argTask.id,
       title: argTask.title,
       description: argTask.description,
@@ -392,13 +402,13 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       position: argTask.position,
       delegatedEmail: argTask.delegatedEmail,
       isCanceled: argTask.isCanceled,
-      childId: argTask.childId,
+      childUuid: argTask.childUuid,
       isDelegated: argTask.isDelegated,
       notificationLocalizationId: argTask.notificationLocalizationId,
       notificationLocalizationRadius: argTask.notificationLocalizationRadius,
       notificationOnEnter: argTask.notificationOnEnter,
       notificationOnExit: argTask.notificationOnExit,
-      parentId: argTask.parentId,
+      parentUuid: argTask.parentUuid,
       supervisorEmail: argTask.supervisorEmail,
       taskStatus: argTask.taskStatus,
     );
@@ -426,8 +436,13 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.taskToEdit.notificationLocalizationId);
     }
 
-    List<Attachment> attachments = Provider.of<AttachmentProvider>(context).attachments.where((attachment) => attachment.taskId == taskToEdit.id && !attachment.toDelete).toList();
-    attachments.addAll(Provider.of<AttachmentProvider>(context).delegatedAttachments.where((attachment) => attachment.taskId == taskToEdit.parentId && !attachment.toDelete).toList());
+    List<Attachment> attachments =
+        Provider.of<AttachmentProvider>(context).attachments.where((attachment) => attachment.taskUuid == taskToEdit.uuid && !attachment.toDelete).toList();
+
+    attachments.addAll(Provider.of<AttachmentProvider>(context)
+        .delegatedAttachments
+        .where((attachment) => attachment.taskUuid == taskToEdit.parentUuid && !attachment.toDelete)
+        .toList());
 
     return WillPopScope(
       // ignore: missing_return
@@ -435,13 +450,22 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         this._formKey.currentState.save();
         bool result = false;
 
-        if ((!this.checkEquals(this.originalTask, this.taskToEdit) || Provider.of<AttachmentProvider>(context, listen: false).notSavedAttachments.length > 0) && !this.changesSaved) {
+        if ((!this.checkEquals(this.originalTask, this.taskToEdit) || Provider.of<AttachmentProvider>(context, listen: false).notSavedAttachments.length > 0) &&
+            !this.changesSaved) {
           result = await Dialogs.showActionDialog(
             context,
             AppLocalizations.of(context).changes,
             this.saveTask,
             () {},
           );
+        }
+
+        final notSaved = Provider.of<AttachmentProvider>(context, listen: false).notSavedAttachments;
+
+        if (notSaved != null) {
+          notSaved.forEach((element) {
+            Provider.of<SynchronizeProvider>(context, listen: false).addAttachmentToDelete(element.uuid);
+          });
         }
 
         await Provider.of<AttachmentProvider>(context, listen: false).deleteNotSavedAttachments();
@@ -568,7 +592,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                   ),
                   TaskDetailsAttachments(
                     attachments: attachments,
-                    taskId: taskToEdit.id,
+                    taskUuid: taskToEdit.uuid,
                   ),
                 ],
               ),

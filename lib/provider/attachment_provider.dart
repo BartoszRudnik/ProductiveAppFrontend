@@ -1,12 +1,16 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:global_configuration/global_configuration.dart';
-import 'package:productive_app/model/attachment.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:productive_app/db/attachment_database.dart';
+import 'package:productive_app/model/attachment.dart';
+import 'package:productive_app/utils/internet_connection.dart';
+import 'package:uuid/uuid.dart';
 
 class AttachmentProvider with ChangeNotifier {
   List<Attachment> attachments;
@@ -26,7 +30,7 @@ class AttachmentProvider with ChangeNotifier {
 
   Future<void> deleteFlaggedAttachments() async {
     this.attachments.where((element) => element.toDelete).toList().forEach((element) {
-      this._deleteAttachment(element.id);
+      this._deleteAttachment(element.uuid);
       this.attachments.remove(element);
     });
 
@@ -37,7 +41,7 @@ class AttachmentProvider with ChangeNotifier {
 
   Future<void> deleteNotSavedAttachments() async {
     this.notSavedAttachments.forEach((attachment) {
-      this._deleteAttachment(attachment.id);
+      this._deleteAttachment(attachment.uuid);
       this.attachments.remove(attachment);
     });
 
@@ -54,50 +58,71 @@ class AttachmentProvider with ChangeNotifier {
     );
   }
 
-  void setToDelete(int attachmentId) {
-    this.attachments.firstWhere((attachment) => attachment.id == attachmentId).toDelete = true;
+  void setToDelete(String attachmentUuid) {
+    this.attachments.firstWhere((attachment) => attachment.uuid == attachmentUuid).toDelete = true;
 
     notifyListeners();
   }
 
-  List<Attachment> taskAttachments(int taskId) {
-    return this.attachments.where((attachment) => attachment.taskId == taskId && !attachment.toDelete).toList();
-  }
+  Future<void> getDelegatedAttachments(List<String> delegatedTasksUuid) async {
+    if (await InternetConnection.internetConnection()) {
+      final finalUrl = this._serverUrl + 'attachment/getDelegatedAttachments';
 
-  Future<void> getDelegatedAttachments(List<int> delegatedTasksId) async {
-    final finalUrl = this._serverUrl + 'attachment/getDelegatedAttachments';
-
-    List<Attachment> loadedAttachments = [];
-
-    try {
-      final response = await http.post(
-        finalUrl,
-        body: json.encode({
-          "tasksId": delegatedTasksId,
-        }),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-
-      final responseBody = json.decode(response.body);
-
-      for (var element in responseBody) {
-        final newAttachment = Attachment(
-          fileName: element['fileName'],
-          id: element['id'],
-          taskId: element['taskId'],
+      List<Attachment> loadedAttachments = [];
+      try {
+        final response = await http.post(
+          finalUrl,
+          body: json.encode({
+            "tasksUuid": delegatedTasksUuid,
+          }),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
         );
 
-        loadedAttachments.add(newAttachment);
-      }
+        final responseBody = json.decode(response.body);
 
-      if (loadedAttachments.length > 0) {
-        this.delegatedAttachments = loadedAttachments;
-      }
+        for (final element in responseBody) {
+          Attachment newAttachment = Attachment(
+            uuid: element['uuid'],
+            fileName: element['fileName'],
+            id: element['id'],
+            taskUuid: element['taskUuid'],
+          );
 
-      notifyListeners();
+          if (!await AttachmentDatabase.checkIfExists(newAttachment.uuid)) {
+            final file = await this.getFileBytes(newAttachment.uuid);
+
+            if (file != null) {
+              newAttachment.localFile = file;
+            }
+
+            newAttachment = await AttachmentDatabase.create(newAttachment, this.userMail);
+          }
+
+          loadedAttachments.add(newAttachment);
+        }
+
+        if (loadedAttachments.length > 0) {
+          this.delegatedAttachments = loadedAttachments;
+        }
+
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
+    }
+  }
+
+  void notify() {
+    notifyListeners();
+  }
+
+  Future<void> getAttachmentsOffline() async {
+    try {
+      this.attachments = await AttachmentDatabase.readAll(this.userMail);
     } catch (error) {
       print(error);
       throw (error);
@@ -107,26 +132,31 @@ class AttachmentProvider with ChangeNotifier {
   Future<void> getAttachments() async {
     final finalUrl = this._serverUrl + 'attachment/getUserAttachments/${this.userMail}';
 
-    List<Attachment> loadedAttachments = [];
-
     try {
       final response = await http.get(finalUrl);
 
       final responseBody = json.decode(response.body);
 
       for (var element in responseBody) {
-        final newAttachment = Attachment(
+        Attachment newAttachment = Attachment(
+          uuid: element['uuid'],
           fileName: element['fileName'],
           id: element['id'],
-          taskId: element['taskId'],
+          taskUuid: element['taskUuid'],
         );
 
-        loadedAttachments.add(newAttachment);
+        if (!await AttachmentDatabase.checkIfExists(newAttachment.uuid)) {
+          final file = await this.getFileBytes(newAttachment.uuid);
+
+          if (file != null) {
+            newAttachment.localFile = file;
+          }
+
+          newAttachment = await AttachmentDatabase.create(newAttachment, this.userMail);
+        }
       }
 
-      if (loadedAttachments.length > 0) {
-        this.attachments = loadedAttachments;
-      }
+      this.attachments = await AttachmentDatabase.readAll(this.userMail);
 
       notifyListeners();
     } catch (error) {
@@ -135,43 +165,41 @@ class AttachmentProvider with ChangeNotifier {
     }
   }
 
-  Future<void> _deleteAttachment(int attachmentId) async {
-    final finalUrl = this._serverUrl + 'attachment/deleteAttachment/$attachmentId';
+  Future<void> _deleteAttachment(String uuid) async {
+    await AttachmentDatabase.deleteByUuid(uuid);
 
-    try {
-      http.delete(
-        finalUrl,
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+    if (await InternetConnection.internetConnection()) {
+      final finalUrl = this._serverUrl + 'attachment/deleteAttachment/$uuid';
+
+      try {
+        http.delete(
+          finalUrl,
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
-  Future<void> setAttachments(List<File> attachments, int taskId, bool editMode) {
-    try {
-      attachments.forEach((attachment) async {
-        final fileName = basename(attachment.path);
-        final finalUrl = this._serverUrl + 'attachment/addAttachment/${this.userMail}/$taskId/$fileName';
-        final uri = Uri.parse(finalUrl);
+  Future<void> setAttachments(List<File> attachments, String taskUuid, bool editMode) async {
+    attachments.forEach(
+      (attachment) async {
+        final attachmentBytes = await attachment.readAsBytes();
+        final uuid = Uuid();
 
-        final request = http.MultipartRequest('POST', uri);
-        final multipartFile = await http.MultipartFile.fromPath('multipartFile', attachment.path, filename: attachment.path);
-
-        request.files.add(multipartFile);
-
-        final response = await request.send();
-        final respStr = await response.stream.bytesToString();
-
-        final newAttachment = Attachment(
-          id: int.parse(respStr),
-          taskId: taskId,
+        Attachment newAttachment = Attachment(
+          uuid: uuid.v1(),
+          taskUuid: taskUuid,
           fileName: basename(attachment.path),
+          localFile: attachmentBytes,
         );
+
+        newAttachment = await AttachmentDatabase.create(newAttachment, this.userMail);
 
         this.attachments.add(newAttachment);
 
@@ -180,32 +208,73 @@ class AttachmentProvider with ChangeNotifier {
         }
 
         notifyListeners();
-      });
-    } catch (error) {
-      print(error);
-      throw (error);
+
+        if (await InternetConnection.internetConnection()) {
+          try {
+            final fileName = basename(attachment.path);
+            final uri = Uri.parse(this._serverUrl + 'attachment/addAttachment/${this.userMail}/$taskUuid/$fileName/${newAttachment.uuid}');
+
+            final request = http.MultipartRequest('POST', uri);
+            final multipartFile = await http.MultipartFile.fromPath('multipartFile', attachment.path, filename: attachment.path);
+
+            request.files.add(multipartFile);
+
+            final response = await request.send();
+            final respStr = await response.stream.bytesToString();
+
+            if (newAttachment.id != int.parse(respStr)) {
+              await AttachmentDatabase.updateId(newAttachment.id, int.parse(respStr));
+
+              newAttachment.id = int.parse(respStr);
+              notifyListeners();
+            }
+          } catch (error) {
+            print(error);
+            throw (error);
+          }
+        }
+      },
+    );
+  }
+
+  Future<Uint8List> getFileBytes(String uuid) async {
+    if (await InternetConnection.internetConnection()) {
+      final finalUrl = this._serverUrl + 'attachment/getAttachment/$uuid';
+
+      try {
+        final response = await http.get(finalUrl);
+
+        return response.bodyBytes;
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
+    } else {
+      return null;
     }
   }
 
-  Future<File> loadAttachments(int attachmentId) async {
-    final finalUrl = this._serverUrl + 'attachment/getAttachment/$attachmentId';
-
+  Future<File> loadAttachment(String uuid) async {
     try {
-      final response = await http.get(finalUrl);
+      final allAttachments = this.attachments + this.delegatedAttachments;
+      final choosenAttachment = allAttachments.firstWhere((element) => element.uuid == uuid);
 
-      final bytes = response.bodyBytes;
+      if (choosenAttachment.localFile == null) {
+        choosenAttachment.localFile = await this.getFileBytes(uuid);
+        await AttachmentDatabase.update(choosenAttachment, this.userMail);
+      }
 
-      return this._storeFile(finalUrl, bytes, attachmentId);
+      return this._storeFile(List.from(choosenAttachment.localFile), uuid);
     } catch (error) {
       print(error);
       throw (error);
     }
   }
 
-  Future<File> _storeFile(String url, List<int> bytes, int attachmentId) async {
+  Future<File> _storeFile(List<int> bytes, String uuid) async {
     final allAttachments = this.attachments + this.delegatedAttachments;
 
-    String fileName = allAttachments.firstWhere((element) => element.id == attachmentId).fileName;
+    String fileName = allAttachments.firstWhere((element) => element.uuid == uuid).fileName;
 
     final dir = await getApplicationDocumentsDirectory();
 

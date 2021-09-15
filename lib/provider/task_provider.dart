@@ -1,11 +1,16 @@
 import 'dart:convert';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
+import 'package:productive_app/db/task_database.dart';
 import 'package:productive_app/model/location.dart';
-import '../utils/notifications.dart';
+import 'package:productive_app/utils/internet_connection.dart';
+
 import '../model/tag.dart';
 import '../model/task.dart';
+import '../utils/notifications.dart';
 
 class TaskProvider with ChangeNotifier {
   List<Task> _trashTasks = [];
@@ -143,54 +148,73 @@ class TaskProvider with ChangeNotifier {
   }
 
   Future<int> addTaskWithGeolocation(Task task, double latitude, double longitude) async {
-    String url = this._serverUrl + 'task/add';
+    if (await InternetConnection.internetConnection()) {
+      String url = this._serverUrl + 'task/add';
 
-    if (task.startDate == null) {
-      task.startDate = DateTime.fromMicrosecondsSinceEpoch(0);
-    }
-
-    if (task.endDate == null) {
-      task.endDate = DateTime.fromMicrosecondsSinceEpoch(0);
-    }
-
-    try {
-      final response = await http.post(
-        url,
-        body: json.encode(
-          {
-            'taskName': task.title,
-            'taskDescription': task.description,
-            'userEmail': this.userMail,
-            'startDate': task.startDate.toIso8601String(),
-            'endDate': task.endDate.toIso8601String(),
-            'ifDone': task.done,
-            'priority': task.priority,
-            'tags': task.tags.map((tag) => tag.toJson()).toList(),
-            'localization': task.localization,
-            'delegatedEmail': task.delegatedEmail,
-            'isCanceled': task.isCanceled,
-            'localizationId': task.notificationLocalizationId,
-            'localizationRadius': task.notificationLocalizationRadius,
-            'notificationOnEnter': task.notificationOnEnter,
-            'notificationOnExit': task.notificationOnExit,
+      try {
+        final response = await http.post(
+          url,
+          body: json.encode(
+            {
+              'uuid': task.uuid,
+              'taskName': task.title,
+              'taskDescription': task.description,
+              'userEmail': this.userMail,
+              'startDate': task.startDate != null ? task.startDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
+              'endDate': task.endDate != null ? task.endDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
+              'ifDone': task.done,
+              'priority': task.priority,
+              'tags': task.tags.map((tag) => tag.toJson()).toList(),
+              'localization': task.localization,
+              'delegatedEmail': task.delegatedEmail,
+              'isCanceled': task.isCanceled,
+              'localizationId': task.notificationLocalizationId,
+              'localizationRadius': task.notificationLocalizationRadius,
+              'notificationOnEnter': task.notificationOnEnter,
+              'notificationOnExit': task.notificationOnExit,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
+        );
 
-      task.id = int.parse(response.body);
-      task.position = int.parse(response.body) + 1000.0;
+        task.id = int.parse(response.body);
 
-      if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
-        task.endDate = null;
+        task = await TaskDatabase.create(task, this.userMail);
+
+        task.position = int.parse(response.body) + 1000.0;
+        await TaskDatabase.update(task, this.userMail);
+
+        if (task.notificationLocalizationId != null) {
+          Notifications.addGeofence(
+            task.id,
+            latitude,
+            longitude,
+            task.notificationLocalizationRadius,
+            task.notificationOnEnter,
+            task.notificationOnExit,
+            task.title,
+            task.description,
+          );
+        }
+
+        this.taskList.add(task);
+        this.addToLocalization(task);
+
+        notifyListeners();
+
+        return task.id;
+      } catch (error) {
+        print(error);
+        throw error;
       }
+    } else {
+      task = await TaskDatabase.create(task, this.userMail);
 
-      if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
-        task.startDate = null;
-      }
+      task.position = task.id + 1000.0;
+      await TaskDatabase.update(task, this.userMail);
 
       if (task.notificationLocalizationId != null) {
         Notifications.addGeofence(
@@ -206,115 +230,117 @@ class TaskProvider with ChangeNotifier {
       }
 
       this.taskList.add(task);
-      this.addToLocalication(task);
+      this.addToLocalization(task);
 
       notifyListeners();
 
       return task.id;
-    } catch (error) {
-      print(error);
-      throw error;
     }
   }
 
   Future<int> addTask(Task task) async {
-    String url = this._serverUrl + 'task/add';
+    if (await InternetConnection.internetConnection()) {
+      String url = this._serverUrl + 'task/add';
 
-    if (task.startDate == null) {
-      task.startDate = DateTime.fromMicrosecondsSinceEpoch(0);
-    }
-
-    if (task.endDate == null) {
-      task.endDate = DateTime.fromMicrosecondsSinceEpoch(0);
-    }
-
-    try {
-      final response = await http.post(
-        url,
-        body: json.encode(
-          {
-            'taskName': task.title,
-            'taskDescription': task.description,
-            'userEmail': this.userMail,
-            'startDate': task.startDate.toIso8601String(),
-            'endDate': task.endDate.toIso8601String(),
-            'ifDone': task.done,
-            'priority': task.priority,
-            'tags': task.tags.map((tag) => tag.toJson()).toList(),
-            'localization': task.localization,
-            'delegatedEmail': task.delegatedEmail,
-            'isCanceled': task.isCanceled,
-            'localizationId': task.notificationLocalizationId,
-            'localizationRadius': task.notificationLocalizationRadius,
-            'notificationOnEnter': task.notificationOnEnter,
-            'notificationOnExit': task.notificationOnExit,
+      try {
+        final response = await http.post(
+          url,
+          body: json.encode(
+            {
+              'uuid': task.uuid,
+              'taskName': task.title,
+              'taskDescription': task.description,
+              'userEmail': this.userMail,
+              'startDate': task.startDate != null ? task.startDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
+              'endDate': task.endDate != null ? task.endDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
+              'ifDone': task.done,
+              'priority': task.priority,
+              'tags': task.tags.map((tag) => tag.toJson()).toList(),
+              'localization': task.localization,
+              'delegatedEmail': task.delegatedEmail,
+              'isCanceled': task.isCanceled,
+              'localizationId': task.notificationLocalizationId,
+              'localizationRadius': task.notificationLocalizationRadius,
+              'notificationOnEnter': task.notificationOnEnter,
+              'notificationOnExit': task.notificationOnExit,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
+        );
 
-      task.id = int.parse(response.body);
-      task.position = int.parse(response.body) + 1000.0;
+        task.id = int.parse(response.body);
+        task.position = int.parse(response.body) + 1000.0;
 
-      if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
-        task.endDate = null;
+        task = await TaskDatabase.create(task, this.userMail);
+
+        this.taskList.add(task);
+        this.addToLocalization(task);
+
+        notifyListeners();
+
+        return task.id;
+      } catch (error) {
+        print(error);
+        throw error;
       }
+    } else {
+      task = await TaskDatabase.create(task, this.userMail);
 
-      if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
-        task.startDate = null;
-      }
+      task.position = task.id + 1000.0;
+      await TaskDatabase.update(task, this.userMail);
 
       this.taskList.add(task);
-      this.addToLocalication(task);
+      this.addToLocalization(task);
 
       notifyListeners();
 
       return task.id;
-    } catch (error) {
-      print(error);
-      throw error;
     }
   }
 
   Future<void> updateTaskPosition(Task task, double newPosition) async {
     String url = this._serverUrl + 'task/updatePosition/${task.id}';
 
-    try {
-      await http.put(
-        url,
-        body: json.encode(
-          {
-            'position': newPosition,
+    task.position = newPosition;
+
+    if (task.localization == 'INBOX') {
+      this.sortByPosition(this._inboxTasks);
+    } else if (task.localization == 'ANYTIME') {
+      this.sortByPosition(this._anytimeTasks);
+    } else if (task.localization == 'SCHEDULED') {
+      this.sortByPosition(this._scheduledTasks);
+    }
+
+    await TaskDatabase.update(task, this.userMail);
+
+    notifyListeners();
+
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.put(
+          url,
+          body: json.encode(
+            {
+              'position': newPosition,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-
-      task.position = newPosition;
-
-      if (task.localization == 'INBOX') {
-        this.sortByPosition(this._inboxTasks);
-      } else if (task.localization == 'ANYTIME') {
-        this.sortByPosition(this._anytimeTasks);
-      } else if (task.localization == 'SCHEDULED') {
-        this.sortByPosition(this._scheduledTasks);
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
       }
-
-      notifyListeners();
-    } catch (error) {
-      print(error);
-      throw (error);
     }
   }
 
   Future<void> updateTask(Task task, String newLocation) async {
-    String url = this._serverUrl + 'task/update/${task.id}';
+    String url = this._serverUrl + 'task/update';
 
     if (task.localization != newLocation) {
       if (newLocation == 'ANYTIME' && this._anytimeTasks.length > 0) {
@@ -328,76 +354,66 @@ class TaskProvider with ChangeNotifier {
       Notifications.removeGeofence(task.id);
     }
 
-    if (task.startDate == null) {
-      task.startDate = DateTime.fromMicrosecondsSinceEpoch(0);
+    this.deleteFromLocalization(task);
+
+    task.localization = newLocation;
+
+    this.addToLocalization(task);
+
+    if (task.localization == 'INBOX') {
+      this.sortByPosition(this._inboxTasks);
+    } else if (task.localization == 'ANYTIME') {
+      this.sortByPosition(this._anytimeTasks);
+    } else if (task.localization == 'SCHEDULED') {
+      this.sortByPosition(this._scheduledTasks);
+    } else if (task.localization == 'DELEGATED') {
+      task.taskStatus = 'Sent';
+      this.sortByPosition(this._delegatedTasks);
     }
 
-    if (task.endDate == null) {
-      task.endDate = DateTime.fromMicrosecondsSinceEpoch(0);
-    }
+    await TaskDatabase.update(task, this.userMail);
 
-    try {
-      await http.put(
-        url,
-        body: json.encode(
-          {
-            'taskName': task.title,
-            'taskDescription': task.description,
-            'userEmail': this.userMail,
-            'startDate': task.startDate.toIso8601String(),
-            'endDate': task.endDate.toIso8601String(),
-            'ifDone': task.done,
-            'priority': task.priority,
-            'tags': task.tags.map((tag) => tag.toJson()).toList(),
-            'localization': newLocation,
-            'position': task.position,
-            'delegatedEmail': task.delegatedEmail,
-            'isCanceled': task.isCanceled,
-            'localizationId': task.notificationLocalizationId,
-            'localizationRadius': task.notificationLocalizationRadius,
-            'notificationOnEnter': task.notificationOnEnter,
-            'notificationOnExit': task.notificationOnExit,
+    notifyListeners();
+
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.put(
+          url,
+          body: json.encode(
+            {
+              'uuid': task.uuid,
+              'taskName': task.title,
+              'taskDescription': task.description,
+              'userEmail': this.userMail,
+              'startDate': task.startDate != null ? task.startDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
+              'endDate': task.endDate != null ? task.endDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
+              'ifDone': task.done,
+              'priority': task.priority,
+              'tags': task.tags.map((tag) => tag.toJson()).toList(),
+              'localization': newLocation,
+              'position': task.position,
+              'delegatedEmail': task.delegatedEmail,
+              'isCanceled': task.isCanceled,
+              'localizationId': task.notificationLocalizationId,
+              'localizationRadius': task.notificationLocalizationRadius,
+              'notificationOnEnter': task.notificationOnEnter,
+              'notificationOnExit': task.notificationOnExit,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-
-      if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
-        task.endDate = null;
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
       }
-
-      if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
-        task.startDate = null;
-      }
-
-      this.deleteFromLocalization(task);
-
-      task.localization = newLocation;
-
-      this.addToLocalication(task);
-
-      if (task.localization == 'INBOX') {
-        this.sortByPosition(this._inboxTasks);
-      } else if (task.localization == 'ANYTIME') {
-        this.sortByPosition(this._anytimeTasks);
-      } else if (task.localization == 'SCHEDULED') {
-        this.sortByPosition(this._scheduledTasks);
-      } else if (task.localization == 'DELEGATED') {
-        this.sortByPosition(this._delegatedTasks);
-      }
-
-      notifyListeners();
-    } catch (error) {
-      print(error);
-      throw (error);
     }
   }
 
   Future<void> updateTaskWithGeolocation(Task task, String newLocation, double longitude, double latitude) async {
-    String url = this._serverUrl + 'task/update/${task.id}';
+    String url = this._serverUrl + 'task/update';
 
     if (task.localization != newLocation) {
       if (newLocation == 'ANYTIME' && this._anytimeTasks.length > 0) {
@@ -411,221 +427,223 @@ class TaskProvider with ChangeNotifier {
       Notifications.removeGeofence(task.id);
     }
 
-    if (task.startDate == null) {
-      task.startDate = DateTime.fromMicrosecondsSinceEpoch(0);
+    this.deleteFromLocalization(task);
+
+    task.localization = newLocation;
+
+    this.addToLocalization(task);
+
+    if (task.localization == 'INBOX') {
+      this.sortByPosition(this._inboxTasks);
+    } else if (task.localization == 'ANYTIME') {
+      this.sortByPosition(this._anytimeTasks);
+    } else if (task.localization == 'SCHEDULED') {
+      this.sortByPosition(this._scheduledTasks);
+    } else if (task.localization == 'DELEGATED') {
+      task.taskStatus = 'Sent';
+      this.sortByPosition(this._delegatedTasks);
     }
 
-    if (task.endDate == null) {
-      task.endDate = DateTime.fromMicrosecondsSinceEpoch(0);
-    }
-
-    try {
-      await http.put(
-        url,
-        body: json.encode(
-          {
-            'taskName': task.title,
-            'taskDescription': task.description,
-            'userEmail': this.userMail,
-            'startDate': task.startDate.toIso8601String(),
-            'endDate': task.endDate.toIso8601String(),
-            'ifDone': task.done,
-            'priority': task.priority,
-            'tags': task.tags.map((tag) => tag.toJson()).toList(),
-            'localization': newLocation,
-            'position': task.position,
-            'delegatedEmail': task.delegatedEmail,
-            'isCanceled': task.isCanceled,
-            'localizationId': task.notificationLocalizationId,
-            'localizationRadius': task.notificationLocalizationRadius,
-            'notificationOnEnter': task.notificationOnEnter,
-            'notificationOnExit': task.notificationOnExit,
-          },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
+    if (newLocation != 'TRASH' && newLocation != 'COMPLETED') {
+      this.notificationChange(
+        task.id,
+        task.notificationLocalizationId,
+        task.notificationLocalizationRadius,
+        task.notificationOnExit,
+        task.notificationOnEnter,
+        latitude,
+        longitude,
+        task.title,
+        task.description,
       );
+    }
 
-      if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
-        task.endDate = null;
-      }
+    await TaskDatabase.update(task, this.userMail);
 
-      if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
-        task.startDate = null;
-      }
+    notifyListeners();
 
-      this.deleteFromLocalization(task);
-
-      task.localization = newLocation;
-
-      this.addToLocalication(task);
-
-      if (task.localization == 'INBOX') {
-        this.sortByPosition(this._inboxTasks);
-      } else if (task.localization == 'ANYTIME') {
-        this.sortByPosition(this._anytimeTasks);
-      } else if (task.localization == 'SCHEDULED') {
-        this.sortByPosition(this._scheduledTasks);
-      } else if (task.localization == 'DELEGATED') {
-        this.sortByPosition(this._delegatedTasks);
-      }
-
-      if (newLocation != 'TRASH' && newLocation != 'COMPLETED') {
-        this.notificationChange(
-          task.id,
-          task.notificationLocalizationId,
-          task.notificationLocalizationRadius,
-          task.notificationOnExit,
-          task.notificationOnEnter,
-          latitude,
-          longitude,
-          task.title,
-          task.description,
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.put(
+          url,
+          body: json.encode(
+            {
+              'uuid': task.uuid,
+              'taskName': task.title,
+              'taskDescription': task.description,
+              'userEmail': this.userMail,
+              'startDate': task.startDate != null ? task.startDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
+              'endDate': task.endDate != null ? task.endDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
+              'ifDone': task.done,
+              'priority': task.priority,
+              'tags': task.tags.map((tag) => tag.toJson()).toList(),
+              'localization': newLocation,
+              'position': task.position,
+              'delegatedEmail': task.delegatedEmail,
+              'isCanceled': task.isCanceled,
+              'localizationId': task.notificationLocalizationId,
+              'localizationRadius': task.notificationLocalizationRadius,
+              'notificationOnEnter': task.notificationOnEnter,
+              'notificationOnExit': task.notificationOnExit,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
         );
+      } catch (error) {
+        print(error);
+        throw (error);
       }
-
-      notifyListeners();
-    } catch (error) {
-      print(error);
-      throw (error);
     }
   }
 
   Future<void> fetchSingleTaskFull(int taskId) async {
-    String url = this._serverUrl + 'task/getSingleTaskFull/${this.userMail}/$taskId';
+    if (await InternetConnection.internetConnection()) {
+      String url = this._serverUrl + 'task/getSingleTaskFull/${this.userMail}/$taskId';
 
-    try {
-      final response = await http.get(url);
-      final responseBody = json.decode(utf8.decode(response.bodyBytes));
+      try {
+        final response = await http.get(url);
+        final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
-      List<Tag> taskTags = [];
-      String taskStatus;
-      String supervisorEmail;
+        List<Tag> taskTags = [];
+        String taskStatus;
+        String supervisorEmail;
 
-      for (var tagElement in responseBody['tags']) {
-        taskTags.add(Tag(
-          id: tagElement['id'],
-          name: tagElement['name'],
-        ));
+        for (var tagElement in responseBody['tags']) {
+          taskTags.add(Tag(
+            uuid: tagElement['uuid'],
+            id: tagElement['id'],
+            name: tagElement['name'],
+          ));
+        }
+
+        if (responseBody['supervisorEmail'] != null) {
+          supervisorEmail = responseBody['supervisorEmail'];
+        }
+
+        if (responseBody['tasks']['taskStatus'] != null) {
+          taskStatus = responseBody['tasks']['taskStatus'];
+        }
+
+        Task task = Task(
+            uuid: responseBody['tasks']['uuid'],
+            id: responseBody['tasks']['id'],
+            title: responseBody['tasks']['taskName'],
+            description: responseBody['tasks']['description'],
+            done: responseBody['tasks']['ifDone'],
+            priority: responseBody['tasks']['priority'],
+            endDate: responseBody['tasks']['endDate'] == null ? null : DateTime.tryParse(responseBody['tasks']['endDate']),
+            startDate: responseBody['tasks']['startDate'] == null ? null : DateTime.tryParse(responseBody['tasks']['startDate']),
+            tags: taskTags,
+            localization: responseBody['tasks']['taskList'],
+            position: responseBody['tasks']['position'],
+            delegatedEmail: responseBody['tasks']['delegatedEmail'],
+            isDelegated: responseBody['tasks']['isDelegated'],
+            taskStatus: taskStatus,
+            isCanceled: responseBody['tasks']['isCanceled'],
+            supervisorEmail: supervisorEmail,
+            childUuid: responseBody['childUuid'],
+            parentUuid: responseBody['parentUuid']);
+
+        if (responseBody['tasks']['notificationLocalization'] != null) {
+          task.notificationLocalizationId = responseBody['tasks']['notificationLocalization']['id'];
+          task.notificationLocalizationRadius = responseBody['tasks']['localizationRadius'];
+          task.notificationOnEnter = responseBody['tasks']['notificationOnEnter'];
+          task.notificationOnExit = responseBody['tasks']['notificationOnExit'];
+        } else {
+          task.notificationLocalizationId = null;
+        }
+
+        if (task.endDate != null && task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+          task.endDate = null;
+        }
+
+        if (task.startDate != null && task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+          task.startDate = null;
+        }
+
+        this.taskList.add(task);
+
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        throw (error);
       }
-
-      supervisorEmail = responseBody['supervisorEmail'];
-
-      if (responseBody['tasks']['taskStatus'] != null) {
-        taskStatus = responseBody['tasks']['taskStatus'];
-      }
-
-      Task task = Task(
-          id: responseBody['tasks']['id'],
-          title: responseBody['tasks']['taskName'],
-          description: responseBody['tasks']['description'],
-          done: responseBody['tasks']['ifDone'],
-          priority: responseBody['tasks']['priority'],
-          endDate: DateTime.parse(responseBody['tasks']['endDate']),
-          startDate: DateTime.parse(responseBody['tasks']['startDate']),
-          tags: taskTags,
-          localization: responseBody['tasks']['taskList'],
-          position: responseBody['tasks']['position'],
-          delegatedEmail: responseBody['tasks']['delegatedEmail'],
-          isDelegated: responseBody['tasks']['isDelegated'],
-          taskStatus: taskStatus,
-          isCanceled: responseBody['tasks']['isCanceled'],
-          supervisorEmail: supervisorEmail,
-          childId: responseBody['childId'],
-          parentId: responseBody['parentId']);
-
-      if (responseBody['tasks']['notificationLocalization'] != null) {
-        task.notificationLocalizationId = responseBody['tasks']['notificationLocalization']['id'];
-        task.notificationLocalizationRadius = responseBody['tasks']['localizationRadius'];
-        task.notificationOnEnter = responseBody['tasks']['notificationOnEnter'];
-        task.notificationOnExit = responseBody['tasks']['notificationOnExit'];
-      } else {
-        task.notificationLocalizationId = null;
-      }
-
-      if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
-        task.endDate = null;
-      }
-
-      if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
-        task.startDate = null;
-      }
-
-      this.taskList.add(task);
-
-      notifyListeners();
-    } catch (error) {
-      print(error);
-      throw (error);
     }
   }
 
   Future<void> fetchSingleTask(int taskId) async {
-    String url = this._serverUrl + 'task/getSingleTask/${this.userMail}/$taskId';
-    String supervisorEmail;
-    Task mockTask = Task(
-      id: -1,
-      title: 'Mock task',
-      description: 'Mock task desc',
-      done: false,
-      priority: 'HIGH',
-      endDate: DateTime.parse('2021-01-01'),
-      startDate: DateTime.parse('2021-01-01'),
-      supervisorEmail: 'mock@mock.com',
-    );
-    try {
-      final response = await http.get(url);
-      final responseBody = json.decode(utf8.decode(response.bodyBytes));
-
-      supervisorEmail = responseBody['ownerEmail'];
-
-      Task task = Task(
-        id: responseBody['taskId'],
-        title: responseBody['taskName'],
-        description: responseBody['description'],
-        priority: responseBody['priority'],
-        endDate: DateTime.parse(responseBody['endDate']),
-        startDate: DateTime.parse(responseBody['startDate']),
-        supervisorEmail: supervisorEmail,
+    if (await InternetConnection.internetConnection()) {
+      String url = this._serverUrl + 'task/getSingleTask/${this.userMail}/$taskId';
+      String supervisorEmail;
+      Task mockTask = Task(
+        uuid: '',
+        id: -1,
+        title: 'Mock task',
+        description: 'Mock task desc',
+        done: false,
+        priority: 'HIGH',
+        endDate: DateTime.parse('2021-01-01'),
+        startDate: DateTime.parse('2021-01-01'),
+        supervisorEmail: 'mock@mock.com',
       );
-      singleTask = task;
-      notifyListeners();
-    } catch (error) {
-      singleTask = mockTask;
-      notifyListeners();
-      print(error);
-      throw error;
+      try {
+        final response = await http.get(url);
+        final responseBody = json.decode(utf8.decode(response.bodyBytes));
+
+        supervisorEmail = responseBody['ownerEmail'];
+
+        Task task = Task(
+          uuid: responseBody['uuid'],
+          id: responseBody['taskId'],
+          title: responseBody['taskName'],
+          description: responseBody['description'],
+          priority: responseBody['priority'],
+          endDate: DateTime.parse(responseBody['endDate']),
+          startDate: DateTime.parse(responseBody['startDate']),
+          supervisorEmail: supervisorEmail,
+        );
+        singleTask = task;
+        notifyListeners();
+      } catch (error) {
+        singleTask = mockTask;
+        notifyListeners();
+        print(error);
+        throw error;
+      }
     }
   }
 
   Future<void> addGeofenceFromOtherDevice(Task task) async {
-    String url = this._serverUrl + 'localization/getCoordinates/${task.notificationLocalizationId}';
+    if (await InternetConnection.internetConnection()) {
+      String url = this._serverUrl + 'localization/getCoordinates/${task.uuid}';
 
-    double latitude;
-    double longitude;
+      double latitude;
+      double longitude;
 
-    try {
-      final response = await http.get(url);
-      final responseBody = json.decode(response.body);
+      try {
+        final response = await http.get(url);
+        final responseBody = json.decode(response.body);
 
-      latitude = responseBody['latitude'];
-      longitude = responseBody['longitude'];
+        latitude = responseBody['latitude'];
+        longitude = responseBody['longitude'];
 
-      Notifications.addGeofence(
-        task.id,
-        latitude,
-        longitude,
-        task.notificationLocalizationRadius,
-        task.notificationOnEnter,
-        task.notificationOnExit,
-        task.title,
-        task.description,
-      );
-    } catch (error) {
-      print(error);
-      throw (error);
+        Notifications.addGeofence(
+          task.id,
+          latitude,
+          longitude,
+          task.notificationLocalizationRadius,
+          task.notificationOnEnter,
+          task.notificationOnExit,
+          task.title,
+          task.description,
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 
@@ -638,32 +656,40 @@ class TaskProvider with ChangeNotifier {
       final response = await http.get(url);
       final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
-      for (var element in responseBody) {
+      await TaskDatabase.deleteAll(this.userMail);
+
+      for (final element in responseBody) {
         List<Tag> taskTags = [];
         String taskStatus;
         String supervisorEmail;
 
-        for (var tagElement in element['tags']) {
-          taskTags.add(Tag(
-            id: tagElement['id'],
-            name: tagElement['name'],
-          ));
+        if (element['tags'] != null) {
+          for (var tagElement in element['tags']) {
+            taskTags.add(Tag(
+              uuid: tagElement['uuid'],
+              id: tagElement['id'],
+              name: tagElement['name'],
+            ));
+          }
         }
 
-        supervisorEmail = element['supervisorEmail'];
+        if (element['tasks']['supervisorEmail'] != null) {
+          supervisorEmail = element['supervisorEmail'];
+        }
 
         if (element['tasks']['taskStatus'] != null) {
           taskStatus = element['tasks']['taskStatus'];
         }
 
         Task task = Task(
+            uuid: element['tasks']['uuid'],
             id: element['tasks']['id'],
             title: element['tasks']['taskName'],
             description: element['tasks']['description'],
             done: element['tasks']['ifDone'],
             priority: element['tasks']['priority'],
-            endDate: DateTime.parse(element['tasks']['endDate']),
-            startDate: DateTime.parse(element['tasks']['startDate']),
+            endDate: element['tasks']['endDate'] != null ? DateTime.tryParse(element['tasks']['endDate']) : null,
+            startDate: element['tasks']['endDate'] != null ? DateTime.tryParse(element['tasks']['startDate']) : null,
             tags: taskTags,
             localization: element['tasks']['taskList'],
             position: element['tasks']['position'],
@@ -672,8 +698,8 @@ class TaskProvider with ChangeNotifier {
             taskStatus: taskStatus,
             isCanceled: element['tasks']['isCanceled'],
             supervisorEmail: supervisorEmail,
-            childId: element['childId'],
-            parentId: element['parentId']);
+            childUuid: element['childUuid'],
+            parentUuid: element['parentUuid']);
 
         if (element['tasks']['notificationLocalization'] != null) {
           task.notificationLocalizationId = element['tasks']['notificationLocalization']['id'];
@@ -690,18 +716,20 @@ class TaskProvider with ChangeNotifier {
           this.addGeofenceFromOtherDevice(task);
         }
 
-        if (task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+        if (task.endDate != null && task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
           task.endDate = null;
         }
 
-        if (task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+        if (task.startDate != null && task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
           task.startDate = null;
         }
 
+        task = await TaskDatabase.create(task, this.userMail);
         loadedTasks.add(task);
       }
 
       this.taskList = loadedTasks;
+
       this.divideTasks();
 
       this.sortByPosition(this._anytimeTasks);
@@ -716,9 +744,27 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
-  Future<void> deleteAllTasks(String listName) async {
-    final url = this._serverUrl + 'task/deleteAllFromList';
+  Future<void> fetchTasksOffline(List<Tag> tags) async {
+    try {
+      this.taskList = await TaskDatabase.readAll(tags, this.userMail);
 
+      this.divideTasks();
+
+      this.sortByPosition(this._anytimeTasks);
+      this.sortByPosition(this._scheduledTasks);
+      this.sortByPosition(this._inboxTasks);
+      this.sortByPosition(this._delegatedTasks);
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
+  void notify() {
+    notifyListeners();
+  }
+
+  Future<void> deleteAllTasks(String listName) async {
     List<int> toDelete = [];
 
     if (listName == 'Completed') {
@@ -731,135 +777,139 @@ class TaskProvider with ChangeNotifier {
       });
     }
 
-    try {
-      await http.post(
-        url,
-        body: json.encode(
-          {
-            'tasks': toDelete,
+    if (listName == 'Completed') {
+      this._completedTasks = [];
+    } else if (listName == 'Trash') {
+      this._trashTasks = [];
+    }
+
+    await TaskDatabase.deleteAllFromList(listName.toUpperCase());
+
+    notifyListeners();
+
+    if (await InternetConnection.internetConnection()) {
+      final url = this._serverUrl + 'task/deleteAllFromList';
+
+      try {
+        await http.post(
+          url,
+          body: json.encode(
+            {
+              'tasks': toDelete,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-
-      if (listName == 'Completed') {
-        this._completedTasks = [];
-      } else if (listName == 'Trash') {
-        this._trashTasks = [];
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
       }
-
-      notifyListeners();
-    } catch (error) {
-      print(error);
-      throw (error);
     }
   }
 
-  Future<void> deleteTask(int id) async {
-    final url = this._serverUrl + 'task/delete/$id';
+  Future<void> deleteTask(String uuid, int id) async {
+    final url = this._serverUrl + 'task/delete/$uuid/$id';
 
-    var tmpProduct = this.taskList.firstWhere((element) => element.id == id);
+    Task tmpProduct = this.taskList.firstWhere((element) => element.uuid == uuid);
 
-    try {
-      await http.delete(url);
+    await TaskDatabase.delete(uuid);
 
-      this.deleteFromLocalization(tmpProduct);
-      this.taskList.removeWhere((element) => element.id == id);
+    this.deleteFromLocalization(tmpProduct);
+    this.taskList.removeWhere((element) => element.uuid == uuid);
 
-      tmpProduct = null;
+    tmpProduct = null;
 
-      notifyListeners();
-    } catch (error) {
-      print(error);
-      this.taskList.add(tmpProduct);
-      throw error;
+    notifyListeners();
+
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.delete(url);
+      } catch (error) {
+        print(error);
+        throw error;
+      }
     }
   }
 
   Future<void> toggleTaskStatus(Task task) async {
-    String url = this._serverUrl + 'task/done/${task.id}';
+    this.localizationTaskStatus(task);
 
-    try {
-      final response = await http.post(url);
+    if (await InternetConnection.internetConnection()) {
+      String url = this._serverUrl + 'task/done/${task.uuid}';
 
-      if (response != null && task.localization == 'DELEGATED') {
-        final newStatus = response.body;
-        this.updateTaskStatus(task.id, newStatus);
+      try {
+        final response = await http.post(url);
+
+        if (response != null && task.localization == 'DELEGATED') {
+          final newStatus = response.body;
+          this.updateTaskStatus(task.uuid, newStatus);
+        }
+
+        await TaskDatabase.update(task, this.userMail);
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        throw error;
       }
-
-      this.localizationTaskStatus(task);
-
+    } else {
+      await TaskDatabase.update(task, this.userMail);
       notifyListeners();
-    } catch (error) {
-      print(error);
-
-      this.taskList[task.id - 1] = task;
-      throw error;
     }
   }
 
   Future<void> toggleTaskStatusWithGeolocation(Task task, double latitude, double longitude) async {
-    String url = this._serverUrl + 'task/done/${task.id}';
+    this.localizationTaskStatus(task);
 
-    try {
-      final response = await http.post(url);
+    if (task.done) {
+      Notifications.removeGeofence(task.id);
+    } else {
+      Notifications.addGeofence(
+        task.id,
+        latitude,
+        longitude,
+        task.notificationLocalizationRadius,
+        task.notificationOnEnter,
+        task.notificationOnExit,
+        task.title,
+        task.description,
+      );
+    }
 
-      if (response != null && task.localization == 'DELEGATED') {
-        final newStatus = response.body;
-        this.updateTaskStatus(task.id, newStatus);
+    if (await InternetConnection.internetConnection()) {
+      String url = this._serverUrl + 'task/done/${task.uuid}';
+
+      try {
+        final response = await http.post(url);
+
+        if (response != null && task.localization == 'DELEGATED') {
+          final newStatus = response.body;
+          this.updateTaskStatus(task.uuid, newStatus);
+        }
+        await TaskDatabase.update(task, this.userMail);
+
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        throw error;
       }
-
-      this.localizationTaskStatus(task);
-
-      if (task.done) {
-        Notifications.removeGeofence(task.id);
-      } else {
-        Notifications.addGeofence(
-          task.id,
-          latitude,
-          longitude,
-          task.notificationLocalizationRadius,
-          task.notificationOnEnter,
-          task.notificationOnExit,
-          task.title,
-          task.description,
-        );
-      }
+    } else {
+      await TaskDatabase.update(task, this.userMail);
 
       notifyListeners();
-    } catch (error) {
-      print(error);
-
-      this.taskList[task.id - 1] = task;
-      throw error;
     }
   }
 
   Future<void> getPriorities() async {
-    this.taskPriorities = [];
-    String url = this._serverUrl + 'task/priorities';
+    this.taskPriorities = ['LOW', 'NORMAL', 'HIGH', 'HIGHER', 'CRITICAL'];
 
-    try {
-      final response = await http.get(url);
-
-      final responseBody = json.decode(response.body);
-
-      for (var element in responseBody) {
-        this.taskPriorities.add(element.toString());
-      }
-
-      notifyListeners();
-    } catch (error) {
-      print(error);
-      throw error;
-    }
+    notifyListeners();
   }
 
-  void updateTaskStatus(int id, String newStatus) {
-    this._delegatedTasks.firstWhere((element) => element.id == id).taskStatus = newStatus;
+  void updateTaskStatus(String uuid, String newStatus) {
+    this._delegatedTasks.firstWhere((element) => element.uuid == uuid).taskStatus = newStatus;
   }
 
   void localizationTaskStatus(Task task) {
@@ -878,7 +928,7 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
-  void addToLocalication(Task task) {
+  void addToLocalization(Task task) {
     if (task.localization == 'INBOX') {
       this._inboxTasks.add(task);
     } else if (task.localization == 'ANYTIME') {
@@ -937,7 +987,14 @@ class TaskProvider with ChangeNotifier {
 
   void clearTagFromTasks(String tagName) {
     this._inboxTasks.forEach((task) {
-      task.tags.removeWhere((tag) => tag.name == tagName);
+      task.tags.removeWhere((tag) {
+        if (tag.name == tagName) {
+          TaskDatabase.update(task, this.userMail);
+
+          return true;
+        }
+        return false;
+      });
     });
     this._anytimeTasks.forEach((task) {
       task.tags.removeWhere((tag) => tag.name == tagName);
@@ -960,27 +1017,36 @@ class TaskProvider with ChangeNotifier {
 
   void editTag(String oldName, String newName) {
     this._inboxTasks.forEach((task) {
-      task.tags.forEach((tag) {
-        if (tag.name == oldName) {
-          tag.name = newName;
-        }
-      });
+      if (task.tags != null) {
+        task.tags.forEach((tag) async {
+          if (tag.name == oldName) {
+            tag.name = newName;
+            await TaskDatabase.update(task, this.userMail);
+          }
+        });
+      }
     });
 
     this._anytimeTasks.forEach((task) {
-      task.tags.forEach((tag) {
-        if (tag.name == oldName) {
-          tag.name = newName;
-        }
-      });
+      if (task.tags != null) {
+        task.tags.forEach((tag) async {
+          if (tag.name == oldName) {
+            tag.name = newName;
+            await TaskDatabase.update(task, this.userMail);
+          }
+        });
+      }
     });
 
     this._scheduledTasks.forEach((task) {
-      task.tags.forEach((tag) {
-        if (tag.name == oldName) {
-          tag.name = newName;
-        }
-      });
+      if (task.tags != null) {
+        task.tags.forEach((tag) async {
+          if (tag.name == oldName) {
+            tag.name = newName;
+            await TaskDatabase.update(task, this.userMail);
+          }
+        });
+      }
     });
 
     notifyListeners();
@@ -1010,8 +1076,8 @@ class TaskProvider with ChangeNotifier {
       (element) {
         element.delegatedEmail = null;
         element.supervisorEmail = null;
-        element.childId = null;
-        element.parentId = null;
+        element.childUuid = null;
+        element.parentUuid = null;
 
         String newLocation;
 
@@ -1043,19 +1109,29 @@ class TaskProvider with ChangeNotifier {
     return this
         ._scheduledTasks
         .where((element) => (element.startDate != null &&
-            (element.startDate.difference(DateTime.now()).inDays < 0 || (element.startDate.difference(DateTime.now()).inDays == 0 && (element.startDate.day < DateTime.now().day || element.startDate.month < DateTime.now().month)))))
+            (element.startDate.difference(DateTime.now()).inDays < 0 ||
+                (element.startDate.difference(DateTime.now()).inDays == 0 &&
+                    ((element.startDate.month < DateTime.now().month) ||
+                        (element.startDate.day < DateTime.now().day && element.startDate.month <= DateTime.now().month))))))
         .toList();
   }
 
   List<Task> tasksToday() {
-    return this._scheduledTasks.where((element) => (element.startDate != null && element.startDate.difference(DateTime.now()).inDays == 0 && element.startDate.day == DateTime.now().day)).toList();
+    return this
+        ._scheduledTasks
+        .where(
+            (element) => (element.startDate != null && element.startDate.difference(DateTime.now()).inDays == 0 && element.startDate.day == DateTime.now().day))
+        .toList();
   }
 
   List<Task> taskAfterToday() {
     return this
         ._scheduledTasks
         .where((element) => (element.startDate != null &&
-            (element.startDate.difference(DateTime.now()).inDays > 0 || (element.startDate.difference(DateTime.now()).inDays == 0 && (element.startDate.day > DateTime.now().day || element.startDate.month > DateTime.now().month)))))
+            (element.startDate.difference(DateTime.now()).inDays > 0 ||
+                (element.startDate.difference(DateTime.now()).inDays == 0 &&
+                    ((element.startDate.month > DateTime.now().month) ||
+                        (element.startDate.day > DateTime.now().day && element.startDate.month >= DateTime.now().month))))))
         .toList();
   }
 
@@ -1072,7 +1148,10 @@ class TaskProvider with ChangeNotifier {
   }
 
   List<Task> filterCollaboratorEmail(List<Task> listToFilter, List<String> filterEmails) {
-    return [...listToFilter.where((element) => ((element.delegatedEmail != null && filterEmails.contains(element.delegatedEmail)) || (element.supervisorEmail != null && filterEmails.contains(element.supervisorEmail))))];
+    return [
+      ...listToFilter.where((element) => ((element.delegatedEmail != null && filterEmails.contains(element.delegatedEmail)) ||
+          (element.supervisorEmail != null && filterEmails.contains(element.supervisorEmail))))
+    ];
   }
 
   List<Task> filterPriority(List<Task> listToFilter, List<String> filterPriorities) {

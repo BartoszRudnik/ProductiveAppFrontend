@@ -21,24 +21,16 @@ class _GrantAccessListTileState extends State<GrantAccessListTile> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? Theme.of(context).floatingActionButtonTheme.backgroundColor
-            : Theme.of(context).primaryColor,
+        color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).floatingActionButtonTheme.backgroundColor : Theme.of(context).primaryColor,
         border: Border.all(
           color: Theme.of(context).primaryColor,
         ),
       ),
       child: SwitchListTile(
-        tileColor: Theme.of(context).brightness == Brightness.dark
-            ? Theme.of(context).primaryColorDark
-            : Colors.black,
-        activeColor: Theme.of(context).brightness == Brightness.dark
-            ? Theme.of(context).primaryColor
-            : Theme.of(context).primaryColorDark,
+        tileColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColorDark : Colors.black,
+        activeColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColor : Theme.of(context).primaryColorDark,
         inactiveTrackColor: Theme.of(context).primaryColorLight,
-        activeTrackColor: Theme.of(context).brightness == Brightness.dark
-            ? Theme.of(context).primaryColor
-            : Theme.of(context).accentColor,
+        activeTrackColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColor : Theme.of(context).accentColor,
         title: Text(
           AppLocalizations.of(context).grantActivityAccess,
           style: TextStyle(color: Colors.white),
@@ -48,8 +40,7 @@ class _GrantAccessListTileState extends State<GrantAccessListTile> {
           setState(
             () {
               this.widget.grantAccess = value;
-              Provider.of<DelegateProvider>(context, listen: false)
-                  .changePermission(this.widget.email);
+              Provider.of<DelegateProvider>(context, listen: false).changePermission(this.widget.email);
             },
           );
         },

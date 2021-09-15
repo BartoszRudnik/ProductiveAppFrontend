@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
+import 'package:productive_app/config/images.dart';
 import 'package:productive_app/provider/locale_provider.dart';
 import 'package:provider/provider.dart';
+
 import '../model/collaborator.dart';
 import '../model/collaboratorTask.dart';
 import '../provider/delegate_provider.dart';
@@ -32,12 +34,12 @@ class _RecentTasksState extends State<RecentTasks> {
 
   @override
   void initState() {
+    super.initState();
     this._fetchAllTasksNumber();
 
     this._pagingController.addPageRequestListener((pageKey) {
       this._fetchPage(pageKey);
     });
-    super.initState();
   }
 
   @override
@@ -117,7 +119,9 @@ class _RecentTasksState extends State<RecentTasks> {
       final recentTasks = this._recentTasks;
 
       for (var i = 0; i < recentTasks.length; i++) {
-        if (recentTasks[i].lastUpdated.day == weekDay.day && recentTasks[i].lastUpdated.month == weekDay.month && recentTasks[i].lastUpdated.year == weekDay.year) {
+        if (recentTasks[i].lastUpdated.day == weekDay.day &&
+            recentTasks[i].lastUpdated.month == weekDay.month &&
+            recentTasks[i].lastUpdated.year == weekDay.year) {
           dayTotalTasks += 1;
         }
       }
@@ -157,6 +161,20 @@ class _RecentTasksState extends State<RecentTasks> {
                         builderDelegate: PagedChildBuilderDelegate<CollaboratorTask>(
                           itemBuilder: (context, task, index) => SingleCollaboratorTask(task: task),
                           firstPageProgressIndicatorBuilder: (_) => ListShimmer(),
+                          firstPageErrorIndicatorBuilder: (_) => Container(
+                            child: Column(
+                              children: [
+                                Container(
+                                  height: MediaQuery.of(context).size.height * 0.3,
+                                  child: Image.asset(
+                                    Images.noInternet,
+                                    fit: BoxFit.fitHeight,
+                                  ),
+                                ),
+                                Text('No internet connection, try again later.')
+                              ],
+                            ),
+                          ),
                           noItemsFoundIndicatorBuilder: (_) => Container(
                             child: Center(
                               child: Text(AppLocalizations.of(context).emptyList),
