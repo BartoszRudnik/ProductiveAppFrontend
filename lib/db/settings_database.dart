@@ -59,7 +59,7 @@ class SettingsDatabase {
       Map settingsMap = settings.toJson();
       settingsMap['userMail'] = userMail;
 
-      db.insert(tableSettings, settingsMap);
+      await db.insert(tableSettings, settingsMap);
     }
   }
 }
