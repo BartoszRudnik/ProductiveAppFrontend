@@ -15,15 +15,20 @@ class FilterTagsDialog extends StatelessWidget {
     @required this.alreadyChoosenTags,
   });
 
+  List<String> extra = [];
+
   @override
   Widget build(BuildContext context) {
     List<Tag> tags = Provider.of<TagProvider>(context).tags;
     List<Tag> filteredTags = List<Tag>.from(tags);
     List<String> newTags = List<String>.from(this.alreadyChoosenTags);
 
+    newTags.addAll(this.extra);
+    this.extra = [];
+
     filteredTags.forEach(
       (element) {
-        if (this.alreadyChoosenTags != null && this.alreadyChoosenTags.contains(element.name)) {
+        if (newTags != null && newTags.contains(element.name)) {
           element.isSelected = true;
         } else {
           element.isSelected = false;
@@ -61,13 +66,13 @@ class FilterTagsDialog extends StatelessWidget {
                         if (alreadyExists.isEmpty) {
                           try {
                             final uuid = Uuid();
-                            await Provider.of<TagProvider>(context, listen: false).addTag(
-                              Tag(
-                                id: tags.length + 1,
-                                name: value,
-                                uuid: uuid.v1(),
-                              ),
+                            final newTag = Tag(
+                              id: tags.length + 1,
+                              name: value,
+                              uuid: uuid.v1(),
                             );
+                            this.extra.add(newTag.name);
+                            await Provider.of<TagProvider>(context, listen: false).addTag(newTag);
                           } catch (error) {
                             print(error);
                           }
