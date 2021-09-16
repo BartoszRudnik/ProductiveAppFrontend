@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:productive_app/provider/attachment_provider.dart';
 import 'package:productive_app/provider/location_provider.dart';
 import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:productive_app/provider/task_provider.dart';
@@ -59,7 +60,7 @@ class ReceivedCollaborator extends StatelessWidget {
         ),
       ),
       // ignore: missing_return
-      confirmDismiss: (direction) {
+      confirmDismiss: (direction) async {
         if (direction == DismissDirection.endToStart) {
           return showDialog(
             context: context,
@@ -116,7 +117,9 @@ class ReceivedCollaborator extends StatelessWidget {
             ),
           );
         } else {
-          Provider.of<DelegateProvider>(context, listen: false).acceptInvitation(this.collaborator.uuid);
+          final tasks = await Provider.of<TaskProvider>(context, listen: false).getTasksFromCollaborator(this.collaborator.email);
+          await Provider.of<AttachmentProvider>(context, listen: false).getDelegatedAttachmentsFromSingleUser(tasks);
+          await Provider.of<DelegateProvider>(context, listen: false).acceptInvitation(this.collaborator.uuid);
         }
       },
       child: CollaboratorListElement(

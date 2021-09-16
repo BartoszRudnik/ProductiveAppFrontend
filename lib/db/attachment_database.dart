@@ -17,6 +17,7 @@ class AttachmentDatabase {
 
     final result = await db.query(
       tableAttachment,
+      columns: AttachmentFields.values,
       where: 'userMail = ?',
       whereArgs: [userMail],
     );
@@ -105,8 +106,8 @@ class AttachmentDatabase {
     Map map = attachment.toJson();
     map['userMail'] = userMail;
 
-    if (attachment.id != null && read(attachment.id) != null) {
-      update(attachment, userMail);
+    if (attachment.id != null && await read(attachment.id) != null) {
+      await update(attachment, userMail);
       return attachment;
     } else {
       final id = await db.insert(tableAttachment, map);

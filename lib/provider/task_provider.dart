@@ -765,15 +765,15 @@ class TaskProvider with ChangeNotifier {
   }
 
   Future<void> deleteAllTasks(String listName) async {
-    List<int> toDelete = [];
+    List<String> toDelete = [];
 
     if (listName == 'Completed') {
       this._completedTasks.forEach((element) {
-        toDelete.add(element.id);
+        toDelete.add(element.uuid);
       });
     } else if (listName == 'Trash') {
       this._trashTasks.forEach((element) {
-        toDelete.add(element.id);
+        toDelete.add(element.uuid);
       });
     }
 
@@ -899,6 +899,114 @@ class TaskProvider with ChangeNotifier {
       await TaskDatabase.update(task, this.userMail);
 
       notifyListeners();
+    }
+  }
+
+  Future<List<String>> getTasksFromCollaborator(String collaboratorMail) async {
+    if (await InternetConnection.internetConnection()) {
+      List<String> tasksUuid = [];
+
+      final url = this._serverUrl + 'task/fromCollaborator/${this.userMail}/$collaboratorMail';
+
+      try {
+        final response = await http.get(url);
+
+        final responseBody = json.decode(utf8.decode(response.bodyBytes));
+
+        print(responseBody);
+
+        for (final element in responseBody) {
+          List<Tag> taskTags = [];
+          String taskStatus;
+          String supervisorEmail;
+
+          if (element['tags'] != null) {
+            for (var tagElement in element['tags']) {
+              taskTags.add(Tag(
+                uuid: tagElement['uuid'],
+                id: tagElement['id'],
+                name: tagElement['name'],
+              ));
+            }
+          }
+
+          if (element['tasks']['supervisorEmail'] != null) {
+            supervisorEmail = element['supervisorEmail'];
+          }
+
+          if (element['tasks']['taskStatus'] != null) {
+            taskStatus = element['tasks']['taskStatus'];
+          }
+
+          Task task = Task(
+              uuid: element['tasks']['uuid'],
+              id: element['tasks']['id'],
+              title: element['tasks']['taskName'],
+              description: element['tasks']['description'],
+              done: element['tasks']['ifDone'],
+              priority: element['tasks']['priority'],
+              endDate: element['tasks']['endDate'] != null ? DateTime.tryParse(element['tasks']['endDate']) : null,
+              startDate: element['tasks']['endDate'] != null ? DateTime.tryParse(element['tasks']['startDate']) : null,
+              tags: taskTags,
+              localization: element['tasks']['taskList'],
+              position: element['tasks']['position'],
+              delegatedEmail: element['tasks']['delegatedEmail'],
+              isDelegated: element['tasks']['isDelegated'],
+              taskStatus: taskStatus,
+              isCanceled: element['tasks']['isCanceled'],
+              supervisorEmail: supervisorEmail,
+              childUuid: element['childUuid'],
+              parentUuid: element['parentUuid']);
+
+          if (element['tasks']['notificationLocalization'] != null) {
+            task.notificationLocalizationId = element['tasks']['notificationLocalization']['id'];
+            task.notificationLocalizationRadius = element['tasks']['localizationRadius'];
+            task.notificationOnEnter = element['tasks']['notificationOnEnter'];
+            task.notificationOnExit = element['tasks']['notificationOnExit'];
+          } else {
+            task.notificationLocalizationId = null;
+          }
+
+          final notificationExists = await Notifications.checkIfGeofenceExists(task.id);
+
+          if (task.localization != 'COMPLETED' &&
+              task.localization != 'TRASH' &&
+              !task.done &&
+              task.notificationLocalizationId != null &&
+              !notificationExists) {
+            this.addGeofenceFromOtherDevice(task);
+          }
+
+          if (task.endDate != null && task.endDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+            task.endDate = null;
+          }
+
+          if (task.startDate != null && task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
+            task.startDate = null;
+          }
+
+          task = await TaskDatabase.create(task, this.userMail);
+          this.taskList.add(task);
+
+          tasksUuid.add(task.parentUuid);
+        }
+
+        this.divideTasks();
+
+        this.sortByPosition(this._anytimeTasks);
+        this.sortByPosition(this._scheduledTasks);
+        this.sortByPosition(this._inboxTasks);
+        this.sortByPosition(this._delegatedTasks);
+
+        notifyListeners();
+
+        return tasksUuid;
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
+    } else {
+      return [];
     }
   }
 
