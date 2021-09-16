@@ -902,9 +902,10 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
-  Future<void> getTasksFromCollaborator(String collaboratorMail) async {
-    print('fetching');
+  Future<List<String>> getTasksFromCollaborator(String collaboratorMail) async {
     if (await InternetConnection.internetConnection()) {
+      List<String> tasksUuid = [];
+
       final url = this._serverUrl + 'task/fromCollaborator/${this.userMail}/$collaboratorMail';
 
       try {
@@ -986,6 +987,8 @@ class TaskProvider with ChangeNotifier {
 
           task = await TaskDatabase.create(task, this.userMail);
           this.taskList.add(task);
+
+          tasksUuid.add(task.parentUuid);
         }
 
         this.divideTasks();
@@ -996,10 +999,14 @@ class TaskProvider with ChangeNotifier {
         this.sortByPosition(this._delegatedTasks);
 
         notifyListeners();
+
+        return tasksUuid;
       } catch (error) {
         print(error);
         throw (error);
       }
+    } else {
+      return [];
     }
   }
 

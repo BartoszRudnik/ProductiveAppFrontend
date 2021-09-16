@@ -28,6 +28,7 @@ class _AttachmentDialogState extends State<AttachmentDialog> {
           fontSize: 24,
         ),
       ),
+      actionsAlignment: MainAxisAlignment.spaceEvenly,
       actions: [
         ElevatedButton(
           onPressed: () async {

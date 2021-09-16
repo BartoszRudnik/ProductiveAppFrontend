@@ -64,7 +64,27 @@ class AttachmentProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getDelegatedAttachments(List<String> delegatedTasksUuid) async {
+  Future<void> getDelegatedAttachmentsFromSingleUser(List<String> delegatedTasksUuid) async {
+    final attachments = await this.getDelegatedAttachments(delegatedTasksUuid);
+
+    if (attachments.length > 0) {
+      this.delegatedAttachments.addAll(attachments);
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> getAllDelegatedAttachments(List<String> delegatedTasksUuid) async {
+    final attachments = await this.getDelegatedAttachments(delegatedTasksUuid);
+
+    if (attachments.length > 0) {
+      this.delegatedAttachments = attachments;
+    }
+
+    notifyListeners();
+  }
+
+  Future<List<Attachment>> getDelegatedAttachments(List<String> delegatedTasksUuid) async {
     if (await InternetConnection.internetConnection()) {
       final finalUrl = this._serverUrl + 'attachment/getDelegatedAttachments';
 
@@ -104,15 +124,13 @@ class AttachmentProvider with ChangeNotifier {
           loadedAttachments.add(newAttachment);
         }
 
-        if (loadedAttachments.length > 0) {
-          this.delegatedAttachments = loadedAttachments;
-        }
-
-        notifyListeners();
+        return loadedAttachments;
       } catch (error) {
         print(error);
         throw (error);
       }
+    } else {
+      return [];
     }
   }
 

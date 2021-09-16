@@ -143,7 +143,7 @@ class Data {
         delegatedTasksId.add(task.parentUuid);
       });
 
-      await Provider.of<AttachmentProvider>(context, listen: false).getDelegatedAttachments(delegatedTasksId);
+      await Provider.of<AttachmentProvider>(context, listen: false).getAllDelegatedAttachments(delegatedTasksId);
     }
   }
 }
