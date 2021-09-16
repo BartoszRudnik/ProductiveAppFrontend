@@ -192,25 +192,15 @@ class AttachmentProvider with ChangeNotifier {
         final attachmentBytes = await attachment.readAsBytes();
         final uuid = Uuid();
 
-        Attachment newAttachment = Attachment(
-          uuid: uuid.v1(),
-          taskUuid: taskUuid,
-          fileName: basename(attachment.path),
-          localFile: attachmentBytes,
-        );
-
-        newAttachment = await AttachmentDatabase.create(newAttachment, this.userMail);
-
-        this.attachments.add(newAttachment);
-
-        if (editMode) {
-          this.notSavedAttachments.add(newAttachment);
-        }
-
-        notifyListeners();
-
         if (await InternetConnection.internetConnection()) {
           try {
+            Attachment newAttachment = Attachment(
+              uuid: uuid.v1(),
+              taskUuid: taskUuid,
+              fileName: basename(attachment.path),
+              localFile: attachmentBytes,
+            );
+
             final fileName = basename(attachment.path);
             final uri = Uri.parse(this._serverUrl + 'attachment/addAttachment/${this.userMail}/$taskUuid/$fileName/${newAttachment.uuid}');
 
@@ -222,16 +212,37 @@ class AttachmentProvider with ChangeNotifier {
             final response = await request.send();
             final respStr = await response.stream.bytesToString();
 
-            if (newAttachment.id != int.parse(respStr)) {
-              await AttachmentDatabase.updateId(newAttachment.id, int.parse(respStr));
+            newAttachment.id = int.parse(respStr);
+            newAttachment = await AttachmentDatabase.create(newAttachment, this.userMail);
 
-              newAttachment.id = int.parse(respStr);
-              notifyListeners();
+            this.attachments.add(newAttachment);
+
+            if (editMode) {
+              this.notSavedAttachments.add(newAttachment);
             }
+
+            notifyListeners();
           } catch (error) {
             print(error);
             throw (error);
           }
+        } else {
+          Attachment newAttachment = Attachment(
+            uuid: uuid.v1(),
+            taskUuid: taskUuid,
+            fileName: basename(attachment.path),
+            localFile: attachmentBytes,
+          );
+
+          newAttachment = await AttachmentDatabase.create(newAttachment, this.userMail);
+
+          this.attachments.add(newAttachment);
+
+          if (editMode) {
+            this.notSavedAttachments.add(newAttachment);
+          }
+
+          notifyListeners();
         }
       },
     );

@@ -56,6 +56,10 @@ class Data {
         AttachmentDatabase.readAll(userEmail).then((value) => attachments = value),
       ]);
 
+      attachments.forEach((element) {
+        print(element.toJson());
+      });
+
       await TaskDatabase.readAll(tags, userEmail).then((value) => tasks = value);
 
       await Future.wait([

@@ -59,7 +59,7 @@ class ReceivedCollaborator extends StatelessWidget {
         ),
       ),
       // ignore: missing_return
-      confirmDismiss: (direction) {
+      confirmDismiss: (direction) async {
         if (direction == DismissDirection.endToStart) {
           return showDialog(
             context: context,
@@ -116,7 +116,8 @@ class ReceivedCollaborator extends StatelessWidget {
             ),
           );
         } else {
-          Provider.of<DelegateProvider>(context, listen: false).acceptInvitation(this.collaborator.uuid);
+          await Provider.of<TaskProvider>(context, listen: false).getTasksFromCollaborator(this.collaborator.email);
+          await Provider.of<DelegateProvider>(context, listen: false).acceptInvitation(this.collaborator.uuid);
         }
       },
       child: CollaboratorListElement(
