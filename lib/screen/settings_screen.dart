@@ -15,7 +15,7 @@ import '../widget/settings_manage_account.dart';
 import '../widget/settings_user_avatar.dart';
 
 class SettingsScreen extends StatefulWidget {
-  static const routeName = "/collaborators";
+  static const routeName = "/settings";
 
   @override
   _SettingsScreenState createState() => _SettingsScreenState();
