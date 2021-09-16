@@ -53,8 +53,7 @@ class DelegateDialog extends StatelessWidget {
                     child: TextFormField(
                       onChanged: (value) {
                         setState(() {
-                          filteredCollaborators =
-                              collaborators.where((element) => element.email.toLowerCase().contains(value.toLowerCase())).toList();
+                          filteredCollaborators = collaborators.where((element) => element.email.toLowerCase().contains(value.toLowerCase())).toList();
                         });
                       },
                       validator: (value) {
@@ -70,7 +69,13 @@ class DelegateDialog extends StatelessWidget {
                         final alreadyExists = collaborators.where((element) => element.email == value);
                         if (alreadyExists.isEmpty) {
                           try {
-                            await Provider.of<DelegateProvider>(context, listen: false).addCollaborator(value);
+                            final newColab = await Provider.of<DelegateProvider>(context, listen: false).addCollaborator(value);
+
+                            setState(() {
+                              this.choosenCollaborator = newColab;
+                              this.choosenCollaborator.isSelected = true;
+                              this.choosenMail = newColab.email;
+                            });
                           } catch (error) {
                             return showDialog(
                               context: context,
@@ -165,8 +170,7 @@ class DelegateDialog extends StatelessWidget {
                                 child: FadeInImage(
                                   image: NetworkImage(this._serverUrl + 'userImage/getImage/${filteredCollaborators[collaboratorIndex].email}'),
                                   placeholder: AssetImage('assets/images/profile_placeholder.jpg'),
-                                  imageErrorBuilder: (ctx, error, stackTrace) =>
-                                      Image.asset('assets/images/profile_placeholder.jpg', fit: BoxFit.fitWidth),
+                                  imageErrorBuilder: (ctx, error, stackTrace) => Image.asset('assets/images/profile_placeholder.jpg', fit: BoxFit.fitWidth),
                                 ),
                               ),
                               title: Text(
@@ -174,9 +178,7 @@ class DelegateDialog extends StatelessWidget {
                                     ? filteredCollaborators[collaboratorIndex].collaboratorName
                                     : filteredCollaborators[collaboratorIndex].email,
                                 style: TextStyle(
-                                  color: filteredCollaborators[collaboratorIndex].isSelected
-                                      ? Theme.of(context).accentColor
-                                      : Theme.of(context).primaryColor,
+                                  color: filteredCollaborators[collaboratorIndex].isSelected ? Theme.of(context).accentColor : Theme.of(context).primaryColor,
                                 ),
                               ),
                             ),

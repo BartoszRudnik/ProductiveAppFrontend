@@ -473,7 +473,7 @@ class DelegateProvider with ChangeNotifier {
     return false;
   }
 
-  Future<void> addCollaborator(String newCollaborator) async {
+  Future<Collaborator> addCollaborator(String newCollaborator) async {
     if (await InternetConnection.internetConnection()) {
       final requestUrl = this._serverUrl + 'delegate/addCollaborator';
 
@@ -511,16 +511,20 @@ class DelegateProvider with ChangeNotifier {
           collaboratorName: '',
         );
 
+        collaborator = await CollaboratorDatabase.create(collaborator, this.userEmail);
+
         this.collaborators.insert(0, collaborator);
         this._send.insert(0, collaborator);
 
-        await CollaboratorDatabase.create(collaborator, this.userEmail);
-
         notifyListeners();
+
+        return collaborator;
       } catch (error) {
         print(error);
         throw (error);
       }
+    } else {
+      return null;
     }
   }
 
