@@ -83,10 +83,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
   }
 
   bool differentNotification(Task newTask, Task oldTask) {
-    if (newTask.notificationLocalizationId != null && oldTask.notificationLocalizationId == null) {
+    if (newTask.notificationLocalizationUuid != null && oldTask.notificationLocalizationUuid == null) {
       return true;
-    } else if (newTask.notificationLocalizationId != null && oldTask.notificationLocalizationId != null) {
-      if (newTask.notificationLocalizationId != oldTask.notificationLocalizationId ||
+    } else if (newTask.notificationLocalizationUuid != null && oldTask.notificationLocalizationUuid != null) {
+      if (newTask.notificationLocalizationUuid != oldTask.notificationLocalizationUuid ||
           newTask.notificationLocalizationRadius != oldTask.notificationLocalizationRadius ||
           newTask.notificationOnEnter != oldTask.notificationOnEnter ||
           newTask.notificationOnExit != oldTask.notificationOnExit) {
@@ -185,12 +185,12 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       taskToEdit.localization = originalTask.localization;
 
       if (taskToEdit.done != originalTask.done) {
-        if (taskToEdit.notificationLocalizationId != null) {
+        if (taskToEdit.notificationLocalizationUuid != null) {
           if (taskToEdit.done) {
             Notifications.removeGeofence(taskToEdit.id);
           } else {
-            double latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(taskToEdit.notificationLocalizationId);
-            double longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(taskToEdit.notificationLocalizationId);
+            double latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(taskToEdit.notificationLocalizationUuid);
+            double longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(taskToEdit.notificationLocalizationUuid);
 
             Notifications.addGeofence(
               taskToEdit.id,
@@ -207,8 +207,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
 
         await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, newLocalization);
       } else if (this.differentNotification(taskToEdit, originalTask)) {
-        final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(taskToEdit.notificationLocalizationId);
-        final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(taskToEdit.notificationLocalizationId);
+        final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(taskToEdit.notificationLocalizationUuid);
+        final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(taskToEdit.notificationLocalizationUuid);
 
         await Provider.of<TaskProvider>(context, listen: false).updateTaskWithGeolocation(taskToEdit, newLocalization, longitude, latitude);
       } else {
@@ -260,7 +260,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
   void setNotificationLocalization(TaskLocation taskLocation) {
     setState(() {
       if (taskLocation != null && taskLocation.location != null) {
-        this.taskToEdit.notificationLocalizationId = taskLocation.location.id;
+        this.taskToEdit.notificationLocalizationUuid = taskLocation.location.uuid;
         this.taskToEdit.notificationLocalizationRadius = taskLocation.notificationRadius;
         this.taskToEdit.notificationOnEnter = taskLocation.notificationOnEnter;
         this.taskToEdit.notificationOnExit = taskLocation.notificationOnExit;
@@ -272,7 +272,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
 
   void deleteNotificationLocalization() {
     setState(() {
-      this.taskToEdit.notificationLocalizationId = null;
+      this.taskToEdit.notificationLocalizationUuid = null;
       this.taskToEdit.notificationLocalizationRadius = 0.1;
       this.taskToEdit.notificationOnEnter = false;
       this.taskToEdit.notificationOnExit = false;
@@ -298,7 +298,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       builder: (context) {
         return NotificationLocationDialog(
           key: UniqueKey(),
-          notificationLocationId: this.taskToEdit.notificationLocalizationId,
+          notificationLocationUuid: this.taskToEdit.notificationLocalizationUuid,
           notificationOnEnter: this.taskToEdit.notificationOnEnter,
           notificationOnExit: this.taskToEdit.notificationOnExit,
           notificationRadius: this.taskToEdit.notificationLocalizationRadius,
@@ -370,7 +370,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         a.endDate == b.endDate &&
         a.tags == b.tags &&
         a.done == b.done &&
-        a.notificationLocalizationId == b.notificationLocalizationId &&
+        a.notificationLocalizationUuid == b.notificationLocalizationUuid &&
         a.notificationLocalizationRadius == b.notificationLocalizationRadius &&
         a.notificationOnEnter == b.notificationOnEnter &&
         a.notificationOnExit == b.notificationOnExit;
@@ -404,7 +404,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       isCanceled: argTask.isCanceled,
       childUuid: argTask.childUuid,
       isDelegated: argTask.isDelegated,
-      notificationLocalizationId: argTask.notificationLocalizationId,
+      notificationLocalizationUuid: argTask.notificationLocalizationUuid,
       notificationLocalizationRadius: argTask.notificationLocalizationRadius,
       notificationOnEnter: argTask.notificationOnEnter,
       notificationOnExit: argTask.notificationOnExit,
@@ -431,9 +431,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     double latitude = -1;
     double longitude = -1;
 
-    if (this.taskToEdit.notificationLocalizationId != null) {
-      latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.taskToEdit.notificationLocalizationId);
-      longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.taskToEdit.notificationLocalizationId);
+    if (this.taskToEdit.notificationLocalizationUuid != null) {
+      latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.taskToEdit.notificationLocalizationUuid);
+      longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.taskToEdit.notificationLocalizationUuid);
     }
 
     List<Attachment> attachments =

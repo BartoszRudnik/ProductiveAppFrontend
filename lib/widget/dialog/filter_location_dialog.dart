@@ -7,7 +7,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class FilterLocationDialog extends StatelessWidget {
   final _locationKey = GlobalKey<FormState>();
 
-  final List<int> alreadyChoosenLocations;
+  final List<String> alreadyChoosenLocations;
 
   FilterLocationDialog({
     @required this.alreadyChoosenLocations,
@@ -17,7 +17,7 @@ class FilterLocationDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Location> locations = Provider.of<LocationProvider>(context, listen: false).locations;
     List<Location> filteredLocations = List<Location>.from(locations);
-    List<int> newLocations = List<int>.from(this.alreadyChoosenLocations);
+    List<String> newLocations = List<String>.from(this.alreadyChoosenLocations);
 
     filteredLocations.forEach(
       (element) {
@@ -66,9 +66,9 @@ class FilterLocationDialog extends StatelessWidget {
                           setState(() {
                             filteredLocations[tagIndex].isSelected = !filteredLocations[tagIndex].isSelected;
                             if (newLocations != null && !newLocations.contains(filteredLocations[tagIndex].id) && filteredLocations[tagIndex].isSelected) {
-                              newLocations.add(filteredLocations[tagIndex].id);
+                              newLocations.add(filteredLocations[tagIndex].uuid);
                             } else if (newLocations != null && !filteredLocations[tagIndex].isSelected) {
-                              newLocations.remove(filteredLocations[tagIndex].id);
+                              newLocations.remove(filteredLocations[tagIndex].uuid);
                             }
                           });
                         },

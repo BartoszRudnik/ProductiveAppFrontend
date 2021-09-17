@@ -70,8 +70,8 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
     }
 
     for (int i = 0; i < tasks.length; i++) {
-      final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(tasks[i].notificationLocalizationId);
-      final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(tasks[i].notificationLocalizationId);
+      final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(tasks[i].notificationLocalizationUuid);
+      final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(tasks[i].notificationLocalizationUuid);
 
       final newMarker = Marker(
         icon: tasks[i].id == actualMarkerId ? this.selectedIcon : this.defaultIcon,
@@ -121,8 +121,8 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
 
       this._mapMove(LatLng(location.coords.latitude, location.coords.longitude), 15);
     } else {
-      final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.tasks[0].notificationLocalizationId);
-      final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.tasks[0].notificationLocalizationId);
+      final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.tasks[0].notificationLocalizationUuid);
+      final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.tasks[0].notificationLocalizationUuid);
 
       this._mapMove(LatLng(latitude, longitude), 15);
     }
@@ -199,9 +199,10 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
                     IconButton(
                       icon: Icon(Icons.navigate_before_outlined),
                       onPressed: () {
-                        final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(tasks[previousTaskIndex].notificationLocalizationId);
+                        final latitude =
+                            Provider.of<LocationProvider>(context, listen: false).getLatitude(tasks[previousTaskIndex].notificationLocalizationUuid);
                         final longitude =
-                            Provider.of<LocationProvider>(context, listen: false).getLongitude(tasks[previousTaskIndex].notificationLocalizationId);
+                            Provider.of<LocationProvider>(context, listen: false).getLongitude(tasks[previousTaskIndex].notificationLocalizationUuid);
 
                         LatLng point = LatLng(latitude, longitude);
                         this._animatedMapMove(point, 16.0);
@@ -246,8 +247,8 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
                     IconButton(
                       icon: Icon(Icons.navigate_next_outlined),
                       onPressed: () {
-                        final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(tasks[nextTaskIndex].notificationLocalizationId);
-                        final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(tasks[nextTaskIndex].notificationLocalizationId);
+                        final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(tasks[nextTaskIndex].notificationLocalizationUuid);
+                        final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(tasks[nextTaskIndex].notificationLocalizationUuid);
 
                         LatLng point = LatLng(latitude, longitude);
                         this._animatedMapMove(point, 16.0);

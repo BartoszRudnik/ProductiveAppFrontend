@@ -13,7 +13,7 @@ import 'location_dialog.dart';
 
 class NotificationLocationDialog extends StatefulWidget {
   final Key key;
-  final notificationLocationId;
+  final notificationLocationUuid;
   final notificationRadius;
   final notificationOnEnter;
   final notificationOnExit;
@@ -21,7 +21,7 @@ class NotificationLocationDialog extends StatefulWidget {
 
   NotificationLocationDialog({
     @required this.key,
-    @required this.notificationLocationId,
+    @required this.notificationLocationUuid,
     @required this.notificationOnEnter,
     @required this.notificationOnExit,
     @required this.notificationRadius,
@@ -71,8 +71,8 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
   Widget build(BuildContext context) {
     final locationsList = Provider.of<LocationProvider>(context).locations;
 
-    if (this.widget.notificationLocationId != null && this.location == null && !this.deleted) {
-      this.location = locationsList.firstWhere((element) => element.id == this.widget.notificationLocationId);
+    if (this.widget.notificationLocationUuid != null && this.location == null && !this.deleted) {
+      this.location = locationsList.firstWhere((element) => element.uuid == this.widget.notificationLocationUuid);
     }
 
     return AlertDialog(

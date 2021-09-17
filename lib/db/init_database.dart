@@ -170,7 +170,7 @@ class InitDatabase {
       ${TaskFields.isCanceled} $boolType,
       ${TaskFields.parentUuid} $textType,
       ${TaskFields.childUuid} $textType,
-      ${TaskFields.notificationLocalizationId} $integerType,
+      ${TaskFields.notificationLocalizationUuid} $textType,
       ${TaskFields.notificationLocalizationRadius} $doubleType,
       ${TaskFields.notificationOnEnter} $boolType,
       ${TaskFields.notificationOnExit} $boolType,

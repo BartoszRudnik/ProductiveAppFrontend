@@ -80,7 +80,7 @@ class _TaskDetailsMapState extends State<TaskDetailsMap> {
       height: 175,
       child: Stack(
         children: [
-          if (this.widget.taskToEdit.notificationLocalizationId != null && this.widget.latitude != null && this.widget.longitude != null)
+          if (this.widget.taskToEdit.notificationLocalizationUuid != null && this.widget.latitude != null && this.widget.longitude != null)
             Container(
               height: 175,
               width: double.infinity,
@@ -117,7 +117,7 @@ class _TaskDetailsMapState extends State<TaskDetailsMap> {
                 ),
               ),
             ),
-          if (this.widget.taskToEdit.notificationLocalizationId == null || this.widget.longitude == null || this.widget.latitude == null)
+          if (this.widget.taskToEdit.notificationLocalizationUuid == null || this.widget.longitude == null || this.widget.latitude == null)
             Column(
               children: [
                 Expanded(
@@ -142,7 +142,7 @@ class _TaskDetailsMapState extends State<TaskDetailsMap> {
                         NewTaskNotificationLocalization(
                           bigIcon: true,
                           setNotificationLocalization: this.widget.setNotificationLocalization,
-                          notificationLocalizationId: this.widget.taskToEdit.notificationLocalizationId,
+                          notificationLocalizationUuid: this.widget.taskToEdit.notificationLocalizationUuid,
                           notificationOnEnter: this.widget.taskToEdit.notificationOnEnter,
                           notificationOnExit: this.widget.taskToEdit.notificationOnExit,
                           notificationRadius: this.widget.taskToEdit.notificationLocalizationRadius,

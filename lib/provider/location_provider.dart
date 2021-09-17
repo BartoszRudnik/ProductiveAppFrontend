@@ -43,8 +43,8 @@ class LocationProvider with ChangeNotifier {
     }
   }
 
-  double getLongitude(int id) {
-    final location = this.locationList.firstWhere((element) => element.id == id, orElse: () => null);
+  double getLongitude(String uuid) {
+    final location = this.locationList.firstWhere((element) => element.uuid == uuid, orElse: () => null);
 
     if (location != null) {
       return location.longitude;
@@ -53,8 +53,8 @@ class LocationProvider with ChangeNotifier {
     }
   }
 
-  double getLatitude(int id) {
-    final location = this.locationList.firstWhere((element) => element.id == id, orElse: () => null);
+  double getLatitude(String uuid) {
+    final location = this.locationList.firstWhere((element) => element.uuid == uuid, orElse: () => null);
 
     if (location != null) {
       return location.latitude;
@@ -63,8 +63,8 @@ class LocationProvider with ChangeNotifier {
     }
   }
 
-  String getLocationName(int id) {
-    return this.locationList.firstWhere((element) => element.id == id).localizationName;
+  String getLocationName(String uuid) {
+    return this.locationList.firstWhere((element) => element.uuid == uuid).localizationName;
   }
 
   List<MapEntry<geocoding.Placemark, LatLng>> get marks {

@@ -108,12 +108,12 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
         final UserScrollNotification userScroll = notification;
         switch (userScroll.direction) {
           case ScrollDirection.forward:
-            if (userScroll.metrics.maxScrollExtent != userScroll.metrics.minScrollExtent) {
+            if (userScroll.metrics.maxScrollExtent != userScroll.metrics.minScrollExtent && mounted) {
               this._hideFab.forward();
             }
             break;
           case ScrollDirection.reverse:
-            if (userScroll.metrics.maxScrollExtent != userScroll.metrics.minScrollExtent) {
+            if (userScroll.metrics.maxScrollExtent != userScroll.metrics.minScrollExtent && mounted) {
               this._hideFab.reverse();
             }
             break;
@@ -201,8 +201,7 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Badge(
-                  showBadge: Provider.of<TaskProvider>(context).countInboxDelegated() != null &&
-                      Provider.of<TaskProvider>(context).countInboxDelegated() > 0,
+                  showBadge: Provider.of<TaskProvider>(context).countInboxDelegated() != null && Provider.of<TaskProvider>(context).countInboxDelegated() > 0,
                   badgeColor: index == _selectedPageIndex ? Theme.of(context).accentColor : Theme.of(context).primaryColor,
                   badgeContent: Text(
                     Provider.of<TaskProvider>(context).countInboxDelegated().toString(),
@@ -281,8 +280,7 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
               leadingButton: IconButton(
                 icon: Badge(
                   position: BadgePosition.topStart(),
-                  showBadge: Provider.of<DelegateProvider>(context).received.length > 0 ||
-                      Provider.of<DelegateProvider>(context).numberOfPermissionRequest > 0,
+                  showBadge: Provider.of<DelegateProvider>(context).received.length > 0 || Provider.of<DelegateProvider>(context).numberOfPermissionRequest > 0,
                   badgeColor: Theme.of(context).primaryColor,
                   child: Icon(Icons.menu),
                 ),

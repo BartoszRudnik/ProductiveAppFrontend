@@ -34,7 +34,7 @@ class Settings {
   List<String> collaborators;
   List<String> priorities;
   List<String> tags;
-  List<int> locations;
+  List<String> locations;
   int sortingMode;
   String taskName;
   DateTime lastUpdated;
@@ -124,7 +124,7 @@ class Settings {
         collaborators: json[SettingsFields.collaborators] == null ? [] : splitStringList(json[SettingsFields.collaborators] as String),
         priorities: json[SettingsFields.priorities] == null ? [] : splitStringList(json[SettingsFields.priorities] as String),
         tags: json[SettingsFields.tags] == null ? [] : splitStringList(json[SettingsFields.tags] as String),
-        locations: json[SettingsFields.locations] == null ? [] : splitIntList(json[SettingsFields.locations] as String),
+        locations: json[SettingsFields.locations] == null ? [] : splitStringList(json[SettingsFields.locations] as String),
         sortingMode: json[SettingsFields.sortingMode] == null ? 0 : json[SettingsFields.sortingMode] as int,
         lastUpdated: json[SettingsFields.lastUpdated] == null ? DateTime.now() : DateTime.parse(json[SettingsFields.lastUpdated] as String),
       );
@@ -150,7 +150,7 @@ class Settings {
       SettingsFields.collaborators: this.joinStringList(this.collaborators),
       SettingsFields.priorities: this.joinStringList(this.priorities),
       SettingsFields.tags: this.joinStringList(this.tags),
-      SettingsFields.locations: this.joinIntList(this.locations),
+      SettingsFields.locations: this.joinStringList(this.locations),
       SettingsFields.sortingMode: this.sortingMode == null ? 0 : this.sortingMode,
       SettingsFields.lastUpdated: this.lastUpdated != null ? this.lastUpdated.toIso8601String() : DateTime.now().toIso8601String(),
     };

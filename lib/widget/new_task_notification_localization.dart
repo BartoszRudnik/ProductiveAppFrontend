@@ -4,7 +4,7 @@ import 'package:productive_app/widget/dialog/notification_location_dialog.dart';
 class NewTaskNotificationLocalization extends StatefulWidget {
   final Function setNotificationLocalization;
 
-  final int notificationLocalizationId;
+  final String notificationLocalizationUuid;
   final double notificationRadius;
   final bool notificationOnEnter;
   final bool notificationOnExit;
@@ -15,7 +15,7 @@ class NewTaskNotificationLocalization extends StatefulWidget {
   NewTaskNotificationLocalization({
     this.bigIcon,
     @required this.setNotificationLocalization,
-    @required this.notificationLocalizationId,
+    @required this.notificationLocalizationUuid,
     @required this.notificationOnEnter,
     @required this.notificationOnExit,
     @required this.notificationRadius,
@@ -40,7 +40,7 @@ class _NewTaskNotificationLocalizationState extends State<NewTaskNotificationLoc
           builder: (context) {
             return NotificationLocationDialog(
               key: UniqueKey(),
-              notificationLocationId: this.widget.notificationLocalizationId,
+              notificationLocationUuid: this.widget.notificationLocalizationUuid,
               notificationOnEnter: this.widget.notificationOnEnter,
               notificationOnExit: this.widget.notificationOnExit,
               notificationRadius: this.widget.notificationRadius,

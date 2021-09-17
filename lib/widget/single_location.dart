@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:productive_app/model/location.dart';
+import 'package:productive_app/provider/settings_provider.dart';
 import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -62,8 +63,9 @@ class SingleLocation extends StatelessWidget {
         if (direction == DismissDirection.endToStart) {
           bool hasAgreed = await Dialogs.showChoiceDialog(context, AppLocalizations.of(context).areSureDeleteLocation);
           if (hasAgreed) {
-            Provider.of<TaskProvider>(context, listen: false).clearLocationFromTasks(location.id);
+            Provider.of<TaskProvider>(context, listen: false).clearLocationFromTasks(location.uuid);
             Provider.of<SynchronizeProvider>(context, listen: false).addLocationToDelete(location.uuid);
+            await Provider.of<SettingsProvider>(context, listen: false).deleteFilterLocation(location.uuid);
             Provider.of<LocationProvider>(context, listen: false).deleteLocation(location.uuid);
           }
         }

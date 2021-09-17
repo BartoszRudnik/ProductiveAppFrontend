@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_app/config/const_values.dart';
+import 'package:productive_app/provider/locale_provider.dart';
 import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -27,11 +28,11 @@ class TaskWidget extends StatefulWidget {
 
 class _TaskWidgetState extends State<TaskWidget> {
   void changeTaskStatus() async {
-    if (this.widget.task.notificationLocalizationId == null) {
+    if (this.widget.task.notificationLocalizationUuid == null) {
       await Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(this.widget.task);
     } else {
-      final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.widget.task.notificationLocalizationId);
-      final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.widget.task.notificationLocalizationId);
+      final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.widget.task.notificationLocalizationUuid);
+      final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.widget.task.notificationLocalizationUuid);
 
       await Provider.of<TaskProvider>(context, listen: false).toggleTaskStatusWithGeolocation(this.widget.task, latitude, longitude);
     }
@@ -173,11 +174,11 @@ class _TaskWidgetState extends State<TaskWidget> {
                   newLocation = 'DELEGATED';
                 }
 
-                if (this.widget.task.notificationLocalizationId == null) {
+                if (this.widget.task.notificationLocalizationUuid == null) {
                   Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
                 } else {
-                  final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.widget.task.notificationLocalizationId);
-                  final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.widget.task.notificationLocalizationId);
+                  final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.widget.task.notificationLocalizationUuid);
+                  final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.widget.task.notificationLocalizationUuid);
 
                   Provider.of<TaskProvider>(context, listen: false).updateTaskWithGeolocation(this.widget.task, newLocation, longitude, latitude);
                 }
@@ -202,9 +203,8 @@ class _TaskWidgetState extends State<TaskWidget> {
                           fontSize: 20,
                           fontWeight: FontWeight.w400,
                           fontFamily: 'RobotoCondensed',
-                          decoration: this.widget.task.done || (this.widget.task.isCanceled != null && this.widget.task.isCanceled)
-                              ? TextDecoration.lineThrough
-                              : null,
+                          decoration:
+                              this.widget.task.done || (this.widget.task.isCanceled != null && this.widget.task.isCanceled) ? TextDecoration.lineThrough : null,
                           color: this.widget.task.done || (this.widget.task.isCanceled != null && this.widget.task.isCanceled)
                               ? Colors.grey
                               : Theme.of(context).primaryColor,
@@ -213,9 +213,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                     ),
                     SizedBox(width: 7),
                     if (this.widget.task.isDelegated != null && this.widget.task.isDelegated) Icon(Icons.supervisor_account_outlined),
-                    if (this.widget.task.delegatedEmail != null &&
-                        this.widget.task.localization == 'DELEGATED' &&
-                        this.widget.task.taskStatus != null)
+                    if (this.widget.task.delegatedEmail != null && this.widget.task.localization == 'DELEGATED' && this.widget.task.taskStatus != null)
                       Container(
                         alignment: Alignment.center,
                         padding: EdgeInsets.symmetric(horizontal: 4),
@@ -275,12 +273,15 @@ class _TaskWidgetState extends State<TaskWidget> {
                                 SizedBox(width: 6),
                                 this.widget.task.startDate != null
                                     ? Text(
-                                        DateFormat('MMM d').format(this.widget.task.startDate) + ' - ',
+                                        DateFormat.MMMd(Provider.of<LocaleProvider>(context, listen: false).locale.languageCode)
+                                                .format(this.widget.task.startDate) +
+                                            ' - ',
                                       )
                                     : Text(''),
                                 this.widget.task.endDate != null
                                     ? Text(
-                                        DateFormat('MMM d').format(this.widget.task.endDate),
+                                        DateFormat.MMMd(Provider.of<LocaleProvider>(context, listen: false).locale.languageCode)
+                                            .format(this.widget.task.endDate),
                                       )
                                     : Text(''),
                               ],
@@ -290,13 +291,9 @@ class _TaskWidgetState extends State<TaskWidget> {
                             Container(
                               child: Row(
                                 children: [
-                                  if (taskEndDate.difference(today).inDays == 0 &&
-                                      this.widget.task.endDate.hour != 0 &&
-                                      this.widget.task.endDate.minute != 0)
+                                  if (taskEndDate.difference(today).inDays == 0 && this.widget.task.endDate.hour != 0 && this.widget.task.endDate.minute != 0)
                                     Icon(Icons.access_time_outlined),
-                                  if (taskEndDate.difference(today).inDays == 0 &&
-                                      this.widget.task.endDate.hour != 0 &&
-                                      this.widget.task.endDate.minute != 0)
+                                  if (taskEndDate.difference(today).inDays == 0 && this.widget.task.endDate.hour != 0 && this.widget.task.endDate.minute != 0)
                                     Text(
                                       DateFormat('Hm').format(this.widget.task.endDate),
                                     ),
