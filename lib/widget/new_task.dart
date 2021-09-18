@@ -165,6 +165,7 @@ class _NewTaskState extends State<NewTask> {
       this._notificationOnEnter = null;
       this._notificationOnExit = null;
       this._delegatedEmail = null;
+      this._files = [];
     });
   }
 

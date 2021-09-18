@@ -189,7 +189,7 @@ class TaskProvider with ChangeNotifier {
 
         if (task.notificationLocalizationUuid != null) {
           Notifications.addGeofence(
-            task.id,
+            task.uuid,
             latitude,
             longitude,
             task.notificationLocalizationRadius,
@@ -218,7 +218,7 @@ class TaskProvider with ChangeNotifier {
 
       if (task.notificationLocalizationUuid != null) {
         Notifications.addGeofence(
-          task.id,
+          task.uuid,
           latitude,
           longitude,
           task.notificationLocalizationRadius,
@@ -351,7 +351,7 @@ class TaskProvider with ChangeNotifier {
     }
 
     if (newLocation == 'TRASH' || newLocation == 'COMPLETED') {
-      Notifications.removeGeofence(task.id);
+      Notifications.removeGeofence(task.uuid);
     }
 
     this.deleteFromLocalization(task);
@@ -424,7 +424,7 @@ class TaskProvider with ChangeNotifier {
     }
 
     if (newLocation == 'TRASH' || newLocation == 'COMPLETED') {
-      Notifications.removeGeofence(task.id);
+      Notifications.removeGeofence(task.uuid);
     }
 
     this.deleteFromLocalization(task);
@@ -446,7 +446,7 @@ class TaskProvider with ChangeNotifier {
 
     if (newLocation != 'TRASH' && newLocation != 'COMPLETED') {
       this.notificationChange(
-        task.id,
+        task.uuid,
         task.notificationLocalizationRadius,
         task.notificationOnExit,
         task.notificationOnEnter,
@@ -498,9 +498,9 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
-  Future<void> fetchSingleTaskFull(int taskId) async {
+  Future<void> fetchSingleTaskFull(String taskUuid) async {
     if (await InternetConnection.internetConnection()) {
-      String url = this._serverUrl + 'task/getSingleTaskFull/${this.userMail}/$taskId';
+      String url = this._serverUrl + 'task/getSingleTaskFull/${this.userMail}/$taskUuid';
 
       try {
         final response = await http.get(url);
@@ -573,9 +573,9 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
-  Future<void> fetchSingleTask(int taskId) async {
+  Future<void> fetchSingleTask(String taskUuid) async {
     if (await InternetConnection.internetConnection()) {
-      String url = this._serverUrl + 'task/getSingleTask/${this.userMail}/$taskId';
+      String url = this._serverUrl + 'task/getSingleTask/${this.userMail}/$taskUuid';
       String supervisorEmail;
       Task mockTask = Task(
         uuid: '',
@@ -630,7 +630,7 @@ class TaskProvider with ChangeNotifier {
         longitude = responseBody['longitude'];
 
         Notifications.addGeofence(
-          task.id,
+          task.uuid,
           latitude,
           longitude,
           task.notificationLocalizationRadius,
@@ -877,10 +877,10 @@ class TaskProvider with ChangeNotifier {
     this.localizationTaskStatus(task);
 
     if (task.done) {
-      Notifications.removeGeofence(task.id);
+      Notifications.removeGeofence(task.uuid);
     } else {
       Notifications.addGeofence(
-        task.id,
+        task.uuid,
         latitude,
         longitude,
         task.notificationLocalizationRadius,
@@ -1351,7 +1351,7 @@ class TaskProvider with ChangeNotifier {
   }
 
   void notificationChange(
-    int taskId,
+    String taskUuid,
     double notificationRadius,
     bool onExit,
     bool onEnter,
@@ -1360,9 +1360,9 @@ class TaskProvider with ChangeNotifier {
     String title,
     String description,
   ) {
-    Notifications.removeGeofence(taskId);
-    if (taskId != null && latitude != null && longitude != null && notificationRadius != null) {
-      Notifications.addGeofence(taskId, latitude, longitude, notificationRadius, onEnter, onExit, title, description);
+    Notifications.removeGeofence(taskUuid);
+    if (taskUuid != null && latitude != null && longitude != null && notificationRadius != null) {
+      Notifications.addGeofence(taskUuid, latitude, longitude, notificationRadius, onEnter, onExit, title, description);
     }
   }
 

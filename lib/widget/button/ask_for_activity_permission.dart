@@ -29,6 +29,7 @@ class AskForActivityPermission extends StatelessWidget {
 
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
+                    behavior: SnackBarBehavior.floating,
                     content: Text(
                       AppLocalizations.of(context).requestHasBeenSend,
                       textAlign: TextAlign.center,

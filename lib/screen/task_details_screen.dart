@@ -187,13 +187,13 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       if (taskToEdit.done != originalTask.done) {
         if (taskToEdit.notificationLocalizationUuid != null) {
           if (taskToEdit.done) {
-            Notifications.removeGeofence(taskToEdit.id);
+            Notifications.removeGeofence(taskToEdit.uuid);
           } else {
             double latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(taskToEdit.notificationLocalizationUuid);
             double longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(taskToEdit.notificationLocalizationUuid);
 
             Notifications.addGeofence(
-              taskToEdit.id,
+              taskToEdit.uuid,
               latitude,
               longitude,
               taskToEdit.notificationLocalizationRadius,
@@ -216,12 +216,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       }
 
       if (this.originalTask.localization != newLocalization) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context).taskMoved + ConstValues.listName(newLocalization, context)),
-            duration: Duration(seconds: 2),
-          ),
-        );
+        final args = ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
+        final Function showSnackBar = args['function'];
+
+        showSnackBar(newLocalization);
       }
 
       await Provider.of<AttachmentProvider>(context, listen: false).deleteFlaggedAttachments();
@@ -420,10 +418,12 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     final localizations = Provider.of<TaskProvider>(context, listen: false).localizations;
 
     if (taskToEdit == null) {
-      originalTask = ModalRoute.of(context).settings.arguments as Task;
+      final args = ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
+
+      originalTask = args['task'];
       setTaskToEdit(originalTask);
       this._description = taskToEdit.description;
-      if (_description.isNotEmpty && _description.trim() != '') {
+      if (this._description != null && this._description.isNotEmpty && _description.trim() != '') {
         onDescriptionChanged(taskToEdit.description);
       }
     }

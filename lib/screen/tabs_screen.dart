@@ -252,7 +252,7 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
           ],
         ),
         transform: Matrix4.translationValues(offsetX, offsetY, 0)..scale(scale),
-        duration: Duration(milliseconds: 250),
+        duration: Duration(milliseconds: 300),
         child: GestureDetector(
           onTap: () {
             if (isDrawerVisible) _changeTranform(0, 0, 1);
@@ -304,28 +304,39 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
                 },
               ),
             ),
-            bottomNavigationBar: BottomNavigationBar(
-              selectedFontSize: 0,
-              currentIndex: _selectedPageIndex,
-              type: BottomNavigationBarType.fixed,
-              items: [
-                BottomNavigationBarItem(
-                  icon: _buildIconInbox(Icons.inbox_outlined, AppLocalizations.of(context).inbox, 0),
-                  title: SizedBox.shrink(),
+            bottomNavigationBar: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
+                border: Border(
+                  top: BorderSide(
+                    color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColorDark : Colors.black,
+                    width: 1.0,
+                  ),
                 ),
-                BottomNavigationBarItem(
-                  icon: _buildIcon(Icons.access_time, AppLocalizations.of(context).anytime, 1),
-                  title: SizedBox.shrink(),
-                ),
-                BottomNavigationBarItem(
-                  icon: _buildIcon(Icons.calendar_today, AppLocalizations.of(context).scheduled, 2),
-                  title: SizedBox.shrink(),
-                ),
-                BottomNavigationBarItem(
-                  icon: _buildIcon(Icons.person_outline_outlined, AppLocalizations.of(context).delegated, 3),
-                  title: SizedBox.shrink(),
-                ),
-              ],
+              ),
+              child: BottomNavigationBar(
+                selectedFontSize: 0,
+                currentIndex: _selectedPageIndex,
+                type: BottomNavigationBarType.fixed,
+                items: [
+                  BottomNavigationBarItem(
+                    icon: _buildIconInbox(Icons.inbox_outlined, AppLocalizations.of(context).inbox, 0),
+                    title: SizedBox.shrink(),
+                  ),
+                  BottomNavigationBarItem(
+                    icon: _buildIcon(Icons.access_time, AppLocalizations.of(context).anytime, 1),
+                    title: SizedBox.shrink(),
+                  ),
+                  BottomNavigationBarItem(
+                    icon: _buildIcon(Icons.calendar_today, AppLocalizations.of(context).scheduled, 2),
+                    title: SizedBox.shrink(),
+                  ),
+                  BottomNavigationBarItem(
+                    icon: _buildIcon(Icons.person_outline_outlined, AppLocalizations.of(context).delegated, 3),
+                    title: SizedBox.shrink(),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

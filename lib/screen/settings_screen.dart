@@ -34,6 +34,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+          behavior: SnackBarBehavior.floating,
           content: Text(AppLocalizations.of(context).savedData, textAlign: TextAlign.center),
           duration: Duration(seconds: 2),
         ),
