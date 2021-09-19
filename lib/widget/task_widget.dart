@@ -27,17 +27,6 @@ class TaskWidget extends StatefulWidget {
 }
 
 class _TaskWidgetState extends State<TaskWidget> {
-  void showInfo(String newLocalization) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        margin: EdgeInsetsDirectional.only(bottom: 60),
-        behavior: SnackBarBehavior.floating,
-        content: Text(AppLocalizations.of(context).taskMoved + ConstValues.listName(newLocalization, context)),
-        duration: Duration(seconds: 2),
-      ),
-    );
-  }
-
   void changeTaskStatus() async {
     if (this.widget.task.notificationLocalizationUuid == null) {
       await Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(this.widget.task);
@@ -69,10 +58,7 @@ class _TaskWidgetState extends State<TaskWidget> {
             if (this.widget.task.isCanceled == null || !this.widget.task.isCanceled) {
               Navigator.of(context).pushNamed(
                 TaskDetailScreen.routeName,
-                arguments: {
-                  "task": this.widget.task,
-                  "function": this.showInfo,
-                },
+                arguments: this.widget.task,
               );
             }
           },

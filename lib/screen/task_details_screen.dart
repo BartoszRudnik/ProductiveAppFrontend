@@ -150,8 +150,32 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     this.setTaskListAutomatically();
   }
 
+  void showInfo(String newLocalization) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        margin: EdgeInsetsDirectional.only(bottom: 60),
+        behavior: SnackBarBehavior.floating,
+        content: Text(AppLocalizations.of(context).taskMoved + ConstValues.listName(newLocalization, context)),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
   Future<void> saveTask() async {
     bool isValid = this._formKey.currentState.validate();
+
+    if (this.startTime != null && taskToEdit.startDate != null) {
+      taskToEdit.startDate =
+          new DateTime(taskToEdit.startDate.year, taskToEdit.startDate.month, taskToEdit.startDate.day, this.startTime.hour, this.startTime.minute);
+    } else if (taskToEdit.startDate != null) {
+      taskToEdit.startDate = new DateTime(taskToEdit.startDate.year, taskToEdit.startDate.month, taskToEdit.startDate.day, 0, 0);
+    }
+
+    if (this.endTime != null && taskToEdit.endDate != null) {
+      taskToEdit.endDate = new DateTime(taskToEdit.endDate.year, taskToEdit.endDate.month, taskToEdit.endDate.day, this.endTime.hour, this.endTime.minute);
+    } else if (taskToEdit.endDate != null) {
+      taskToEdit.endDate = new DateTime(taskToEdit.endDate.year, taskToEdit.endDate.month, taskToEdit.endDate.day, 0, 0);
+    }
 
     isValid = await TaskValidate.validateTaskEdit(taskToEdit, originalTask, context);
 
@@ -166,19 +190,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
           this.taskToEdit.localization != 'DELEGATED' &&
           (originalTask.localization == 'ANYTIME' || originalTask.localization == 'SCHEDULED')) {
         this.taskToEdit.localization = 'DELEGATED';
-      }
-
-      if (this.startTime != null && taskToEdit.startDate != null) {
-        taskToEdit.startDate =
-            new DateTime(taskToEdit.startDate.year, taskToEdit.startDate.month, taskToEdit.startDate.day, this.startTime.hour, this.startTime.minute);
-      } else if (taskToEdit.startDate != null) {
-        taskToEdit.startDate = new DateTime(taskToEdit.startDate.year, taskToEdit.startDate.month, taskToEdit.startDate.day, 0, 0);
-      }
-
-      if (this.endTime != null && taskToEdit.endDate != null) {
-        taskToEdit.endDate = new DateTime(taskToEdit.endDate.year, taskToEdit.endDate.month, taskToEdit.endDate.day, this.endTime.hour, this.endTime.minute);
-      } else if (taskToEdit.endDate != null) {
-        taskToEdit.endDate = new DateTime(taskToEdit.endDate.year, taskToEdit.endDate.month, taskToEdit.endDate.day, 0, 0);
       }
 
       final newLocalization = taskToEdit.localization;
@@ -216,10 +227,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       }
 
       if (this.originalTask.localization != newLocalization) {
-        final args = ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
-        final Function showSnackBar = args['function'];
-
-        showSnackBar(newLocalization);
+        this.showInfo(newLocalization);
       }
 
       await Provider.of<AttachmentProvider>(context, listen: false).deleteFlaggedAttachments();
@@ -375,12 +383,12 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
   }
 
   void setTaskToEdit(Task argTask) {
-    if (argTask.startDate != null && argTask.startDate.hour != 0 && argTask.startDate.minute != 0) {
+    if (argTask.startDate != null && (argTask.startDate.hour != 0 || argTask.startDate.minute != 0)) {
       setState(() {
         this.startTime = TimeOfDay(hour: argTask.startDate.hour, minute: argTask.startDate.minute);
       });
     }
-    if (argTask.endDate != null && argTask.endDate.hour != 0 && argTask.endDate.minute != 0) {
+    if (argTask.endDate != null && (argTask.endDate.hour != 0 || argTask.endDate.minute != 0)) {
       setState(() {
         this.endTime = TimeOfDay(hour: argTask.endDate.hour, minute: argTask.endDate.minute);
       });
@@ -418,9 +426,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     final localizations = Provider.of<TaskProvider>(context, listen: false).localizations;
 
     if (taskToEdit == null) {
-      final args = ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
+      originalTask = ModalRoute.of(context).settings.arguments as Task;
 
-      originalTask = args['task'];
       setTaskToEdit(originalTask);
       this._description = taskToEdit.description;
       if (this._description != null && this._description.isNotEmpty && _description.trim() != '') {

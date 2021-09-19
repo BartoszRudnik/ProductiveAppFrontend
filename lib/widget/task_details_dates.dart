@@ -11,8 +11,8 @@ class TaskDetailsDates extends StatefulWidget {
   final Function selectStartTime;
   final Function selectEndTime;
   final Task taskToEdit;
-  TimeOfDay endTime;
-  TimeOfDay startTime;
+  final TimeOfDay endTime;
+  final TimeOfDay startTime;
 
   TaskDetailsDates({
     @required this.selectEndDate,
