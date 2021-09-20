@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:productive_app/model/tag.dart';
 import 'package:productive_app/provider/tag_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:uuid/uuid.dart';
 
 class TagsDialog extends StatefulWidget {
   static const routeName = "/tags-dialog";
@@ -25,32 +26,32 @@ class _TagsDialogState extends State<TagsDialog> {
 
   @override
   void initState() {
-    initValues();
     super.initState();
+    initValues();
   }
 
   void organizeFinalList(int index) {
     setState(() {
       filteredTags[index].isSelected = !filteredTags[index].isSelected;
-      Tag tagInList = _finalTags.firstWhere((element) => element.name == filteredTags[index].name, orElse: () => null);
+      Tag tagInList = this._finalTags.firstWhere((element) => element.name == filteredTags[index].name, orElse: () => null);
       if (filteredTags[index].isSelected && tagInList == null) {
-        _finalTags.add(filteredTags[index]);
+        this._finalTags.add(filteredTags[index]);
       } else {
-        _finalTags.remove(tagInList);
+        this._finalTags.remove(tagInList);
       }
     });
   }
 
   void initValues() {
-    tags = Provider.of<TagProvider>(context, listen: false).tags;
-    filteredTags = List<Tag>.from(tags);
+    this.tags = Provider.of<TagProvider>(context, listen: false).tags;
+    filteredTags = List<Tag>.from(this.tags);
 
     filteredTags.forEach((element) {
       element.isSelected = false;
     });
 
     if (this.widget.taskTags != null) {
-      _finalTags = List<Tag>.from(this.widget.taskTags);
+      this._finalTags = List<Tag>.from(this.widget.taskTags);
 
       this.widget.taskTags.forEach((element) {
         element.isSelected = true;
@@ -74,7 +75,7 @@ class _TagsDialogState extends State<TagsDialog> {
                 child: TextFormField(
                   onChanged: (value) {
                     setState(() {
-                      filteredTags = tags.where((element) => element.name.toLowerCase().contains(value.toLowerCase())).toList();
+                      filteredTags = this.tags.where((element) => element.name.toLowerCase().contains(value.toLowerCase())).toList();
                     });
                   },
                   validator: (value) {
@@ -84,14 +85,17 @@ class _TagsDialogState extends State<TagsDialog> {
                     return null;
                   },
                   onSaved: (value) {
-                    setState(() {
-                      final newTag = Tag(id: (tags.length + 1), name: value);
-                      final alreadyExists = tags.where((element) => element.name == newTag.name);
-                      if (alreadyExists.isEmpty) {
-                        Provider.of<TagProvider>(context, listen: false).addTag(newTag);
-                        tags.insert(0, newTag);
-                      }
-                    });
+                    final uuid = Uuid();
+                    final newTag = Tag(
+                      id: (this.tags.length + 1),
+                      name: value,
+                      uuid: uuid.v1(),
+                    );
+                    final alreadyExists = this.tags.where((element) => element.name == newTag.name);
+                    if (alreadyExists.isEmpty) {
+                      Provider.of<TagProvider>(context, listen: false).addTag(newTag);
+                      this.tags.insert(0, newTag);
+                    }
                   },
                   maxLines: null,
                   decoration: InputDecoration(
@@ -112,7 +116,8 @@ class _TagsDialogState extends State<TagsDialog> {
                   if (isValid) {
                     _tKey.currentState.save();
                     _tKey.currentState.reset();
-                    filteredTags = tags;
+                    filteredTags = this.tags;
+                    this.organizeFinalList(0);
                   }
                 },
                 backgroundColor: Theme.of(context).primaryColor,
@@ -156,10 +161,10 @@ class _TagsDialogState extends State<TagsDialog> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    if (_finalTags == null) {
+                    if (this._finalTags == null) {
                       Navigator.of(context).pop('cancel');
                     } else {
-                      Navigator.of(context).pop(_finalTags);
+                      Navigator.of(context).pop(this._finalTags);
                     }
                   },
                   child: Text(AppLocalizations.of(context).save),

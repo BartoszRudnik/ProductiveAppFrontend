@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
 import '../model/task.dart';
 import 'task_widget.dart';
 
@@ -18,13 +18,9 @@ class ReorderableTaskList extends StatelessWidget {
       physics: const AlwaysScrollableScrollPhysics(),
       shrinkWrap: true,
       itemCount: this.tasks.length,
-      itemBuilder: (ctx, index) => ChangeNotifierProvider.value(
+      itemBuilder: (ctx, index) => TaskWidget(
+        task: this.tasks[index],
         key: ValueKey(this.tasks[index]),
-        value: this.tasks[index],
-        child: TaskWidget(
-          task: this.tasks[index],
-          key: ValueKey(this.tasks[index]),
-        ),
       ),
       onReorder: (int oldIndex, int newIndex) {
         this.onReorder(newIndex, oldIndex, this.tasks, context);

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:global_configuration/global_configuration.dart';
-import 'package:productive_app/provider/attachment_provider.dart';
 import 'package:productive_app/l10n/L10n.dart';
+import 'package:productive_app/provider/attachment_provider.dart';
 import 'package:productive_app/provider/locale_provider.dart';
-import 'utils/notifications.dart';
+import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:provider/provider.dart';
+
 import 'config/color_themes.dart';
 import 'config/my_routes.dart';
 import 'model/settings.dart';
@@ -18,10 +21,9 @@ import 'provider/tag_provider.dart';
 import 'provider/task_provider.dart';
 import 'provider/theme_provider.dart';
 import 'screen/entry_screen.dart';
-import 'screen/main_screen.dart';
 import 'screen/loading_auth_screen.dart';
-import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'screen/main_screen.dart';
+import 'utils/notifications.dart';
 
 void headlessTask(bg.HeadlessEvent headlessEvent) async {
   switch (headlessEvent.name) {
@@ -57,6 +59,18 @@ class MyApp extends StatelessWidget {
             email: auth.email,
           ),
         ),
+        ChangeNotifierProxyProvider<AuthProvider, SynchronizeProvider>(
+          create: null,
+          update: (ctx, auth, previousSynchronize) => SynchronizeProvider(
+            authToken: auth.token,
+            userMail: auth.email,
+            attachmentsToDelete: previousSynchronize == null ? [] : previousSynchronize.attachmentsToDelete,
+            tasksToDelete: previousSynchronize == null ? [] : previousSynchronize.tasksToDelete,
+            collaboratorsToDelete: previousSynchronize == null ? [] : previousSynchronize.collaboratorsToDelete,
+            tagsToDelete: previousSynchronize == null ? [] : previousSynchronize.tagsToDelete,
+            locationsToDelete: previousSynchronize == null ? [] : previousSynchronize.locationsToDelete,
+          ),
+        ),
         ChangeNotifierProxyProvider<AuthProvider, AttachmentProvider>(
           create: null,
           update: (ctx, auth, previousAttachments) => AttachmentProvider(
@@ -81,7 +95,7 @@ class MyApp extends StatelessWidget {
             authToken: auth.token,
             taskList: previousTasks == null ? [] : previousTasks.taskList,
             taskPriorities: previousTasks == null ? [] : previousTasks.priorities,
-            singleTask: previousTasks == null ? Task(id: -1, title: '') : previousTasks.singleTask,
+            singleTask: previousTasks == null ? Task(id: -1, title: '', uuid: '') : previousTasks.singleTask,
           ),
         ),
         ChangeNotifierProxyProvider<AuthProvider, TagProvider>(
@@ -108,6 +122,10 @@ class MyApp extends StatelessWidget {
                     showOnlyWithLocalization: false,
                     showOnlyUnfinished: false,
                     showOnlyDelegated: false,
+                    collaborators: [],
+                    locations: [],
+                    tags: [],
+                    priorities: [],
                   )
                 : previousSettings.userSettings,
             userMail: auth.email,
@@ -116,8 +134,11 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProxyProvider<AuthProvider, LocationProvider>(
           create: null,
-          update: (ctx, auth, previousTasks) =>
-              LocationProvider(userMail: auth.email, authToken: auth.token, locationList: previousTasks == null ? [] : previousTasks.locationList, placemarks: previousTasks == null ? [] : previousTasks.placemarks),
+          update: (ctx, auth, previousTasks) => LocationProvider(
+              userMail: auth.email,
+              authToken: auth.token,
+              locationList: previousTasks == null ? [] : previousTasks.locationList,
+              placemarks: previousTasks == null ? [] : previousTasks.placemarks),
         ),
       ],
       builder: (context, _) {

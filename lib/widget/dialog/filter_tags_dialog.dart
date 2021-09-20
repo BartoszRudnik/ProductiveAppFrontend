@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
+
 import '../../model/tag.dart';
 import '../../provider/tag_provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FilterTagsDialog extends StatelessWidget {
   final _tagKey = GlobalKey<FormState>();
@@ -13,15 +15,20 @@ class FilterTagsDialog extends StatelessWidget {
     @required this.alreadyChoosenTags,
   });
 
+  List<String> extra = [];
+
   @override
   Widget build(BuildContext context) {
     List<Tag> tags = Provider.of<TagProvider>(context).tags;
     List<Tag> filteredTags = List<Tag>.from(tags);
     List<String> newTags = List<String>.from(this.alreadyChoosenTags);
 
+    newTags.addAll(this.extra);
+    this.extra = [];
+
     filteredTags.forEach(
       (element) {
-        if (this.alreadyChoosenTags != null && this.alreadyChoosenTags.contains(element.name)) {
+        if (newTags != null && newTags.contains(element.name)) {
           element.isSelected = true;
         } else {
           element.isSelected = false;
@@ -58,7 +65,14 @@ class FilterTagsDialog extends StatelessWidget {
                         final alreadyExists = tags.where((element) => element.name == value);
                         if (alreadyExists.isEmpty) {
                           try {
-                            await Provider.of<TagProvider>(context, listen: false).addTag(Tag(id: tags.length + 1, name: value));
+                            final uuid = Uuid();
+                            final newTag = Tag(
+                              id: tags.length + 1,
+                              name: value,
+                              uuid: uuid.v1(),
+                            );
+                            this.extra.add(newTag.name);
+                            await Provider.of<TagProvider>(context, listen: false).addTag(newTag);
                           } catch (error) {
                             print(error);
                           }

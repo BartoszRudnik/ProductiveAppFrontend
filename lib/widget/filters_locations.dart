@@ -54,7 +54,7 @@ class FiltersLocations extends StatelessWidget {
                           },
                         );
 
-                        if (selected != null && selected.length >= 1) {
+                        if (selected != null && selected.length >= 1 && selected != 'cancel') {
                           await Provider.of<SettingsProvider>(context, listen: false).addFilterLocations(selected);
                         } else if (selected != 'cancel') {
                           await Provider.of<SettingsProvider>(context, listen: false).clearFilterLocations();

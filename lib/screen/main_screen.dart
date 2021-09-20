@@ -1,9 +1,11 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:productive_app/utils/internet_connection.dart';
 import 'package:provider/provider.dart';
+
 import '../model/task.dart';
 import '../provider/location_provider.dart';
 import '../provider/task_provider.dart';
-import '../provider/theme_provider.dart';
 import '../utils/data.dart';
 import '../utils/notifications.dart';
 import '../widget/drawer/main_drawer.dart';
@@ -20,7 +22,8 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   void onClickedNotification(String payload) async {
-    Task task = Provider.of<TaskProvider>(context, listen: false).taskList.firstWhere((element) => element.id == int.parse(payload), orElse: () => null);
+    Task task =
+        Provider.of<TaskProvider>(context, listen: false).taskList.firstWhere((element) => element.id == int.parse(payload), orElse: () => null);
 
     if (task == null) {
       await Provider.of<LocationProvider>(context, listen: false).getLocations();
@@ -34,18 +37,40 @@ class _MainScreenState extends State<MainScreen> {
 
   void listenNotifications() => Notifications.onNotifications.stream.listen(onClickedNotification);
 
-  Future<void> future;
+  void listenInternetChanges() => Connectivity().onConnectivityChanged.listen((connectionResult) async {
+        if (checkInternetConnection(connectionResult)) {
+          await this.loadData(context);
+        }
+      });
+
+  bool checkInternetConnection(ConnectivityResult result) {
+    return result != ConnectivityResult.none;
+  }
+
+  Future<void> loadData(BuildContext context) async {
+    if (await InternetConnection.internetConnection()) {
+      await Data.synchronizeData(context);
+      await Data.loadData(context);
+    } else {
+      await Data.loadDataOffline(context);
+    }
+  }
+
+  Future future;
 
   @override
   void initState() {
-    future = Data.loadData(context);
-    Provider.of<ThemeProvider>(context, listen: false).getUserMode();
+    super.initState();
+
+    this.future = this.loadData(context);
 
     Notifications.initLocalization();
     Notifications.initNotification();
-    listenNotifications();
 
-    super.initState();
+    listenNotifications();
+    listenInternetChanges();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => Data.notify(context));
   }
 
   @override

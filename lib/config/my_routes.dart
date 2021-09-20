@@ -9,7 +9,7 @@ import 'package:productive_app/screen/main_screen.dart';
 import 'package:productive_app/screen/new_password_screen.dart';
 import 'package:productive_app/screen/related_task_info_screen.dart';
 import 'package:productive_app/screen/reset_password_screen.dart';
-import 'package:productive_app/screen/settings_tabs_screen.dart';
+import 'package:productive_app/screen/settings_screen.dart';
 import 'package:productive_app/screen/tabs_screen.dart';
 import 'package:productive_app/screen/tags_screen.dart';
 import 'package:productive_app/screen/task_details_screen.dart';
@@ -31,7 +31,7 @@ class MyRoutes {
     CompletedScreen.routeName: (ctx) => CompletedScreen(),
     TrashScreen.routeName: (ctx) => TrashScreen(),
     CollaboratorsScreen.routeName: (ctx) => CollaboratorsScreen(),
-    SettingsTabsScreen.routeName: (ctx) => SettingsTabsScreen(),
+    SettingsScreen.routeName: (ctx) => SettingsScreen(),
     FiltersScreen.routeName: (ctx) => FiltersScreen(),
     RelatedTaskInfoScreen.routeName: (ctx) => RelatedTaskInfoScreen(),
     LocationsScreen.routeName: (ctx) => LocationsScreen(),

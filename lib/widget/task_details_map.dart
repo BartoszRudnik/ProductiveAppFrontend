@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:productive_app/model/task.dart';
 import 'package:productive_app/widget/new_task_notification_localization.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TaskDetailsMap extends StatefulWidget {
   final Function setLocation;
@@ -39,9 +39,9 @@ class _TaskDetailsMapState extends State<TaskDetailsMap> {
 
   @override
   void initState() {
-    this._loadMapStyles();
-
     super.initState();
+
+    this._loadMapStyles();
   }
 
   Future _loadMapStyles() async {

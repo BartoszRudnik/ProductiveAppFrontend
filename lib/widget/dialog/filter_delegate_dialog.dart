@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
+import 'package:productive_app/config/images.dart';
 import 'package:productive_app/model/collaborator.dart';
 import 'package:productive_app/provider/delegate_provider.dart';
 import 'package:provider/provider.dart';
@@ -15,15 +16,22 @@ class FilterDelegateDialog extends StatelessWidget {
     @required this.alreadyChoosenCollaborators,
   });
 
+  List<String> extra = [];
+
   @override
   Widget build(BuildContext context) {
     List<Collaborator> collaborators = Provider.of<DelegateProvider>(context).collaboratorsList;
     List<Collaborator> filteredCollaborators = List<Collaborator>.from(collaborators);
     List<String> newCollaborators = List<String>.from(this.alreadyChoosenCollaborators);
 
+    if (extra.length > 0) {
+      newCollaborators.addAll(extra);
+      extra = [];
+    }
+
     filteredCollaborators.forEach(
       (element) {
-        if (this.alreadyChoosenCollaborators != null && this.alreadyChoosenCollaborators.contains(element.email)) {
+        if (newCollaborators != null && newCollaborators.contains(element.email)) {
           element.isSelected = true;
         } else {
           element.isSelected = false;
@@ -63,7 +71,12 @@ class FilterDelegateDialog extends StatelessWidget {
                         final alreadyExists = collaborators.where((element) => element.email == value);
                         if (alreadyExists.isEmpty) {
                           try {
-                            await Provider.of<DelegateProvider>(context, listen: false).addCollaborator(value);
+                            final colab = await Provider.of<DelegateProvider>(context, listen: false).addCollaborator(value);
+
+                            setState(() {
+                              colab.isSelected = true;
+                              this.extra.add(colab.email);
+                            });
                           } catch (error) {
                             return showDialog(
                               context: context,
@@ -137,7 +150,8 @@ class FilterDelegateDialog extends StatelessWidget {
                         onTap: () {
                           setState(() {
                             filteredCollaborators[collaboratorIndex].isSelected = !filteredCollaborators[collaboratorIndex].isSelected;
-                            if (!newCollaborators.contains(filteredCollaborators[collaboratorIndex].email) && filteredCollaborators[collaboratorIndex].isSelected) {
+                            if (!newCollaborators.contains(filteredCollaborators[collaboratorIndex].email) &&
+                                filteredCollaborators[collaboratorIndex].isSelected) {
                               newCollaborators.add(filteredCollaborators[collaboratorIndex].email);
                             } else if (!filteredCollaborators[collaboratorIndex].isSelected) {
                               newCollaborators.remove(filteredCollaborators[collaboratorIndex].email);
@@ -154,10 +168,13 @@ class FilterDelegateDialog extends StatelessWidget {
                                 child: FadeInImage(
                                   image: NetworkImage(this._serverUrl + 'userImage/getImage/${filteredCollaborators[collaboratorIndex].email}'),
                                   placeholder: AssetImage('assets/images/profile_placeholder.jpg'),
+                                  imageErrorBuilder: (ctx, obj, stackTrace) => Image.asset(Images.profilePicturePlacholder),
                                 ),
                               ),
                               title: Text(
-                                filteredCollaborators[collaboratorIndex].collaboratorName.length > 1 ? filteredCollaborators[collaboratorIndex].collaboratorName : filteredCollaborators[collaboratorIndex].email,
+                                filteredCollaborators[collaboratorIndex].collaboratorName.length > 1
+                                    ? filteredCollaborators[collaboratorIndex].collaboratorName
+                                    : filteredCollaborators[collaboratorIndex].email,
                                 style: TextStyle(
                                   color: filteredCollaborators[collaboratorIndex].isSelected ? Theme.of(context).accentColor : Theme.of(context).primaryColor,
                                 ),
