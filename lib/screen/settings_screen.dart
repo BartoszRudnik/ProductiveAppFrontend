@@ -288,6 +288,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final picker = ImagePicker();
       final pickedImage = await picker.getImage(
         source: imageSource,
+        imageQuality: 20,
       );
       final pickedImageFile = File(pickedImage.path);
 

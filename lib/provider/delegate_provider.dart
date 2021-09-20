@@ -363,8 +363,8 @@ class DelegateProvider with ChangeNotifier {
           isAskingForPermission: isAskingForPermission,
         );
 
+        newCollaborator = await CollaboratorDatabase.create(newCollaborator, this.userEmail);
         loadedCollaborators.add(newCollaborator);
-        await CollaboratorDatabase.create(newCollaborator, this.userEmail);
       }
 
       this.collaborators = loadedCollaborators;
