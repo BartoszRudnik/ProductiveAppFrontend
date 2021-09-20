@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:productive_app/provider/attachment_provider.dart';
+import 'package:productive_app/provider/location_provider.dart';
+import 'package:productive_app/utils/internet_connection.dart';
 import 'package:provider/provider.dart';
 
 import '../model/task.dart';
@@ -53,7 +56,18 @@ class InboxScreen extends StatelessWidget {
           Expanded(
             child: RefreshIndicator(
                 backgroundColor: Theme.of(context).primaryColor,
-                onRefresh: () => Provider.of<TaskProvider>(context, listen: false).fetchTasks(),
+                onRefresh: () async {
+                  if (await InternetConnection.internetConnection()) {
+                    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+                    await Future.wait(
+                      [
+                        taskProvider.fetchTasks(),
+                        Provider.of<AttachmentProvider>(context, listen: false).getAllDelegatedAttachments(taskProvider.delegatedTasksUuid),
+                        Provider.of<LocationProvider>(context, listen: false).getLocations(),
+                      ],
+                    );
+                  }
+                },
                 child: tasks.length == 0
                     ? EmptyList(message: AppLocalizations.of(context).emptyInbox)
                     : userSettings.sortingMode == 6

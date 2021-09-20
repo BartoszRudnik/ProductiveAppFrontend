@@ -134,16 +134,10 @@ class Data {
       print(error);
     }
 
-    final List<Task> delegatedTasks = Provider.of<TaskProvider>(context, listen: false).taskList.where((element) => element.parentUuid != null).toList();
+    final List<String> delegatedTasks = Provider.of<TaskProvider>(context, listen: false).delegatedTasksUuid;
 
     if (delegatedTasks != null && delegatedTasks.length > 0) {
-      List<String> delegatedTasksId = [];
-
-      delegatedTasks.forEach((task) {
-        delegatedTasksId.add(task.parentUuid);
-      });
-
-      await Provider.of<AttachmentProvider>(context, listen: false).getAllDelegatedAttachments(delegatedTasksId);
+      await Provider.of<AttachmentProvider>(context, listen: false).getAllDelegatedAttachments(delegatedTasks);
     }
   }
 }

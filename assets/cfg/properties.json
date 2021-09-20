@@ -1,5 +1,5 @@
 {
-    "serverUrl": "http://192.99.169.102:8080/api/v1/",
-    "serverUrl_local": "http://192.168.1.120:8080/api/v1/",
+    "serverUrl_vps": "http://192.99.169.102:8080/api/v1/",
+    "serverUrl": "http://192.168.1.120:8080/api/v1/",
     "serverUrl_heroku": "https://productive-app-dev.herokuapp.com/api/v1/"
 }

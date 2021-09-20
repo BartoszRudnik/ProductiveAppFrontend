@@ -81,6 +81,16 @@ class TaskProvider with ChangeNotifier {
     return [...this.taskList];
   }
 
+  List<String> get delegatedTasksUuid {
+    List<String> delegated = [];
+
+    delegated.addAll(this.inboxTasks.where((element) => element.parentUuid != null).map((e) => e.parentUuid));
+    delegated.addAll(this.anytimeTasks.where((element) => element.parentUuid != null).map((e) => e.parentUuid));
+    delegated.addAll(this.scheduledTasks.where((element) => element.parentUuid != null).map((e) => e.parentUuid));
+
+    return delegated;
+  }
+
   List<String> get tasksWithLocationId {
     List<String> withLocation = [];
 
