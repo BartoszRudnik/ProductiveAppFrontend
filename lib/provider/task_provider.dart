@@ -81,6 +81,16 @@ class TaskProvider with ChangeNotifier {
     return [...this.taskList];
   }
 
+  List<String> get tasksWithLocationId {
+    List<String> withLocation = [];
+
+    withLocation.addAll(this.inboxTasks.where((element) => element.notificationLocalizationUuid != null).map((e) => e.uuid));
+    withLocation.addAll(this.anytimeTasks.where((element) => element.notificationLocalizationUuid != null).map((e) => e.uuid));
+    withLocation.addAll(this.scheduledTasks.where((element) => element.notificationLocalizationUuid != null).map((e) => e.uuid));
+
+    return withLocation;
+  }
+
   List<Task> get tasksWithLocation {
     List<Task> withLocation = [];
 
@@ -188,7 +198,7 @@ class TaskProvider with ChangeNotifier {
         await TaskDatabase.update(task, this.userMail);
 
         if (task.notificationLocalizationUuid != null) {
-          Notifications.addGeofence(
+          await Notifications.addGeofence(
             task.uuid,
             latitude,
             longitude,
@@ -217,7 +227,7 @@ class TaskProvider with ChangeNotifier {
       await TaskDatabase.update(task, this.userMail);
 
       if (task.notificationLocalizationUuid != null) {
-        Notifications.addGeofence(
+        await Notifications.addGeofence(
           task.uuid,
           latitude,
           longitude,
@@ -351,7 +361,7 @@ class TaskProvider with ChangeNotifier {
     }
 
     if (newLocation == 'TRASH' || newLocation == 'COMPLETED') {
-      Notifications.removeGeofence(task.uuid);
+      await Notifications.removeGeofence(task.uuid);
     }
 
     this.deleteFromLocalization(task);
@@ -424,7 +434,7 @@ class TaskProvider with ChangeNotifier {
     }
 
     if (newLocation == 'TRASH' || newLocation == 'COMPLETED') {
-      Notifications.removeGeofence(task.uuid);
+      await Notifications.removeGeofence(task.uuid);
     }
 
     this.deleteFromLocalization(task);
@@ -629,7 +639,7 @@ class TaskProvider with ChangeNotifier {
         latitude = responseBody['latitude'];
         longitude = responseBody['longitude'];
 
-        Notifications.addGeofence(
+        await Notifications.addGeofence(
           task.uuid,
           latitude,
           longitude,
@@ -877,9 +887,9 @@ class TaskProvider with ChangeNotifier {
     this.localizationTaskStatus(task);
 
     if (task.done) {
-      Notifications.removeGeofence(task.uuid);
+      await Notifications.removeGeofence(task.uuid);
     } else {
-      Notifications.addGeofence(
+      await Notifications.addGeofence(
         task.uuid,
         latitude,
         longitude,
@@ -1351,18 +1361,10 @@ class TaskProvider with ChangeNotifier {
   }
 
   void notificationChange(
-    String taskUuid,
-    double notificationRadius,
-    bool onExit,
-    bool onEnter,
-    double latitude,
-    double longitude,
-    String title,
-    String description,
-  ) {
-    Notifications.removeGeofence(taskUuid);
+      String taskUuid, double notificationRadius, bool onExit, bool onEnter, double latitude, double longitude, String title, String description) async {
+    await Notifications.removeGeofence(taskUuid);
     if (taskUuid != null && latitude != null && longitude != null && notificationRadius != null) {
-      Notifications.addGeofence(taskUuid, latitude, longitude, notificationRadius, onEnter, onExit, title, description);
+      await Notifications.addGeofence(taskUuid, latitude, longitude, notificationRadius, onEnter, onExit, title, description);
     }
   }
 

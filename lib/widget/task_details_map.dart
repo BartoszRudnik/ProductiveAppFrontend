@@ -146,7 +146,7 @@ class _TaskDetailsMapState extends State<TaskDetailsMap> {
                           notificationOnEnter: this.widget.taskToEdit.notificationOnEnter,
                           notificationOnExit: this.widget.taskToEdit.notificationOnExit,
                           notificationRadius: this.widget.taskToEdit.notificationLocalizationRadius,
-                          taskId: this.widget.originalTask.id,
+                          taskUuid: this.widget.originalTask.uuid,
                         ),
                         Text(
                           AppLocalizations.of(context).tapToAddLocation,

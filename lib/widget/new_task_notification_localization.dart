@@ -8,7 +8,7 @@ class NewTaskNotificationLocalization extends StatefulWidget {
   final double notificationRadius;
   final bool notificationOnEnter;
   final bool notificationOnExit;
-  final int taskId;
+  final String taskUuid;
 
   bool bigIcon = false;
 
@@ -19,7 +19,7 @@ class NewTaskNotificationLocalization extends StatefulWidget {
     @required this.notificationOnEnter,
     @required this.notificationOnExit,
     @required this.notificationRadius,
-    this.taskId,
+    this.taskUuid,
   });
 
   @override
@@ -44,7 +44,7 @@ class _NewTaskNotificationLocalizationState extends State<NewTaskNotificationLoc
               notificationOnEnter: this.widget.notificationOnEnter,
               notificationOnExit: this.widget.notificationOnExit,
               notificationRadius: this.widget.notificationRadius,
-              taskId: this.widget.taskId,
+              taskUuid: this.widget.taskUuid,
             );
           },
         );

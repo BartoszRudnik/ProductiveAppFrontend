@@ -8,7 +8,7 @@ class CollaboratorDatabase {
     await db.delete(
       tableCollaborators,
       where: '${CollaboratorsFields.email} = ? OR userMail = ?',
-      whereArgs: [userMail],
+      whereArgs: [userMail, userMail],
     );
   }
 

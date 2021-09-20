@@ -9,9 +9,19 @@ import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:productive_app/db/attachment_database.dart';
+import 'package:productive_app/db/collaboratorTask_database.dart';
+import 'package:productive_app/db/collaborator_database.dart';
+import 'package:productive_app/db/graphic_database.dart';
+import 'package:productive_app/db/locale_database.dart';
+import 'package:productive_app/db/location_database.dart';
+import 'package:productive_app/db/settings_database.dart';
+import 'package:productive_app/db/tag_database.dart';
+import 'package:productive_app/db/task_database.dart';
 import 'package:productive_app/db/user_database.dart';
 import 'package:productive_app/utils/google_sign_in_api.dart';
 import 'package:productive_app/utils/internet_connection.dart';
+import 'package:productive_app/utils/notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../exception/HttpException.dart';
@@ -106,7 +116,23 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<void> deleteAccount(String token) async {
+  Future<void> clearAccountData(List<String> tasks) async {
+    await Future.wait([
+      AttachmentDatabase.deleteAll(this._email),
+      CollaboratorDatabase.deleteAll(this._email),
+      CollaboratorTaskDatabase.deleteAll(this._email),
+      GraphicDatabase.deleteAll(this._email),
+      LocaleDatabase.deleteAll(this._email),
+      LocationDatabase.deleteAll(this._email),
+      SettingsDatabase.delete(this._email),
+      TagDatabase.deleteAll(this._email),
+      TaskDatabase.deleteAll(this._email),
+      UserDatabase.delete(this._email),
+      Notifications.removeUserGeofences(tasks),
+    ]);
+  }
+
+  Future<void> deleteAccount(String token, List<String> tasks) async {
     String url = this._serverUrl + 'account/deleteAccount/${this._email}/$token';
 
     await UserDatabase.delete(this.email);
@@ -121,7 +147,13 @@ class AuthProvider with ChangeNotifier {
           },
         );
 
-        this.logout();
+        if (this._user != null && this._user.userType.toLowerCase() == "google") {
+          await this.googleLogout();
+        } else {
+          await this.logout();
+        }
+
+        await this.clearAccountData(tasks);
       } catch (error) {
         print(error);
         throw (error);

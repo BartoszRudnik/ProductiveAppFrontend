@@ -17,7 +17,7 @@ class NotificationLocationDialog extends StatefulWidget {
   final notificationRadius;
   final notificationOnEnter;
   final notificationOnExit;
-  final taskId;
+  final String taskUuid;
 
   NotificationLocationDialog({
     @required this.key,
@@ -25,7 +25,7 @@ class NotificationLocationDialog extends StatefulWidget {
     @required this.notificationOnEnter,
     @required this.notificationOnExit,
     @required this.notificationRadius,
-    this.taskId,
+    this.taskUuid,
   });
 
   @override
@@ -290,8 +290,8 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                     child: Text(AppLocalizations.of(context).cancel),
                   ),
                   ElevatedButton(
-                    onPressed: () {
-                      Notifications.removeGeofence(this.widget.taskId);
+                    onPressed: () async {
+                      await Notifications.removeGeofence(this.widget.taskUuid);
                       setState(() {
                         this.deleted = true;
                         this.location = null;
@@ -313,7 +313,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                         );
 
                         Navigator.of(context).pop(returnLocation);
-                      } else if (this.deleted && this.widget.taskId != null) {
+                      } else if (this.deleted && this.widget.taskUuid != null) {
                         Navigator.of(context).pop(-1);
                       } else {
                         Navigator.of(context).pop('cancel');

@@ -198,12 +198,12 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       if (taskToEdit.done != originalTask.done) {
         if (taskToEdit.notificationLocalizationUuid != null) {
           if (taskToEdit.done) {
-            Notifications.removeGeofence(taskToEdit.uuid);
+            await Notifications.removeGeofence(taskToEdit.uuid);
           } else {
             double latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(taskToEdit.notificationLocalizationUuid);
             double longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(taskToEdit.notificationLocalizationUuid);
 
-            Notifications.addGeofence(
+            await Notifications.addGeofence(
               taskToEdit.uuid,
               latitude,
               longitude,
@@ -308,7 +308,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
           notificationOnEnter: this.taskToEdit.notificationOnEnter,
           notificationOnExit: this.taskToEdit.notificationOnExit,
           notificationRadius: this.taskToEdit.notificationLocalizationRadius,
-          taskId: this.taskToEdit.id,
+          taskUuid: this.taskToEdit.uuid,
         );
       },
     );

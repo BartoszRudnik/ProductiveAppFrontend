@@ -75,20 +75,23 @@ class Notifications {
     return result;
   }
 
-  static void removeGeofence(String uuid) {
-    bg.BackgroundGeolocation.removeGeofence(uuid).then((bool success) {
-      print('[removeGeofence] success');
+  static Future<void> removeUserGeofences(List<String> tasks) async {
+    tasks.forEach((taskUuid) async {
+      await bg.BackgroundGeolocation.removeGeofence(taskUuid);
     });
   }
 
-  static void removeAllGeofences() {
-    bg.BackgroundGeolocation.removeGeofences().then((bool success) {
-      print('[removeGeofences] all geofences have been destroyed');
-    });
+  static Future<void> removeGeofence(String uuid) async {
+    await bg.BackgroundGeolocation.removeGeofence(uuid);
   }
 
-  static void addGeofence(String uuid, double latitude, double longitude, double radius, bool onEnter, bool onExit, String title, String description) {
-    bg.BackgroundGeolocation.addGeofence(bg.Geofence(
+  static Future<void> removeAllGeofences() async {
+    await bg.BackgroundGeolocation.removeGeofences();
+  }
+
+  static Future<void> addGeofence(
+      String uuid, double latitude, double longitude, double radius, bool onEnter, bool onExit, String title, String description) async {
+    await bg.BackgroundGeolocation.addGeofence(bg.Geofence(
       identifier: uuid,
       radius: radius * 1000,
       latitude: latitude,
@@ -102,10 +105,6 @@ class Notifications {
         'description': description,
         'title': title,
       },
-    )).then((bool success) {
-      print('[addGeofence] success with $latitude and $longitude');
-    }).catchError((error) {
-      print('[addGeofence] FAILURE: $error');
-    });
+    ));
   }
 }
