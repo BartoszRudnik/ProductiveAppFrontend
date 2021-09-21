@@ -41,6 +41,7 @@ class _TaskWidgetState extends State<TaskWidget> {
   @override
   Widget build(BuildContext context) {
     bool isArchived = (this.widget.task.localization == 'COMPLETED' || this.widget.task.localization == 'TRASH');
+    bool isPlanDo = !isArchived && !(this.widget.task.localization == 'INBOX');
 
     DateTime taskEndDate;
     DateTime today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
@@ -77,7 +78,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                           size: 50,
                         ),
                         Text(
-                          isArchived ? AppLocalizations.of(context).restore : AppLocalizations.of(context).organize,
+                          isArchived ? AppLocalizations.of(context).restore : ( isPlanDo ? AppLocalizations.of(context).completed :AppLocalizations.of(context).organize),
                           style: TextStyle(color: Theme.of(context).accentColor, fontSize: 20, fontWeight: FontWeight.w400),
                         ),
                       ],
@@ -132,13 +133,13 @@ class _TaskWidgetState extends State<TaskWidget> {
                             ElevatedButton(
                               onPressed: () {
                                 if (!isArchived) {
-                                  String newLocation = 'INBOX';
+                                  String newLocation = 'TRASH';
 
-                                  if (this.widget.task.done) {
+                                  /*if (this.widget.task.done) {
                                     newLocation = 'COMPLETED';
                                   } else {
                                     newLocation = 'TRASH';
-                                  }
+                                  }*/
                                   Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
                                 } else {
                                   Provider.of<SynchronizeProvider>(context, listen: false).addTaskToDelete(
@@ -167,17 +168,23 @@ class _TaskWidgetState extends State<TaskWidget> {
               if (direction == DismissDirection.startToEnd && (this.widget.task.isCanceled == null || !this.widget.task.isCanceled)) {
                 String newLocation;
 
-                if (this.widget.task.delegatedEmail == null) {
-                  if (this.widget.task.startDate != null) {
-                    newLocation = 'SCHEDULED';
+                if (isPlanDo){
+                  newLocation = "COMPLETED";
+                }
+                else {
+                  if (this.widget.task.delegatedEmail == null) {
+                    if (this.widget.task.startDate != null) {
+                      newLocation = 'SCHEDULED';
+                    } else {
+                      newLocation = 'ANYTIME';
+                    }
                   } else {
-                    newLocation = 'ANYTIME';
+                    newLocation = 'DELEGATED';
                   }
-                } else {
-                  newLocation = 'DELEGATED';
                 }
 
                 if (this.widget.task.notificationLocalizationUuid == null) {
+
                   Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
                 } else {
                   final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.widget.task.notificationLocalizationUuid);
