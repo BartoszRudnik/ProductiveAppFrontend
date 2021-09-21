@@ -28,6 +28,7 @@ class TaskFields {
     notificationOnExit,
     lastUpdated,
     uuid,
+    taskState,
   ];
 
   static final String id = "id";
@@ -53,6 +54,7 @@ class TaskFields {
   static final String notificationOnExit = "notificationOnExit";
   static final String lastUpdated = "lastUpdated";
   static final String uuid = "uuid";
+  static final String taskState = "taskState";
 }
 
 class Task {
@@ -73,14 +75,13 @@ class Task {
   bool isCanceled;
   String parentUuid;
   String childUuid;
-
   String notificationLocalizationUuid;
   num notificationLocalizationRadius;
   bool notificationOnEnter;
   bool notificationOnExit;
-
   DateTime lastUpdated;
   String uuid;
+  String taskState;
 
   String joinTagList(List<Tag> tagList) {
     if (tagList != null && tagList.length > 0) {
@@ -143,6 +144,7 @@ class Task {
     this.notificationOnEnter = false,
     this.notificationOnExit = false,
     this.lastUpdated,
+    @required this.taskState,
     @required this.uuid,
   });
 
@@ -170,8 +172,10 @@ class Task {
     bool notificationOnExit,
     DateTime lastUpdated,
     String uuid,
+    String taskState,
   }) =>
       Task(
+        taskState: taskState ?? this.taskState,
         id: id ?? this.id,
         title: title ?? this.title,
         childUuid: childUuid ?? this.childUuid,
@@ -199,6 +203,7 @@ class Task {
 
   static Task fromJson(Map<String, Object> json, List<Tag> tags) {
     return Task(
+      taskState: json[TaskFields.taskState] == null ? null : json[TaskFields.taskState] as String,
       id: json[TaskFields.id] == null ? null : json[TaskFields.id] as int,
       title: json[TaskFields.title] == null ? null : json[TaskFields.title] as String,
       childUuid: json[TaskFields.childUuid] == null ? null : json[TaskFields.childUuid] as String,
@@ -271,6 +276,7 @@ class Task {
               : 0,
       TaskFields.lastUpdated: this.lastUpdated != null ? this.lastUpdated.toIso8601String() : DateTime.now().toIso8601String(),
       TaskFields.uuid: this.uuid ?? null,
+      TaskFields.taskState: this.taskState,
     };
   }
 }

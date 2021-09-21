@@ -24,7 +24,7 @@ class TaskProvider with ChangeNotifier {
 
   List<String> taskPriorities = [];
 
-  final _localizations = ['INBOX', 'SCHEDULED', 'ANYTIME', 'COMPLETED', 'TRASH', 'DELEGATED'];
+  final _localizations = ['COLLECT', 'PLAN&DO', 'COMPLETED'];
 
   Map<String, int> prioritiesValue = {
     'LOW': 1,
@@ -192,6 +192,7 @@ class TaskProvider with ChangeNotifier {
               'localizationRadius': task.notificationLocalizationRadius,
               'notificationOnEnter': task.notificationOnEnter,
               'notificationOnExit': task.notificationOnExit,
+              'taskState': task.taskState,
             },
           ),
           headers: {
@@ -283,6 +284,7 @@ class TaskProvider with ChangeNotifier {
               'localizationRadius': task.notificationLocalizationRadius,
               'notificationOnEnter': task.notificationOnEnter,
               'notificationOnExit': task.notificationOnExit,
+              'taskState': task.taskState,
             },
           ),
           headers: {
@@ -418,6 +420,7 @@ class TaskProvider with ChangeNotifier {
               'localizationRadius': task.notificationLocalizationRadius,
               'notificationOnEnter': task.notificationOnEnter,
               'notificationOnExit': task.notificationOnExit,
+              'taskState': task.taskState,
             },
           ),
           headers: {
@@ -504,6 +507,7 @@ class TaskProvider with ChangeNotifier {
               'localizationRadius': task.notificationLocalizationRadius,
               'notificationOnEnter': task.notificationOnEnter,
               'notificationOnExit': task.notificationOnExit,
+              'taskState': task.taskState,
             },
           ),
           headers: {
@@ -547,24 +551,26 @@ class TaskProvider with ChangeNotifier {
         }
 
         Task task = Task(
-            uuid: responseBody['tasks']['uuid'],
-            id: responseBody['tasks']['id'],
-            title: responseBody['tasks']['taskName'],
-            description: responseBody['tasks']['description'],
-            done: responseBody['tasks']['ifDone'],
-            priority: responseBody['tasks']['priority'],
-            endDate: responseBody['tasks']['endDate'] == null ? null : DateTime.tryParse(responseBody['tasks']['endDate']),
-            startDate: responseBody['tasks']['startDate'] == null ? null : DateTime.tryParse(responseBody['tasks']['startDate']),
-            tags: taskTags,
-            localization: responseBody['tasks']['taskList'],
-            position: responseBody['tasks']['position'],
-            delegatedEmail: responseBody['tasks']['delegatedEmail'],
-            isDelegated: responseBody['tasks']['isDelegated'],
-            taskStatus: taskStatus,
-            isCanceled: responseBody['tasks']['isCanceled'],
-            supervisorEmail: supervisorEmail,
-            childUuid: responseBody['childUuid'],
-            parentUuid: responseBody['parentUuid']);
+          uuid: responseBody['tasks']['uuid'],
+          id: responseBody['tasks']['id'],
+          title: responseBody['tasks']['taskName'],
+          description: responseBody['tasks']['description'],
+          done: responseBody['tasks']['ifDone'],
+          priority: responseBody['tasks']['priority'],
+          endDate: responseBody['tasks']['endDate'] == null ? null : DateTime.tryParse(responseBody['tasks']['endDate']),
+          startDate: responseBody['tasks']['startDate'] == null ? null : DateTime.tryParse(responseBody['tasks']['startDate']),
+          tags: taskTags,
+          localization: responseBody['tasks']['taskList'],
+          position: responseBody['tasks']['position'],
+          delegatedEmail: responseBody['tasks']['delegatedEmail'],
+          isDelegated: responseBody['tasks']['isDelegated'],
+          taskStatus: taskStatus,
+          isCanceled: responseBody['tasks']['isCanceled'],
+          supervisorEmail: supervisorEmail,
+          childUuid: responseBody['childUuid'],
+          parentUuid: responseBody['parentUuid'],
+          taskState: responseBody['tasks']['taskState'],
+        );
 
         if (responseBody['tasks']['notificationLocalization'] != null) {
           task.notificationLocalizationUuid = responseBody['tasks']['notificationLocalization']['uuid'];
@@ -607,6 +613,7 @@ class TaskProvider with ChangeNotifier {
         endDate: DateTime.parse('2021-01-01'),
         startDate: DateTime.parse('2021-01-01'),
         supervisorEmail: 'mock@mock.com',
+        taskState: 'COLLECT',
       );
       try {
         final response = await http.get(url);
@@ -623,6 +630,7 @@ class TaskProvider with ChangeNotifier {
           endDate: DateTime.parse(responseBody['endDate']),
           startDate: DateTime.parse(responseBody['startDate']),
           supervisorEmail: supervisorEmail,
+          taskState: responseBody['taskState'],
         );
         singleTask = task;
         notifyListeners();
@@ -704,6 +712,7 @@ class TaskProvider with ChangeNotifier {
             uuid: element['tasks']['uuid'],
             id: element['tasks']['id'],
             title: element['tasks']['taskName'],
+            taskState: element['tasks']['taskState'],
             description: element['tasks']['description'],
             done: element['tasks']['ifDone'],
             priority: element['tasks']['priority'],
@@ -977,6 +986,7 @@ class TaskProvider with ChangeNotifier {
               title: element['tasks']['taskName'],
               description: element['tasks']['description'],
               done: element['tasks']['ifDone'],
+              taskState: element['tasks']['taskState'],
               priority: element['tasks']['priority'],
               endDate: element['tasks']['endDate'] != null ? DateTime.tryParse(element['tasks']['endDate']) : null,
               startDate: element['tasks']['endDate'] != null ? DateTime.tryParse(element['tasks']['startDate']) : null,

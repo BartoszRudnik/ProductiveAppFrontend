@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:productive_app/config/const_values.dart';
 
 class TaskLocalization extends StatefulWidget {
-  List<String> localizations;
+  final List<String> localizations;
   String localization;
-  Function setLocalization;
+  final Function setLocalization;
 
   TaskLocalization({
     @required this.localization,
@@ -23,7 +23,7 @@ class _TaskLocalizationState extends State<TaskLocalization> {
       child: Row(
         children: [
           Icon(Icons.all_inbox),
-          Text(ConstValues.listName(this.widget.localization, context)),
+          Text(ConstValues.stateName(this.widget.localization, context)),
         ],
       ),
       initialValue: this.widget.localization,
@@ -35,8 +35,9 @@ class _TaskLocalizationState extends State<TaskLocalization> {
       },
       itemBuilder: (context) {
         return widget.localizations.map((e) {
+          print(e);
           return PopupMenuItem(
-            child: Text(ConstValues.listName(e, context)),
+            child: Text(ConstValues.stateName(e, context)),
             value: e,
           );
         }).toList();
