@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+
 import '../provider/task_provider.dart';
 import '../widget/appBar/delete_appBar.dart';
 import '../widget/task_widget.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CompletedScreen extends StatelessWidget {
   static const routeName = '/completed-screen';
@@ -23,13 +24,9 @@ class CompletedScreen extends StatelessWidget {
               child: ListView.builder(
                 shrinkWrap: true,
                 itemCount: completedTasks.length,
-                itemBuilder: (ctx, index) => ChangeNotifierProvider.value(
-                  key: ValueKey(completedTasks[index].id),
-                  value: completedTasks[index],
-                  child: TaskWidget(
-                    task: completedTasks[index],
-                    key: UniqueKey(),
-                  ),
+                itemBuilder: (ctx, index) => TaskWidget(
+                  task: completedTasks[index],
+                  key: UniqueKey(),
                 ),
               ),
             ),

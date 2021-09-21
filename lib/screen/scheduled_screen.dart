@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:productive_app/provider/attachment_provider.dart';
+import 'package:productive_app/provider/location_provider.dart';
+import 'package:productive_app/utils/internet_connection.dart';
 import 'package:provider/provider.dart';
+
 import '../model/task.dart';
 import '../provider/settings_provider.dart';
 import '../provider/task_provider.dart';
 import '../utils/manage_filters.dart';
 import '../widget/empty_list.dart';
 import '../widget/task_widget.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ScheduledScreen extends StatelessWidget {
   @override
@@ -23,7 +27,18 @@ class ScheduledScreen extends StatelessWidget {
 
     return RefreshIndicator(
       backgroundColor: Theme.of(context).primaryColor,
-      onRefresh: () => Provider.of<TaskProvider>(context, listen: false).fetchTasks(),
+      onRefresh: () async {
+        if (await InternetConnection.internetConnection()) {
+          final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+          await Future.wait(
+            [
+              taskProvider.fetchTasks(),
+              Provider.of<AttachmentProvider>(context, listen: false).getAllDelegatedAttachments(taskProvider.delegatedTasksUuid),
+              Provider.of<LocationProvider>(context, listen: false).getLocations(),
+            ],
+          );
+        }
+      },
       child: before.length == 0 && today.length == 0 && after.length == 0
           ? EmptyList(message: AppLocalizations.of(context).emptyScheduled)
           : SingleChildScrollView(
@@ -55,13 +70,9 @@ class ScheduledScreen extends StatelessWidget {
                               physics: const NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               itemCount: before.length,
-                              itemBuilder: (ctx, index) => ChangeNotifierProvider.value(
+                              itemBuilder: (ctx, index) => TaskWidget(
+                                task: before[index],
                                 key: ValueKey(before[index]),
-                                value: before[index],
-                                child: TaskWidget(
-                                  task: before[index],
-                                  key: ValueKey(before[index]),
-                                ),
                               ),
                               onReorder: (int oldIndex, int newIndex) {
                                 if (newIndex > before.length) newIndex = before.length;
@@ -99,13 +110,9 @@ class ScheduledScreen extends StatelessWidget {
                                 physics: const NeverScrollableScrollPhysics(),
                                 shrinkWrap: true,
                                 itemCount: before.length,
-                                itemBuilder: (ctx, index) => ChangeNotifierProvider.value(
+                                itemBuilder: (ctx, index) => TaskWidget(
+                                  task: before[index],
                                   key: ValueKey(before[index]),
-                                  value: before[index],
-                                  child: TaskWidget(
-                                    task: before[index],
-                                    key: ValueKey(before[index]),
-                                  ),
                                 ),
                               ),
                             ),
@@ -133,13 +140,9 @@ class ScheduledScreen extends StatelessWidget {
                               physics: const NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               itemCount: today.length,
-                              itemBuilder: (ctx, index) => ChangeNotifierProvider.value(
+                              itemBuilder: (ctx, index) => TaskWidget(
+                                task: today[index],
                                 key: ValueKey(today[index]),
-                                value: today[index],
-                                child: TaskWidget(
-                                  task: today[index],
-                                  key: ValueKey(today[index]),
-                                ),
                               ),
                               onReorder: (int oldIndex, int newIndex) {
                                 if (newIndex > today.length) newIndex = today.length;
@@ -177,13 +180,9 @@ class ScheduledScreen extends StatelessWidget {
                                 physics: const NeverScrollableScrollPhysics(),
                                 shrinkWrap: true,
                                 itemCount: today.length,
-                                itemBuilder: (ctx, index) => ChangeNotifierProvider.value(
+                                itemBuilder: (ctx, index) => TaskWidget(
+                                  task: today[index],
                                   key: ValueKey(today[index]),
-                                  value: today[index],
-                                  child: TaskWidget(
-                                    task: today[index],
-                                    key: ValueKey(today[index]),
-                                  ),
                                 ),
                               ),
                             ),
@@ -211,13 +210,9 @@ class ScheduledScreen extends StatelessWidget {
                               physics: const NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               itemCount: after.length,
-                              itemBuilder: (ctx, index) => ChangeNotifierProvider.value(
+                              itemBuilder: (ctx, index) => TaskWidget(
+                                task: after[index],
                                 key: ValueKey(after[index]),
-                                value: after[index],
-                                child: TaskWidget(
-                                  task: after[index],
-                                  key: ValueKey(after[index]),
-                                ),
                               ),
                               onReorder: (int oldIndex, int newIndex) {
                                 if (newIndex > after.length) newIndex = after.length;
@@ -255,13 +250,9 @@ class ScheduledScreen extends StatelessWidget {
                                 physics: const NeverScrollableScrollPhysics(),
                                 shrinkWrap: true,
                                 itemCount: after.length,
-                                itemBuilder: (ctx, index) => ChangeNotifierProvider.value(
+                                itemBuilder: (ctx, index) => TaskWidget(
+                                  task: after[index],
                                   key: ValueKey(after[index]),
-                                  value: after[index],
-                                  child: TaskWidget(
-                                    task: after[index],
-                                    key: ValueKey(after[index]),
-                                  ),
                                 ),
                               ),
                             ),

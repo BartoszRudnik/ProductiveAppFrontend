@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:productive_app/model/task.dart';
 import 'package:productive_app/widget/new_task_notification_localization.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TaskDetailsMap extends StatefulWidget {
   final Function setLocation;
@@ -39,9 +39,9 @@ class _TaskDetailsMapState extends State<TaskDetailsMap> {
 
   @override
   void initState() {
-    this._loadMapStyles();
-
     super.initState();
+
+    this._loadMapStyles();
   }
 
   Future _loadMapStyles() async {
@@ -80,7 +80,7 @@ class _TaskDetailsMapState extends State<TaskDetailsMap> {
       height: 175,
       child: Stack(
         children: [
-          if (this.widget.taskToEdit.notificationLocalizationId != null && this.widget.latitude != null && this.widget.longitude != null)
+          if (this.widget.taskToEdit.notificationLocalizationUuid != null && this.widget.latitude != null && this.widget.longitude != null)
             Container(
               height: 175,
               width: double.infinity,
@@ -117,7 +117,7 @@ class _TaskDetailsMapState extends State<TaskDetailsMap> {
                 ),
               ),
             ),
-          if (this.widget.taskToEdit.notificationLocalizationId == null || this.widget.longitude == null || this.widget.latitude == null)
+          if (this.widget.taskToEdit.notificationLocalizationUuid == null || this.widget.longitude == null || this.widget.latitude == null)
             Column(
               children: [
                 Expanded(
@@ -142,11 +142,11 @@ class _TaskDetailsMapState extends State<TaskDetailsMap> {
                         NewTaskNotificationLocalization(
                           bigIcon: true,
                           setNotificationLocalization: this.widget.setNotificationLocalization,
-                          notificationLocalizationId: this.widget.taskToEdit.notificationLocalizationId,
+                          notificationLocalizationUuid: this.widget.taskToEdit.notificationLocalizationUuid,
                           notificationOnEnter: this.widget.taskToEdit.notificationOnEnter,
                           notificationOnExit: this.widget.taskToEdit.notificationOnExit,
                           notificationRadius: this.widget.taskToEdit.notificationLocalizationRadius,
-                          taskId: this.widget.originalTask.id,
+                          taskUuid: this.widget.originalTask.uuid,
                         ),
                         Text(
                           AppLocalizations.of(context).tapToAddLocation,

@@ -5,4 +5,5 @@ class Images {
   static String loadingScreenImageDark = 'assets/images/loading_screen_image_dark.png';
   static String emptyTaskListLight = 'assets/images/EmptyTaskListLight.png';
   static String emptyTaskListDark = 'assets/images/EmptyTaskListDark.png';
+  static String noInternet = 'assets/images/no_internet.png';
 }

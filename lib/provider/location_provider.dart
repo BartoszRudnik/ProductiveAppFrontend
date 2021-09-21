@@ -1,10 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:global_configuration/global_configuration.dart';
-import 'package:http/http.dart' as http;
 import 'package:geocoding/geocoding.dart' as geocoding;
+import 'package:global_configuration/global_configuration.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart' as http;
+import 'package:productive_app/db/location_database.dart';
+import 'package:productive_app/utils/internet_connection.dart';
+import 'package:uuid/uuid.dart';
 
 import '../model/location.dart' as models;
 
@@ -26,6 +29,12 @@ class LocationProvider with ChangeNotifier {
     @required this.placemarks,
   });
 
+  void setLocations(List<models.Location> listToSet) {
+    this.locationList = listToSet;
+
+    notifyListeners();
+  }
+
   List<models.Location> get locations {
     if (this.searchingText == null || this.searchingText.length < 1) {
       return [...this.locationList];
@@ -34,8 +43,8 @@ class LocationProvider with ChangeNotifier {
     }
   }
 
-  double getLongitude(int id) {
-    final location = this.locationList.firstWhere((element) => element.id == id, orElse: () => null);
+  double getLongitude(String uuid) {
+    final location = this.locationList.firstWhere((element) => element.uuid == uuid, orElse: () => null);
 
     if (location != null) {
       return location.longitude;
@@ -44,8 +53,8 @@ class LocationProvider with ChangeNotifier {
     }
   }
 
-  double getLatitude(int id) {
-    final location = this.locationList.firstWhere((element) => element.id == id, orElse: () => null);
+  double getLatitude(String uuid) {
+    final location = this.locationList.firstWhere((element) => element.uuid == uuid, orElse: () => null);
 
     if (location != null) {
       return location.latitude;
@@ -54,8 +63,8 @@ class LocationProvider with ChangeNotifier {
     }
   }
 
-  String getLocationName(int id) {
-    return this.locationList.firstWhere((element) => element.id == id).localizationName;
+  String getLocationName(String uuid) {
+    return this.locationList.firstWhere((element) => element.uuid == uuid).localizationName;
   }
 
   List<MapEntry<geocoding.Placemark, LatLng>> get marks {
@@ -74,15 +83,32 @@ class LocationProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void notify() {
+    notifyListeners();
+  }
+
+  Future<void> getLocationsOffline() async {
+    try {
+      this.locationList = await LocationDatabase.readAll(this.userMail);
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
   Future<void> getLocations() async {
     final url = this._serverUrl + "localization/getLocalizations/${this.userMail}";
     final List<models.Location> loadedLocations = [];
+
+    await LocationDatabase.deleteAll(this.userMail);
+
     try {
       final response = await http.get(url);
       final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
       for (var element in responseBody) {
         models.Location loc = models.Location(
+          uuid: element['uuid'],
           id: element['id'],
           localizationName: element["localizationName"],
           longitude: element["longitude"],
@@ -91,7 +117,9 @@ class LocationProvider with ChangeNotifier {
           locality: element["locality"],
           street: element["street"],
         );
+
         loadedLocations.add(loc);
+        await LocationDatabase.create(loc, this.userMail);
       }
 
       this.locationList = loadedLocations;
@@ -105,103 +133,126 @@ class LocationProvider with ChangeNotifier {
   Future<void> addLocation(models.Location newLocation) async {
     final url = this._serverUrl + "localization/addLocalization/${this.userMail}";
 
-    try {
-      final response = await http.post(
-        url,
-        body: json.encode(
-          {
-            'localizationName': newLocation.localizationName,
-            'longitude': newLocation.longitude,
-            'latitude': newLocation.latitude,
-            'street': newLocation.street,
-            'country': newLocation.country,
-            'locality': newLocation.locality,
+    final uuid = Uuid();
+
+    newLocation.uuid = uuid.v1();
+    newLocation.id = null;
+    newLocation = await LocationDatabase.create(newLocation, this.userMail);
+
+    this.locationList.insert(0, newLocation);
+
+    notifyListeners();
+
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          url,
+          body: json.encode(
+            {
+              'uuid': newLocation.uuid,
+              'localizationName': newLocation.localizationName,
+              'longitude': newLocation.longitude,
+              'latitude': newLocation.latitude,
+              'street': newLocation.street,
+              'country': newLocation.country,
+              'locality': newLocation.locality,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
           },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
-
-      newLocation.id = int.parse(response.body);
-
-      this.locationList.insert(0, newLocation);
-      notifyListeners();
-    } catch (error) {
-      print(error);
-      throw error;
+        );
+      } catch (error) {
+        print(error);
+        throw error;
+      }
     }
   }
 
-  Future<void> updateLocation(int id, models.Location location) async {
-    final url = this._serverUrl + "localization/updateLocalization/$id";
-    try {
-      await http.put(
-        url,
-        body: json.encode({
-          'localizationName': location.localizationName,
-          'longitude': location.longitude,
-          'latitude': location.latitude,
-          'street': location.street,
-          'locality': location.locality,
-          'country': location.country,
-        }),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
+  Future<void> updateLocation(models.Location location) async {
+    final url = this._serverUrl + "localization/updateLocalization/${location.uuid}";
 
-      notifyListeners();
-    } catch (error) {
-      print(error);
-      throw error;
+    await LocationDatabase.update(location, this.userMail);
+    notifyListeners();
+
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.put(
+          url,
+          body: json.encode({
+            'uuid': location.uuid,
+            'localizationName': location.localizationName,
+            'longitude': location.longitude,
+            'latitude': location.latitude,
+            'street': location.street,
+            'locality': location.locality,
+            'country': location.country,
+          }),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+        throw error;
+      }
     }
   }
 
-  Future<void> deleteLocation(int id) async {
-    final url = this._serverUrl + "localization/deleteLocalization/$id";
-    try {
-      await http.delete(url);
-      this.locationList.removeWhere((element) => element.id == id);
-      notifyListeners();
-    } catch (error) {
-      print(error);
-      throw error;
+  Future<void> deleteLocation(String uuid) async {
+    final url = this._serverUrl + "localization/deleteLocalization/$uuid";
+
+    this.locationList.removeWhere((element) => element.uuid == uuid);
+    await LocationDatabase.deleteByUuid(uuid);
+
+    notifyListeners();
+
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.delete(url);
+      } catch (error) {
+        print(error);
+        throw error;
+      }
     }
   }
 
   Future<void> findGlobalLocationsFromQuery(String query) async {
-    final url = "https://nominatim.openstreetmap.org/search?q=$query&format=json";
-    List<MapEntry<geocoding.Placemark, LatLng>> loadedMarks = [];
-    if (query.length >= 3) {
-      try {
-        final response = await http.get(url);
-        final responseBody = json.decode(utf8.decode(response.bodyBytes));
+    if (await InternetConnection.internetConnection()) {
+      final url = "https://nominatim.openstreetmap.org/search?q=$query&format=json";
+      List<MapEntry<geocoding.Placemark, LatLng>> loadedMarks = [];
 
-        for (var element in responseBody) {
-          models.Location loc = models.Location(
-            id: -1,
-            localizationName: element["name"],
-            longitude: double.parse(element["lon"]),
-            latitude: double.parse(element["lat"]),
-            country: " ",
-            locality: " ",
-            street: " ",
-          );
-          List<geocoding.Placemark> newMarks = await geocoding.placemarkFromCoordinates(loc.latitude, loc.longitude);
+      if (query.length >= 3) {
+        try {
+          final response = await http.get(url);
+          final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
-          for (var mark in newMarks) {
-            LatLng position = LatLng(double.parse(element["lat"]), double.parse(element["lon"]));
-            loadedMarks.add(MapEntry(mark, position));
+          for (var element in responseBody) {
+            models.Location loc = models.Location(
+              uuid: '',
+              id: -1,
+              localizationName: element["name"],
+              longitude: double.parse(element["lon"]),
+              latitude: double.parse(element["lat"]),
+              country: " ",
+              locality: " ",
+              street: " ",
+            );
+            List<geocoding.Placemark> newMarks = await geocoding.placemarkFromCoordinates(loc.latitude, loc.longitude);
+
+            for (var mark in newMarks) {
+              LatLng position = LatLng(double.parse(element["lat"]), double.parse(element["lon"]));
+              loadedMarks.add(MapEntry(mark, position));
+            }
           }
+          this.placemarks = loadedMarks;
+          notifyListeners();
+        } catch (error) {
+          print(error);
+          throw error;
         }
-        this.placemarks = loadedMarks;
-        notifyListeners();
-      } catch (error) {
-        print(error);
-        throw error;
       }
     }
   }

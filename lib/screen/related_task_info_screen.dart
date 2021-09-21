@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_app/config/const_values.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import '../model/task.dart';
 import '../provider/task_provider.dart';
 import '../widget/appBar/task_appBar.dart';
@@ -16,16 +17,16 @@ class RelatedTaskInfoScreen extends StatefulWidget {
 
 class _RelatedTaskInfoScreenState extends State<RelatedTaskInfoScreen> {
   Task originalTask;
-  int taskId = 0;
+  String taskUuid;
   DateFormat formatter = DateFormat("yyyy-MM-dd");
   TimeOfDay startTime;
   TimeOfDay endTime;
   IconData priorityIcon;
 
   Future<void> loadData() async {
-    taskId = ModalRoute.of(context).settings.arguments as int;
+    taskUuid = ModalRoute.of(context).settings.arguments as String;
 
-    await Provider.of<TaskProvider>(context, listen: false).fetchSingleTask(taskId);
+    await Provider.of<TaskProvider>(context, listen: false).fetchSingleTask(taskUuid);
 
     originalTask = Provider.of<TaskProvider>(context, listen: false).getSingleTask;
     startTime = TimeOfDay(hour: originalTask.startDate.hour, minute: originalTask.startDate.minute);
@@ -36,11 +37,6 @@ class _RelatedTaskInfoScreenState extends State<RelatedTaskInfoScreen> {
     if (originalTask.priority == 'HIGHER') priorityIcon = Icons.arrow_upward_outlined;
     if (originalTask.priority == 'HIGHER') priorityIcon = Icons.arrow_upward_outlined;
     if (originalTask.priority == 'CRITICAL') priorityIcon = Icons.warning_amber_sharp;
-  }
-
-  @override
-  void initState() {
-    super.initState();
   }
 
   Future<void> a() async {}

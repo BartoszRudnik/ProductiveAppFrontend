@@ -35,18 +35,28 @@ class ConstValues {
   }
 
   static String listName(String listName, BuildContext context) {
-    if (listName.toLowerCase() == "INBOX".toLowerCase()) {
+    if (listName.toLowerCase() == "inbox") {
       return AppLocalizations.of(context).inbox;
-    } else if (listName.toLowerCase() == "SCHEDULED".toLowerCase()) {
+    } else if (listName.toLowerCase() == "scheduled") {
       return AppLocalizations.of(context).scheduled;
-    } else if (listName.toLowerCase() == "ANYTIME".toLowerCase()) {
+    } else if (listName.toLowerCase() == "anytime") {
       return AppLocalizations.of(context).anytime;
-    } else if (listName.toLowerCase() == "COMPLETED".toLowerCase()) {
+    } else if (listName.toLowerCase() == "completed") {
       return AppLocalizations.of(context).completed;
-    } else if (listName.toLowerCase() == "TRASH".toLowerCase()) {
+    } else if (listName.toLowerCase() == "trash") {
       return AppLocalizations.of(context).trash;
     } else {
       return AppLocalizations.of(context).delegated;
+    }
+  }
+
+  static String stateName(String listName, BuildContext context) {
+    if (listName.toLowerCase() == "collect") {
+      return AppLocalizations.of(context).collect;
+    } else if (listName.toLowerCase() == "plan&do") {
+      return AppLocalizations.of(context).planDo;
+    } else {
+      return AppLocalizations.of(context).completed;
     }
   }
 

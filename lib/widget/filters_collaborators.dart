@@ -77,7 +77,10 @@ class FiltersCollaborators extends StatelessWidget {
                     scrollDirection: Axis.horizontal,
                     itemCount: this.collaborators.length,
                     itemBuilder: (context, index) {
-                      final collaboratorName = Provider.of<DelegateProvider>(context, listen: false).collaborators.firstWhere((element) => element.email == this.collaborators[index]).collaboratorName;
+                      final collaboratorName = Provider.of<DelegateProvider>(context, listen: false)
+                          .collaborators
+                          .firstWhere((element) => element.email == this.collaborators[index])
+                          .collaboratorName;
 
                       Future<void> onPressed() async {
                         await Provider.of<SettingsProvider>(context, listen: false).deleteFilterCollaboratorEmail(this.collaborators[index]);

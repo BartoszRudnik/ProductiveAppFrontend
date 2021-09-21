@@ -24,7 +24,7 @@
   "@\"analytics": {},
   "anytime": "Anytime",
   "@\"anytime": {},
-  "archive": "Archive",
+  "archive": "Delete Task",
   "@\"archive": {},
   "areSureDeleteLocation": "Are you sure you want to delete this location?",
   "@\"areSureDeleteLocation": {},
@@ -180,7 +180,7 @@
   "@\"notificationOnEnter": {},
   "notificationOnExit": "Notification on exit",
   "@\"notificationOnExit": {},
-  "organize": "Organize",
+  "organize": "Plan&do",
   "@\"organize": {},
   "password": "Password",
   "@\"password": {},
@@ -352,5 +352,9 @@
   "emptyEmail": "Email cannot be empty",
   "collaboratorAlreadyExist": "Collaborator already exist",
   "noLocationTasks": "No tasks with location",
-  "collaboratorNameOrEmail": "Enter collaborator name or email"
+  "collaboratorNameOrEmail": "Enter collaborator name or email",
+  "collect": "Collect",
+  "planDo": "Plan&Do",
+  "state": "State",
+  "attributes": "Attributes"  
 }

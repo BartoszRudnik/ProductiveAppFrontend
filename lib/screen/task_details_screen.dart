@@ -1,9 +1,14 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_app/config/const_values.dart';
+import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:productive_app/utils/task_validate.dart';
+import 'package:productive_app/widget/task_details_state.dart';
+import 'package:productive_app/widget/task_details_description.dart';
+import 'package:productive_app/widget/task_details_tags.dart';
 import 'package:provider/provider.dart';
-import '../config/color_themes.dart';
 import '../model/attachment.dart';
 import '../model/task.dart';
 import '../model/taskLocation.dart';
@@ -22,8 +27,6 @@ import '../widget/task_details_attributes.dart';
 import '../widget/task_details_bottom_bar.dart';
 import '../widget/task_details_dates.dart';
 import '../widget/task_details_map.dart';
-import '../widget/task_tags_edit.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TaskDetailScreen extends StatefulWidget {
   static const routeName = "/task-details";
@@ -47,17 +50,17 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
   bool _locationChanged = false;
   bool _isFocused = false;
   bool _isDescriptionInitial = true;
-  String _description = "";
+
   DateFormat formatter = DateFormat("yyyy-MM-dd");
 
   @override
   void initState() {
+    super.initState();
+
     _descriptionFocus.addListener(onDescriptionFocusChange);
     taskToEdit = null;
 
     Provider.of<AttachmentProvider>(context, listen: false).prepare();
-
-    super.initState();
   }
 
   void setNewAttachments(List<int> newAttachments) {
@@ -73,16 +76,16 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
 
   void onDescriptionChanged(String text) {
     setState(() {
-      _description = text;
+      this.taskToEdit.description = text;
     });
     checkColor();
   }
 
   bool differentNotification(Task newTask, Task oldTask) {
-    if (newTask.notificationLocalizationId != null && oldTask.notificationLocalizationId == null) {
+    if (newTask.notificationLocalizationUuid != null && oldTask.notificationLocalizationUuid == null) {
       return true;
-    } else if (newTask.notificationLocalizationId != null && oldTask.notificationLocalizationId != null) {
-      if (newTask.notificationLocalizationId != oldTask.notificationLocalizationId ||
+    } else if (newTask.notificationLocalizationUuid != null && oldTask.notificationLocalizationUuid != null) {
+      if (newTask.notificationLocalizationUuid != oldTask.notificationLocalizationUuid ||
           newTask.notificationLocalizationRadius != oldTask.notificationLocalizationRadius ||
           newTask.notificationOnEnter != oldTask.notificationOnEnter ||
           newTask.notificationOnExit != oldTask.notificationOnExit) {
@@ -97,14 +100,39 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
 
   void checkColor() {
     setState(() {
-      _isDescriptionInitial = true;
-      if (_description.isNotEmpty) {
-        _isDescriptionInitial = false;
+      this._isDescriptionInitial = true;
+      if (this.taskToEdit == null || this.taskToEdit.description.isNotEmpty) {
+        this._isDescriptionInitial = false;
       }
-      if (_isFocused) {
-        _isDescriptionInitial = false;
+      if (this._isFocused) {
+        this._isDescriptionInitial = false;
       }
     });
+  }
+
+  void _chooseTaskList() {
+    if (this.taskToEdit.taskState == null) {
+      this.taskToEdit.taskState = 'COLLECT';
+      this.taskToEdit.localization = 'INBOX';
+    } else {
+      if (this.taskToEdit.taskState == 'COLLECT') {
+        this.taskToEdit.localization = 'INBOX';
+      } else if (this.taskToEdit.taskState == "COMPLETED") {
+        if (this.taskToEdit.done) {
+          this.taskToEdit.localization = 'COMPLETED';
+        } else {
+          this.taskToEdit.localization = 'TRASH';
+        }
+      } else if (this.taskToEdit.taskState == "PLAN&DO") {
+        if (this.taskToEdit.delegatedEmail != null) {
+          this.taskToEdit.localization = 'DELEGATED';
+        } else if (this.taskToEdit.startDate != null) {
+          this.taskToEdit.localization = 'SCHEDULED';
+        } else {
+          this.taskToEdit.localization = 'ANYTIME';
+        }
+      }
+    }
   }
 
   Future<void> selectStartTime() async {
@@ -146,8 +174,32 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     this.setTaskListAutomatically();
   }
 
+  void showInfo(String newLocalization) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        margin: EdgeInsetsDirectional.only(bottom: 60),
+        behavior: SnackBarBehavior.floating,
+        content: Text(AppLocalizations.of(context).taskMoved + ConstValues.listName(newLocalization, context)),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
   Future<void> saveTask() async {
     bool isValid = this._formKey.currentState.validate();
+
+    if (this.startTime != null && taskToEdit.startDate != null) {
+      taskToEdit.startDate =
+          new DateTime(taskToEdit.startDate.year, taskToEdit.startDate.month, taskToEdit.startDate.day, this.startTime.hour, this.startTime.minute);
+    } else if (taskToEdit.startDate != null) {
+      taskToEdit.startDate = new DateTime(taskToEdit.startDate.year, taskToEdit.startDate.month, taskToEdit.startDate.day, 0, 0);
+    }
+
+    if (this.endTime != null && taskToEdit.endDate != null) {
+      taskToEdit.endDate = new DateTime(taskToEdit.endDate.year, taskToEdit.endDate.month, taskToEdit.endDate.day, this.endTime.hour, this.endTime.minute);
+    } else if (taskToEdit.endDate != null) {
+      taskToEdit.endDate = new DateTime(taskToEdit.endDate.year, taskToEdit.endDate.month, taskToEdit.endDate.day, 0, 0);
+    }
 
     isValid = await TaskValidate.validateTaskEdit(taskToEdit, originalTask, context);
 
@@ -158,35 +210,22 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     this._formKey.currentState.save();
 
     try {
-      if (this.taskToEdit.delegatedEmail != null && this.taskToEdit.localization != 'DELEGATED' && (originalTask.localization == 'ANYTIME' || originalTask.localization == 'SCHEDULED')) {
-        this.taskToEdit.localization = 'DELEGATED';
-      }
-
-      if (this.startTime != null && taskToEdit.startDate != null) {
-        taskToEdit.startDate = new DateTime(taskToEdit.startDate.year, taskToEdit.startDate.month, taskToEdit.startDate.day, this.startTime.hour, this.startTime.minute);
-      } else if (taskToEdit.startDate != null) {
-        taskToEdit.startDate = new DateTime(taskToEdit.startDate.year, taskToEdit.startDate.month, taskToEdit.startDate.day, 0, 0);
-      }
-
-      if (this.endTime != null && taskToEdit.endDate != null) {
-        taskToEdit.endDate = new DateTime(taskToEdit.endDate.year, taskToEdit.endDate.month, taskToEdit.endDate.day, this.endTime.hour, this.endTime.minute);
-      } else if (taskToEdit.endDate != null) {
-        taskToEdit.endDate = new DateTime(taskToEdit.endDate.year, taskToEdit.endDate.month, taskToEdit.endDate.day, 0, 0);
-      }
+      this._chooseTaskList();
 
       final newLocalization = taskToEdit.localization;
+
       taskToEdit.localization = originalTask.localization;
 
       if (taskToEdit.done != originalTask.done) {
-        if (taskToEdit.notificationLocalizationId != null) {
+        if (taskToEdit.notificationLocalizationUuid != null) {
           if (taskToEdit.done) {
-            Notifications.removeGeofence(taskToEdit.id);
+            await Notifications.removeGeofence(taskToEdit.uuid);
           } else {
-            double latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(taskToEdit.notificationLocalizationId);
-            double longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(taskToEdit.notificationLocalizationId);
+            double latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(taskToEdit.notificationLocalizationUuid);
+            double longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(taskToEdit.notificationLocalizationUuid);
 
-            Notifications.addGeofence(
-              taskToEdit.id,
+            await Notifications.addGeofence(
+              taskToEdit.uuid,
               latitude,
               longitude,
               taskToEdit.notificationLocalizationRadius,
@@ -200,8 +239,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
 
         await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, newLocalization);
       } else if (this.differentNotification(taskToEdit, originalTask)) {
-        final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(taskToEdit.notificationLocalizationId);
-        final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(taskToEdit.notificationLocalizationId);
+        final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(taskToEdit.notificationLocalizationUuid);
+        final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(taskToEdit.notificationLocalizationUuid);
 
         await Provider.of<TaskProvider>(context, listen: false).updateTaskWithGeolocation(taskToEdit, newLocalization, longitude, latitude);
       } else {
@@ -209,17 +248,14 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       }
 
       if (this.originalTask.localization != newLocalization) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context).taskMoved + ConstValues.listName(newLocalization, context)),
-            duration: Duration(seconds: 2),
-          ),
-        );
+        this.showInfo(newLocalization);
       }
 
       await Provider.of<AttachmentProvider>(context, listen: false).deleteFlaggedAttachments();
       Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);
       this.changesSaved = true;
+    } on SocketException catch (error) {
+      print(error);
     } catch (error) {
       print(error);
       await Dialogs.showWarningDialog(context, AppLocalizations.of(context).errorOccurred);
@@ -251,7 +287,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
   void setNotificationLocalization(TaskLocation taskLocation) {
     setState(() {
       if (taskLocation != null && taskLocation.location != null) {
-        this.taskToEdit.notificationLocalizationId = taskLocation.location.id;
+        this.taskToEdit.notificationLocalizationUuid = taskLocation.location.uuid;
         this.taskToEdit.notificationLocalizationRadius = taskLocation.notificationRadius;
         this.taskToEdit.notificationOnEnter = taskLocation.notificationOnEnter;
         this.taskToEdit.notificationOnExit = taskLocation.notificationOnExit;
@@ -263,7 +299,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
 
   void deleteNotificationLocalization() {
     setState(() {
-      this.taskToEdit.notificationLocalizationId = null;
+      this.taskToEdit.notificationLocalizationUuid = null;
       this.taskToEdit.notificationLocalizationRadius = 0.1;
       this.taskToEdit.notificationOnEnter = false;
       this.taskToEdit.notificationOnExit = false;
@@ -289,11 +325,11 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       builder: (context) {
         return NotificationLocationDialog(
           key: UniqueKey(),
-          notificationLocationId: this.taskToEdit.notificationLocalizationId,
+          notificationLocationUuid: this.taskToEdit.notificationLocalizationUuid,
           notificationOnEnter: this.taskToEdit.notificationOnEnter,
           notificationOnExit: this.taskToEdit.notificationOnExit,
           notificationRadius: this.taskToEdit.notificationLocalizationRadius,
-          taskId: this.taskToEdit.id,
+          taskUuid: this.taskToEdit.uuid,
         );
       },
     );
@@ -311,9 +347,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     });
   }
 
-  void setTaskList(newValue) {
+  void setTaskState(newValue) {
     setState(() {
-      this.taskToEdit.localization = newValue;
+      this.taskToEdit.taskState = newValue;
     });
   }
 
@@ -348,7 +384,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     this.setTaskListAutomatically();
   }
 
-  bool checkEquals(Task a, Task b) {
+  bool _checkEquals(Task a, Task b) {
     return a.id == b.id &&
         a.title == b.title &&
         a.description == b.description &&
@@ -356,30 +392,32 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         a.localization == b.localization &&
         a.delegatedEmail == b.delegatedEmail &&
         a.taskStatus == b.taskStatus &&
+        a.taskState == b.taskState &&
         a.supervisorEmail == b.supervisorEmail &&
         a.startDate == b.startDate &&
         a.endDate == b.endDate &&
         a.tags == b.tags &&
         a.done == b.done &&
-        a.notificationLocalizationId == b.notificationLocalizationId &&
+        a.notificationLocalizationUuid == b.notificationLocalizationUuid &&
         a.notificationLocalizationRadius == b.notificationLocalizationRadius &&
         a.notificationOnEnter == b.notificationOnEnter &&
         a.notificationOnExit == b.notificationOnExit;
   }
 
   void setTaskToEdit(Task argTask) {
-    if (argTask.startDate != null && argTask.startDate.hour != 0 && argTask.startDate.minute != 0) {
+    if (argTask.startDate != null && (argTask.startDate.hour != 0 || argTask.startDate.minute != 0)) {
       setState(() {
         this.startTime = TimeOfDay(hour: argTask.startDate.hour, minute: argTask.startDate.minute);
       });
     }
-    if (argTask.endDate != null && argTask.endDate.hour != 0 && argTask.endDate.minute != 0) {
+    if (argTask.endDate != null && (argTask.endDate.hour != 0 || argTask.endDate.minute != 0)) {
       setState(() {
         this.endTime = TimeOfDay(hour: argTask.endDate.hour, minute: argTask.endDate.minute);
       });
     }
 
     taskToEdit = new Task(
+      uuid: argTask.uuid,
       id: argTask.id,
       title: argTask.title,
       description: argTask.description,
@@ -392,28 +430,30 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       position: argTask.position,
       delegatedEmail: argTask.delegatedEmail,
       isCanceled: argTask.isCanceled,
-      childId: argTask.childId,
+      childUuid: argTask.childUuid,
       isDelegated: argTask.isDelegated,
-      notificationLocalizationId: argTask.notificationLocalizationId,
+      notificationLocalizationUuid: argTask.notificationLocalizationUuid,
       notificationLocalizationRadius: argTask.notificationLocalizationRadius,
       notificationOnEnter: argTask.notificationOnEnter,
       notificationOnExit: argTask.notificationOnExit,
-      parentId: argTask.parentId,
+      parentUuid: argTask.parentUuid,
       supervisorEmail: argTask.supervisorEmail,
       taskStatus: argTask.taskStatus,
+      taskState: argTask.taskState,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final priorities = Provider.of<TaskProvider>(context, listen: false).priorities;
-    final localizations = Provider.of<TaskProvider>(context, listen: false).localizations;
+    final states = Provider.of<TaskProvider>(context, listen: false).localizations;
 
     if (taskToEdit == null) {
       originalTask = ModalRoute.of(context).settings.arguments as Task;
+
       setTaskToEdit(originalTask);
-      this._description = taskToEdit.description;
-      if (_description.isNotEmpty && _description.trim() != '') {
+
+      if (this.taskToEdit.description != null && this.taskToEdit.description.isNotEmpty && this.taskToEdit.description.trim() != '') {
         onDescriptionChanged(taskToEdit.description);
       }
     }
@@ -421,13 +461,18 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     double latitude = -1;
     double longitude = -1;
 
-    if (this.taskToEdit.notificationLocalizationId != null) {
-      latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.taskToEdit.notificationLocalizationId);
-      longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.taskToEdit.notificationLocalizationId);
+    if (this.taskToEdit.notificationLocalizationUuid != null) {
+      latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.taskToEdit.notificationLocalizationUuid);
+      longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.taskToEdit.notificationLocalizationUuid);
     }
 
-    List<Attachment> attachments = Provider.of<AttachmentProvider>(context).attachments.where((attachment) => attachment.taskId == taskToEdit.id && !attachment.toDelete).toList();
-    attachments.addAll(Provider.of<AttachmentProvider>(context).delegatedAttachments.where((attachment) => attachment.taskId == taskToEdit.parentId && !attachment.toDelete).toList());
+    List<Attachment> attachments =
+        Provider.of<AttachmentProvider>(context).attachments.where((attachment) => attachment.taskUuid == taskToEdit.uuid && !attachment.toDelete).toList();
+
+    attachments.addAll(Provider.of<AttachmentProvider>(context)
+        .delegatedAttachments
+        .where((attachment) => attachment.taskUuid == taskToEdit.parentUuid && !attachment.toDelete)
+        .toList());
 
     return WillPopScope(
       // ignore: missing_return
@@ -435,13 +480,23 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         this._formKey.currentState.save();
         bool result = false;
 
-        if ((!this.checkEquals(this.originalTask, this.taskToEdit) || Provider.of<AttachmentProvider>(context, listen: false).notSavedAttachments.length > 0) && !this.changesSaved) {
+        if ((!this._checkEquals(this.originalTask, this.taskToEdit) ||
+                Provider.of<AttachmentProvider>(context, listen: false).notSavedAttachments.length > 0) &&
+            !this.changesSaved) {
           result = await Dialogs.showActionDialog(
             context,
             AppLocalizations.of(context).changes,
             this.saveTask,
             () {},
           );
+        }
+
+        final notSaved = Provider.of<AttachmentProvider>(context, listen: false).notSavedAttachments;
+
+        if (notSaved != null) {
+          notSaved.forEach((element) {
+            Provider.of<SynchronizeProvider>(context, listen: false).addAttachmentToDelete(element.uuid);
+          });
         }
 
         await Provider.of<AttachmentProvider>(context, listen: false).deleteNotSavedAttachments();
@@ -475,45 +530,23 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                       return null;
                     },
                   ),
-                  SizedBox(
-                    height: 10,
+                  TaskDetailsDescription(
+                    description: this.taskToEdit.description,
+                    descriptionFocus: this._descriptionFocus,
+                    isDescriptionInitial: this._isDescriptionInitial,
+                    isFocused: this._isFocused,
+                    onDescriptionChanged: this.onDescriptionChanged,
                   ),
-                  ListTile(
-                    minLeadingWidth: 16,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 0),
-                    leading: Icon(Icons.edit),
-                    title: Align(
-                      alignment: Alignment(-1.1, 0),
-                      child: Text(
-                        AppLocalizations.of(context).description,
-                        style: TextStyle(fontSize: 21),
-                      ),
-                    ),
-                  ),
-                  TextFormField(
-                    initialValue: taskToEdit.description,
-                    maxLines: null,
-                    focusNode: this._descriptionFocus,
-                    onChanged: (text) {
-                      onDescriptionChanged(text);
-                    },
-                    onSaved: (value) {
-                      taskToEdit.description = value;
-                    },
-                    style: TextStyle(fontSize: 16),
-                    textAlign: this._isDescriptionInitial ? TextAlign.center : TextAlign.left,
-                    decoration: ColorThemes.taskDetailsFieldDecoration(this._isFocused, this._description, context),
-                  ),
-                  SizedBox(
-                    height: 10,
+                  TaskDetailsState(
+                    taskState: this.taskToEdit.taskState,
+                    setTaskState: this.setTaskState,
+                    states: states,
                   ),
                   TaskDetailsAttributes(
                     taskToEdit: taskToEdit,
                     priorities: priorities,
                     setDelegatedEmail: setDelegatedEmail,
-                    localizations: localizations,
                     setPriority: setPriority,
-                    setLocalization: setTaskList,
                   ),
                   SizedBox(
                     height: 15,
@@ -536,39 +569,13 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                     selectEndTime: this.selectEndTime,
                     selectStartTime: this.selectStartTime,
                   ),
-                  ListTile(
-                    minLeadingWidth: 16,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 0),
-                    leading: Icon(Icons.tag),
-                    title: Align(
-                      alignment: Alignment(-1.1, 0),
-                      child: Text(
-                        AppLocalizations.of(context).tags,
-                        style: TextStyle(fontSize: 21),
-                      ),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () => editTags(context),
-                    child: TaskTagsEdit(
-                      tags: taskToEdit.tags,
-                    ),
-                  ),
-                  ListTile(
-                    minLeadingWidth: 16,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 0),
-                    leading: Icon(Icons.attach_file_outlined),
-                    title: Align(
-                      alignment: Alignment(-1.1, 0),
-                      child: Text(
-                        AppLocalizations.of(context).attachments,
-                        style: TextStyle(fontSize: 21),
-                      ),
-                    ),
+                  TaskDetailsTags(
+                    tags: this.taskToEdit.tags,
+                    editTags: this.editTags,
                   ),
                   TaskDetailsAttachments(
                     attachments: attachments,
-                    taskId: taskToEdit.id,
+                    taskUuid: taskToEdit.uuid,
                   ),
                 ],
               ),

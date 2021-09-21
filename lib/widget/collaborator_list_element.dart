@@ -30,16 +30,13 @@ class CollaboratorListElement extends StatelessWidget {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(25),
             child: FadeInImage(
-                image: NetworkImage(this._serverUrl +
-                    'userImage/getImage/${this.collaborator.email}'),
+                image: NetworkImage(this._serverUrl + 'userImage/getImage/${this.collaborator.email}'),
                 placeholder: AssetImage(Images.profilePicturePlacholder),
-                imageErrorBuilder: (ctx, obj, stackTrace) =>
-                    Image.asset(Images.profilePicturePlacholder)),
+                imageErrorBuilder: (ctx, obj, stackTrace) => Image.asset(Images.profilePicturePlacholder)),
           ),
         ),
         title: Text(
-          this.collaborator.collaboratorName != null &&
-                  this.collaborator.collaboratorName.length > 1
+          this.collaborator.collaboratorName != null && this.collaborator.collaboratorName.length > 1
               ? this.collaborator.collaboratorName
               : this.collaborator.email,
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),

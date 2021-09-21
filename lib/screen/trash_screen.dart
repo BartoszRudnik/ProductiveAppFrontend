@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+
 import '../provider/task_provider.dart';
 import '../widget/appBar/delete_appBar.dart';
 import '../widget/task_widget.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TrashScreen extends StatelessWidget {
   static const routeName = '/trash-screen';
@@ -23,13 +24,9 @@ class TrashScreen extends StatelessWidget {
               child: ListView.builder(
                 shrinkWrap: true,
                 itemCount: trashTasks.length,
-                itemBuilder: (ctx, index) => ChangeNotifierProvider.value(
-                  key: ValueKey(trashTasks[index].id),
-                  value: trashTasks[index],
-                  child: TaskWidget(
-                    task: trashTasks[index],
-                    key: UniqueKey(),
-                  ),
+                itemBuilder: (ctx, index) => TaskWidget(
+                  task: trashTasks[index],
+                  key: UniqueKey(),
                 ),
               ),
             ),

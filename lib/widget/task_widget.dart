@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_app/config/const_values.dart';
+import 'package:productive_app/provider/locale_provider.dart';
+import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../model/task.dart';
@@ -9,7 +12,6 @@ import '../provider/task_provider.dart';
 import '../screen/task_details_screen.dart';
 import 'button/is_done_button.dart';
 import 'task_tags.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TaskWidget extends StatefulWidget {
   final Task task;
@@ -25,20 +27,21 @@ class TaskWidget extends StatefulWidget {
 }
 
 class _TaskWidgetState extends State<TaskWidget> {
-  void changeTaskStatus() {
-    if (this.widget.task.notificationLocalizationId == null) {
-      Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(this.widget.task);
+  void changeTaskStatus() async {
+    if (this.widget.task.notificationLocalizationUuid == null) {
+      await Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(this.widget.task);
     } else {
-      final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.widget.task.notificationLocalizationId);
-      final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.widget.task.notificationLocalizationId);
+      final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.widget.task.notificationLocalizationUuid);
+      final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.widget.task.notificationLocalizationUuid);
 
-      Provider.of<TaskProvider>(context, listen: false).toggleTaskStatusWithGeolocation(this.widget.task, latitude, longitude);
+      await Provider.of<TaskProvider>(context, listen: false).toggleTaskStatusWithGeolocation(this.widget.task, latitude, longitude);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     bool isArchived = (this.widget.task.localization == 'COMPLETED' || this.widget.task.localization == 'TRASH');
+    bool isPlanDo = !isArchived && !(this.widget.task.localization == 'INBOX');
 
     DateTime taskEndDate;
     DateTime today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
@@ -54,7 +57,10 @@ class _TaskWidgetState extends State<TaskWidget> {
         child: GestureDetector(
           onTap: () {
             if (this.widget.task.isCanceled == null || !this.widget.task.isCanceled) {
-              Navigator.of(context).pushNamed(TaskDetailScreen.routeName, arguments: this.widget.task);
+              Navigator.of(context).pushNamed(
+                TaskDetailScreen.routeName,
+                arguments: this.widget.task,
+              );
             }
           },
           child: Dismissible(
@@ -72,7 +78,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                           size: 50,
                         ),
                         Text(
-                          isArchived ? AppLocalizations.of(context).restore : AppLocalizations.of(context).organize,
+                          isArchived ? AppLocalizations.of(context).restore : ( isPlanDo ? AppLocalizations.of(context).completed :AppLocalizations.of(context).organize),
                           style: TextStyle(color: Theme.of(context).accentColor, fontSize: 20, fontWeight: FontWeight.w400),
                         ),
                       ],
@@ -127,16 +133,22 @@ class _TaskWidgetState extends State<TaskWidget> {
                             ElevatedButton(
                               onPressed: () {
                                 if (!isArchived) {
-                                  String newLocation = 'INBOX';
+                                  String newLocation = 'TRASH';
 
-                                  if (this.widget.task.done) {
+                                  /*if (this.widget.task.done) {
                                     newLocation = 'COMPLETED';
                                   } else {
                                     newLocation = 'TRASH';
                                   }
+                                  this.widget.task.taskState = "COMPLETED";
+                                  }*/
+
                                   Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
                                 } else {
-                                  Provider.of<TaskProvider>(context, listen: false).deleteTask(this.widget.task.id);
+                                  Provider.of<SynchronizeProvider>(context, listen: false).addTaskToDelete(
+                                    this.widget.task.uuid,
+                                  );
+                                  Provider.of<TaskProvider>(context, listen: false).deleteTask(this.widget.task.uuid, this.widget.task.id);
                                 }
 
                                 Navigator.of(context).pop(true);
@@ -159,21 +171,29 @@ class _TaskWidgetState extends State<TaskWidget> {
               if (direction == DismissDirection.startToEnd && (this.widget.task.isCanceled == null || !this.widget.task.isCanceled)) {
                 String newLocation;
 
-                if (this.widget.task.delegatedEmail == null) {
-                  if (this.widget.task.startDate != null) {
-                    newLocation = 'SCHEDULED';
+                if (isPlanDo){
+                  newLocation = "COMPLETED";
+                }
+                else {
+                  if (this.widget.task.delegatedEmail == null) {
+                    if (this.widget.task.startDate != null) {
+                      newLocation = 'SCHEDULED';
+                    } else {
+                      newLocation = 'ANYTIME';
+                    }
                   } else {
-                    newLocation = 'ANYTIME';
+                    newLocation = 'DELEGATED';
                   }
-                } else {
-                  newLocation = 'DELEGATED';
                 }
 
-                if (this.widget.task.notificationLocalizationId == null) {
+                this.widget.task.taskState = "PLAN&DO";
+
+                if (this.widget.task.notificationLocalizationUuid == null) {
+
                   Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
                 } else {
-                  final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.widget.task.notificationLocalizationId);
-                  final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.widget.task.notificationLocalizationId);
+                  final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.widget.task.notificationLocalizationUuid);
+                  final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.widget.task.notificationLocalizationUuid);
 
                   Provider.of<TaskProvider>(context, listen: false).updateTaskWithGeolocation(this.widget.task, newLocation, longitude, latitude);
                 }
@@ -198,8 +218,11 @@ class _TaskWidgetState extends State<TaskWidget> {
                           fontSize: 20,
                           fontWeight: FontWeight.w400,
                           fontFamily: 'RobotoCondensed',
-                          decoration: this.widget.task.done || (this.widget.task.isCanceled != null && this.widget.task.isCanceled) ? TextDecoration.lineThrough : null,
-                          color: this.widget.task.done || (this.widget.task.isCanceled != null && this.widget.task.isCanceled) ? Colors.grey : Theme.of(context).primaryColor,
+                          decoration:
+                              this.widget.task.done || (this.widget.task.isCanceled != null && this.widget.task.isCanceled) ? TextDecoration.lineThrough : null,
+                          color: this.widget.task.done || (this.widget.task.isCanceled != null && this.widget.task.isCanceled)
+                              ? Colors.grey
+                              : Theme.of(context).primaryColor,
                         ),
                       ),
                     ),
@@ -265,12 +288,15 @@ class _TaskWidgetState extends State<TaskWidget> {
                                 SizedBox(width: 6),
                                 this.widget.task.startDate != null
                                     ? Text(
-                                        DateFormat('MMM d').format(this.widget.task.startDate) + ' - ',
+                                        DateFormat.MMMd(Provider.of<LocaleProvider>(context, listen: false).locale.languageCode)
+                                                .format(this.widget.task.startDate) +
+                                            ' - ',
                                       )
                                     : Text(''),
                                 this.widget.task.endDate != null
                                     ? Text(
-                                        DateFormat('MMM d').format(this.widget.task.endDate),
+                                        DateFormat.MMMd(Provider.of<LocaleProvider>(context, listen: false).locale.languageCode)
+                                            .format(this.widget.task.endDate),
                                       )
                                     : Text(''),
                               ],
@@ -280,21 +306,27 @@ class _TaskWidgetState extends State<TaskWidget> {
                             Container(
                               child: Row(
                                 children: [
-                                  if (taskEndDate.difference(today).inDays == 0 && this.widget.task.endDate.hour != 0 && this.widget.task.endDate.minute != 0) Icon(Icons.access_time_outlined),
+                                  if (taskEndDate.difference(today).inDays == 0 && this.widget.task.endDate.hour != 0 && this.widget.task.endDate.minute != 0)
+                                    Icon(Icons.access_time_outlined),
                                   if (taskEndDate.difference(today).inDays == 0 && this.widget.task.endDate.hour != 0 && this.widget.task.endDate.minute != 0)
                                     Text(
                                       DateFormat('Hm').format(this.widget.task.endDate),
                                     ),
                                   if (taskEndDate.difference(today).inDays < 0) Icon(Icons.fireplace_outlined),
-                                  if (taskEndDate.difference(today).inDays < 0) Text(today.difference(taskEndDate).inDays.toString() + AppLocalizations.of(context).overdue),
+                                  if (taskEndDate.difference(today).inDays < 0)
+                                    Text(today.difference(taskEndDate).inDays.toString() + AppLocalizations.of(context).overdue),
                                   if (taskEndDate.difference(today).inDays > 0) Icon(Icons.hourglass_bottom_outlined),
-                                  if (taskEndDate.difference(today).inDays > 0) Text(AppLocalizations.of(context).left(taskEndDate.difference(today).inDays.toString())),
+                                  if (taskEndDate.difference(today).inDays > 0)
+                                    Text(AppLocalizations.of(context).left(taskEndDate.difference(today).inDays.toString())),
                                 ],
                               ),
                             )
                         ],
                       ),
-                    if (this.widget.task.priority != 'NORMAL' || this.widget.task.startDate != null || this.widget.task.endDate != null || this.widget.task.isDelegated != null)
+                    if (this.widget.task.priority != 'NORMAL' ||
+                        this.widget.task.startDate != null ||
+                        this.widget.task.endDate != null ||
+                        this.widget.task.isDelegated != null)
                       SizedBox(
                         height: 4,
                       ),

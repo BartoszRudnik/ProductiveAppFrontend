@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FiltersLocations extends StatelessWidget {
-  final locations;
+  final List<String> locations;
 
   FiltersLocations({
     @required this.locations,
@@ -54,7 +54,7 @@ class FiltersLocations extends StatelessWidget {
                           },
                         );
 
-                        if (selected != null && selected.length >= 1) {
+                        if (selected != null && selected.length >= 1 && selected != 'cancel') {
                           await Provider.of<SettingsProvider>(context, listen: false).addFilterLocations(selected);
                         } else if (selected != 'cancel') {
                           await Provider.of<SettingsProvider>(context, listen: false).clearFilterLocations();

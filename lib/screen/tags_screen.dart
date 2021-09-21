@@ -39,22 +39,21 @@ class _TagsScreenState extends State<TagsScreen> {
     );
   }
 
-  void _editTagForm(
-      BuildContext buildContext, int tagsLength, String initialValue) {
+  void _editTagForm(BuildContext buildContext, int tagsLength, String initialValue, int tagId) {
     showModalBottomSheet(
       backgroundColor: Theme.of(buildContext).primaryColorLight,
       context: buildContext,
       builder: (context) {
         return SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom),
+            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
             child: GestureDetector(
               onTap: () {},
               child: NewTag(
                 tagsLength: tagsLength,
                 editMode: true,
                 initialValue: initialValue,
+                tagId: tagId,
               ),
               behavior: HitTestBehavior.opaque,
             ),

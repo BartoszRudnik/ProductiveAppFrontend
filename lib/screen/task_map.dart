@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:productive_app/config/images.dart';
 import 'package:productive_app/utils/dialogs.dart';
+import 'package:productive_app/utils/internet_connection.dart';
 import 'package:provider/provider.dart';
 import '../model/task.dart';
 import '../provider/location_provider.dart';
@@ -30,6 +32,8 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
   List<Marker> markers = [];
   List<Task> tasks = [];
 
+  bool isInternetConnection = false;
+
   BitmapDescriptor defaultIcon = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
   BitmapDescriptor selectedIcon = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan);
 
@@ -41,6 +45,12 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+
+    InternetConnection.internetConnection().then((value) {
+      setState(() {
+        this.isInternetConnection = value;
+      });
+    });
 
     this._loadMapStyles();
   }
@@ -54,14 +64,14 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
     tasks = Provider.of<TaskProvider>(context, listen: false).tasksWithLocation;
     this.markers = [];
 
-    if (tasks.length == 0) {
+    if (tasks.length == 0 && this.isInternetConnection) {
       await Future.delayed(Duration(seconds: 1));
       await Dialogs.showWarningDialog(context, AppLocalizations.of(context).noLocationTasks);
     }
 
     for (int i = 0; i < tasks.length; i++) {
-      final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(tasks[i].notificationLocalizationId);
-      final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(tasks[i].notificationLocalizationId);
+      final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(tasks[i].notificationLocalizationUuid);
+      final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(tasks[i].notificationLocalizationUuid);
 
       final newMarker = Marker(
         icon: tasks[i].id == actualMarkerId ? this.selectedIcon : this.defaultIcon,
@@ -111,8 +121,8 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
 
       this._mapMove(LatLng(location.coords.latitude, location.coords.longitude), 15);
     } else {
-      final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.tasks[0].notificationLocalizationId);
-      final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.tasks[0].notificationLocalizationId);
+      final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.tasks[0].notificationLocalizationUuid);
+      final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.tasks[0].notificationLocalizationUuid);
 
       this._mapMove(LatLng(latitude, longitude), 15);
     }
@@ -156,7 +166,12 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
             children: [
               Center(
                 child: Text(
-                  AppLocalizations.of(context).task + " (" + (this.tasks.indexWhere((element) => element.id == task.id) + 1).toString() + '/' + this.tasks.length.toString() + ')',
+                  AppLocalizations.of(context).task +
+                      " (" +
+                      (this.tasks.indexWhere((element) => element.id == task.id) + 1).toString() +
+                      '/' +
+                      this.tasks.length.toString() +
+                      ')',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
@@ -184,8 +199,10 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
                     IconButton(
                       icon: Icon(Icons.navigate_before_outlined),
                       onPressed: () {
-                        final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(tasks[previousTaskIndex].notificationLocalizationId);
-                        final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(tasks[previousTaskIndex].notificationLocalizationId);
+                        final latitude =
+                            Provider.of<LocationProvider>(context, listen: false).getLatitude(tasks[previousTaskIndex].notificationLocalizationUuid);
+                        final longitude =
+                            Provider.of<LocationProvider>(context, listen: false).getLongitude(tasks[previousTaskIndex].notificationLocalizationUuid);
 
                         LatLng point = LatLng(latitude, longitude);
                         this._animatedMapMove(point, 16.0);
@@ -230,8 +247,8 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
                     IconButton(
                       icon: Icon(Icons.navigate_next_outlined),
                       onPressed: () {
-                        final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(tasks[nextTaskIndex].notificationLocalizationId);
-                        final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(tasks[nextTaskIndex].notificationLocalizationId);
+                        final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(tasks[nextTaskIndex].notificationLocalizationUuid);
+                        final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(tasks[nextTaskIndex].notificationLocalizationUuid);
 
                         LatLng point = LatLng(latitude, longitude);
                         this._animatedMapMove(point, 16.0);
@@ -277,18 +294,42 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
 
     return Scaffold(
       appBar: FiltersAppBar(title: AppLocalizations.of(context).taskMap),
-      body: Container(
-        height: MediaQuery.of(context).size.height,
-        width: double.infinity,
-        child: GoogleMap(
-          mapType: MapType.normal,
-          initialCameraPosition: this._startPosition,
-          onMapCreated: (final controller) {
-            this._onMapCreated(controller);
-          },
-          markers: Set<Marker>.of(this.markers),
-        ),
-      ),
+      body: this.isInternetConnection
+          ? Container(
+              height: MediaQuery.of(context).size.height,
+              width: double.infinity,
+              child: GoogleMap(
+                mapType: MapType.normal,
+                initialCameraPosition: this._startPosition,
+                onMapCreated: (final controller) {
+                  this._onMapCreated(controller);
+                },
+                markers: Set<Marker>.of(this.markers),
+              ),
+            )
+          : Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Container(
+                  child: Image.asset(
+                    Images.noInternet,
+                  ),
+                ),
+                Text('No internet connection, try again later'),
+                ElevatedButton(
+                  onPressed: () async {
+                    final internetConnection = await InternetConnection.internetConnection();
+
+                    if (internetConnection != this.isInternetConnection) {
+                      setState(() {
+                        this.isInternetConnection = internetConnection;
+                      });
+                    }
+                  },
+                  child: Text('Try again'),
+                ),
+              ],
+            ),
     );
   }
 }

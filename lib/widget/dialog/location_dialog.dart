@@ -63,11 +63,13 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
   }
 
   void _mapMove(LatLng point, double zoom) {
-    this._mapController.moveCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(target: point, zoom: zoom),
-          ),
-        );
+    if (this._mapController != null) {
+      this._mapController.moveCamera(
+            CameraUpdate.newCameraPosition(
+              CameraPosition(target: point, zoom: zoom),
+            ),
+          );
+    }
   }
 
   void getUserLocation() async {

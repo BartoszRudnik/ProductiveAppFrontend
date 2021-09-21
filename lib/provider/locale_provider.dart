@@ -1,7 +1,10 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
+import 'package:productive_app/db/locale_database.dart';
+import 'package:productive_app/utils/internet_connection.dart';
 
 class LocaleProvider with ChangeNotifier {
   Locale locale;
@@ -14,6 +17,19 @@ class LocaleProvider with ChangeNotifier {
     @required this.email,
   });
 
+  Future<void> getLocaleOffline() async {
+    try {
+      final result = await LocaleDatabase.read(this.email);
+
+      this.locale = Locale(result[0]);
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw (error);
+    }
+  }
+
   Future<void> getLocale() async {
     final requestUrl = this._serverUrl + "locale/get/${this.email}";
 
@@ -23,6 +39,9 @@ class LocaleProvider with ChangeNotifier {
       final responseBody = json.decode(response.body);
 
       this.locale = Locale(responseBody['languageCode']);
+
+      await LocaleDatabase.deleteAll(this.email);
+      await LocaleDatabase.create(this.locale.languageCode, this.email);
 
       notifyListeners();
     } catch (error) {
@@ -34,25 +53,29 @@ class LocaleProvider with ChangeNotifier {
   void setLocale(Locale locale) async {
     final requestUrl = this._serverUrl + "locale/set/${this.email}";
 
-    try {
-      await http.post(
-        requestUrl,
-        body: json.encode(
-          {
-            "languageCode": locale.languageCode,
-          },
-        ),
-        headers: {
-          'content-type': 'application/json',
-          'accept': 'application/json',
-        },
-      );
+    LocaleDatabase.create(locale.languageCode, this.email);
+    this.locale = locale;
 
-      this.locale = locale;
-      notifyListeners();
-    } catch (error) {
-      print(error);
-      throw (error);
+    notifyListeners();
+
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          requestUrl,
+          body: json.encode(
+            {
+              "languageCode": locale.languageCode,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
     }
   }
 

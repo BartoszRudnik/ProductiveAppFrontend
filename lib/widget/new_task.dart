@@ -1,8 +1,10 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:productive_app/utils/dialogs.dart';
 import 'package:productive_app/utils/task_validate.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
+
 import '../model/tag.dart';
 import '../model/task.dart';
 import '../model/taskLocation.dart';
@@ -21,7 +23,6 @@ import 'task_description.dart';
 import 'task_localization.dart';
 import 'task_priority.dart';
 import 'task_title.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NewTask extends StatefulWidget {
   final String localization;
@@ -48,6 +49,7 @@ class _NewTaskState extends State<NewTask> {
 
   String _delegatedEmail;
   String _localization;
+  String _taskState = 'COLLECT';
   String _priority = 'NORMAL';
   String _taskName = '';
   String _taskDescription = '';
@@ -58,7 +60,7 @@ class _NewTaskState extends State<NewTask> {
   TimeOfDay _startTime;
   TimeOfDay _endTime;
 
-  int _notificationLocalizationId;
+  String _notificationLocalizationUuid;
   double _notificationLocalizationRadius;
   bool _notificationOnEnter;
   bool _notificationOnExit;
@@ -80,12 +82,12 @@ class _NewTaskState extends State<NewTask> {
   void setNotificationLocalization(TaskLocation taskLocation) {
     setState(() {
       if (taskLocation != null && taskLocation.location != null) {
-        this._notificationLocalizationId = taskLocation.location.id;
+        this._notificationLocalizationUuid = taskLocation.location.uuid;
         this._notificationLocalizationRadius = taskLocation.notificationRadius;
         this._notificationOnEnter = taskLocation.notificationOnEnter;
         this._notificationOnExit = taskLocation.notificationOnExit;
       } else {
-        this._notificationLocalizationId = null;
+        this._notificationLocalizationUuid = null;
         this._notificationLocalizationRadius = null;
         this._notificationOnEnter = null;
         this._notificationOnExit = null;
@@ -93,8 +95,7 @@ class _NewTaskState extends State<NewTask> {
     });
   }
 
-  void setDate(DateTime startDate, DateTime endDate, TimeOfDay startTime,
-      TimeOfDay endTime) {
+  void setDate(DateTime startDate, DateTime endDate, TimeOfDay startTime, TimeOfDay endTime) {
     this._startDate = startDate;
     this._endDate = endDate;
     this._startTime = startTime;
@@ -122,7 +123,7 @@ class _NewTaskState extends State<NewTask> {
   }
 
   void setLocalization(String value) {
-    this._localization = value;
+    this._taskState = value;
   }
 
   void setFullScreen() {
@@ -145,15 +146,59 @@ class _NewTaskState extends State<NewTask> {
     this._finalTags = newTags;
   }
 
+  void clearForm() {
+    this.newTaskTitleKey.currentState.reset();
+    this.newTaskDescriptionKey.currentState.reset();
+    setState(() {
+      this._taskState = 'COLLECT';
+      this._startDate = null;
+      this._endDate = null;
+      this._startTime = null;
+      this._endTime = null;
+      this._localization = this.widget.localization;
+      this._isDone = false;
+      this._priority = 'NORMAL';
+      this._finalTags.forEach((element) {
+        element.isSelected = false;
+      });
+      this._finalTags = [];
+      this._notificationLocalizationUuid = null;
+      this._notificationLocalizationRadius = null;
+      this._notificationOnEnter = null;
+      this._notificationOnExit = null;
+      this._delegatedEmail = null;
+      this._files = [];
+    });
+  }
+
+  void _chooseTaskList() {
+    if (this._taskState == null) {
+      this._taskState = 'COLLECT';
+      this._localization = 'INBOX';
+    } else {
+      if (this._taskState == 'COLLECT') {
+        this._localization = 'INBOX';
+      } else if (this._taskState == "COMPLETED") {
+        if (this._isDone) {
+          this._localization = 'COMPLETED';
+        } else {
+          this._localization = 'TRASH';
+        }
+      } else if (this._taskState == "PLAN&DO") {
+        if (this._delegatedEmail != null) {
+          this._localization = 'DELEGATED';
+        } else if (this._startDate != null) {
+          this._localization = 'SCHEDULED';
+        } else {
+          this._localization = 'ANYTIME';
+        }
+      }
+    }
+  }
+
   Future<void> _addNewTask() async {
     bool isValidTitle = this.newTaskTitleKey.currentState.validate();
-    bool isValidRest = await TaskValidate.validateNewTask(
-        this._startDate,
-        this._endDate,
-        this._localization,
-        this._isDone,
-        this._delegatedEmail,
-        context);
+    bool isValidRest = await TaskValidate.validateNewTask(this._startDate, this._endDate, this._localization, this._isDone, this._delegatedEmail, context);
 
     if (!isValidRest || !isValidTitle) {
       this._isValid = false;
@@ -173,84 +218,63 @@ class _NewTaskState extends State<NewTask> {
     this.newTaskDescriptionKey.currentState.save();
 
     if (this._startDate != null && this._startTime != null) {
-      this._startDate = DateTime(this._startDate.year, this._startDate.month,
-          this._startDate.day, this._startTime.hour, this._startTime.minute);
+      this._startDate = DateTime(this._startDate.year, this._startDate.month, this._startDate.day, this._startTime.hour, this._startTime.minute);
     }
 
     if (this._endDate != null && this._endTime != null) {
-      this._endDate = DateTime(this._endDate.year, this._endDate.month,
-          this._endDate.day, this._endTime.hour, this._endTime.minute);
+      this._endDate = DateTime(this._endDate.year, this._endDate.month, this._endDate.day, this._endTime.hour, this._endTime.minute);
     }
 
+    this._chooseTaskList();
+
+    final uuid = Uuid();
+
     final newTask = Task(
+      uuid: uuid.v1(),
       id: null,
       title: this._taskName,
       startDate: this._startDate,
       endDate: this._endDate,
+      taskState: this._taskState,
       done: this._isDone,
       priority: this._priority,
       tags: this._finalTags,
       description: this._taskDescription,
       localization: this._localization,
-      position: null,
       delegatedEmail: this._delegatedEmail,
       isDelegated: false,
       taskStatus: null,
       isCanceled: false,
     );
 
-    if (this._notificationLocalizationId != null) {
-      newTask.notificationLocalizationId = this._notificationLocalizationId;
-      newTask.notificationLocalizationRadius =
-          this._notificationLocalizationRadius;
+    if (this._notificationLocalizationUuid != null) {
+      newTask.notificationLocalizationUuid = this._notificationLocalizationUuid;
+      newTask.notificationLocalizationRadius = this._notificationLocalizationRadius;
       newTask.notificationOnEnter = this._notificationOnEnter;
       newTask.notificationOnExit = this._notificationOnExit;
     }
 
     try {
-      if (this._notificationLocalizationId == null) {
-        final taskId = await Provider.of<TaskProvider>(context, listen: false)
-            .addTask(newTask);
+      if (this._notificationLocalizationUuid == null) {
+        await Provider.of<TaskProvider>(context, listen: false).addTask(newTask);
 
-        await Provider.of<AttachmentProvider>(context, listen: false)
-            .setAttachments(this._files, taskId, false);
+        await Provider.of<AttachmentProvider>(context, listen: false).setAttachments(this._files, newTask.uuid, false);
       } else {
-        final latitude = Provider.of<LocationProvider>(context, listen: false)
-            .getLatitude(this._notificationLocalizationId);
-        final longitude = Provider.of<LocationProvider>(context, listen: false)
-            .getLongitude(this._notificationLocalizationId);
+        final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this._notificationLocalizationUuid);
+        final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this._notificationLocalizationUuid);
 
-        final taskId = await Provider.of<TaskProvider>(context, listen: false)
-            .addTaskWithGeolocation(newTask, latitude, longitude);
+        await Provider.of<TaskProvider>(context, listen: false).addTaskWithGeolocation(newTask, latitude, longitude);
 
-        await Provider.of<AttachmentProvider>(context, listen: false)
-            .setAttachments(this._files, taskId, false);
+        await Provider.of<AttachmentProvider>(context, listen: false).setAttachments(this._files, newTask.uuid, false);
       }
 
-      this.newTaskTitleKey.currentState.reset();
-      this.newTaskDescriptionKey.currentState.reset();
+      this.clearForm();
+
       setState(() {
-        this._startDate = null;
-        this._endDate = null;
-        this._startTime = null;
-        this._endTime = null;
-        this._localization = this.widget.localization;
-        this._isDone = false;
-        this._priority = 'NORMAL';
-        this._finalTags.forEach((element) {
-          element.isSelected = false;
-        });
-        this._finalTags = [];
-        this._notificationLocalizationId = null;
-        this._notificationLocalizationRadius = null;
-        this._notificationOnEnter = null;
-        this._notificationOnExit = null;
-        this._delegatedEmail = null;
+        this._waiting = false;
       });
     } on SocketException catch (_) {
-      var message = AppLocalizations.of(context).connectionFailed;
-
-      Dialogs.showWarningDialog(context, message);
+      this.clearForm();
 
       setState(() {
         this._waiting = false;
@@ -262,36 +286,24 @@ class _NewTaskState extends State<NewTask> {
       print(error);
       throw (error);
     }
-
-    setState(() {
-      this._waiting = false;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final priorities =
-        Provider.of<TaskProvider>(context, listen: false).priorities;
-    final localizations =
-        Provider.of<TaskProvider>(context, listen: false).localizations;
+    final priorities = Provider.of<TaskProvider>(context, listen: false).priorities;
+    final localizations = Provider.of<TaskProvider>(context, listen: false).localizations;
 
     return AnimatedContainer(
-      color: Theme.of(context).brightness == Brightness.dark
-          ? Colors.grey[700]
-          : Colors.white,
+      color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[700] : Colors.white,
       curve: Curves.easeInOut,
       duration: Duration(milliseconds: 300),
-      height: this._screenHeight == null
-          ? MediaQuery.of(context).size.height * 0.33
-          : this._screenHeight,
+      height: this._screenHeight == null ? MediaQuery.of(context).size.height * 0.33 : this._screenHeight,
       padding: EdgeInsets.symmetric(
         horizontal: 20,
       ),
       child: SingleChildScrollView(
         child: Container(
-          height: this._screenHeight == null
-              ? MediaQuery.of(context).size.height * 0.33
-              : this._screenHeight,
+          height: this._screenHeight == null ? MediaQuery.of(context).size.height * 0.33 : this._screenHeight,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -305,9 +317,7 @@ class _NewTaskState extends State<NewTask> {
                     isDone: this._isDone,
                     changeIsDoneStatus: this.changeIsDone,
                   ),
-                  title: TaskTitle(
-                      setTaskName: this.setTaskName,
-                      newTaskTitleKey: this.newTaskTitleKey),
+                  title: TaskTitle(setTaskName: this.setTaskName, newTaskTitleKey: this.newTaskTitleKey),
                   trailing: FullScreenButton(setFullScreen: this.setFullScreen),
                   subtitle: TaskDescription(
                     setTaskDescription: this.setTaskDescription,
@@ -338,14 +348,11 @@ class _NewTaskState extends State<NewTask> {
                         finalTags: this._finalTags,
                       ),
                       NewTaskNotificationLocalization(
-                        setNotificationLocalization:
-                            this.setNotificationLocalization,
-                        notificationLocalizationId:
-                            this._notificationLocalizationId,
+                        setNotificationLocalization: this.setNotificationLocalization,
+                        notificationLocalizationUuid: this._notificationLocalizationUuid,
                         notificationOnEnter: this._notificationOnEnter,
                         notificationOnExit: this._notificationOnExit,
-                        notificationRadius:
-                            this._notificationLocalizationRadius,
+                        notificationRadius: this._notificationLocalizationRadius,
                       ),
                       TaskDelegate(
                         setDelegatedEmail: this.setDelegatedEmail,
@@ -365,15 +372,14 @@ class _NewTaskState extends State<NewTask> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TaskLocalization(
-                        localization: this._localization,
+                        localization: this._taskState,
                         localizations: localizations,
                         setLocalization: this.setLocalization,
                       ),
                       if (this._waiting == true)
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: CircularProgressIndicator(
-                              backgroundColor: Theme.of(context).primaryColor),
+                          child: CircularProgressIndicator(backgroundColor: Theme.of(context).primaryColor),
                         )
                       else
                         AddTaskButton(

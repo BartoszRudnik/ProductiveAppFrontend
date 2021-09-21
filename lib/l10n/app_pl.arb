@@ -24,7 +24,7 @@
   "@\"analytics": {},
   "anytime": "W każdej chwili",
   "@\"anytime": {},
-  "archive": "Archiwizuj",
+  "archive": "Usuń zadanie",
   "@\"archive": {},
   "areSureDeleteLocation": "Czy na pewno chcesz usunąć tę lokalizację?",
   "@\"areSureDeleteLocation": {},
@@ -180,7 +180,7 @@
   "@\"notificationOnEnter": {},
   "notificationOnExit": "Powiadomienie przy wyjściu",
   "@\"notificationOnExit": {},
-  "organize": "Organizuj",
+  "organize": "Zaplanuj i wciel",
   "@\"organize": {},
   "password": "Hasło",
   "@\"password": {},
@@ -352,5 +352,9 @@
   "emptyEmail": "Email nie może być pusty",
   "collaboratorAlreadyExist": "Zaproszenie zostało już wysłane",
   "noLocationTasks": "Brak zadań z lokalizacją",
-  "collaboratorNameOrEmail": "Podaj nazwę lub email współpracownika"
+  "collaboratorNameOrEmail": "Podaj nazwę lub email współpracownika",
+  "collect": "Kolekcjonowanie",
+  "planDo": "Realizacja",
+  "state": "Stan",
+  "attributes": "Atrybuty" 
 }
