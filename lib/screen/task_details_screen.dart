@@ -1,14 +1,14 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_app/config/const_values.dart';
 import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:productive_app/utils/task_validate.dart';
+import 'package:productive_app/widget/task_details_state.dart';
+import 'package:productive_app/widget/task_details_description.dart';
+import 'package:productive_app/widget/task_details_tags.dart';
 import 'package:provider/provider.dart';
-
-import '../config/color_themes.dart';
 import '../model/attachment.dart';
 import '../model/task.dart';
 import '../model/taskLocation.dart';
@@ -27,7 +27,6 @@ import '../widget/task_details_attributes.dart';
 import '../widget/task_details_bottom_bar.dart';
 import '../widget/task_details_dates.dart';
 import '../widget/task_details_map.dart';
-import '../widget/task_tags_edit.dart';
 
 class TaskDetailScreen extends StatefulWidget {
   static const routeName = "/task-details";
@@ -51,7 +50,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
   bool _locationChanged = false;
   bool _isFocused = false;
   bool _isDescriptionInitial = true;
-  String _description = "";
+
   DateFormat formatter = DateFormat("yyyy-MM-dd");
 
   @override
@@ -77,7 +76,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
 
   void onDescriptionChanged(String text) {
     setState(() {
-      _description = text;
+      this.taskToEdit.description = text;
     });
     checkColor();
   }
@@ -101,14 +100,39 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
 
   void checkColor() {
     setState(() {
-      _isDescriptionInitial = true;
-      if (_description.isNotEmpty) {
-        _isDescriptionInitial = false;
+      this._isDescriptionInitial = true;
+      if (this.taskToEdit == null || this.taskToEdit.description.isNotEmpty) {
+        this._isDescriptionInitial = false;
       }
-      if (_isFocused) {
-        _isDescriptionInitial = false;
+      if (this._isFocused) {
+        this._isDescriptionInitial = false;
       }
     });
+  }
+
+  void _chooseTaskList() {
+    if (this.taskToEdit.taskState == null) {
+      this.taskToEdit.taskState = 'COLLECT';
+      this.taskToEdit.localization = 'INBOX';
+    } else {
+      if (this.taskToEdit.taskState == 'COLLECT') {
+        this.taskToEdit.localization = 'INBOX';
+      } else if (this.taskToEdit.taskState == "COMPLETED") {
+        if (this.taskToEdit.done) {
+          this.taskToEdit.localization = 'COMPLETED';
+        } else {
+          this.taskToEdit.localization = 'TRASH';
+        }
+      } else if (this.taskToEdit.taskState == "PLAN&DO") {
+        if (this.taskToEdit.delegatedEmail != null) {
+          this.taskToEdit.localization = 'DELEGATED';
+        } else if (this.taskToEdit.startDate != null) {
+          this.taskToEdit.localization = 'SCHEDULED';
+        } else {
+          this.taskToEdit.localization = 'ANYTIME';
+        }
+      }
+    }
   }
 
   Future<void> selectStartTime() async {
@@ -186,13 +210,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     this._formKey.currentState.save();
 
     try {
-      if (this.taskToEdit.delegatedEmail != null &&
-          this.taskToEdit.localization != 'DELEGATED' &&
-          (originalTask.localization == 'ANYTIME' || originalTask.localization == 'SCHEDULED')) {
-        this.taskToEdit.localization = 'DELEGATED';
-      }
+      this._chooseTaskList();
 
       final newLocalization = taskToEdit.localization;
+
       taskToEdit.localization = originalTask.localization;
 
       if (taskToEdit.done != originalTask.done) {
@@ -326,9 +347,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     });
   }
 
-  void setTaskList(newValue) {
+  void setTaskState(newValue) {
     setState(() {
-      this.taskToEdit.localization = newValue;
+      this.taskToEdit.taskState = newValue;
     });
   }
 
@@ -363,7 +384,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     this.setTaskListAutomatically();
   }
 
-  bool checkEquals(Task a, Task b) {
+  bool _checkEquals(Task a, Task b) {
     return a.id == b.id &&
         a.title == b.title &&
         a.description == b.description &&
@@ -371,6 +392,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         a.localization == b.localization &&
         a.delegatedEmail == b.delegatedEmail &&
         a.taskStatus == b.taskStatus &&
+        a.taskState == b.taskState &&
         a.supervisorEmail == b.supervisorEmail &&
         a.startDate == b.startDate &&
         a.endDate == b.endDate &&
@@ -417,20 +439,21 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       parentUuid: argTask.parentUuid,
       supervisorEmail: argTask.supervisorEmail,
       taskStatus: argTask.taskStatus,
+      taskState: argTask.taskState,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final priorities = Provider.of<TaskProvider>(context, listen: false).priorities;
-    final localizations = Provider.of<TaskProvider>(context, listen: false).localizations;
+    final states = Provider.of<TaskProvider>(context, listen: false).localizations;
 
     if (taskToEdit == null) {
       originalTask = ModalRoute.of(context).settings.arguments as Task;
 
       setTaskToEdit(originalTask);
-      this._description = taskToEdit.description;
-      if (this._description != null && this._description.isNotEmpty && _description.trim() != '') {
+
+      if (this.taskToEdit.description != null && this.taskToEdit.description.isNotEmpty && this.taskToEdit.description.trim() != '') {
         onDescriptionChanged(taskToEdit.description);
       }
     }
@@ -457,7 +480,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         this._formKey.currentState.save();
         bool result = false;
 
-        if ((!this.checkEquals(this.originalTask, this.taskToEdit) || Provider.of<AttachmentProvider>(context, listen: false).notSavedAttachments.length > 0) &&
+        if ((!this._checkEquals(this.originalTask, this.taskToEdit) ||
+                Provider.of<AttachmentProvider>(context, listen: false).notSavedAttachments.length > 0) &&
             !this.changesSaved) {
           result = await Dialogs.showActionDialog(
             context,
@@ -506,45 +530,23 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                       return null;
                     },
                   ),
-                  SizedBox(
-                    height: 10,
+                  TaskDetailsDescription(
+                    description: this.taskToEdit.description,
+                    descriptionFocus: this._descriptionFocus,
+                    isDescriptionInitial: this._isDescriptionInitial,
+                    isFocused: this._isFocused,
+                    onDescriptionChanged: this.onDescriptionChanged,
                   ),
-                  ListTile(
-                    minLeadingWidth: 16,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 0),
-                    leading: Icon(Icons.edit),
-                    title: Align(
-                      alignment: Alignment(-1.1, 0),
-                      child: Text(
-                        AppLocalizations.of(context).description,
-                        style: TextStyle(fontSize: 21),
-                      ),
-                    ),
-                  ),
-                  TextFormField(
-                    initialValue: taskToEdit.description,
-                    maxLines: null,
-                    focusNode: this._descriptionFocus,
-                    onChanged: (text) {
-                      onDescriptionChanged(text);
-                    },
-                    onSaved: (value) {
-                      taskToEdit.description = value;
-                    },
-                    style: TextStyle(fontSize: 16),
-                    textAlign: this._isDescriptionInitial ? TextAlign.center : TextAlign.left,
-                    decoration: ColorThemes.taskDetailsFieldDecoration(this._isFocused, this._description, context),
-                  ),
-                  SizedBox(
-                    height: 10,
+                  TaskDetailsState(
+                    taskState: this.taskToEdit.taskState,
+                    setTaskState: this.setTaskState,
+                    states: states,
                   ),
                   TaskDetailsAttributes(
                     taskToEdit: taskToEdit,
                     priorities: priorities,
                     setDelegatedEmail: setDelegatedEmail,
-                    localizations: localizations,
                     setPriority: setPriority,
-                    setLocalization: setTaskList,
                   ),
                   SizedBox(
                     height: 15,
@@ -567,35 +569,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                     selectEndTime: this.selectEndTime,
                     selectStartTime: this.selectStartTime,
                   ),
-                  ListTile(
-                    minLeadingWidth: 16,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 0),
-                    leading: Icon(Icons.tag),
-                    title: Align(
-                      alignment: Alignment(-1.1, 0),
-                      child: Text(
-                        AppLocalizations.of(context).tags,
-                        style: TextStyle(fontSize: 21),
-                      ),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () => editTags(context),
-                    child: TaskTagsEdit(
-                      tags: taskToEdit.tags,
-                    ),
-                  ),
-                  ListTile(
-                    minLeadingWidth: 16,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 0),
-                    leading: Icon(Icons.attach_file_outlined),
-                    title: Align(
-                      alignment: Alignment(-1.1, 0),
-                      child: Text(
-                        AppLocalizations.of(context).attachments,
-                        style: TextStyle(fontSize: 21),
-                      ),
-                    ),
+                  TaskDetailsTags(
+                    tags: this.taskToEdit.tags,
+                    editTags: this.editTags,
                   ),
                   TaskDetailsAttachments(
                     attachments: attachments,

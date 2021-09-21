@@ -352,5 +352,9 @@
   "emptyEmail": "Email nie może być pusty",
   "collaboratorAlreadyExist": "Zaproszenie zostało już wysłane",
   "noLocationTasks": "Brak zadań z lokalizacją",
-  "collaboratorNameOrEmail": "Podaj nazwę lub email współpracownika"
+  "collaboratorNameOrEmail": "Podaj nazwę lub email współpracownika",
+  "collect": "Kolekcjonowanie",
+  "planDo": "Realizacja",
+  "state": "Stan",
+  "attributes": "Atrybuty" 
 }

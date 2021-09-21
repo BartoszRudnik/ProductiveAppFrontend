@@ -176,6 +176,7 @@ class InitDatabase {
       ${TaskFields.notificationOnExit} $boolType,
       ${TaskFields.lastUpdated} $textType,
       ${TaskFields.uuid} $textType,
+      ${TaskFields.taskState} $textType,
       $userEmail $textType
     )
     ''');

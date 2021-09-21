@@ -49,6 +49,7 @@ class _NewTaskState extends State<NewTask> {
 
   String _delegatedEmail;
   String _localization;
+  String _taskState = 'COLLECT';
   String _priority = 'NORMAL';
   String _taskName = '';
   String _taskDescription = '';
@@ -122,7 +123,7 @@ class _NewTaskState extends State<NewTask> {
   }
 
   void setLocalization(String value) {
-    this._localization = value;
+    this._taskState = value;
   }
 
   void setFullScreen() {
@@ -149,6 +150,7 @@ class _NewTaskState extends State<NewTask> {
     this.newTaskTitleKey.currentState.reset();
     this.newTaskDescriptionKey.currentState.reset();
     setState(() {
+      this._taskState = 'COLLECT';
       this._startDate = null;
       this._endDate = null;
       this._startTime = null;
@@ -167,6 +169,31 @@ class _NewTaskState extends State<NewTask> {
       this._delegatedEmail = null;
       this._files = [];
     });
+  }
+
+  void _chooseTaskList() {
+    if (this._taskState == null) {
+      this._taskState = 'COLLECT';
+      this._localization = 'INBOX';
+    } else {
+      if (this._taskState == 'COLLECT') {
+        this._localization = 'INBOX';
+      } else if (this._taskState == "COMPLETED") {
+        if (this._isDone) {
+          this._localization = 'COMPLETED';
+        } else {
+          this._localization = 'TRASH';
+        }
+      } else if (this._taskState == "PLAN&DO") {
+        if (this._delegatedEmail != null) {
+          this._localization = 'DELEGATED';
+        } else if (this._startDate != null) {
+          this._localization = 'SCHEDULED';
+        } else {
+          this._localization = 'ANYTIME';
+        }
+      }
+    }
   }
 
   Future<void> _addNewTask() async {
@@ -198,6 +225,8 @@ class _NewTaskState extends State<NewTask> {
       this._endDate = DateTime(this._endDate.year, this._endDate.month, this._endDate.day, this._endTime.hour, this._endTime.minute);
     }
 
+    this._chooseTaskList();
+
     final uuid = Uuid();
 
     final newTask = Task(
@@ -206,6 +235,7 @@ class _NewTaskState extends State<NewTask> {
       title: this._taskName,
       startDate: this._startDate,
       endDate: this._endDate,
+      taskState: this._taskState,
       done: this._isDone,
       priority: this._priority,
       tags: this._finalTags,
@@ -233,7 +263,7 @@ class _NewTaskState extends State<NewTask> {
         final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this._notificationLocalizationUuid);
         final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this._notificationLocalizationUuid);
 
-        final taskId = await Provider.of<TaskProvider>(context, listen: false).addTaskWithGeolocation(newTask, latitude, longitude);
+        await Provider.of<TaskProvider>(context, listen: false).addTaskWithGeolocation(newTask, latitude, longitude);
 
         await Provider.of<AttachmentProvider>(context, listen: false).setAttachments(this._files, newTask.uuid, false);
       }
@@ -342,7 +372,7 @@ class _NewTaskState extends State<NewTask> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TaskLocalization(
-                        localization: this._localization,
+                        localization: this._taskState,
                         localizations: localizations,
                         setLocalization: this.setLocalization,
                       ),

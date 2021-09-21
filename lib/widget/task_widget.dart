@@ -139,7 +139,10 @@ class _TaskWidgetState extends State<TaskWidget> {
                                     newLocation = 'COMPLETED';
                                   } else {
                                     newLocation = 'TRASH';
+                                  }
+                                  this.widget.task.taskState = "COMPLETED";
                                   }*/
+
                                   Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
                                 } else {
                                   Provider.of<SynchronizeProvider>(context, listen: false).addTaskToDelete(
@@ -182,6 +185,8 @@ class _TaskWidgetState extends State<TaskWidget> {
                     newLocation = 'DELEGATED';
                   }
                 }
+
+                this.widget.task.taskState = "PLAN&DO";
 
                 if (this.widget.task.notificationLocalizationUuid == null) {
 
