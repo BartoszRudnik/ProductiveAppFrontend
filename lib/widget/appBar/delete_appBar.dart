@@ -53,11 +53,11 @@ class DeleteAppBar extends StatelessWidget with PreferredSizeWidget {
                   } else {
                     newLocation = 'DELEGATED';
                   }
-                  if (element.notificationLocalizationId == null) {
+                  if (element.notificationLocalizationUuid == null) {
                     Provider.of<TaskProvider>(context, listen: false).updateTask(element, newLocation);
                   } else {
-                    final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(element.notificationLocalizationId);
-                    final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(element.notificationLocalizationId);
+                    final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(element.notificationLocalizationUuid);
+                    final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(element.notificationLocalizationUuid);
 
                     Provider.of<TaskProvider>(context, listen: false).updateTaskWithGeolocation(element, newLocation, longitude, latitude);
                   }

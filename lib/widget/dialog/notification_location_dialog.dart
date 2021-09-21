@@ -13,19 +13,19 @@ import 'location_dialog.dart';
 
 class NotificationLocationDialog extends StatefulWidget {
   final Key key;
-  final notificationLocationId;
+  final notificationLocationUuid;
   final notificationRadius;
   final notificationOnEnter;
   final notificationOnExit;
-  final taskId;
+  final String taskUuid;
 
   NotificationLocationDialog({
     @required this.key,
-    @required this.notificationLocationId,
+    @required this.notificationLocationUuid,
     @required this.notificationOnEnter,
     @required this.notificationOnExit,
     @required this.notificationRadius,
-    this.taskId,
+    this.taskUuid,
   });
 
   @override
@@ -71,8 +71,8 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
   Widget build(BuildContext context) {
     final locationsList = Provider.of<LocationProvider>(context).locations;
 
-    if (this.widget.notificationLocationId != null && this.location == null && !this.deleted) {
-      this.location = locationsList.firstWhere((element) => element.id == this.widget.notificationLocationId);
+    if (this.widget.notificationLocationUuid != null && this.location == null && !this.deleted) {
+      this.location = locationsList.firstWhere((element) => element.uuid == this.widget.notificationLocationUuid);
     }
 
     return AlertDialog(
@@ -290,8 +290,8 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                     child: Text(AppLocalizations.of(context).cancel),
                   ),
                   ElevatedButton(
-                    onPressed: () {
-                      Notifications.removeGeofence(this.widget.taskId);
+                    onPressed: () async {
+                      await Notifications.removeGeofence(this.widget.taskUuid);
                       setState(() {
                         this.deleted = true;
                         this.location = null;
@@ -313,7 +313,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                         );
 
                         Navigator.of(context).pop(returnLocation);
-                      } else if (this.deleted && this.widget.taskId != null) {
+                      } else if (this.deleted && this.widget.taskUuid != null) {
                         Navigator.of(context).pop(-1);
                       } else {
                         Navigator.of(context).pop('cancel');

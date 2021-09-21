@@ -17,16 +17,16 @@ class RelatedTaskInfoScreen extends StatefulWidget {
 
 class _RelatedTaskInfoScreenState extends State<RelatedTaskInfoScreen> {
   Task originalTask;
-  int taskId = 0;
+  String taskUuid;
   DateFormat formatter = DateFormat("yyyy-MM-dd");
   TimeOfDay startTime;
   TimeOfDay endTime;
   IconData priorityIcon;
 
   Future<void> loadData() async {
-    taskId = ModalRoute.of(context).settings.arguments as int;
+    taskUuid = ModalRoute.of(context).settings.arguments as String;
 
-    await Provider.of<TaskProvider>(context, listen: false).fetchSingleTask(taskId);
+    await Provider.of<TaskProvider>(context, listen: false).fetchSingleTask(taskUuid);
 
     originalTask = Provider.of<TaskProvider>(context, listen: false).getSingleTask;
     startTime = TimeOfDay(hour: originalTask.startDate.hour, minute: originalTask.startDate.minute);
@@ -198,11 +198,7 @@ class _RelatedTaskInfoScreenState extends State<RelatedTaskInfoScreen> {
                                     ),
                                   )
                                 : Text(
-                                    AppLocalizations.of(context).startDate +
-                                        ": " +
-                                        formatter.format(originalTask.startDate) +
-                                        ', ' +
-                                        startTime.format(context),
+                                    AppLocalizations.of(context).startDate + ": " + formatter.format(originalTask.startDate) + ', ' + startTime.format(context),
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400,
@@ -220,11 +216,7 @@ class _RelatedTaskInfoScreenState extends State<RelatedTaskInfoScreen> {
                                     ),
                                   )
                                 : Text(
-                                    AppLocalizations.of(context).endDate +
-                                        ": " +
-                                        formatter.format(originalTask.endDate) +
-                                        ', ' +
-                                        endTime.format(context),
+                                    AppLocalizations.of(context).endDate + ": " + formatter.format(originalTask.endDate) + ', ' + endTime.format(context),
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w400,

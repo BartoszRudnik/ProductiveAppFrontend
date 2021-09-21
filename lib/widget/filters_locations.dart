@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FiltersLocations extends StatelessWidget {
-  final locations;
+  final List<String> locations;
 
   FiltersLocations({
     @required this.locations,

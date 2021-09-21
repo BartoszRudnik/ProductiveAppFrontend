@@ -83,10 +83,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
   }
 
   bool differentNotification(Task newTask, Task oldTask) {
-    if (newTask.notificationLocalizationId != null && oldTask.notificationLocalizationId == null) {
+    if (newTask.notificationLocalizationUuid != null && oldTask.notificationLocalizationUuid == null) {
       return true;
-    } else if (newTask.notificationLocalizationId != null && oldTask.notificationLocalizationId != null) {
-      if (newTask.notificationLocalizationId != oldTask.notificationLocalizationId ||
+    } else if (newTask.notificationLocalizationUuid != null && oldTask.notificationLocalizationUuid != null) {
+      if (newTask.notificationLocalizationUuid != oldTask.notificationLocalizationUuid ||
           newTask.notificationLocalizationRadius != oldTask.notificationLocalizationRadius ||
           newTask.notificationOnEnter != oldTask.notificationOnEnter ||
           newTask.notificationOnExit != oldTask.notificationOnExit) {
@@ -150,8 +150,32 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     this.setTaskListAutomatically();
   }
 
+  void showInfo(String newLocalization) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        margin: EdgeInsetsDirectional.only(bottom: 60),
+        behavior: SnackBarBehavior.floating,
+        content: Text(AppLocalizations.of(context).taskMoved + ConstValues.listName(newLocalization, context)),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
   Future<void> saveTask() async {
     bool isValid = this._formKey.currentState.validate();
+
+    if (this.startTime != null && taskToEdit.startDate != null) {
+      taskToEdit.startDate =
+          new DateTime(taskToEdit.startDate.year, taskToEdit.startDate.month, taskToEdit.startDate.day, this.startTime.hour, this.startTime.minute);
+    } else if (taskToEdit.startDate != null) {
+      taskToEdit.startDate = new DateTime(taskToEdit.startDate.year, taskToEdit.startDate.month, taskToEdit.startDate.day, 0, 0);
+    }
+
+    if (this.endTime != null && taskToEdit.endDate != null) {
+      taskToEdit.endDate = new DateTime(taskToEdit.endDate.year, taskToEdit.endDate.month, taskToEdit.endDate.day, this.endTime.hour, this.endTime.minute);
+    } else if (taskToEdit.endDate != null) {
+      taskToEdit.endDate = new DateTime(taskToEdit.endDate.year, taskToEdit.endDate.month, taskToEdit.endDate.day, 0, 0);
+    }
 
     isValid = await TaskValidate.validateTaskEdit(taskToEdit, originalTask, context);
 
@@ -168,32 +192,19 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         this.taskToEdit.localization = 'DELEGATED';
       }
 
-      if (this.startTime != null && taskToEdit.startDate != null) {
-        taskToEdit.startDate =
-            new DateTime(taskToEdit.startDate.year, taskToEdit.startDate.month, taskToEdit.startDate.day, this.startTime.hour, this.startTime.minute);
-      } else if (taskToEdit.startDate != null) {
-        taskToEdit.startDate = new DateTime(taskToEdit.startDate.year, taskToEdit.startDate.month, taskToEdit.startDate.day, 0, 0);
-      }
-
-      if (this.endTime != null && taskToEdit.endDate != null) {
-        taskToEdit.endDate = new DateTime(taskToEdit.endDate.year, taskToEdit.endDate.month, taskToEdit.endDate.day, this.endTime.hour, this.endTime.minute);
-      } else if (taskToEdit.endDate != null) {
-        taskToEdit.endDate = new DateTime(taskToEdit.endDate.year, taskToEdit.endDate.month, taskToEdit.endDate.day, 0, 0);
-      }
-
       final newLocalization = taskToEdit.localization;
       taskToEdit.localization = originalTask.localization;
 
       if (taskToEdit.done != originalTask.done) {
-        if (taskToEdit.notificationLocalizationId != null) {
+        if (taskToEdit.notificationLocalizationUuid != null) {
           if (taskToEdit.done) {
-            Notifications.removeGeofence(taskToEdit.id);
+            await Notifications.removeGeofence(taskToEdit.uuid);
           } else {
-            double latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(taskToEdit.notificationLocalizationId);
-            double longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(taskToEdit.notificationLocalizationId);
+            double latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(taskToEdit.notificationLocalizationUuid);
+            double longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(taskToEdit.notificationLocalizationUuid);
 
-            Notifications.addGeofence(
-              taskToEdit.id,
+            await Notifications.addGeofence(
+              taskToEdit.uuid,
               latitude,
               longitude,
               taskToEdit.notificationLocalizationRadius,
@@ -207,8 +218,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
 
         await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, newLocalization);
       } else if (this.differentNotification(taskToEdit, originalTask)) {
-        final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(taskToEdit.notificationLocalizationId);
-        final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(taskToEdit.notificationLocalizationId);
+        final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(taskToEdit.notificationLocalizationUuid);
+        final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(taskToEdit.notificationLocalizationUuid);
 
         await Provider.of<TaskProvider>(context, listen: false).updateTaskWithGeolocation(taskToEdit, newLocalization, longitude, latitude);
       } else {
@@ -216,12 +227,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       }
 
       if (this.originalTask.localization != newLocalization) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context).taskMoved + ConstValues.listName(newLocalization, context)),
-            duration: Duration(seconds: 2),
-          ),
-        );
+        this.showInfo(newLocalization);
       }
 
       await Provider.of<AttachmentProvider>(context, listen: false).deleteFlaggedAttachments();
@@ -260,7 +266,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
   void setNotificationLocalization(TaskLocation taskLocation) {
     setState(() {
       if (taskLocation != null && taskLocation.location != null) {
-        this.taskToEdit.notificationLocalizationId = taskLocation.location.id;
+        this.taskToEdit.notificationLocalizationUuid = taskLocation.location.uuid;
         this.taskToEdit.notificationLocalizationRadius = taskLocation.notificationRadius;
         this.taskToEdit.notificationOnEnter = taskLocation.notificationOnEnter;
         this.taskToEdit.notificationOnExit = taskLocation.notificationOnExit;
@@ -272,7 +278,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
 
   void deleteNotificationLocalization() {
     setState(() {
-      this.taskToEdit.notificationLocalizationId = null;
+      this.taskToEdit.notificationLocalizationUuid = null;
       this.taskToEdit.notificationLocalizationRadius = 0.1;
       this.taskToEdit.notificationOnEnter = false;
       this.taskToEdit.notificationOnExit = false;
@@ -298,11 +304,11 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       builder: (context) {
         return NotificationLocationDialog(
           key: UniqueKey(),
-          notificationLocationId: this.taskToEdit.notificationLocalizationId,
+          notificationLocationUuid: this.taskToEdit.notificationLocalizationUuid,
           notificationOnEnter: this.taskToEdit.notificationOnEnter,
           notificationOnExit: this.taskToEdit.notificationOnExit,
           notificationRadius: this.taskToEdit.notificationLocalizationRadius,
-          taskId: this.taskToEdit.id,
+          taskUuid: this.taskToEdit.uuid,
         );
       },
     );
@@ -370,19 +376,19 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         a.endDate == b.endDate &&
         a.tags == b.tags &&
         a.done == b.done &&
-        a.notificationLocalizationId == b.notificationLocalizationId &&
+        a.notificationLocalizationUuid == b.notificationLocalizationUuid &&
         a.notificationLocalizationRadius == b.notificationLocalizationRadius &&
         a.notificationOnEnter == b.notificationOnEnter &&
         a.notificationOnExit == b.notificationOnExit;
   }
 
   void setTaskToEdit(Task argTask) {
-    if (argTask.startDate != null && argTask.startDate.hour != 0 && argTask.startDate.minute != 0) {
+    if (argTask.startDate != null && (argTask.startDate.hour != 0 || argTask.startDate.minute != 0)) {
       setState(() {
         this.startTime = TimeOfDay(hour: argTask.startDate.hour, minute: argTask.startDate.minute);
       });
     }
-    if (argTask.endDate != null && argTask.endDate.hour != 0 && argTask.endDate.minute != 0) {
+    if (argTask.endDate != null && (argTask.endDate.hour != 0 || argTask.endDate.minute != 0)) {
       setState(() {
         this.endTime = TimeOfDay(hour: argTask.endDate.hour, minute: argTask.endDate.minute);
       });
@@ -404,7 +410,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       isCanceled: argTask.isCanceled,
       childUuid: argTask.childUuid,
       isDelegated: argTask.isDelegated,
-      notificationLocalizationId: argTask.notificationLocalizationId,
+      notificationLocalizationUuid: argTask.notificationLocalizationUuid,
       notificationLocalizationRadius: argTask.notificationLocalizationRadius,
       notificationOnEnter: argTask.notificationOnEnter,
       notificationOnExit: argTask.notificationOnExit,
@@ -421,9 +427,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
 
     if (taskToEdit == null) {
       originalTask = ModalRoute.of(context).settings.arguments as Task;
+
       setTaskToEdit(originalTask);
       this._description = taskToEdit.description;
-      if (_description.isNotEmpty && _description.trim() != '') {
+      if (this._description != null && this._description.isNotEmpty && _description.trim() != '') {
         onDescriptionChanged(taskToEdit.description);
       }
     }
@@ -431,9 +438,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     double latitude = -1;
     double longitude = -1;
 
-    if (this.taskToEdit.notificationLocalizationId != null) {
-      latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.taskToEdit.notificationLocalizationId);
-      longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.taskToEdit.notificationLocalizationId);
+    if (this.taskToEdit.notificationLocalizationUuid != null) {
+      latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.taskToEdit.notificationLocalizationUuid);
+      longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.taskToEdit.notificationLocalizationUuid);
     }
 
     List<Attachment> attachments =

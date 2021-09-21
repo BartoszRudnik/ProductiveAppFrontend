@@ -108,12 +108,12 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
         final UserScrollNotification userScroll = notification;
         switch (userScroll.direction) {
           case ScrollDirection.forward:
-            if (userScroll.metrics.maxScrollExtent != userScroll.metrics.minScrollExtent) {
+            if (userScroll.metrics.maxScrollExtent != userScroll.metrics.minScrollExtent && mounted) {
               this._hideFab.forward();
             }
             break;
           case ScrollDirection.reverse:
-            if (userScroll.metrics.maxScrollExtent != userScroll.metrics.minScrollExtent) {
+            if (userScroll.metrics.maxScrollExtent != userScroll.metrics.minScrollExtent && mounted) {
               this._hideFab.reverse();
             }
             break;
@@ -201,8 +201,7 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Badge(
-                  showBadge: Provider.of<TaskProvider>(context).countInboxDelegated() != null &&
-                      Provider.of<TaskProvider>(context).countInboxDelegated() > 0,
+                  showBadge: Provider.of<TaskProvider>(context).countInboxDelegated() != null && Provider.of<TaskProvider>(context).countInboxDelegated() > 0,
                   badgeColor: index == _selectedPageIndex ? Theme.of(context).accentColor : Theme.of(context).primaryColor,
                   badgeContent: Text(
                     Provider.of<TaskProvider>(context).countInboxDelegated().toString(),
@@ -253,7 +252,7 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
           ],
         ),
         transform: Matrix4.translationValues(offsetX, offsetY, 0)..scale(scale),
-        duration: Duration(milliseconds: 250),
+        duration: Duration(milliseconds: 300),
         child: GestureDetector(
           onTap: () {
             if (isDrawerVisible) _changeTranform(0, 0, 1);
@@ -281,8 +280,7 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
               leadingButton: IconButton(
                 icon: Badge(
                   position: BadgePosition.topStart(),
-                  showBadge: Provider.of<DelegateProvider>(context).received.length > 0 ||
-                      Provider.of<DelegateProvider>(context).numberOfPermissionRequest > 0,
+                  showBadge: Provider.of<DelegateProvider>(context).received.length > 0 || Provider.of<DelegateProvider>(context).numberOfPermissionRequest > 0,
                   badgeColor: Theme.of(context).primaryColor,
                   child: Icon(Icons.menu),
                 ),
@@ -306,28 +304,39 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
                 },
               ),
             ),
-            bottomNavigationBar: BottomNavigationBar(
-              selectedFontSize: 0,
-              currentIndex: _selectedPageIndex,
-              type: BottomNavigationBarType.fixed,
-              items: [
-                BottomNavigationBarItem(
-                  icon: _buildIconInbox(Icons.inbox_outlined, AppLocalizations.of(context).inbox, 0),
-                  title: SizedBox.shrink(),
+            bottomNavigationBar: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
+                border: Border(
+                  top: BorderSide(
+                    color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColorDark : Colors.black,
+                    width: 1.0,
+                  ),
                 ),
-                BottomNavigationBarItem(
-                  icon: _buildIcon(Icons.access_time, AppLocalizations.of(context).anytime, 1),
-                  title: SizedBox.shrink(),
-                ),
-                BottomNavigationBarItem(
-                  icon: _buildIcon(Icons.calendar_today, AppLocalizations.of(context).scheduled, 2),
-                  title: SizedBox.shrink(),
-                ),
-                BottomNavigationBarItem(
-                  icon: _buildIcon(Icons.person_outline_outlined, AppLocalizations.of(context).delegated, 3),
-                  title: SizedBox.shrink(),
-                ),
-              ],
+              ),
+              child: BottomNavigationBar(
+                selectedFontSize: 0,
+                currentIndex: _selectedPageIndex,
+                type: BottomNavigationBarType.fixed,
+                items: [
+                  BottomNavigationBarItem(
+                    icon: _buildIconInbox(Icons.inbox_outlined, AppLocalizations.of(context).inbox, 0),
+                    title: SizedBox.shrink(),
+                  ),
+                  BottomNavigationBarItem(
+                    icon: _buildIcon(Icons.access_time, AppLocalizations.of(context).anytime, 1),
+                    title: SizedBox.shrink(),
+                  ),
+                  BottomNavigationBarItem(
+                    icon: _buildIcon(Icons.calendar_today, AppLocalizations.of(context).scheduled, 2),
+                    title: SizedBox.shrink(),
+                  ),
+                  BottomNavigationBarItem(
+                    icon: _buildIcon(Icons.person_outline_outlined, AppLocalizations.of(context).delegated, 3),
+                    title: SizedBox.shrink(),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

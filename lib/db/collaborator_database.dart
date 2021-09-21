@@ -8,7 +8,7 @@ class CollaboratorDatabase {
     await db.delete(
       tableCollaborators,
       where: '${CollaboratorsFields.email} = ? OR userMail = ?',
-      whereArgs: [userMail],
+      whereArgs: [userMail, userMail],
     );
   }
 
@@ -84,8 +84,8 @@ class CollaboratorDatabase {
     return await db.update(
       tableCollaborators,
       collaborator.toJson(),
-      where: '${CollaboratorsFields.id} = ?',
-      whereArgs: [collaborator.id],
+      where: '${CollaboratorsFields.uuid} = ?',
+      whereArgs: [collaborator.uuid],
     );
   }
 

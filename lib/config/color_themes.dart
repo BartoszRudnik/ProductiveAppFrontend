@@ -73,8 +73,7 @@ class ColorThemes {
     textTheme: TextThemes.textTheme,
   );
 
-  static InputDecoration loginFormFieldDecoration(
-      BuildContext context, String labelText, IconData icon) {
+  static InputDecoration loginFormFieldDecoration(BuildContext context, String labelText, IconData icon) {
     return InputDecoration(
       focusedBorder: UnderlineInputBorder(
         borderSide: BorderSide(color: Theme.of(context).primaryColorDark),
@@ -103,14 +102,12 @@ class ColorThemes {
     );
   }
 
-  static InputDecoration taskDetailsFieldDecoration(
-      isFocused, description, BuildContext context) {
+  static InputDecoration taskDetailsFieldDecoration(isFocused, description, BuildContext context) {
     return InputDecoration(
-      hintText:
-          isFocused ? "" : AppLocalizations.of(context).tapToAddDescription,
+      hintText: isFocused ? "" : AppLocalizations.of(context).tapToAddDescription,
       filled: true,
       fillColor: Theme.of(context).primaryColorLight,
-      enabledBorder: description.isEmpty
+      enabledBorder: description != null && description.isEmpty
           ? OutlineInputBorder(
               borderSide: BorderSide(
                 color: Theme.of(context).primaryColorDark,
@@ -150,13 +147,8 @@ class ColorThemes {
   static ButtonStyle addTaskButtonStyle(BuildContext context) {
     return ElevatedButton.styleFrom(
       onPrimary: Theme.of(context).primaryColor,
-      side: BorderSide(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.grey[700]
-              : Theme.of(context).accentColor),
-      primary: Theme.of(context).brightness == Brightness.dark
-          ? Colors.grey[700]
-          : Theme.of(context).accentColor,
+      side: BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[700] : Theme.of(context).accentColor),
+      primary: Theme.of(context).brightness == Brightness.dark ? Colors.grey[700] : Theme.of(context).accentColor,
       elevation: 0,
     );
   }
@@ -189,8 +181,7 @@ class ColorThemes {
     );
   }
 
-  static InputDecoration searchFormFieldDecoration(
-      BuildContext context, String labelText, Function onPressed) {
+  static InputDecoration searchFormFieldDecoration(BuildContext context, String labelText, Function onPressed) {
     return InputDecoration(
       focusedBorder: InputBorder.none,
       enabledBorder: InputBorder.none,

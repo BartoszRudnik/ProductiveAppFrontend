@@ -22,17 +22,18 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   void onClickedNotification(String payload) async {
-    Task task =
-        Provider.of<TaskProvider>(context, listen: false).taskList.firstWhere((element) => element.id == int.parse(payload), orElse: () => null);
+    Task task = Provider.of<TaskProvider>(context, listen: false).taskList.firstWhere((element) => element.uuid == payload, orElse: () => null);
 
     if (task == null) {
       await Provider.of<LocationProvider>(context, listen: false).getLocations();
-      await Provider.of<TaskProvider>(context, listen: false).fetchSingleTaskFull(int.parse(payload));
+      await Provider.of<TaskProvider>(context, listen: false).fetchSingleTaskFull(payload);
 
-      task = Provider.of<TaskProvider>(context, listen: false).taskList.firstWhere((element) => element.id == int.parse(payload));
+      task = Provider.of<TaskProvider>(context, listen: false).taskList.firstWhere((element) => element.uuid == payload);
     }
 
-    Navigator.of(context).pushNamed(TaskDetailScreen.routeName, arguments: task);
+    if (task != null && task.title != null) {
+      Navigator.of(context).pushNamed(TaskDetailScreen.routeName, arguments: task);
+    }
   }
 
   void listenNotifications() => Notifications.onNotifications.stream.listen(onClickedNotification);

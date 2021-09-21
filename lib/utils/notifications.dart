@@ -45,7 +45,7 @@ class Notifications {
   }
 
   static Future<void> onGeofence(bg.GeofenceEvent event) async {
-    final taskId = event.extras['id'];
+    final taskUuid = event.extras['uuid'];
     final taskTitle = event.extras['title'];
     final taskDescription = event.extras['description'];
 
@@ -58,7 +58,7 @@ class Notifications {
     );
 
     const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-    await _notifications.show(0, taskTitle, taskDescription, platformChannelSpecifics, payload: taskId);
+    await _notifications.show(0, taskTitle, taskDescription, platformChannelSpecifics, payload: taskUuid);
   }
 
   static Future _selectNotification(String payload) async {
@@ -75,21 +75,24 @@ class Notifications {
     return result;
   }
 
-  static void removeGeofence(int identifier) {
-    bg.BackgroundGeolocation.removeGeofence(identifier.toString()).then((bool success) {
-      print('[removeGeofence] success');
+  static Future<void> removeUserGeofences(List<String> tasks) async {
+    tasks.forEach((taskUuid) async {
+      await bg.BackgroundGeolocation.removeGeofence(taskUuid);
     });
   }
 
-  static void removeAllGeofences() {
-    bg.BackgroundGeolocation.removeGeofences().then((bool success) {
-      print('[removeGeofences] all geofences have been destroyed');
-    });
+  static Future<void> removeGeofence(String uuid) async {
+    await bg.BackgroundGeolocation.removeGeofence(uuid);
   }
 
-  static void addGeofence(int identifier, double latitude, double longitude, double radius, bool onEnter, bool onExit, String title, String description) {
-    bg.BackgroundGeolocation.addGeofence(bg.Geofence(
-      identifier: identifier.toString(),
+  static Future<void> removeAllGeofences() async {
+    await bg.BackgroundGeolocation.removeGeofences();
+  }
+
+  static Future<void> addGeofence(
+      String uuid, double latitude, double longitude, double radius, bool onEnter, bool onExit, String title, String description) async {
+    await bg.BackgroundGeolocation.addGeofence(bg.Geofence(
+      identifier: uuid,
       radius: radius * 1000,
       latitude: latitude,
       longitude: longitude,
@@ -98,14 +101,10 @@ class Notifications {
       notifyOnDwell: true,
       loiteringDelay: 30000,
       extras: {
-        'id': identifier.toString(),
+        'uuid': uuid,
         'description': description,
         'title': title,
       },
-    )).then((bool success) {
-      print('[addGeofence] success with $latitude and $longitude');
-    }).catchError((error) {
-      print('[addGeofence] FAILURE: $error');
-    });
+    ));
   }
 }

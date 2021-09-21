@@ -67,7 +67,7 @@ class SettingsProvider with ChangeNotifier {
       List<String> collaborators = [];
       List<String> priorities = [];
       List<String> tags = [];
-      List<int> locations = [];
+      List<String> locations = [];
 
       for (final element in responseBody['locations']) {
         locations.add(element);
@@ -119,7 +119,7 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addFilterLocations(List<int> locations) async {
+  Future<void> addFilterLocations(List<String> locations) async {
     final finalUrl = this._serverUrl + 'filterSettings/addFilterLocations/${this.userMail}';
 
     if (locations != null) {
@@ -247,11 +247,11 @@ class SettingsProvider with ChangeNotifier {
     }
   }
 
-  Future<void> deleteFilterLocation(int location) async {
+  Future<void> deleteFilterLocation(String locationUuid) async {
     final finalUrl = this._serverUrl + 'filterSettings/deleteFilterLocation/${this.userMail}';
 
-    if (location != null) {
-      this.userSettings.locations.remove(location);
+    if (locationUuid != null) {
+      this.userSettings.locations.remove(locationUuid);
     }
 
     await SettingsDatabase.create(this.userSettings, this.userMail);
@@ -264,7 +264,7 @@ class SettingsProvider with ChangeNotifier {
           finalUrl,
           body: json.encode(
             {
-              'location': location,
+              'locationUuid': locationUuid,
             },
           ),
           headers: {

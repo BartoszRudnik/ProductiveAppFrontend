@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:productive_app/provider/task_provider.dart';
 import 'package:productive_app/widget/settings_language.dart';
 import 'package:provider/provider.dart';
 
@@ -34,6 +35,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+          behavior: SnackBarBehavior.floating,
           content: Text(AppLocalizations.of(context).savedData, textAlign: TextAlign.center),
           duration: Duration(seconds: 2),
         ),
@@ -45,7 +47,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     bool hasAgreed = await Dialogs.showChoiceDialog(context, AppLocalizations.of(context).areYouSureDeleteAccount);
     if (hasAgreed) {
       Provider.of<AuthProvider>(context, listen: false).getDeleteToken();
-      String enteredToken;
 
       showDialog(
         context: context,
@@ -82,9 +83,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             return null;
                           },
                           onSaved: (value) async {
-                            enteredToken = value;
+                            final tasksWithLocation = Provider.of<TaskProvider>(context, listen: false).tasksWithLocationId;
 
-                            Provider.of<AuthProvider>(context, listen: false).deleteAccount(enteredToken);
+                            await Provider.of<AuthProvider>(context, listen: false).deleteAccount(value, tasksWithLocation);
                           },
                         ),
                       ),
@@ -287,6 +288,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final picker = ImagePicker();
       final pickedImage = await picker.getImage(
         source: imageSource,
+        imageQuality: 20,
       );
       final pickedImageFile = File(pickedImage.path);
 

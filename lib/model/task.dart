@@ -22,7 +22,7 @@ class TaskFields {
     isCanceled,
     parentUuid,
     childUuid,
-    notificationLocalizationId,
+    notificationLocalizationUuid,
     notificationLocalizationRadius,
     notificationOnEnter,
     notificationOnExit,
@@ -47,7 +47,7 @@ class TaskFields {
   static final String isCanceled = "isCanceled";
   static final String parentUuid = "parentUuid";
   static final String childUuid = "childUuid";
-  static final String notificationLocalizationId = "notificationLocalizationId";
+  static final String notificationLocalizationUuid = "notificationLocalizationUuid";
   static final String notificationLocalizationRadius = "notificationLocalizationRadius";
   static final String notificationOnEnter = "notificationOnEnter";
   static final String notificationOnExit = "notificationOnExit";
@@ -74,7 +74,7 @@ class Task {
   String parentUuid;
   String childUuid;
 
-  int notificationLocalizationId;
+  String notificationLocalizationUuid;
   num notificationLocalizationRadius;
   bool notificationOnEnter;
   bool notificationOnExit;
@@ -138,7 +138,7 @@ class Task {
     this.supervisorEmail,
     this.childUuid,
     this.parentUuid,
-    this.notificationLocalizationId,
+    this.notificationLocalizationUuid,
     this.notificationLocalizationRadius,
     this.notificationOnEnter = false,
     this.notificationOnExit = false,
@@ -164,7 +164,7 @@ class Task {
     String supervisorEmail,
     String childUuid,
     String parentUuid,
-    int notificationLocalizationId,
+    String notificationLocalizationUuid,
     num notificationLocalizationRadius,
     bool notificationOnEnter,
     bool notificationOnExit,
@@ -189,7 +189,7 @@ class Task {
         taskStatus: taskStatus ?? this.taskStatus,
         supervisorEmail: supervisorEmail ?? this.supervisorEmail,
         parentUuid: parentUuid ?? this.parentUuid,
-        notificationLocalizationId: notificationLocalizationId ?? this.notificationLocalizationId,
+        notificationLocalizationUuid: notificationLocalizationUuid ?? this.notificationLocalizationUuid,
         notificationLocalizationRadius: notificationLocalizationRadius ?? this.notificationLocalizationRadius,
         notificationOnEnter: notificationOnEnter ?? this.notificationOnEnter,
         notificationOnExit: notificationOnExit ?? this.notificationOnExit,
@@ -216,7 +216,7 @@ class Task {
       taskStatus: json[TaskFields.taskStatus] == null ? null : json[TaskFields.taskStatus] as String,
       supervisorEmail: json[TaskFields.supervisorEmail] == null ? null : json[TaskFields.supervisorEmail] as String,
       parentUuid: json[TaskFields.parentUuid] == null ? null : json[TaskFields.parentUuid] as String,
-      notificationLocalizationId: json[TaskFields.notificationLocalizationId] == null ? null : json[TaskFields.notificationLocalizationId] as int,
+      notificationLocalizationUuid: json[TaskFields.notificationLocalizationUuid] == null ? null : json[TaskFields.notificationLocalizationUuid] as String,
       notificationLocalizationRadius:
           json[TaskFields.notificationLocalizationRadius] == null ? null : json[TaskFields.notificationLocalizationRadius] as double,
       notificationOnEnter: json[TaskFields.notificationOnEnter] == null ? false : json[TaskFields.notificationOnEnter] == 1,
@@ -229,21 +229,21 @@ class Task {
   Map<String, dynamic> toJson() {
     return {
       TaskFields.id: this.id,
-      TaskFields.title: this.title,
-      TaskFields.childUuid: this.childUuid,
-      TaskFields.priority: this.priority,
-      TaskFields.description: this.description,
-      TaskFields.startDate: this.startDate != null ? this.startDate.toIso8601String() : null,
-      TaskFields.endDate: this.endDate != null ? this.endDate.toIso8601String() : null,
+      TaskFields.title: this.title ?? null,
+      TaskFields.childUuid: this.childUuid ?? null,
+      TaskFields.priority: this.priority ?? null,
+      TaskFields.description: this.description ?? null,
+      TaskFields.startDate: this.startDate != null ? this.startDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
+      TaskFields.endDate: this.endDate != null ? this.endDate.toIso8601String() : DateTime.fromMicrosecondsSinceEpoch(0).toIso8601String(),
       TaskFields.tags: this.joinTagList(this.tags),
       TaskFields.done: this.done == null
           ? 0
           : this.done
               ? 1
               : 0,
-      TaskFields.localization: this.localization,
-      TaskFields.position: this.position,
-      TaskFields.delegatedEmail: this.delegatedEmail,
+      TaskFields.localization: this.localization ?? null,
+      TaskFields.position: this.position ?? null,
+      TaskFields.delegatedEmail: this.delegatedEmail ?? null,
       TaskFields.isDelegated: this.isDelegated == null
           ? 0
           : this.isDelegated
@@ -254,11 +254,11 @@ class Task {
           : this.isCanceled
               ? 1
               : 0,
-      TaskFields.taskStatus: this.taskStatus,
-      TaskFields.supervisorEmail: this.supervisorEmail,
-      TaskFields.parentUuid: this.parentUuid,
-      TaskFields.notificationLocalizationId: this.notificationLocalizationId,
-      TaskFields.notificationLocalizationRadius: this.notificationLocalizationRadius,
+      TaskFields.taskStatus: this.taskStatus ?? null,
+      TaskFields.supervisorEmail: this.supervisorEmail ?? null,
+      TaskFields.parentUuid: this.parentUuid ?? null,
+      TaskFields.notificationLocalizationUuid: this.notificationLocalizationUuid ?? null,
+      TaskFields.notificationLocalizationRadius: this.notificationLocalizationRadius ?? null,
       TaskFields.notificationOnEnter: this.notificationOnEnter == null
           ? 0
           : this.notificationOnEnter
@@ -270,7 +270,7 @@ class Task {
               ? 1
               : 0,
       TaskFields.lastUpdated: this.lastUpdated != null ? this.lastUpdated.toIso8601String() : DateTime.now().toIso8601String(),
-      TaskFields.uuid: this.uuid,
+      TaskFields.uuid: this.uuid ?? null,
     };
   }
 }

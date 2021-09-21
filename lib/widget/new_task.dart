@@ -59,7 +59,7 @@ class _NewTaskState extends State<NewTask> {
   TimeOfDay _startTime;
   TimeOfDay _endTime;
 
-  int _notificationLocalizationId;
+  String _notificationLocalizationUuid;
   double _notificationLocalizationRadius;
   bool _notificationOnEnter;
   bool _notificationOnExit;
@@ -81,12 +81,12 @@ class _NewTaskState extends State<NewTask> {
   void setNotificationLocalization(TaskLocation taskLocation) {
     setState(() {
       if (taskLocation != null && taskLocation.location != null) {
-        this._notificationLocalizationId = taskLocation.location.id;
+        this._notificationLocalizationUuid = taskLocation.location.uuid;
         this._notificationLocalizationRadius = taskLocation.notificationRadius;
         this._notificationOnEnter = taskLocation.notificationOnEnter;
         this._notificationOnExit = taskLocation.notificationOnExit;
       } else {
-        this._notificationLocalizationId = null;
+        this._notificationLocalizationUuid = null;
         this._notificationLocalizationRadius = null;
         this._notificationOnEnter = null;
         this._notificationOnExit = null;
@@ -160,18 +160,18 @@ class _NewTaskState extends State<NewTask> {
         element.isSelected = false;
       });
       this._finalTags = [];
-      this._notificationLocalizationId = null;
+      this._notificationLocalizationUuid = null;
       this._notificationLocalizationRadius = null;
       this._notificationOnEnter = null;
       this._notificationOnExit = null;
       this._delegatedEmail = null;
+      this._files = [];
     });
   }
 
   Future<void> _addNewTask() async {
     bool isValidTitle = this.newTaskTitleKey.currentState.validate();
-    bool isValidRest =
-        await TaskValidate.validateNewTask(this._startDate, this._endDate, this._localization, this._isDone, this._delegatedEmail, context);
+    bool isValidRest = await TaskValidate.validateNewTask(this._startDate, this._endDate, this._localization, this._isDone, this._delegatedEmail, context);
 
     if (!isValidRest || !isValidTitle) {
       this._isValid = false;
@@ -217,21 +217,21 @@ class _NewTaskState extends State<NewTask> {
       isCanceled: false,
     );
 
-    if (this._notificationLocalizationId != null) {
-      newTask.notificationLocalizationId = this._notificationLocalizationId;
+    if (this._notificationLocalizationUuid != null) {
+      newTask.notificationLocalizationUuid = this._notificationLocalizationUuid;
       newTask.notificationLocalizationRadius = this._notificationLocalizationRadius;
       newTask.notificationOnEnter = this._notificationOnEnter;
       newTask.notificationOnExit = this._notificationOnExit;
     }
 
     try {
-      if (this._notificationLocalizationId == null) {
+      if (this._notificationLocalizationUuid == null) {
         await Provider.of<TaskProvider>(context, listen: false).addTask(newTask);
 
         await Provider.of<AttachmentProvider>(context, listen: false).setAttachments(this._files, newTask.uuid, false);
       } else {
-        final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this._notificationLocalizationId);
-        final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this._notificationLocalizationId);
+        final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this._notificationLocalizationUuid);
+        final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this._notificationLocalizationUuid);
 
         final taskId = await Provider.of<TaskProvider>(context, listen: false).addTaskWithGeolocation(newTask, latitude, longitude);
 
@@ -319,7 +319,7 @@ class _NewTaskState extends State<NewTask> {
                       ),
                       NewTaskNotificationLocalization(
                         setNotificationLocalization: this.setNotificationLocalization,
-                        notificationLocalizationId: this._notificationLocalizationId,
+                        notificationLocalizationUuid: this._notificationLocalizationUuid,
                         notificationOnEnter: this._notificationOnEnter,
                         notificationOnExit: this._notificationOnExit,
                         notificationRadius: this._notificationLocalizationRadius,
