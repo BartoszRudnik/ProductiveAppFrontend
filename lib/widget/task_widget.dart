@@ -28,13 +28,16 @@ class TaskWidget extends StatefulWidget {
 
 class _TaskWidgetState extends State<TaskWidget> {
   void changeTaskStatus() async {
+    this.widget.task.taskState = "COMPLETED";
+    this.widget.task.done = true;
+
     if (this.widget.task.notificationLocalizationUuid == null) {
-      await Provider.of<TaskProvider>(context, listen: false).toggleTaskStatus(this.widget.task);
+      await Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, 'COMPLETED');
     } else {
       final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.widget.task.notificationLocalizationUuid);
       final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.widget.task.notificationLocalizationUuid);
 
-      await Provider.of<TaskProvider>(context, listen: false).toggleTaskStatusWithGeolocation(this.widget.task, latitude, longitude);
+      await Provider.of<TaskProvider>(context, listen: false).updateTaskWithGeolocation(this.widget.task, 'COMPLETED', longitude, latitude);
     }
   }
 
@@ -73,12 +76,18 @@ class _TaskWidgetState extends State<TaskWidget> {
                     child: Row(
                       children: [
                         Icon(
-                          isArchived ? Icons.restore_from_trash_outlined : Icons.navigate_next_outlined,
+                          isArchived
+                              ? Icons.restore_from_trash_outlined
+                              : isPlanDo
+                                  ? Icons.done_outline_outlined
+                                  : Icons.navigate_next_outlined,
                           color: Theme.of(context).accentColor,
                           size: 50,
                         ),
                         Text(
-                          isArchived ? AppLocalizations.of(context).restore : ( isPlanDo ? AppLocalizations.of(context).completed :AppLocalizations.of(context).organize),
+                          isArchived
+                              ? AppLocalizations.of(context).restore
+                              : (isPlanDo ? AppLocalizations.of(context).completed : AppLocalizations.of(context).organize),
                           style: TextStyle(color: Theme.of(context).accentColor, fontSize: 20, fontWeight: FontWeight.w400),
                         ),
                       ],
@@ -133,15 +142,8 @@ class _TaskWidgetState extends State<TaskWidget> {
                             ElevatedButton(
                               onPressed: () {
                                 if (!isArchived) {
-                                  String newLocation = 'TRASH';
-
-                                  /*if (this.widget.task.done) {
-                                    newLocation = 'COMPLETED';
-                                  } else {
-                                    newLocation = 'TRASH';
-                                  }
+                                  String newLocation = this.widget.task.done ? 'COMPLETED' : 'TRASH';
                                   this.widget.task.taskState = "COMPLETED";
-                                  }*/
 
                                   Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
                                 } else {
@@ -159,7 +161,9 @@ class _TaskWidgetState extends State<TaskWidget> {
                               onPressed: () {
                                 Navigator.of(context).pop(false);
                               },
-                              child: Text(AppLocalizations.of(context).no),
+                              child: Text(
+                                AppLocalizations.of(context).no,
+                              ),
                             ),
                           ],
                         )
@@ -171,10 +175,24 @@ class _TaskWidgetState extends State<TaskWidget> {
               if (direction == DismissDirection.startToEnd && (this.widget.task.isCanceled == null || !this.widget.task.isCanceled)) {
                 String newLocation;
 
-                if (isPlanDo){
+                if (this.widget.task.taskState == "COMPLETED") {
+                  this.widget.task.done = false;
+                  this.widget.task.taskState = "PLAN&DO";
+                  if (this.widget.task.delegatedEmail == null) {
+                    if (this.widget.task.startDate != null) {
+                      newLocation = 'SCHEDULED';
+                    } else {
+                      newLocation = 'ANYTIME';
+                    }
+                  } else {
+                    newLocation = 'DELEGATED';
+                  }
+                } else if (isPlanDo || this.widget.task.done) {
+                  this.widget.task.taskState = "COMPLETED";
                   newLocation = "COMPLETED";
-                }
-                else {
+                  this.widget.task.done = true;
+                } else {
+                  this.widget.task.taskState = "PLAN&DO";
                   if (this.widget.task.delegatedEmail == null) {
                     if (this.widget.task.startDate != null) {
                       newLocation = 'SCHEDULED';
@@ -186,10 +204,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                   }
                 }
 
-                this.widget.task.taskState = "PLAN&DO";
-
                 if (this.widget.task.notificationLocalizationUuid == null) {
-
                   Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
                 } else {
                   final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.widget.task.notificationLocalizationUuid);

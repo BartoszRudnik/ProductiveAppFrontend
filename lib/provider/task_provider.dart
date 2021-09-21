@@ -370,17 +370,17 @@ class TaskProvider with ChangeNotifier {
       } else if (newLocation == 'SCHEDULED' && this._scheduledTasks.length > 0) {
         task.position = this._scheduledTasks[this._scheduledTasks.length - 1].position + 1000.0;
       }
+
+      this.deleteFromLocalization(task);
+
+      task.localization = newLocation;
+
+      this.addToLocalization(task);
     }
 
     if (newLocation == 'TRASH' || newLocation == 'COMPLETED') {
       await Notifications.removeGeofence(task.uuid);
     }
-
-    this.deleteFromLocalization(task);
-
-    task.localization = newLocation;
-
-    this.addToLocalization(task);
 
     if (task.localization == 'INBOX') {
       this.sortByPosition(this._inboxTasks);
@@ -1097,17 +1097,17 @@ class TaskProvider with ChangeNotifier {
 
   void deleteFromLocalization(Task task) {
     if (task.localization == 'INBOX') {
-      this._inboxTasks.remove(task);
+      this._inboxTasks.removeWhere((element) => element.uuid == task.uuid);
     } else if (task.localization == 'ANYTIME') {
-      this._anytimeTasks.remove(task);
+      this._anytimeTasks.removeWhere((element) => element.uuid == task.uuid);
     } else if (task.localization == 'SCHEDULED') {
-      this._scheduledTasks.remove(task);
+      this._scheduledTasks.removeWhere((element) => element.uuid == task.uuid);
     } else if (task.localization == 'COMPLETED') {
-      this._completedTasks.remove(task);
+      this._completedTasks.removeWhere((element) => element.uuid == task.uuid);
     } else if (task.localization == 'TRASH') {
-      this._trashTasks.remove(task);
+      this._trashTasks.removeWhere((element) => element.uuid == task.uuid);
     } else if (task.localization == 'DELEGATED') {
-      this._delegatedTasks.remove(task);
+      this._delegatedTasks.removeWhere((element) => element.uuid == task.uuid);
     }
   }
 
