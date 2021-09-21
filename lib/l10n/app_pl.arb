@@ -354,5 +354,7 @@
   "noLocationTasks": "Brak zadań z lokalizacją",
   "collaboratorNameOrEmail": "Podaj nazwę lub email współpracownika",
   "collect": "Kolekcjonowanie",
-  "planDo": "Realizacja"
+  "planDo": "Realizacja",
+  "state": "Stan",
+  "attributes": "Atrybuty" 
 }

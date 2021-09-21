@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:productive_app/config/const_values.dart';
 
 class TaskDetailsState extends StatelessWidget {
   final String taskState;
@@ -22,7 +24,7 @@ class TaskDetailsState extends StatelessWidget {
           title: Align(
             alignment: Alignment(-1.1, 0),
             child: Text(
-              'State',
+              AppLocalizations.of(context).state,
               style: TextStyle(fontSize: 21),
             ),
           ),
@@ -35,12 +37,16 @@ class TaskDetailsState extends StatelessWidget {
               this.setTaskState(value);
             },
             itemBuilder: (ctx) {
-              return this.states.map((e) {
-                return PopupMenuItem(
-                  value: e,
-                  child: Text(e),
-                );
-              }).toList();
+              return this.states.map(
+                (e) {
+                  return PopupMenuItem(
+                    value: e,
+                    child: Text(
+                      ConstValues.stateName(e, context),
+                    ),
+                  );
+                },
+              ).toList();
             },
             child: Container(
               height: 50,
@@ -53,7 +59,7 @@ class TaskDetailsState extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(
-                    this.taskState,
+                    ConstValues.stateName(this.taskState, context),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 16,

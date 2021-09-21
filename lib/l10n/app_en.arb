@@ -354,5 +354,7 @@
   "noLocationTasks": "No tasks with location",
   "collaboratorNameOrEmail": "Enter collaborator name or email",
   "collect": "Collect",
-  "planDo": "Plan&Do"  
+  "planDo": "Plan&Do",
+  "state": "State",
+  "attributes": "Attributes"  
 }

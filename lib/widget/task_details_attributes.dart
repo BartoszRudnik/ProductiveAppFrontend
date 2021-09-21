@@ -41,7 +41,7 @@ class TaskDetailsAttributes extends StatelessWidget {
           title: Align(
             alignment: Alignment(-1.1, 0),
             child: Text(
-              'Attributes',
+              AppLocalizations.of(context).attributes,
               style: TextStyle(fontSize: 21),
             ),
           ),

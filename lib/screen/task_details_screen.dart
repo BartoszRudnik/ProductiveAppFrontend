@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:productive_app/config/const_values.dart';
 import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:productive_app/utils/task_validate.dart';
-import 'package:productive_app/widget/taskDetailsState.dart';
+import 'package:productive_app/widget/task_details_state.dart';
 import 'package:productive_app/widget/task_details_description.dart';
 import 'package:productive_app/widget/task_details_tags.dart';
 import 'package:provider/provider.dart';
@@ -384,7 +384,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     this.setTaskListAutomatically();
   }
 
-  bool checkEquals(Task a, Task b) {
+  bool _checkEquals(Task a, Task b) {
     return a.id == b.id &&
         a.title == b.title &&
         a.description == b.description &&
@@ -392,6 +392,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         a.localization == b.localization &&
         a.delegatedEmail == b.delegatedEmail &&
         a.taskStatus == b.taskStatus &&
+        a.taskState == b.taskState &&
         a.supervisorEmail == b.supervisorEmail &&
         a.startDate == b.startDate &&
         a.endDate == b.endDate &&
@@ -479,7 +480,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         this._formKey.currentState.save();
         bool result = false;
 
-        if ((!this.checkEquals(this.originalTask, this.taskToEdit) || Provider.of<AttachmentProvider>(context, listen: false).notSavedAttachments.length > 0) &&
+        if ((!this._checkEquals(this.originalTask, this.taskToEdit) ||
+                Provider.of<AttachmentProvider>(context, listen: false).notSavedAttachments.length > 0) &&
             !this.changesSaved) {
           result = await Dialogs.showActionDialog(
             context,
