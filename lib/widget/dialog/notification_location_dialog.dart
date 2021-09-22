@@ -39,14 +39,12 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
   Location location;
 
   bool deleted = false;
+  bool saveLocation = false;
+  bool newLocation = false;
 
   Future<void> _addNewLocationForm(BuildContext buildContext, Location choosenLocation) async {
     if (choosenLocation != null) {
-      String name = await Dialogs.showTextFieldDialog(context, AppLocalizations.of(context).enterLocationName);
-      if (name == null || name.isEmpty) {
-        return;
-      }
-      choosenLocation.localizationName = name;
+      this.newLocation = true;
       this.location = choosenLocation;
       await Provider.of<LocationProvider>(context, listen: false).addLocation(choosenLocation);
     }
@@ -75,12 +73,24 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
       this.location = locationsList.firstWhere((element) => element.uuid == this.widget.notificationLocationUuid);
     }
 
+    double overallHeightNotNull = MediaQuery.of(context).size.height * 0.65;
+    double overallHeightNull = MediaQuery.of(context).size.height * 0.6;
+    double heightNotNull = 130;
+    double heightNull = 80;
+
+    if (this.newLocation) {
+      overallHeightNotNull = MediaQuery.of(context).size.height * 0.75;
+      overallHeightNull = MediaQuery.of(context).size.height * 0.7;
+      heightNotNull += 50;
+      heightNull += 50;
+    }
+
     return AlertDialog(
       content: AnimatedContainer(
-        duration: Duration(milliseconds: 500),
+        duration: Duration(milliseconds: 300),
         curve: Curves.easeInOut,
-        height: this.location != null ? MediaQuery.of(context).size.height * 0.65 : MediaQuery.of(context).size.height * 0.6,
-        width: 450,
+        height: this.location != null ? overallHeightNotNull : overallHeightNull,
+        width: MediaQuery.of(context).size.width * 0.75,
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -93,7 +103,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                   child: AnimatedContainer(
                     duration: Duration(milliseconds: 500),
                     curve: Curves.easeInOut,
-                    height: this.location != null ? 125 : 70,
+                    height: this.location != null ? heightNotNull : heightNull,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -110,7 +120,11 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                                 ),
                                 onPressed: () {},
                                 child: Text(
-                                  this.location.localizationName + ": " + this.location.locality + ", " + this.location.street,
+                                  this.location.localizationName +
+                                      (this.location.localizationName.length > 0 ? ": " : "") +
+                                      this.location.locality +
+                                      ", " +
+                                      this.location.street,
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 3,
                                 ),
@@ -137,10 +151,11 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                                               id: -1,
                                               latitude: 0.0,
                                               longitude: 0.0,
-                                              localizationName: 'test',
+                                              localizationName: '',
                                               country: "",
                                               locality: "",
                                               street: "",
+                                              saved: false,
                                             ),
                                           );
                                         },
@@ -197,6 +212,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                                         ).toList(),
                                         onChanged: (value) {
                                           setState(() {
+                                            this.newLocation = false;
                                             this.deleted = false;
                                             this.location = value;
                                           });
@@ -209,6 +225,32 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                             ),
                           ],
                         ),
+                        if (this.newLocation)
+                          SwitchListTile(
+                            value: this.saveLocation,
+                            activeColor: Theme.of(context).primaryColor,
+                            onChanged: (value) async {
+                              setState(() {
+                                this.saveLocation = !this.saveLocation;
+                              });
+
+                              if (this.saveLocation) {
+                                String name = await Dialogs.showTextFieldDialog(context, AppLocalizations.of(context).enterLocationName);
+                                this.location.localizationName = name;
+                                this.location.saved = true;
+                              } else {
+                                this.location.localizationName = '';
+                                this.location.saved = false;
+                              }
+
+                              await Provider.of<LocationProvider>(context, listen: false).editLocationName(
+                                this.location.uuid,
+                                this.location.localizationName,
+                                this.location.saved,
+                              );
+                            },
+                            title: Text(AppLocalizations.of(context).saveLocation),
+                          ),
                       ],
                     ),
                   ),

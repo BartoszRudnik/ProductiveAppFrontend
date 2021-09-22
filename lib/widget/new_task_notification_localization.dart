@@ -10,10 +10,10 @@ class NewTaskNotificationLocalization extends StatefulWidget {
   final bool notificationOnExit;
   final String taskUuid;
 
-  bool bigIcon = false;
+  final bool bigIcon;
 
   NewTaskNotificationLocalization({
-    this.bigIcon,
+    this.bigIcon = false,
     @required this.setNotificationLocalization,
     @required this.notificationLocalizationUuid,
     @required this.notificationOnEnter,

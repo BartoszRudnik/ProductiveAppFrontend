@@ -75,6 +75,7 @@ class InitDatabase {
       ${LocationFields.longitude} $doubleType,
       ${LocationFields.isSelected} $boolType,
       ${LocationFields.uuid} $textType,
+      ${LocationFields.saved} $boolType,
       $userEmail $textType
     )
     ''');

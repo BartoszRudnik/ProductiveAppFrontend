@@ -37,9 +37,9 @@ class LocationProvider with ChangeNotifier {
 
   List<models.Location> get locations {
     if (this.searchingText == null || this.searchingText.length < 1) {
-      return [...this.locationList];
+      return this.locationList.where((element) => element.saved).toList();
     } else {
-      return this.locationList.where((element) => element.localizationName.toLowerCase().contains(this.searchingText.toLowerCase())).toList();
+      return this.locationList.where((element) => element.saved && element.localizationName.toLowerCase().contains(this.searchingText.toLowerCase())).toList();
     }
   }
 
@@ -116,6 +116,7 @@ class LocationProvider with ChangeNotifier {
           country: element["country"],
           locality: element["locality"],
           street: element["street"],
+          saved: element['saved'],
         );
 
         loadedLocations.add(loc);
@@ -156,6 +157,7 @@ class LocationProvider with ChangeNotifier {
               'street': newLocation.street,
               'country': newLocation.country,
               'locality': newLocation.locality,
+              'saved': newLocation.saved,
             },
           ),
           headers: {
@@ -188,6 +190,7 @@ class LocationProvider with ChangeNotifier {
             'street': location.street,
             'locality': location.locality,
             'country': location.country,
+            'saved': location.saved,
           }),
           headers: {
             'content-type': 'application/json',
@@ -197,6 +200,41 @@ class LocationProvider with ChangeNotifier {
       } catch (error) {
         print(error);
         throw error;
+      }
+    }
+  }
+
+  Future<void> editLocationName(String locationUuid, String newName, bool saved) async {
+    final location = this.locationList.firstWhere((element) => element.uuid == locationUuid);
+
+    location.localizationName = newName;
+    location.saved = saved;
+
+    await LocationDatabase.update(location, this.userMail);
+
+    notifyListeners();
+
+    if (await InternetConnection.internetConnection()) {
+      final url = this._serverUrl + "localization/editName/$locationUuid";
+
+      try {
+        await http.put(
+          url,
+          body: json.encode(
+            {
+              'uuid': location.uuid,
+              'localizationName': location.localizationName,
+              'saved': location.saved,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+        throw (error);
       }
     }
   }
@@ -239,6 +277,7 @@ class LocationProvider with ChangeNotifier {
               country: " ",
               locality: " ",
               street: " ",
+              saved: false,
             );
             List<geocoding.Placemark> newMarks = await geocoding.placemarkFromCoordinates(loc.latitude, loc.longitude);
 

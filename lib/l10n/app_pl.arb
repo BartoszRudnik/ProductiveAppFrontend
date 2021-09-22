@@ -356,5 +356,6 @@
   "collect": "Kolekcjonowanie",
   "planDo": "Realizacja",
   "state": "Stan",
-  "attributes": "Atrybuty" 
+  "attributes": "Atrybuty",
+  "saveLocation": "Zapisz lokalizacje" 
 }
