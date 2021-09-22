@@ -87,7 +87,6 @@ class SettingsProvider with ChangeNotifier {
 
       Settings newSettings = Settings(
         id: responseBody['id'],
-        showOnlyUnfinished: responseBody['showOnlyUnfinished'],
         showOnlyDelegated: responseBody['showOnlyDelegated'],
         showOnlyWithLocalization: responseBody['showOnlyWithLocalization'],
         collaborators: collaborators,
@@ -504,31 +503,6 @@ class SettingsProvider with ChangeNotifier {
     final finalUrl = this._serverUrl + 'filterSettings/changeShowOnlyDelegatedStatus/${this.userMail}';
 
     this.userSettings.showOnlyDelegated = !this.userSettings.showOnlyDelegated;
-
-    await SettingsDatabase.create(this.userSettings, this.userMail);
-
-    notifyListeners();
-
-    if (await InternetConnection.internetConnection()) {
-      try {
-        await http.post(
-          finalUrl,
-          headers: {
-            'content-type': 'application/json',
-            'accept': 'application/json',
-          },
-        );
-      } catch (error) {
-        print(error);
-        throw (error);
-      }
-    }
-  }
-
-  Future<void> changeShowOnlyUnfinished() async {
-    final finalUrl = this._serverUrl + 'filterSettings/changeShowOnlyUnfinishedStatus/${this.userMail}';
-
-    this.userSettings.showOnlyUnfinished = !this.userSettings.showOnlyUnfinished;
 
     await SettingsDatabase.create(this.userSettings, this.userMail);
 

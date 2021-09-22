@@ -285,14 +285,17 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     if (accepted) {
       originalTask.done = taskToEdit.done;
       setTaskToEdit(originalTask);
+      taskToEdit.taskState = "COMPLETED";
+
+      String newLocalization;
       if (taskToEdit.done) {
-        taskToEdit.localization = "COMPLETED";
+        newLocalization = "COMPLETED";
       } else {
-        taskToEdit.localization = "TRASH";
+        newLocalization = "TRASH";
       }
       try {
         await Provider.of<AttachmentProvider>(context, listen: false).deleteFlaggedAttachments();
-        await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, taskToEdit.localization);
+        await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, newLocalization);
         Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);
       } catch (error) {
         await Dialogs.showWarningDialog(context, AppLocalizations.of(context).errorOccurred);

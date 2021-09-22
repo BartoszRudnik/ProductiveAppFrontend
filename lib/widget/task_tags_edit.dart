@@ -12,7 +12,7 @@ class TaskTagsEdit extends StatelessWidget {
   Widget build(BuildContext context) {
     return (this.tags != null && this.tags.length > 0)
         ? Card(
-            elevation: 2,
+            elevation: this.tags.length > 0 ? 0 : 2,
             child: Container(
               alignment: Alignment.centerLeft,
               height: 30,

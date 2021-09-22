@@ -7,9 +7,10 @@ class ClearFiltersButton extends StatelessWidget {
   Future<void> clear(userSettings, context) async {
     await Future.wait(
       [
-        if (userSettings.showOnlyWithLocalization != null && userSettings.showOnlyWithLocalization) Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyWithLocalization(),
-        if (userSettings.showOnlyDelegated != null && userSettings.showOnlyDelegated) Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyDelegated(),
-        if (userSettings.showOnlyUnfinished != null && userSettings.showOnlyUnfinished) Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyUnfinished(),
+        if (userSettings.showOnlyWithLocalization != null && userSettings.showOnlyWithLocalization)
+          Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyWithLocalization(),
+        if (userSettings.showOnlyDelegated != null && userSettings.showOnlyDelegated)
+          Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyDelegated(),
         if (userSettings.collaborators != null) Provider.of<SettingsProvider>(context, listen: false).clearFilterCollaborators(),
         if (userSettings.locations != null) Provider.of<SettingsProvider>(context, listen: false).clearFilterLocations(),
         if (userSettings.priorities != null) Provider.of<SettingsProvider>(context, listen: false).clearFilterPriorities(),
