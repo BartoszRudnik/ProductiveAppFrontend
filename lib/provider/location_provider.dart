@@ -6,6 +6,7 @@ import 'package:global_configuration/global_configuration.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:productive_app/db/location_database.dart';
+import 'package:productive_app/model/coordinates_and_name.dart';
 import 'package:productive_app/utils/internet_connection.dart';
 import 'package:uuid/uuid.dart';
 
@@ -33,6 +34,10 @@ class LocationProvider with ChangeNotifier {
     this.locationList = listToSet;
 
     notifyListeners();
+  }
+
+  List<models.Location> get allLocations {
+    return this.locationList.toList();
   }
 
   List<models.Location> get locations {
@@ -294,14 +299,4 @@ class LocationProvider with ChangeNotifier {
       }
     }
   }
-}
-
-class CoordinatesAndName {
-  LatLng coordinates;
-  String name;
-
-  CoordinatesAndName({
-    @required this.coordinates,
-    @required this.name,
-  });
 }

@@ -55,7 +55,13 @@ class TaskDatabase {
       whereArgs: [uuid],
     );
 
-    return int.parse(maps.first['id'].toString());
+    final taskId = int.parse(maps.first['id'].toString());
+
+    if (maps.length > 1) {
+      await deleteNotUnique(uuid, taskId);
+    }
+
+    return taskId;
   }
 
   static Future<Task> read(String uuid, List<Tag> tags) async {
@@ -93,14 +99,11 @@ class TaskDatabase {
   static Future<int> update(Task task, String userMail) async {
     final db = await InitDatabase.instance.database;
 
-    if (task.id == null) {
-      task.id = await getIdByUuid(task.uuid);
-    }
+    task.id = await getIdByUuid(task.uuid);
 
     task.lastUpdated = DateTime.now();
 
     Map taskMap = task.toJson();
-
     taskMap['userMail'] = userMail;
 
     return await db.update(
@@ -118,6 +121,16 @@ class TaskDatabase {
       tableTask,
       where: '${TaskFields.localization} = ?',
       whereArgs: [listName],
+    );
+  }
+
+  static Future<int> deleteNotUnique(String uuid, int taskId) async {
+    final db = await InitDatabase.instance.database;
+
+    return await db.delete(
+      tableTask,
+      where: '${TaskFields.uuid} = ? AND ${TaskFields.id} != ?',
+      whereArgs: [uuid, taskId],
     );
   }
 

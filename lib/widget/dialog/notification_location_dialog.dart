@@ -67,10 +67,11 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
 
   @override
   Widget build(BuildContext context) {
-    final locationsList = Provider.of<LocationProvider>(context).locations;
+    final allLocations = Provider.of<LocationProvider>(context).allLocations;
+    final savedLocations = Provider.of<LocationProvider>(context).locations;
 
     if (this.widget.notificationLocationUuid != null && this.location == null && !this.deleted) {
-      this.location = locationsList.firstWhere((element) => element.uuid == this.widget.notificationLocationUuid);
+      this.location = allLocations.firstWhere((element) => element.uuid == this.widget.notificationLocationUuid);
     }
 
     double overallHeightNotNull = MediaQuery.of(context).size.height * 0.65;
@@ -118,7 +119,14 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                                   primary: Theme.of(context).primaryColorLight,
                                   onPrimary: Theme.of(context).primaryColor,
                                 ),
-                                onPressed: () {},
+                                onPressed: () async {
+                                  this.location.localizationName = await Dialogs.showTextFieldDialog(context, AppLocalizations.of(context).enterLocationName);
+
+                                  await Provider.of<LocationProvider>(context, listen: false)
+                                      .editLocationName(this.location.uuid, this.location.localizationName, true);
+
+                                  setState(() {});
+                                },
                                 child: Text(
                                   this.location.localizationName +
                                       (this.location.localizationName.length > 0 ? ": " : "") +
@@ -192,7 +200,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                                           textAlign: TextAlign.center,
                                           style: TextStyle(color: Theme.of(context).primaryColor),
                                         ),
-                                        items: locationsList.map(
+                                        items: savedLocations.map(
                                           (currentLocation) {
                                             return DropdownMenuItem(
                                               value: currentLocation,
@@ -202,7 +210,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                                                 width: double.infinity,
                                                 child: Container(
                                                   child: Text(
-                                                    currentLocation.localizationName,
+                                                    currentLocation.localizationName == null ? '' : currentLocation.localizationName,
                                                     style: TextStyle(fontSize: 16),
                                                   ),
                                                 ),
@@ -241,8 +249,16 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
 
                               if (this.saveLocation) {
                                 String name = await Dialogs.showTextFieldDialog(context, AppLocalizations.of(context).enterLocationName);
-                                this.location.localizationName = name;
-                                this.location.saved = true;
+                                if (name != null) {
+                                  this.location.localizationName = name;
+                                  this.location.saved = true;
+                                } else {
+                                  this.location.localizationName = '';
+                                  this.location.saved = false;
+                                  setState(() {
+                                    this.saveLocation = false;
+                                  });
+                                }
                               } else {
                                 this.location.localizationName = '';
                                 this.location.saved = false;
