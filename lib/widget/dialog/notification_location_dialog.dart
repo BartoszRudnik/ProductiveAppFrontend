@@ -210,8 +210,13 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                                             );
                                           },
                                         ).toList(),
-                                        onChanged: (value) {
+                                        onChanged: (value) async {
+                                          if (this.location != null && this.newLocation) {
+                                            await Provider.of<LocationProvider>(context, listen: false).deleteLocation(this.location.uuid);
+                                          }
+
                                           setState(() {
+                                            this.saveLocation = false;
                                             this.newLocation = false;
                                             this.deleted = false;
                                             this.location = value;

@@ -19,13 +19,13 @@ class FindPlace extends StatefulWidget {
 }
 
 class _FindPlaceState extends State<FindPlace> {
-  List<MapEntry<Placemark, LatLng>> placemarks = [];
+  List<MapEntry<Placemark, CoordinatesAndName>> placemarks = [];
   String searchString;
   final TextEditingController _textEditingController = TextEditingController();
 
   Future<void> getPlacemarks(BuildContext context, String search) async {
     await Provider.of<LocationProvider>(context, listen: false).findGlobalLocationsFromQuery(search);
-    placemarks = Provider.of<LocationProvider>(context, listen: false).marks;
+    this.placemarks = Provider.of<LocationProvider>(context, listen: false).marks;
   }
 
   @override
@@ -40,7 +40,7 @@ class _FindPlaceState extends State<FindPlace> {
           child: Column(
             children: [
               TextField(
-                controller: _textEditingController,
+                controller: this._textEditingController,
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.location_on),
                   hintText: AppLocalizations.of(context).searchForLocation,
@@ -53,24 +53,25 @@ class _FindPlaceState extends State<FindPlace> {
                   });
                 },
               ),
-              if (searchString != null && searchString.length >= 3 && placemarks != [])
+              if (this.searchString != null && this.searchString.length >= 3 && this.placemarks != [])
                 Flexible(
                   child: ListView.builder(
                     shrinkWrap: true,
                     itemCount: this.placemarks.length,
                     itemBuilder: (context, index) => ListTile(
-                      title: Text(placemarks[index].key.locality + ", " + placemarks[index].key.street),
-                      subtitle: Text(placemarks[index].key.country),
+                      title: Text(this.placemarks[index].value.name + ", " + this.placemarks[index].key.street),
+                      subtitle: Text(this.placemarks[index].key.locality + ", " + this.placemarks[index].key.country),
                       onTap: () {
                         setState(
                           () {
-                            LatLng point = LatLng(placemarks[index].value.latitude, placemarks[index].value.longitude);
+                            LatLng point = LatLng(this.placemarks[index].value.coordinates.latitude, this.placemarks[index].value.coordinates.longitude);
                             this.widget.mapMove(point, 15.0);
 
-                            this.widget.setChoosenLocation(point.latitude, point.longitude, placemarks[index].key.country, placemarks[index].key.street, placemarks[index].key.locality);
+                            this.widget.setChoosenLocation(point.latitude, point.longitude, this.placemarks[index].key.country,
+                                this.placemarks[index].key.street, placemarks[index].key.locality);
 
-                            _textEditingController.clear();
-                            searchString = '';
+                            this._textEditingController.clear();
+                            this.searchString = '';
                           },
                         );
                       },

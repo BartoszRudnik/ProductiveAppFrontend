@@ -13,7 +13,7 @@ import '../model/location.dart' as models;
 
 class LocationProvider with ChangeNotifier {
   List<models.Location> locationList;
-  List<MapEntry<geocoding.Placemark, LatLng>> placemarks;
+  List<MapEntry<geocoding.Placemark, CoordinatesAndName>> placemarks;
 
   final String userMail;
   final String authToken;
@@ -67,7 +67,7 @@ class LocationProvider with ChangeNotifier {
     return this.locationList.firstWhere((element) => element.uuid == uuid).localizationName;
   }
 
-  List<MapEntry<geocoding.Placemark, LatLng>> get marks {
+  List<MapEntry<geocoding.Placemark, CoordinatesAndName>> get marks {
     return [...placemarks];
   }
 
@@ -260,32 +260,31 @@ class LocationProvider with ChangeNotifier {
   Future<void> findGlobalLocationsFromQuery(String query) async {
     if (await InternetConnection.internetConnection()) {
       final url = "https://nominatim.openstreetmap.org/search?q=$query&format=json";
-      List<MapEntry<geocoding.Placemark, LatLng>> loadedMarks = [];
+      List<MapEntry<geocoding.Placemark, CoordinatesAndName>> loadedMarks = [];
+
+      query = query.trim();
 
       if (query.length >= 3) {
         try {
           final response = await http.get(url);
           final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
-          for (var element in responseBody) {
-            models.Location loc = models.Location(
-              uuid: '',
-              id: -1,
-              localizationName: element["name"],
-              longitude: double.parse(element["lon"]),
-              latitude: double.parse(element["lat"]),
-              country: " ",
-              locality: " ",
-              street: " ",
-              saved: false,
-            );
-            List<geocoding.Placemark> newMarks = await geocoding.placemarkFromCoordinates(loc.latitude, loc.longitude);
+          int len = responseBody.length > 3 ? 3 : responseBody.length;
 
-            for (var mark in newMarks) {
-              LatLng position = LatLng(double.parse(element["lat"]), double.parse(element["lon"]));
-              loadedMarks.add(MapEntry(mark, position));
+          for (int i = 0; i < len; i++) {
+            List<geocoding.Placemark> newMarks =
+                await geocoding.placemarkFromCoordinates(double.parse(responseBody[i]["lat"]), double.parse(responseBody[i]["lon"]));
+
+            for (final mark in newMarks) {
+              LatLng position = LatLng(double.parse(responseBody[i]["lat"]), double.parse(responseBody[i]["lon"]));
+
+              CoordinatesAndName coordinatesAndName =
+                  CoordinatesAndName(coordinates: position, name: (responseBody[i]['display_name'] as String).split(',')[0]);
+
+              loadedMarks.add(MapEntry(mark, coordinatesAndName));
             }
           }
+
           this.placemarks = loadedMarks;
           notifyListeners();
         } catch (error) {
@@ -295,4 +294,14 @@ class LocationProvider with ChangeNotifier {
       }
     }
   }
+}
+
+class CoordinatesAndName {
+  LatLng coordinates;
+  String name;
+
+  CoordinatesAndName({
+    @required this.coordinates,
+    @required this.name,
+  });
 }
