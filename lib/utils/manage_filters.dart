@@ -10,9 +10,6 @@ class ManageFilters {
     if (userSettings.showOnlyWithLocalization != null && userSettings.showOnlyWithLocalization) {
       tasks = Provider.of<TaskProvider>(context, listen: false).onlyWithLocalization(tasks);
     }
-    if (userSettings.showOnlyUnfinished != null && userSettings.showOnlyUnfinished) {
-      tasks = Provider.of<TaskProvider>(context, listen: false).onlyUnfinishedTasks(tasks);
-    }
     if (userSettings.showOnlyDelegated != null && userSettings.showOnlyDelegated) {
       tasks = Provider.of<TaskProvider>(context, listen: false).onlyDelegatedTasks(tasks);
     }

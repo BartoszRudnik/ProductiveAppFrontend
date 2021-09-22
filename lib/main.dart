@@ -120,7 +120,6 @@ class MyApp extends StatelessWidget {
             userSettings: previousSettings == null
                 ? Settings(
                     showOnlyWithLocalization: false,
-                    showOnlyUnfinished: false,
                     showOnlyDelegated: false,
                     collaborators: [],
                     locations: [],

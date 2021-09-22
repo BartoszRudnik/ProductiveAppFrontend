@@ -4,22 +4,19 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../model/task.dart';
 
-class TaskDetailsBottomBar extends StatefulWidget {
+class TaskDetailsBottomBar extends StatelessWidget {
   final Function deleteTask;
   final Function saveTask;
-  Task taskToEdit;
+  final Function setDone;
+  final Task taskToEdit;
 
   TaskDetailsBottomBar({
     @required this.deleteTask,
     @required this.saveTask,
     @required this.taskToEdit,
+    @required this.setDone,
   });
 
-  @override
-  _TaskDetailsBottomBarState createState() => _TaskDetailsBottomBarState();
-}
-
-class _TaskDetailsBottomBarState extends State<TaskDetailsBottomBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -28,7 +25,7 @@ class _TaskDetailsBottomBarState extends State<TaskDetailsBottomBar> {
           Expanded(
             flex: 4,
             child: TextButton.icon(
-              onPressed: () => this.widget.deleteTask(),
+              onPressed: () => this.deleteTask(),
               style: ElevatedButton.styleFrom(
                 onPrimary: Theme.of(context).primaryColor,
               ),
@@ -51,19 +48,17 @@ class _TaskDetailsBottomBarState extends State<TaskDetailsBottomBar> {
             flex: 6,
             child: TextButton.icon(
               onPressed: () {
-                setState(() {
-                  this.widget.taskToEdit.done = !this.widget.taskToEdit.done;
-                });
+                this.setDone();
               },
               style: ElevatedButton.styleFrom(
                 onPrimary: Theme.of(context).primaryColor,
               ),
-              icon: Icon(this.widget.taskToEdit.done ? Icons.cancel : Icons.done),
+              icon: Icon(this.taskToEdit.done ? Icons.cancel : Icons.done),
               label: Row(
                 children: [
                   Flexible(
                     child: AutoSizeText(
-                      this.widget.taskToEdit.done ? AppLocalizations.of(context).unmarkAsDone : AppLocalizations.of(context).markAsDone,
+                      this.taskToEdit.done ? AppLocalizations.of(context).unmarkAsDone : AppLocalizations.of(context).markAsDone,
                       minFontSize: 10,
                       maxFontSize: 16,
                       maxLines: 1,
@@ -76,7 +71,7 @@ class _TaskDetailsBottomBarState extends State<TaskDetailsBottomBar> {
           Expanded(
             flex: 4,
             child: TextButton.icon(
-              onPressed: () => this.widget.saveTask(),
+              onPressed: () => this.saveTask(),
               style: ElevatedButton.styleFrom(
                 onPrimary: Theme.of(context).primaryColor,
               ),

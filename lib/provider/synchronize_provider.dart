@@ -115,7 +115,6 @@ class SynchronizeProvider with ChangeNotifier {
           finalUrl,
           body: json.encode(
             {
-              "showOnlyUnfinished": settings.showOnlyUnfinished ?? false,
               "showOnlyDelegated": settings.showOnlyDelegated ?? false,
               "showOnlyWithLocalization": settings.showOnlyWithLocalization ?? false,
               "collaborators": settings.collaborators ?? [],
