@@ -265,33 +265,77 @@ class LocationProvider with ChangeNotifier {
   Future<void> findGlobalLocationsFromQuery(String query) async {
     if (await InternetConnection.internetConnection()) {
       final url = "https://nominatim.openstreetmap.org/search?q=$query&format=json";
-      List<MapEntry<geocoding.Placemark, CoordinatesAndName>> loadedMarks = [];
 
-      query = query.trim();
+      List<MapEntry<geocoding.Placemark, CoordinatesAndName>> loadedMarks = [];
 
       if (query.length >= 3) {
         try {
-          final response = await http.get(url);
-          final responseBody = json.decode(utf8.decode(response.bodyBytes));
+          var response = await http.get(url);
+          var responseBody = json.decode(utf8.decode(response.bodyBytes));
 
-          int len = responseBody.length > 3 ? 3 : responseBody.length;
+          int len = responseBody.length > 5 ? 5 : responseBody.length;
 
           for (int i = 0; i < len; i++) {
             List<geocoding.Placemark> newMarks =
                 await geocoding.placemarkFromCoordinates(double.parse(responseBody[i]["lat"]), double.parse(responseBody[i]["lon"]));
 
-            for (final mark in newMarks) {
+            int secondLen = newMarks.length > 5 ? 5 : newMarks.length;
+
+            for (int j = 0; j < secondLen; j++) {
               LatLng position = LatLng(double.parse(responseBody[i]["lat"]), double.parse(responseBody[i]["lon"]));
 
               CoordinatesAndName coordinatesAndName =
                   CoordinatesAndName(coordinates: position, name: (responseBody[i]['display_name'] as String).split(',')[0]);
 
-              loadedMarks.add(MapEntry(mark, coordinatesAndName));
+              loadedMarks.add(MapEntry(newMarks[j], coordinatesAndName));
             }
           }
 
           this.placemarks = loadedMarks;
           notifyListeners();
+        } catch (error) {
+          print(error);
+          throw error;
+        }
+      }
+    }
+  }
+
+  Future<void> findNearLocationsFromQuery(String query, String alternativeQuery) async {
+    if (await InternetConnection.internetConnection()) {
+      final url = "https://nominatim.openstreetmap.org/search?q=$query&format=json";
+
+      List<MapEntry<geocoding.Placemark, CoordinatesAndName>> loadedMarks = [];
+
+      if (alternativeQuery.length >= 3) {
+        try {
+          var response = await http.get(url);
+          var responseBody = json.decode(utf8.decode(response.bodyBytes));
+
+          if (responseBody.length == 0) {
+            this.findGlobalLocationsFromQuery(alternativeQuery);
+          } else {
+            int len = responseBody.length > 5 ? 5 : responseBody.length;
+
+            for (int i = 0; i < len; i++) {
+              List<geocoding.Placemark> newMarks =
+                  await geocoding.placemarkFromCoordinates(double.parse(responseBody[i]["lat"]), double.parse(responseBody[i]["lon"]));
+
+              int secondLen = newMarks.length > 5 ? 5 : newMarks.length;
+
+              for (int j = 0; j < secondLen; j++) {
+                LatLng position = LatLng(double.parse(responseBody[i]["lat"]), double.parse(responseBody[i]["lon"]));
+
+                CoordinatesAndName coordinatesAndName =
+                    CoordinatesAndName(coordinates: position, name: (responseBody[i]['display_name'] as String).split(',')[0]);
+
+                loadedMarks.add(MapEntry(newMarks[j], coordinatesAndName));
+              }
+            }
+
+            this.placemarks = loadedMarks;
+            notifyListeners();
+          }
         } catch (error) {
           print(error);
           throw error;

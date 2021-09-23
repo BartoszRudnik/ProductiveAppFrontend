@@ -5,6 +5,7 @@ import 'package:productive_app/model/coordinates_and_name.dart';
 import 'package:productive_app/provider/location_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
 
 class FindPlace extends StatefulWidget {
   final Function mapMove;
@@ -24,13 +25,14 @@ class _FindPlaceState extends State<FindPlace> {
   String searchString;
   final TextEditingController _textEditingController = TextEditingController();
 
-  Future<void> getPlacemarks(BuildContext context, String search) async {
-    await Provider.of<LocationProvider>(context, listen: false).findGlobalLocationsFromQuery(search);
-    this.placemarks = Provider.of<LocationProvider>(context, listen: false).marks;
+  Future<void> getPlacemarks(BuildContext context, String search, String alternative) async {
+    await Provider.of<LocationProvider>(context, listen: false).findNearLocationsFromQuery(search, alternative);
   }
 
   @override
   Widget build(BuildContext context) {
+    this.placemarks = Provider.of<LocationProvider>(context).marks;
+
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
       child: Card(
@@ -48,10 +50,20 @@ class _FindPlaceState extends State<FindPlace> {
                   contentPadding: EdgeInsets.all(16.0),
                 ),
                 onChanged: (search) async {
-                  await getPlacemarks(context, search);
                   setState(() {
                     searchString = search;
                   });
+
+                  bg.Location location = await bg.BackgroundGeolocation.getCurrentPosition(
+                    timeout: 3,
+                    maximumAge: 10000,
+                    desiredAccuracy: 200,
+                    samples: 3,
+                  );
+
+                  final String searchQuery = search + " " + location.coords.latitude.toString() + " " + location.coords.longitude.toString();
+
+                  await getPlacemarks(context, searchQuery, search);
                 },
               ),
               if (this.searchString != null && this.searchString.length >= 3 && this.placemarks != [])
