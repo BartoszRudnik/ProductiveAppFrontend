@@ -167,6 +167,30 @@ class TaskProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> sendSSE(String childTaskUuid, String collaboratorEmail) async {
+    if (childTaskUuid != null && childTaskUuid.length > 1) {
+      final notifyUrl = this._serverUrl + "delegatedTaskSSE/publish/$collaboratorEmail";
+
+      try {
+        await http.post(
+          notifyUrl,
+          body: json.encode(
+            {
+              'userMail': collaboratorEmail,
+              'taskUuid': childTaskUuid,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+      }
+    }
+  }
+
   Future<int> addTaskWithGeolocation(Task task, double latitude, double longitude) async {
     if (await InternetConnection.internetConnection()) {
       String url = this._serverUrl + 'task/add';
@@ -201,12 +225,12 @@ class TaskProvider with ChangeNotifier {
           },
         );
 
-        task.id = int.parse(response.body);
+        final responseBody = json.decode(response.body);
+
+        task.id = responseBody['taskId'];
+        task.position = task.id + 1000.0;
 
         task = await TaskDatabase.create(task, this.userMail);
-
-        task.position = int.parse(response.body) + 1000.0;
-        await TaskDatabase.update(task, this.userMail);
 
         if (task.notificationLocalizationUuid != null) {
           await Notifications.addGeofence(
@@ -225,6 +249,10 @@ class TaskProvider with ChangeNotifier {
         this.addToLocalization(task);
 
         notifyListeners();
+
+        if (responseBody['childTaskUuid'] != null && responseBody['childTaskUuid'].length > 1) {
+          await this.sendSSE(responseBody['childTaskUuid'], task.delegatedEmail);
+        }
 
         return task.id;
       } catch (error) {
@@ -293,8 +321,10 @@ class TaskProvider with ChangeNotifier {
           },
         );
 
-        task.id = int.parse(response.body);
-        task.position = int.parse(response.body) + 1000.0;
+        final responseBody = json.decode(response.body);
+
+        task.id = responseBody['taskId'];
+        task.position = task.id + 1000.0;
 
         task = await TaskDatabase.create(task, this.userMail);
 
@@ -302,6 +332,10 @@ class TaskProvider with ChangeNotifier {
         this.addToLocalization(task);
 
         notifyListeners();
+
+        if (responseBody['childTaskUuid'] != null && responseBody['childTaskUuid'].length > 1) {
+          await this.sendSSE(responseBody['childTaskUuid'], task.delegatedEmail);
+        }
 
         return task.id;
       } catch (error) {
@@ -397,7 +431,7 @@ class TaskProvider with ChangeNotifier {
 
     if (await InternetConnection.internetConnection()) {
       try {
-        await http.put(
+        final response = await http.put(
           url,
           body: json.encode(
             {
@@ -426,6 +460,12 @@ class TaskProvider with ChangeNotifier {
             'accept': 'application/json',
           },
         );
+
+        final responseBody = json.decode(response.body);
+
+        if (responseBody['childTaskUuid'] != null && responseBody['childTaskUuid'].length > 1) {
+          await this.sendSSE(responseBody['childTaskUuid'], task.delegatedEmail);
+        }
       } catch (error) {
         print(error);
         throw (error);
@@ -482,7 +522,7 @@ class TaskProvider with ChangeNotifier {
 
     if (await InternetConnection.internetConnection()) {
       try {
-        await http.put(
+        final response = await http.put(
           url,
           body: json.encode(
             {
@@ -511,6 +551,12 @@ class TaskProvider with ChangeNotifier {
             'accept': 'application/json',
           },
         );
+
+        final responseBody = json.decode(response.body);
+
+        if (responseBody['childTaskUuid'] != null && responseBody['childTaskUuid'].length > 1) {
+          await this.sendSSE(responseBody['childTaskUuid'], task.delegatedEmail);
+        }
       } catch (error) {
         print(error);
         throw (error);
@@ -586,6 +632,7 @@ class TaskProvider with ChangeNotifier {
         }
 
         this.taskList.add(task);
+        this.addToLocalization(task);
 
         notifyListeners();
       } catch (error) {

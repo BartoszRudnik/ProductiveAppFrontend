@@ -1,5 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:productive_app/provider/delegate_provider.dart';
 import 'package:productive_app/utils/internet_connection.dart';
 import 'package:provider/provider.dart';
 
@@ -12,6 +13,7 @@ import '../widget/drawer/main_drawer.dart';
 import 'loading_task_screen.dart';
 import 'tabs_screen.dart';
 import 'task_details_screen.dart';
+import 'package:http/http.dart' as http;
 
 class MainScreen extends StatefulWidget {
   static const routeName = '/main-screen';
@@ -62,6 +64,8 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
+
+    Provider.of<DelegateProvider>(context, listen: false).subscribe(context);
 
     this.future = this.loadData(context);
 

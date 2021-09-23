@@ -6,7 +6,9 @@ import 'package:http/http.dart' as http;
 import 'package:productive_app/db/collaborator_database.dart';
 import 'package:productive_app/model/collaborator.dart';
 import 'package:productive_app/model/collaboratorTask.dart';
+import 'package:productive_app/provider/task_provider.dart';
 import 'package:productive_app/utils/internet_connection.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 class DelegateProvider with ChangeNotifier {
@@ -29,6 +31,38 @@ class DelegateProvider with ChangeNotifier {
     @required this.userToken,
   }) {
     this.divideCollaborators(this.collaborators);
+  }
+
+  http.Client _client;
+
+  void subscribe(BuildContext context) async {
+    print("Subscribing..");
+    try {
+      this._client = http.Client();
+
+      final request = http.Request("GET", Uri.parse(this._serverUrl + "delegatedTaskSSE/subscribe/${this.userEmail}"));
+
+      Future<http.StreamedResponse> response = _client.send(request);
+
+      response.asStream().listen((streamedResponse) {
+        streamedResponse.stream.listen((data) {
+          final stringValue = utf8.decode(data);
+
+          print(stringValue);
+
+          if (stringValue.contains('event')) {
+            final message = stringValue.split(":");
+            String uuid = message[2].trim();
+
+            uuid = uuid.split("\n")[0];
+
+            Provider.of<TaskProvider>(context, listen: false).fetchSingleTaskFull(uuid);
+          }
+        });
+      });
+    } catch (error) {
+      print(error);
+    }
   }
 
   void setCollaborators(List<Collaborator> newList) {
