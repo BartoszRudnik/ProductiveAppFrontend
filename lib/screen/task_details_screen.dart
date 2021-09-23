@@ -269,7 +269,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       }
 
       await Provider.of<AttachmentProvider>(context, listen: false).deleteFlaggedAttachments();
-      Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);
+
       this.changesSaved = true;
     } on SocketException catch (error) {
       print(error);

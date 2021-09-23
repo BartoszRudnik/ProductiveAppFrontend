@@ -370,13 +370,11 @@ class TaskProvider with ChangeNotifier {
       } else if (newLocation == 'SCHEDULED' && this._scheduledTasks.length > 0) {
         task.position = this._scheduledTasks[this._scheduledTasks.length - 1].position + 1000.0;
       }
-
-      this.deleteFromLocalization(task);
-
-      task.localization = newLocation;
-
-      this.addToLocalization(task);
     }
+
+    this.deleteFromLocalization(task);
+    task.localization = newLocation;
+    this.addToLocalization(task);
 
     if (newLocation == 'TRASH' || newLocation == 'COMPLETED') {
       await Notifications.removeGeofence(task.uuid);
@@ -393,9 +391,9 @@ class TaskProvider with ChangeNotifier {
       this.sortByPosition(this._delegatedTasks);
     }
 
-    await TaskDatabase.update(task, this.userMail);
-
     notifyListeners();
+
+    await TaskDatabase.update(task, this.userMail);
 
     if (await InternetConnection.internetConnection()) {
       try {
@@ -446,15 +444,13 @@ class TaskProvider with ChangeNotifier {
       }
     }
 
+    this.deleteFromLocalization(task);
+    task.localization = newLocation;
+    this.addToLocalization(task);
+
     if (newLocation == 'TRASH' || newLocation == 'COMPLETED') {
       await Notifications.removeGeofence(task.uuid);
     }
-
-    this.deleteFromLocalization(task);
-
-    task.localization = newLocation;
-
-    this.addToLocalization(task);
 
     if (task.localization == 'INBOX') {
       this.sortByPosition(this._inboxTasks);
@@ -1251,9 +1247,11 @@ class TaskProvider with ChangeNotifier {
   }
 
   void sortByPosition(List<Task> listToSort) {
-    listToSort.sort((a, b) {
-      return a.position.compareTo(b.position);
-    });
+    if (listToSort.length > 1) {
+      listToSort.sort((a, b) {
+        return a.position.compareTo(b.position);
+      });
+    }
   }
 
   List<Task> tasksBeforeToday() {

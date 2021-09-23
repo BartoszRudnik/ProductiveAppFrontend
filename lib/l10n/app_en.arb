@@ -356,5 +356,6 @@
   "collect": "Collect",
   "planDo": "Plan&Do",
   "state": "State",
-  "attributes": "Attributes"  
+  "attributes": "Attributes",
+  "saveLocation": "Save location"  
 }
