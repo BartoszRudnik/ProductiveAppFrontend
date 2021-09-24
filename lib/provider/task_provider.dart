@@ -6,7 +6,9 @@ import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:productive_app/db/task_database.dart';
 import 'package:productive_app/model/location.dart';
+import 'package:productive_app/provider/location_provider.dart';
 import 'package:productive_app/utils/internet_connection.dart';
+import 'package:provider/provider.dart';
 
 import '../model/tag.dart';
 import '../model/task.dart';
@@ -564,7 +566,7 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
-  Future<void> fetchSingleTaskFull(String taskUuid) async {
+  Future<void> fetchSingleTaskFull(String taskUuid, BuildContext context) async {
     if (await InternetConnection.internetConnection()) {
       String url = this._serverUrl + 'task/getSingleTaskFull/${this.userMail}/$taskUuid';
 
@@ -619,6 +621,8 @@ class TaskProvider with ChangeNotifier {
           task.notificationLocalizationRadius = responseBody['tasks']['localizationRadius'];
           task.notificationOnEnter = responseBody['tasks']['notificationOnEnter'];
           task.notificationOnExit = responseBody['tasks']['notificationOnExit'];
+
+          await Provider.of<LocationProvider>(context, listen: false).getSingleLocation(task.notificationLocalizationUuid);
         } else {
           task.notificationLocalizationUuid = null;
         }
@@ -632,6 +636,7 @@ class TaskProvider with ChangeNotifier {
         }
 
         this.taskList.add(task);
+        this.deleteFromLocalization(task);
         this.addToLocalization(task);
 
         notifyListeners();

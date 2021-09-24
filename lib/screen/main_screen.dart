@@ -13,7 +13,6 @@ import '../widget/drawer/main_drawer.dart';
 import 'loading_task_screen.dart';
 import 'tabs_screen.dart';
 import 'task_details_screen.dart';
-import 'package:http/http.dart' as http;
 
 class MainScreen extends StatefulWidget {
   static const routeName = '/main-screen';
@@ -28,7 +27,7 @@ class _MainScreenState extends State<MainScreen> {
 
     if (task == null) {
       await Provider.of<LocationProvider>(context, listen: false).getLocations();
-      await Provider.of<TaskProvider>(context, listen: false).fetchSingleTaskFull(payload);
+      await Provider.of<TaskProvider>(context, listen: false).fetchSingleTaskFull(payload, context);
 
       task = Provider.of<TaskProvider>(context, listen: false).taskList.firstWhere((element) => element.uuid == payload);
     }

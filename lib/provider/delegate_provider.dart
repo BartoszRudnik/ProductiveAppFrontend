@@ -56,7 +56,7 @@ class DelegateProvider with ChangeNotifier {
 
             uuid = uuid.split("\n")[0];
 
-            Provider.of<TaskProvider>(context, listen: false).fetchSingleTaskFull(uuid);
+            Provider.of<TaskProvider>(context, listen: false).fetchSingleTaskFull(uuid, context);
           }
         });
       });

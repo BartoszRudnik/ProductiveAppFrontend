@@ -101,6 +101,39 @@ class LocationProvider with ChangeNotifier {
     }
   }
 
+  Future<void> getSingleLocation(String uuid) async {
+    if (await InternetConnection.internetConnection()) {
+      final existingLocation = this.locationList.firstWhere((element) => element.uuid == uuid, orElse: () => null);
+
+      if (existingLocation == null) {
+        final url = this._serverUrl + "localization/getLocalization/$uuid";
+
+        try {
+          final response = await http.get(url);
+          final responseBody = json.decode(response.body);
+
+          final newLocation = models.Location(
+            uuid: responseBody['uuid'],
+            id: responseBody['id'],
+            localizationName: responseBody["localizationName"],
+            longitude: responseBody["longitude"],
+            latitude: responseBody["latitude"],
+            country: responseBody["country"],
+            locality: responseBody["locality"],
+            street: responseBody["street"],
+            saved: responseBody['saved'],
+          );
+
+          this.locationList.add(newLocation);
+
+          notifyListeners();
+        } catch (error) {
+          print(error);
+        }
+      }
+    }
+  }
+
   Future<void> getLocations() async {
     final url = this._serverUrl + "localization/getLocalizations/${this.userMail}";
     final List<models.Location> loadedLocations = [];
