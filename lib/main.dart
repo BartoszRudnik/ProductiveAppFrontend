@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -8,6 +10,8 @@ import 'package:productive_app/provider/attachment_provider.dart';
 import 'package:productive_app/provider/locale_provider.dart';
 import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:workmanager/workmanager.dart';
 
 import 'config/color_themes.dart';
 import 'config/my_routes.dart';
@@ -24,6 +28,38 @@ import 'screen/entry_screen.dart';
 import 'screen/loading_auth_screen.dart';
 import 'screen/main_screen.dart';
 import 'utils/notifications.dart';
+import 'package:http/http.dart' as http;
+
+void callbackDispatcher() {
+  Workmanager().executeTask((taskName, inputData) async {
+    final getPreferences = await SharedPreferences.getInstance();
+
+    if (!getPreferences.containsKey('userData')) {
+      return false;
+    }
+
+    final extractedUserData = json.decode(getPreferences.getString('userData')) as Map<String, Object>;
+    final expiryDate = DateTime.parse(extractedUserData['expiryDate']);
+
+    if (expiryDate.isBefore(DateTime.now())) {
+      return false;
+    }
+
+    final email = extractedUserData['email'];
+
+    final requestUrl = "http://192.168.1.120:8080/api/v1/delegatedTaskSSE/isNewTask/$email";
+    final response = await http.get(requestUrl);
+    final responseBody = json.decode(response.body);
+
+    print(responseBody);
+
+    if (responseBody['result'] == 'true') {
+      Notifications.receivedTask(1);
+    }
+
+    return Future.value(true);
+  });
+}
 
 void headlessTask(bg.HeadlessEvent headlessEvent) async {
   switch (headlessEvent.name) {
@@ -41,6 +77,8 @@ void main() async {
 
   runApp(MyApp());
 
+  Workmanager().initialize(callbackDispatcher);
+  Workmanager().registerPeriodicTask('1', 'taskName');
   bg.BackgroundGeolocation.registerHeadlessTask(headlessTask);
 }
 

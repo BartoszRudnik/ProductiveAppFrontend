@@ -45,6 +45,19 @@ class Notifications {
     await _notifications.initialize(initializationSettings, onSelectNotification: _selectNotification);
   }
 
+  static Future<void> receivedTask(int id) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      '2',
+      'Delegated task',
+      'Notification about new delegated task',
+      importance: Importance.max,
+      priority: Priority.high,
+    );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    await _notifications.show(id, "You have received a new task!", "", platformChannelSpecifics);
+  }
+
   static Future<void> newDelegatedTaskNotification(Task task, String title) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
       '2',
