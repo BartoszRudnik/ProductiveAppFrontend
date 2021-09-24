@@ -236,16 +236,8 @@ class TaskProvider with ChangeNotifier {
         task = await TaskDatabase.create(task, this.userMail);
 
         if (task.notificationLocalizationUuid != null) {
-          await Notifications.addGeofence(
-            task.uuid,
-            latitude,
-            longitude,
-            task.notificationLocalizationRadius,
-            task.notificationOnEnter,
-            task.notificationOnExit,
-            task.title,
-            task.description,
-          );
+          await Notifications.addGeofence(task.uuid, latitude, longitude, task.notificationLocalizationRadius, task.notificationOnEnter,
+              task.notificationOnExit, task.title, task.description, task.id);
         }
 
         this.taskList.add(task);
@@ -269,16 +261,8 @@ class TaskProvider with ChangeNotifier {
       await TaskDatabase.update(task, this.userMail);
 
       if (task.notificationLocalizationUuid != null) {
-        await Notifications.addGeofence(
-          task.uuid,
-          latitude,
-          longitude,
-          task.notificationLocalizationRadius,
-          task.notificationOnEnter,
-          task.notificationOnExit,
-          task.title,
-          task.description,
-        );
+        await Notifications.addGeofence(task.uuid, latitude, longitude, task.notificationLocalizationRadius, task.notificationOnEnter, task.notificationOnExit,
+            task.title, task.description, task.id);
       }
 
       this.taskList.add(task);
@@ -469,6 +453,9 @@ class TaskProvider with ChangeNotifier {
         if (responseBody['childTaskUuid'] != null && responseBody['childTaskUuid'].length > 1) {
           await this.sendSSE(responseBody['childTaskUuid'], task.delegatedEmail);
         }
+        if (responseBody['parentTaskUuid'] != null && responseBody['parentTaskUuid'].length > 1) {
+          await this.sendSSE(responseBody['parentTaskUuid'], responseBody['parentTaskEmail']);
+        }
       } catch (error) {
         print(error);
         throw (error);
@@ -516,6 +503,7 @@ class TaskProvider with ChangeNotifier {
         longitude,
         task.title,
         task.description,
+        task.id,
       );
     }
 
@@ -560,6 +548,9 @@ class TaskProvider with ChangeNotifier {
         if (responseBody['childTaskUuid'] != null && responseBody['childTaskUuid'].length > 1) {
           await this.sendSSE(responseBody['childTaskUuid'], task.delegatedEmail);
         }
+        if (responseBody['parentTaskUuid'] != null && responseBody['parentTaskUuid'].length > 1) {
+          await this.sendSSE(responseBody['parentTaskUuid'], responseBody['parentTaskEmail']);
+        }
       } catch (error) {
         print(error);
         throw (error);
@@ -567,7 +558,7 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
-  Future<void> fetchSingleTaskFull(String taskUuid, BuildContext context) async {
+  Future<Task> fetchSingleTaskFull(String taskUuid, BuildContext context) async {
     if (await InternetConnection.internetConnection()) {
       String url = this._serverUrl + 'task/getSingleTaskFull/${this.userMail}/$taskUuid';
 
@@ -617,6 +608,10 @@ class TaskProvider with ChangeNotifier {
           taskState: responseBody['tasks']['taskState'],
         );
 
+        if (taskStatus == 'Done') {
+          task.done = true;
+        }
+
         if (responseBody['tasks']['notificationLocalization'] != null) {
           task.notificationLocalizationUuid = responseBody['tasks']['notificationLocalization']['uuid'];
           task.notificationLocalizationRadius = responseBody['tasks']['localizationRadius'];
@@ -640,16 +635,29 @@ class TaskProvider with ChangeNotifier {
           await Provider.of<AttachmentProvider>(context, listen: false).getDelegatedAttachmentsFromSingleUser([task.parentUuid]);
         }
 
+        final bool isNew = -1 == this.taskList.indexWhere((element) => element.uuid == task.uuid);
+
         this.taskList.add(task);
         this.deleteFromLocalization(task);
         this.addToLocalization(task);
 
         notifyListeners();
+
+        await TaskDatabase.delete(task.uuid);
+        await TaskDatabase.create(task, this.userMail);
+
+        if (isNew) {
+          return task;
+        } else {
+          return null;
+        }
       } catch (error) {
         print(error);
         throw (error);
       }
     }
+
+    return null;
   }
 
   Future<void> fetchSingleTask(String taskUuid) async {
@@ -719,6 +727,7 @@ class TaskProvider with ChangeNotifier {
           task.notificationOnExit,
           task.title,
           task.description,
+          task.id,
         );
       } catch (error) {
         print(error);
@@ -762,25 +771,30 @@ class TaskProvider with ChangeNotifier {
         }
 
         Task task = Task(
-            uuid: element['tasks']['uuid'],
-            id: element['tasks']['id'],
-            title: element['tasks']['taskName'],
-            taskState: element['tasks']['taskState'],
-            description: element['tasks']['description'],
-            done: element['tasks']['ifDone'],
-            priority: element['tasks']['priority'],
-            endDate: element['tasks']['endDate'] != null ? DateTime.tryParse(element['tasks']['endDate']) : null,
-            startDate: element['tasks']['endDate'] != null ? DateTime.tryParse(element['tasks']['startDate']) : null,
-            tags: taskTags,
-            localization: element['tasks']['taskList'],
-            position: element['tasks']['position'],
-            delegatedEmail: element['tasks']['delegatedEmail'],
-            isDelegated: element['tasks']['isDelegated'],
-            taskStatus: taskStatus,
-            isCanceled: element['tasks']['isCanceled'],
-            supervisorEmail: supervisorEmail,
-            childUuid: element['childUuid'],
-            parentUuid: element['parentUuid']);
+          uuid: element['tasks']['uuid'],
+          id: element['tasks']['id'],
+          title: element['tasks']['taskName'],
+          taskState: element['tasks']['taskState'],
+          description: element['tasks']['description'],
+          done: element['tasks']['ifDone'],
+          priority: element['tasks']['priority'],
+          endDate: element['tasks']['endDate'] != null ? DateTime.tryParse(element['tasks']['endDate']) : null,
+          startDate: element['tasks']['endDate'] != null ? DateTime.tryParse(element['tasks']['startDate']) : null,
+          tags: taskTags,
+          localization: element['tasks']['taskList'],
+          position: element['tasks']['position'],
+          delegatedEmail: element['tasks']['delegatedEmail'],
+          isDelegated: element['tasks']['isDelegated'],
+          taskStatus: taskStatus,
+          isCanceled: element['tasks']['isCanceled'],
+          supervisorEmail: supervisorEmail,
+          childUuid: element['childUuid'],
+          parentUuid: element['parentUuid'],
+        );
+
+        if (taskStatus == 'Done') {
+          task.done = true;
+        }
 
         if (element['tasks']['notificationLocalization'] != null) {
           task.notificationLocalizationUuid = element['tasks']['notificationLocalization']['uuid'];
@@ -970,6 +984,7 @@ class TaskProvider with ChangeNotifier {
         task.notificationOnExit,
         task.title,
         task.description,
+        task.id,
       );
     }
 
@@ -1435,11 +1450,11 @@ class TaskProvider with ChangeNotifier {
             : 1);
   }
 
-  void notificationChange(
-      String taskUuid, double notificationRadius, bool onExit, bool onEnter, double latitude, double longitude, String title, String description) async {
+  void notificationChange(String taskUuid, double notificationRadius, bool onExit, bool onEnter, double latitude, double longitude, String title,
+      String description, int taskId) async {
     await Notifications.removeGeofence(taskUuid);
     if (taskUuid != null && latitude != null && longitude != null && notificationRadius != null) {
-      await Notifications.addGeofence(taskUuid, latitude, longitude, notificationRadius, onEnter, onExit, title, description);
+      await Notifications.addGeofence(taskUuid, latitude, longitude, notificationRadius, onEnter, onExit, title, description, taskId);
     }
   }
 

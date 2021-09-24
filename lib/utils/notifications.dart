@@ -1,5 +1,6 @@
 import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:productive_app/model/task.dart';
 import 'package:rxdart/rxdart.dart';
 
 class Notifications {
@@ -44,13 +45,26 @@ class Notifications {
     await _notifications.initialize(initializationSettings, onSelectNotification: _selectNotification);
   }
 
+  static Future<void> newDelegatedTaskNotification(Task task, String title) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      '2',
+      'Delegated task',
+      'Notification about new delegated task',
+      importance: Importance.max,
+      priority: Priority.high,
+    );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    await _notifications.show(task.id, title + task.title, task.description, platformChannelSpecifics, payload: task.uuid);
+  }
+
   static Future<void> onGeofence(bg.GeofenceEvent event) async {
     final taskUuid = event.extras['uuid'];
     final taskTitle = event.extras['title'];
     final taskDescription = event.extras['description'];
 
     const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      'your channel id',
+      '1',
       'Localization',
       'Geofence notification',
       importance: Importance.max,
@@ -58,7 +72,7 @@ class Notifications {
     );
 
     const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-    await _notifications.show(0, taskTitle, taskDescription, platformChannelSpecifics, payload: taskUuid);
+    await _notifications.show(int.parse(event.extras['id']), taskTitle, taskDescription, platformChannelSpecifics, payload: taskUuid);
   }
 
   static Future _selectNotification(String payload) async {
@@ -90,7 +104,7 @@ class Notifications {
   }
 
   static Future<void> addGeofence(
-      String uuid, double latitude, double longitude, double radius, bool onEnter, bool onExit, String title, String description) async {
+      String uuid, double latitude, double longitude, double radius, bool onEnter, bool onExit, String title, String description, int taskId) async {
     await bg.BackgroundGeolocation.addGeofence(bg.Geofence(
       identifier: uuid,
       radius: radius * 1000,
@@ -104,6 +118,7 @@ class Notifications {
         'uuid': uuid,
         'description': description,
         'title': title,
+        'id': taskId,
       },
     ));
   }

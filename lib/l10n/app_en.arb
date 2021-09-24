@@ -357,5 +357,6 @@
   "planDo": "Plan&Do",
   "state": "State",
   "attributes": "Attributes",
-  "saveLocation": "Save location"  
+  "saveLocation": "Save location",
+  "newTask": "New Task: "  
 }

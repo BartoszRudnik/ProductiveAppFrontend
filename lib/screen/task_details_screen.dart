@@ -250,6 +250,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
               taskToEdit.notificationOnExit,
               taskToEdit.title,
               taskToEdit.description,
+              taskToEdit.id,
             );
           }
         }

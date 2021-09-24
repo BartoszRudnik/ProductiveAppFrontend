@@ -357,5 +357,6 @@
   "planDo": "Realizacja",
   "state": "Stan",
   "attributes": "Atrybuty",
-  "saveLocation": "Zapisz lokalizacje" 
+  "saveLocation": "Zapisz lokalizacje",
+  "newTask": "Nowe zadanie: " 
 }

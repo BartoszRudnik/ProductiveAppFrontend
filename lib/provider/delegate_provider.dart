@@ -8,8 +8,10 @@ import 'package:productive_app/model/collaborator.dart';
 import 'package:productive_app/model/collaboratorTask.dart';
 import 'package:productive_app/provider/task_provider.dart';
 import 'package:productive_app/utils/internet_connection.dart';
+import 'package:productive_app/utils/notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class DelegateProvider with ChangeNotifier {
   List<Collaborator> collaborators = [];
@@ -36,7 +38,6 @@ class DelegateProvider with ChangeNotifier {
   http.Client _client;
 
   void subscribe(BuildContext context) async {
-    print("Subscribing..");
     try {
       this._client = http.Client();
 
@@ -45,7 +46,7 @@ class DelegateProvider with ChangeNotifier {
       Future<http.StreamedResponse> response = _client.send(request);
 
       response.asStream().listen((streamedResponse) {
-        streamedResponse.stream.listen((data) {
+        streamedResponse.stream.listen((data) async {
           final stringValue = utf8.decode(data);
 
           print(stringValue);
@@ -56,7 +57,11 @@ class DelegateProvider with ChangeNotifier {
 
             uuid = uuid.split("\n")[0];
 
-            Provider.of<TaskProvider>(context, listen: false).fetchSingleTaskFull(uuid, context);
+            final task = await Provider.of<TaskProvider>(context, listen: false).fetchSingleTaskFull(uuid, context);
+
+            if (task != null) {
+              await Notifications.newDelegatedTaskNotification(task, AppLocalizations.of(context).newTask);
+            }
           }
         });
       });
