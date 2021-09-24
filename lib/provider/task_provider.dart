@@ -6,6 +6,7 @@ import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:productive_app/db/task_database.dart';
 import 'package:productive_app/model/location.dart';
+import 'package:productive_app/provider/attachment_provider.dart';
 import 'package:productive_app/provider/location_provider.dart';
 import 'package:productive_app/utils/internet_connection.dart';
 import 'package:provider/provider.dart';
@@ -633,6 +634,10 @@ class TaskProvider with ChangeNotifier {
 
         if (task.startDate != null && task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
           task.startDate = null;
+        }
+
+        if (task.parentUuid != null) {
+          await Provider.of<AttachmentProvider>(context, listen: false).getDelegatedAttachmentsFromSingleUser([task.parentUuid]);
         }
 
         this.taskList.add(task);

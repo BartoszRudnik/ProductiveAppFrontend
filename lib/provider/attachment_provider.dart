@@ -65,7 +65,7 @@ class AttachmentProvider with ChangeNotifier {
   }
 
   Future<void> getDelegatedAttachmentsFromSingleUser(List<String> delegatedTasksUuid) async {
-    final attachments = await this.getDelegatedAttachments(delegatedTasksUuid);
+    final attachments = await this._getDelegatedAttachments(delegatedTasksUuid);
 
     if (attachments.length > 0) {
       this.delegatedAttachments.addAll(attachments);
@@ -75,7 +75,7 @@ class AttachmentProvider with ChangeNotifier {
   }
 
   Future<void> getAllDelegatedAttachments(List<String> delegatedTasksUuid) async {
-    final attachments = await this.getDelegatedAttachments(delegatedTasksUuid);
+    final attachments = await this._getDelegatedAttachments(delegatedTasksUuid);
 
     if (attachments.length > 0) {
       this.delegatedAttachments = attachments;
@@ -84,7 +84,7 @@ class AttachmentProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<List<Attachment>> getDelegatedAttachments(List<String> delegatedTasksUuid) async {
+  Future<List<Attachment>> _getDelegatedAttachments(List<String> delegatedTasksUuid) async {
     if (await InternetConnection.internetConnection()) {
       final finalUrl = this._serverUrl + 'attachment/getDelegatedAttachments';
 
