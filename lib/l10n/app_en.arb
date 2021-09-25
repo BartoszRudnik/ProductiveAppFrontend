@@ -358,5 +358,14 @@
   "state": "State",
   "attributes": "Attributes",
   "saveLocation": "Save location",
-  "newTask": "New Task: "  
+  "newTask": "New Task: ",
+  "newInvitation": "You have received a new invitation from user: ",
+  "userHasAcceptedInvitation": "User: {user} has accepted your invitation!",
+  "@userHasAcceptedInvitation":{
+    "placeholders":{
+      "user":{
+        "type": "String"
+      }
+    }
+  }  
 }

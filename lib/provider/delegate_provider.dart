@@ -61,7 +61,7 @@ class DelegateProvider with ChangeNotifier {
     }
   }
 
-  void subscribeCollaborators() async {
+  void subscribeCollaborators(BuildContext context) async {
     try {
       this._collaboratorClient = http.Client();
 
@@ -69,24 +69,35 @@ class DelegateProvider with ChangeNotifier {
 
       Future<http.StreamedResponse> response = this._collaboratorClient.send(request);
 
-      response.asStream().listen((streamedResponse) {
-        streamedResponse.stream.listen((data) async {
-          final stringValue = utf8.decode(data);
+      response.asStream().listen(
+        (streamedResponse) {
+          streamedResponse.stream.listen(
+            (data) async {
+              final stringValue = utf8.decode(data);
 
-          if (stringValue.contains('event')) {
-            final message = stringValue.split(":");
-            String uuid = message[2].trim();
+              if (stringValue.contains('event')) {
+                final message = stringValue.split(":");
+                String uuid = message[2].trim();
 
-            uuid = uuid.split("\n")[0];
+                uuid = uuid.split("\n")[0];
 
-            final relation = await this.getSingleCollaborator(uuid);
+                final result = await this.getSingleCollaborator(uuid);
 
-            if (relation != null) {
-              await Notifications.receivedInvitation(relation.id);
-            }
-          }
-        });
-      });
+                final Collaborator collaborator = result[0];
+                final bool existing = result[1];
+
+                if (collaborator != null) {
+                  if (existing) {
+                    await Notifications.acceptedInvitation(collaborator.id, context, collaborator.email);
+                  } else {
+                    await Notifications.receivedInvitation(collaborator.id, context, collaborator.email);
+                  }
+                }
+              }
+            },
+          );
+        },
+      );
     } catch (error) {
       print(error);
     }
@@ -403,7 +414,7 @@ class DelegateProvider with ChangeNotifier {
     }
   }
 
-  Future<Collaborator> getSingleCollaborator(String relationUuid) async {
+  Future<List<Object>> getSingleCollaborator(String relationUuid) async {
     if (await InternetConnection.internetConnection()) {
       final requestUrl = this._serverUrl + "delegate/getSingleCollaborator/$relationUuid";
 
@@ -469,7 +480,7 @@ class DelegateProvider with ChangeNotifier {
 
         notifyListeners();
 
-        return newCollaborator;
+        return [newCollaborator, existing];
       } catch (error) {
         print(error);
       }

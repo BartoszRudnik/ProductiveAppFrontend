@@ -71,7 +71,7 @@ void callbackDispatcher() {
 
         if (responseBody['result'] == 'true') {
           int id = Random().nextInt(999999);
-          Notifications.receivedInvitation(id);
+          Notifications.invitationNotification(id);
         }
 
         return Future.value(true);

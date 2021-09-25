@@ -65,7 +65,7 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
 
     Provider.of<DelegateProvider>(context, listen: false).subscribe(context);
-    Provider.of<DelegateProvider>(context, listen: false).subscribeCollaborators();
+    Provider.of<DelegateProvider>(context, listen: false).subscribeCollaborators(context);
 
     this.future = this.loadData(context);
 
