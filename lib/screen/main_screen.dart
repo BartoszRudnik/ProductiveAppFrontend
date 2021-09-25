@@ -1,6 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:productive_app/provider/delegate_provider.dart';
+import 'package:productive_app/screen/collaborators_screen.dart';
 import 'package:productive_app/utils/internet_connection.dart';
 import 'package:provider/provider.dart';
 
@@ -23,17 +24,21 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   void onClickedNotification(String payload) async {
-    Task task = Provider.of<TaskProvider>(context, listen: false).taskList.firstWhere((element) => element.uuid == payload, orElse: () => null);
+    if (payload == "collaborator") {
+      Navigator.of(context).pushNamed(CollaboratorsScreen.routeName);
+    } else {
+      Task task = Provider.of<TaskProvider>(context, listen: false).taskList.firstWhere((element) => element.uuid == payload, orElse: () => null);
 
-    if (task == null) {
-      await Provider.of<LocationProvider>(context, listen: false).getLocations();
-      await Provider.of<TaskProvider>(context, listen: false).fetchSingleTaskFull(payload, context);
+      if (task == null) {
+        await Provider.of<LocationProvider>(context, listen: false).getLocations();
+        await Provider.of<TaskProvider>(context, listen: false).fetchSingleTaskFull(payload, context);
 
-      task = Provider.of<TaskProvider>(context, listen: false).taskList.firstWhere((element) => element.uuid == payload);
-    }
+        task = Provider.of<TaskProvider>(context, listen: false).taskList.firstWhere((element) => element.uuid == payload);
+      }
 
-    if (task != null && task.title != null) {
-      Navigator.of(context).pushNamed(TaskDetailScreen.routeName, arguments: task);
+      if (task != null && task.title != null) {
+        Navigator.of(context).pushNamed(TaskDetailScreen.routeName, arguments: task);
+      }
     }
   }
 

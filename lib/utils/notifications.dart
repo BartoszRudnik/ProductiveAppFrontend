@@ -70,7 +70,7 @@ class Notifications {
     );
 
     const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-    await _notifications.show(id, AppLocalizations.of(context).newInvitation + userName, "", platformChannelSpecifics);
+    await _notifications.show(id, AppLocalizations.of(context).newInvitation + userName, "", platformChannelSpecifics, payload: "collaborator");
   }
 
   static Future<void> acceptedInvitation(int id, BuildContext context, String userName) async {
@@ -83,7 +83,7 @@ class Notifications {
     );
 
     const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-    await _notifications.show(id, AppLocalizations.of(context).userHasAcceptedInvitation(userName), "", platformChannelSpecifics);
+    await _notifications.show(id, AppLocalizations.of(context).userHasAcceptedInvitation(userName), "", platformChannelSpecifics, payload: "collaborator");
   }
 
   static Future<void> receivedTask(int id) async {
@@ -96,7 +96,7 @@ class Notifications {
     );
 
     const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-    await _notifications.show(id, "You have received a new task!", "", platformChannelSpecifics);
+    await _notifications.show(id, "You have received a new task!", "", platformChannelSpecifics, payload: "collaborator");
   }
 
   static Future<void> newDelegatedTaskNotification(Task task, String title) async {
@@ -159,21 +159,23 @@ class Notifications {
 
   static Future<void> addGeofence(
       String uuid, double latitude, double longitude, double radius, bool onEnter, bool onExit, String title, String description, int taskId) async {
-    await bg.BackgroundGeolocation.addGeofence(bg.Geofence(
-      identifier: uuid,
-      radius: radius * 1000,
-      latitude: latitude,
-      longitude: longitude,
-      notifyOnEntry: onEnter,
-      notifyOnExit: onExit,
-      notifyOnDwell: true,
-      loiteringDelay: 30000,
-      extras: {
-        'uuid': uuid,
-        'description': description,
-        'title': title,
-        'id': taskId,
-      },
-    ));
+    await bg.BackgroundGeolocation.addGeofence(
+      bg.Geofence(
+        identifier: uuid,
+        radius: radius * 1000,
+        latitude: latitude,
+        longitude: longitude,
+        notifyOnEntry: onEnter,
+        notifyOnExit: onExit,
+        notifyOnDwell: true,
+        loiteringDelay: 30000,
+        extras: {
+          'uuid': uuid,
+          'description': description,
+          'title': title,
+          'id': taskId,
+        },
+      ),
+    );
   }
 }
