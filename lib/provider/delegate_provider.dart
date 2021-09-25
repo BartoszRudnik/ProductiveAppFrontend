@@ -36,6 +36,61 @@ class DelegateProvider with ChangeNotifier {
   }
 
   http.Client _client;
+  http.Client _collaboratorClient;
+
+  Future<void> sendSSE(String relationUUID, String collaboratorEmail) async {
+    if (relationUUID != null && relationUUID.length > 1) {
+      final notifyUrl = this._serverUrl + "delegatedTaskSSE/publishCollaborator/$collaboratorEmail";
+
+      try {
+        await http.post(
+          notifyUrl,
+          body: json.encode(
+            {
+              'relationUuid': relationUUID,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+      }
+    }
+  }
+
+  void subscribeCollaborators() async {
+    try {
+      this._collaboratorClient = http.Client();
+
+      final request = http.Request("GET", Uri.parse(this._serverUrl + "delegatedTaskSSE/subscribeCollaborators/${this.userEmail}"));
+
+      Future<http.StreamedResponse> response = this._collaboratorClient.send(request);
+
+      response.asStream().listen((streamedResponse) {
+        streamedResponse.stream.listen((data) async {
+          final stringValue = utf8.decode(data);
+
+          if (stringValue.contains('event')) {
+            final message = stringValue.split(":");
+            String uuid = message[2].trim();
+
+            uuid = uuid.split("\n")[0];
+
+            final relation = await this.getSingleCollaborator(uuid);
+
+            if (relation != null) {
+              await Notifications.receivedInvitation(relation.id);
+            }
+          }
+        });
+      });
+    } catch (error) {
+      print(error);
+    }
+  }
 
   void subscribe(BuildContext context) async {
     try {
@@ -43,13 +98,11 @@ class DelegateProvider with ChangeNotifier {
 
       final request = http.Request("GET", Uri.parse(this._serverUrl + "delegatedTaskSSE/subscribe/${this.userEmail}"));
 
-      Future<http.StreamedResponse> response = _client.send(request);
+      Future<http.StreamedResponse> response = this._client.send(request);
 
       response.asStream().listen((streamedResponse) {
         streamedResponse.stream.listen((data) async {
           final stringValue = utf8.decode(data);
-
-          print(stringValue);
 
           if (stringValue.contains('event')) {
             final message = stringValue.split(":");
@@ -350,6 +403,81 @@ class DelegateProvider with ChangeNotifier {
     }
   }
 
+  Future<Collaborator> getSingleCollaborator(String relationUuid) async {
+    if (await InternetConnection.internetConnection()) {
+      final requestUrl = this._serverUrl + "delegate/getSingleCollaborator/$relationUuid";
+
+      try {
+        final response = await http.get(requestUrl);
+        final responseBody = json.decode(utf8.decode(response.bodyBytes));
+
+        bool isAskingForPermission = false;
+        bool alreadyAsked = false;
+        bool receivedPermission = false;
+        bool sentPermission = false;
+        bool isReceived = false;
+        String collaboratorEmail = '';
+        String collaboratorName = '';
+
+        if (responseBody['invitationSender'] == this.userEmail) {
+          collaboratorEmail = responseBody['invitationReceiver'];
+          collaboratorName = responseBody['invitationReceiverName'];
+          sentPermission = responseBody['user2Permission'];
+          receivedPermission = responseBody['user1Permission'];
+          isAskingForPermission = responseBody['user2AskForPermission'];
+          alreadyAsked = responseBody['user1AskForPermission'];
+        } else {
+          isReceived = true;
+          collaboratorEmail = responseBody['invitationSender'];
+          collaboratorName = responseBody['invitationSenderName'];
+          sentPermission = responseBody['user1Permission'];
+          receivedPermission = responseBody['user2Permission'];
+          isAskingForPermission = responseBody['user1AskForPermission'];
+          alreadyAsked = responseBody['user2AskForPermission'];
+        }
+
+        Collaborator newCollaborator = Collaborator(
+          uuid: responseBody['uuid'],
+          id: responseBody['id'],
+          email: collaboratorEmail,
+          collaboratorName: collaboratorName,
+          relationState: responseBody['relationState'],
+          isSelected: false,
+          received: isReceived,
+          sentPermission: sentPermission,
+          receivedPermission: receivedPermission,
+          alreadyAsked: alreadyAsked,
+          isAskingForPermission: isAskingForPermission,
+        );
+
+        final existing = null != this.collaborators.firstWhere((element) => element.uuid == newCollaborator.uuid, orElse: () => null);
+
+        if (existing) {
+          Collaborator existingCollaborator = this.collaborators.firstWhere((element) => element.uuid == newCollaborator.uuid);
+
+          await CollaboratorDatabase.deleteByUuid(existingCollaborator.uuid);
+          newCollaborator = await CollaboratorDatabase.create(newCollaborator, this.userEmail);
+
+          this.collaborators.remove(existingCollaborator);
+          this.collaborators.add(newCollaborator);
+        } else {
+          newCollaborator = await CollaboratorDatabase.create(newCollaborator, this.userEmail);
+          this.collaborators.add(newCollaborator);
+        }
+
+        this.divideCollaborators(this.collaborators);
+
+        notifyListeners();
+
+        return newCollaborator;
+      } catch (error) {
+        print(error);
+      }
+    } else {
+      return null;
+    }
+  }
+
   Future<void> getCollaborators() async {
     final requestUrl = this._serverUrl + 'delegate/getAllCollaborators/${this.userEmail}';
 
@@ -471,6 +599,8 @@ class DelegateProvider with ChangeNotifier {
             'accept': 'application/json',
           },
         );
+
+        await this.sendSSE(uuid, collaborator.email);
       } catch (error) {
         print(error);
         throw (error);
@@ -480,6 +610,8 @@ class DelegateProvider with ChangeNotifier {
 
   Future<void> declineInvitation(String uuid) async {
     final requestUrl = this._serverUrl + 'delegate/declineInvitation/$uuid';
+
+    final collaboratorEmail = this._received.firstWhere((element) => element.uuid == uuid).email;
 
     this._received.removeWhere((collaborator) => collaborator.uuid == uuid);
     await CollaboratorDatabase.deleteByUuid(uuid);
@@ -495,6 +627,8 @@ class DelegateProvider with ChangeNotifier {
             'accept': 'application/json',
           },
         );
+
+        await this.sendSSE(uuid, collaboratorEmail);
       } catch (error) {
         print(error);
         throw (error);
@@ -556,6 +690,8 @@ class DelegateProvider with ChangeNotifier {
         this._send.insert(0, collaborator);
 
         notifyListeners();
+
+        await this.sendSSE(uuidCode, newCollaborator);
 
         return collaborator;
       } catch (error) {

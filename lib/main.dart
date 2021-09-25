@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
@@ -31,34 +32,52 @@ import 'utils/notifications.dart';
 import 'package:http/http.dart' as http;
 
 void callbackDispatcher() {
-  Workmanager().executeTask((taskName, inputData) async {
-    final getPreferences = await SharedPreferences.getInstance();
+  Workmanager().executeTask(
+    (taskName, inputData) async {
+      final getPreferences = await SharedPreferences.getInstance();
 
-    if (!getPreferences.containsKey('userData')) {
-      return false;
-    }
+      if (!getPreferences.containsKey('userData')) {
+        return false;
+      }
 
-    final extractedUserData = json.decode(getPreferences.getString('userData')) as Map<String, Object>;
-    final expiryDate = DateTime.parse(extractedUserData['expiryDate']);
+      final extractedUserData = json.decode(getPreferences.getString('userData')) as Map<String, Object>;
+      final expiryDate = DateTime.parse(extractedUserData['expiryDate']);
 
-    if (expiryDate.isBefore(DateTime.now())) {
-      return false;
-    }
+      if (expiryDate.isBefore(DateTime.now())) {
+        return false;
+      }
 
-    final email = extractedUserData['email'];
+      final email = extractedUserData['email'];
 
-    final requestUrl = "http://192.168.1.120:8080/api/v1/delegatedTaskSSE/isNewTask/$email";
-    final response = await http.get(requestUrl);
-    final responseBody = json.decode(response.body);
+      if (taskName == "tasks") {
+        final requestUrl = "http://192.168.1.120:8080/api/v1/delegatedTaskSSE/isNewTask/$email";
+        final response = await http.get(requestUrl);
+        final responseBody = json.decode(response.body);
 
-    print(responseBody);
+        print(responseBody);
 
-    if (responseBody['result'] == 'true') {
-      Notifications.receivedTask(1);
-    }
+        if (responseBody['result'] == 'true') {
+          int id = Random().nextInt(999999);
+          Notifications.receivedTask(id);
+        }
 
-    return Future.value(true);
-  });
+        return Future.value(true);
+      } else {
+        final requestUrl = "http://192.168.1.120:8080/api/v1/delegatedTaskSSE/isNewCollaborator/$email";
+        final response = await http.get(requestUrl);
+        final responseBody = json.decode(response.body);
+
+        print(responseBody);
+
+        if (responseBody['result'] == 'true') {
+          int id = Random().nextInt(999999);
+          Notifications.receivedInvitation(id);
+        }
+
+        return Future.value(true);
+      }
+    },
+  );
 }
 
 void headlessTask(bg.HeadlessEvent headlessEvent) async {
@@ -78,7 +97,8 @@ void main() async {
   runApp(MyApp());
 
   Workmanager().initialize(callbackDispatcher);
-  Workmanager().registerPeriodicTask('1', 'taskName');
+  Workmanager().registerPeriodicTask('1', 'tasks');
+  Workmanager().registerPeriodicTask('2', 'collaborators');
   bg.BackgroundGeolocation.registerHeadlessTask(headlessTask);
 }
 

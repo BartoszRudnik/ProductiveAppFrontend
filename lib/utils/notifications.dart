@@ -45,6 +45,19 @@ class Notifications {
     await _notifications.initialize(initializationSettings, onSelectNotification: _selectNotification);
   }
 
+  static Future<void> receivedInvitation(int id) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      '3',
+      'Invitation from collaborator',
+      'Notification about new notification',
+      importance: Importance.max,
+      priority: Priority.high,
+    );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    await _notifications.show(id, "You have received a new invitation!", "", platformChannelSpecifics);
+  }
+
   static Future<void> receivedTask(int id) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
       '2',
