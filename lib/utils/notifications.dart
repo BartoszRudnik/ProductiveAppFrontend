@@ -1,6 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:productive_app/model/task.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Notifications {
   static final onNotifications = BehaviorSubject<String>();
@@ -44,21 +47,86 @@ class Notifications {
     await _notifications.initialize(initializationSettings, onSelectNotification: _selectNotification);
   }
 
+  static Future<void> invitationNotification(int id) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      '3',
+      'Invitation from collaborator',
+      'Notification about new notification',
+      importance: Importance.max,
+      priority: Priority.max,
+    );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    await _notifications.show(id, "You have received a new invitation!", "", platformChannelSpecifics);
+  }
+
+  static Future<void> receivedInvitation(int id, BuildContext context, String userName) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      '3',
+      'Invitation from collaborator',
+      'Notification about new notification',
+      importance: Importance.max,
+      priority: Priority.max,
+    );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    await _notifications.show(id, AppLocalizations.of(context).newInvitation + userName, "", platformChannelSpecifics, payload: "collaborator");
+  }
+
+  static Future<void> acceptedInvitation(int id, BuildContext context, String userName) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      '3',
+      'Invitation from collaborator',
+      'Notification about new notification',
+      importance: Importance.max,
+      priority: Priority.max,
+    );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    await _notifications.show(id, AppLocalizations.of(context).userHasAcceptedInvitation(userName), "", platformChannelSpecifics, payload: "collaborator");
+  }
+
+  static Future<void> receivedTask(int id) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      '2',
+      'Delegated task',
+      'Notification about new delegated task',
+      importance: Importance.max,
+      priority: Priority.max,
+    );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    await _notifications.show(id, "You have received a new task!", "", platformChannelSpecifics, payload: "collaborator");
+  }
+
+  static Future<void> newDelegatedTaskNotification(Task task, String title) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      '2',
+      'Delegated task',
+      'Notification about new delegated task',
+      importance: Importance.max,
+      priority: Priority.max,
+    );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    await _notifications.show(task.id, title + task.title, task.description, platformChannelSpecifics, payload: task.uuid);
+  }
+
   static Future<void> onGeofence(bg.GeofenceEvent event) async {
     final taskUuid = event.extras['uuid'];
     final taskTitle = event.extras['title'];
     final taskDescription = event.extras['description'];
 
     const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      'your channel id',
+      '1',
       'Localization',
       'Geofence notification',
       importance: Importance.max,
-      priority: Priority.high,
+      priority: Priority.max,
     );
 
     const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-    await _notifications.show(0, taskTitle, taskDescription, platformChannelSpecifics, payload: taskUuid);
+    await _notifications.show(event.extras['id'], taskTitle, taskDescription, platformChannelSpecifics, payload: taskUuid);
   }
 
   static Future _selectNotification(String payload) async {
@@ -90,21 +158,24 @@ class Notifications {
   }
 
   static Future<void> addGeofence(
-      String uuid, double latitude, double longitude, double radius, bool onEnter, bool onExit, String title, String description) async {
-    await bg.BackgroundGeolocation.addGeofence(bg.Geofence(
-      identifier: uuid,
-      radius: radius * 1000,
-      latitude: latitude,
-      longitude: longitude,
-      notifyOnEntry: onEnter,
-      notifyOnExit: onExit,
-      notifyOnDwell: true,
-      loiteringDelay: 30000,
-      extras: {
-        'uuid': uuid,
-        'description': description,
-        'title': title,
-      },
-    ));
+      String uuid, double latitude, double longitude, double radius, bool onEnter, bool onExit, String title, String description, int taskId) async {
+    await bg.BackgroundGeolocation.addGeofence(
+      bg.Geofence(
+        identifier: uuid,
+        radius: radius * 1000,
+        latitude: latitude,
+        longitude: longitude,
+        notifyOnEntry: onEnter,
+        notifyOnExit: onExit,
+        notifyOnDwell: true,
+        loiteringDelay: 30000,
+        extras: {
+          'uuid': uuid,
+          'description': description,
+          'title': title,
+          'id': taskId,
+        },
+      ),
+    );
   }
 }
