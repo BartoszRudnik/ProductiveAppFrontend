@@ -11,26 +11,33 @@ class CompletedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final completedTasks = Provider.of<TaskProvider>(context).completedTasks;
+    final completedTasks = Provider.of<TaskProvider>(context).filteredCompletedTasks;
 
-    return Scaffold(
-      appBar: DeleteAppBar(title: AppLocalizations.of(context).completed),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Expanded(
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: completedTasks.length,
-                itemBuilder: (ctx, index) => TaskWidget(
-                  task: completedTasks[index],
-                  key: UniqueKey(),
+    return WillPopScope(
+      // ignore: missing_return
+      onWillPop: () {
+        Navigator.of(context).pop();
+        Provider.of<TaskProvider>(context, listen: false).clearCompletedName();
+      },
+      child: Scaffold(
+        appBar: DeleteAppBar(title: AppLocalizations.of(context).completed),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Expanded(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: completedTasks.length,
+                  itemBuilder: (ctx, index) => TaskWidget(
+                    task: completedTasks[index],
+                    key: UniqueKey(),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

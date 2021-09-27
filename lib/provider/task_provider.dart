@@ -36,8 +36,10 @@ class TaskProvider with ChangeNotifier {
 
   final String userMail;
   final String authToken;
+  final String _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
-  String _serverUrl = GlobalConfiguration().getValue("serverUrl");
+  String trashName = '';
+  String completedName = '';
 
   TaskProvider({
     @required this.userMail,
@@ -47,6 +49,42 @@ class TaskProvider with ChangeNotifier {
     @required this.singleTask,
   }) {
     this.divideTasks();
+  }
+
+  void setTrashName(String value) {
+    this.trashName = value;
+    notifyListeners();
+  }
+
+  void setCompletedName(String value) {
+    this.completedName = value;
+    notifyListeners();
+  }
+
+  void clearTrashName() {
+    this.trashName = '';
+    notifyListeners();
+  }
+
+  void clearCompletedName() {
+    this.completedName = '';
+    notifyListeners();
+  }
+
+  List<Task> get filteredCompletedTasks {
+    if (this.completedName.length >= 1) {
+      return this.completedTasks.where((element) => element.title.contains(this.completedName)).toList();
+    } else {
+      return this.completedTasks.toList();
+    }
+  }
+
+  List<Task> get filteredTrashTasks {
+    if (this.trashName.length >= 1) {
+      return this.trashTasks.where((element) => element.title.contains(this.trashName)).toList();
+    } else {
+      return this.trashTasks.toList();
+    }
   }
 
   void setInboxTasks(List<Task> newList) {
@@ -201,12 +239,12 @@ class TaskProvider with ChangeNotifier {
           },
         );
 
-        task.id = int.parse(response.body);
+        final responseBody = json.decode(response.body);
+
+        task.id = responseBody['taskId'];
+        task.position = responseBody['taskId'] + 1000.0;
 
         task = await TaskDatabase.create(task, this.userMail);
-
-        task.position = int.parse(response.body) + 1000.0;
-        await TaskDatabase.update(task, this.userMail);
 
         if (task.notificationLocalizationUuid != null) {
           await Notifications.addGeofence(
@@ -292,9 +330,10 @@ class TaskProvider with ChangeNotifier {
             'accept': 'application/json',
           },
         );
+        final responseBody = json.decode(response.body);
 
-        task.id = int.parse(response.body);
-        task.position = int.parse(response.body) + 1000.0;
+        task.id = responseBody['taskId'];
+        task.position = responseBody['taskId'] + 1000.0;
 
         task = await TaskDatabase.create(task, this.userMail);
 

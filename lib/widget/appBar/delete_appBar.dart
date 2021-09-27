@@ -1,42 +1,105 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:productive_app/config/color_themes.dart';
 import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../../provider/location_provider.dart';
 import '../../provider/task_provider.dart';
 
-class DeleteAppBar extends StatelessWidget with PreferredSizeWidget {
+class DeleteAppBar extends StatefulWidget with PreferredSizeWidget {
   final String title;
   final IconButton leadingButton;
 
   DeleteAppBar({@required this.title, this.leadingButton});
 
   @override
+  State<DeleteAppBar> createState() => _DeleteAppBarState();
+
+  @override
+  Size get preferredSize => Size.fromHeight(50);
+}
+
+class _DeleteAppBarState extends State<DeleteAppBar> {
+  bool _searchBarActive = false;
+  final _formKey = GlobalKey<FormFieldState>();
+
+  @override
   Widget build(BuildContext context) {
+    String text = '';
+
+    if (this.widget.title == AppLocalizations.of(context).completed) {
+      text = AppLocalizations.of(context).completed;
+    } else {
+      text = AppLocalizations.of(context).trash;
+    }
+
+    final provider = Provider.of<TaskProvider>(context, listen: false);
+
     return AppBar(
       elevation: 0,
-      title: Text(
-        this.title,
-        style: TextStyle(
-          fontSize: 30,
-          fontWeight: FontWeight.w400,
-          color: Theme.of(context).primaryColor,
-        ),
-      ),
+      title: this._searchBarActive
+          ? TextFormField(
+              autofocus: true,
+              key: this._formKey,
+              onChanged: (value) {
+                if (this.widget.title == AppLocalizations.of(context).completed) {
+                  provider.setCompletedName(value);
+                } else {
+                  provider.setTrashName(value);
+                }
+              },
+              decoration: ColorThemes.searchFormFieldDecoration(
+                context,
+                text,
+                () {
+                  this._formKey.currentState.reset();
+                  if (this.widget.title == AppLocalizations.of(context).completed) {
+                    provider.clearCompletedName();
+                  } else {
+                    provider.clearTrashName();
+                  }
+                },
+              ),
+            )
+          : Text(
+              this.widget.title,
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.w400,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
       systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: Colors.black),
       backgroundColor: Theme.of(context).accentColor,
       backwardsCompatibility: false,
       iconTheme: Theme.of(context).iconTheme,
       brightness: Brightness.dark,
-      leading: (leadingButton != null) ? leadingButton : null,
+      leading: (widget.leadingButton != null) ? widget.leadingButton : null,
       actions: [
+        IconButton(
+          icon: Icon(Icons.search_outlined),
+          onPressed: () {
+            if (this._searchBarActive) {
+              this._formKey.currentState.reset();
+              if (this.widget.title == AppLocalizations.of(context).completed) {
+                provider.clearCompletedName();
+              } else {
+                provider.clearTrashName();
+              }
+            }
+
+            setState(() {
+              this._searchBarActive = !this._searchBarActive;
+            });
+          },
+        ),
         PopupMenuButton(
           icon: Icon(Icons.more_vert_outlined),
           onSelected: (value) async {
             if (value == "restoreAll") {
-              final tasks = this.title == AppLocalizations.of(context).completed
+              final tasks = this.widget.title == AppLocalizations.of(context).completed
                   ? Provider.of<TaskProvider>(context, listen: false).completedTasks
                   : Provider.of<TaskProvider>(context, listen: false).trashTasks;
 
@@ -66,7 +129,7 @@ class DeleteAppBar extends StatelessWidget with PreferredSizeWidget {
             } else if (value == "deleteAll") {
               String listName;
 
-              if (this.title == AppLocalizations.of(context).completed) {
+              if (this.widget.title == AppLocalizations.of(context).completed) {
                 listName = 'Completed';
 
                 final completedTasks = Provider.of<TaskProvider>(context, listen: false).completedTasks;
@@ -101,7 +164,4 @@ class DeleteAppBar extends StatelessWidget with PreferredSizeWidget {
       ],
     );
   }
-
-  @override
-  Size get preferredSize => Size.fromHeight(50);
 }
