@@ -56,10 +56,6 @@ class Data {
         AttachmentDatabase.readAll(userEmail).then((value) => attachments = value),
       ]);
 
-      attachments.forEach((element) {
-        print(element.toJson());
-      });
-
       await TaskDatabase.readAll(tags, userEmail).then((value) => tasks = value);
 
       await Future.wait([
@@ -130,14 +126,14 @@ class Data {
           Provider.of<ThemeProvider>(context, listen: false).getUserMode(),
         ],
       );
+
+      final List<String> delegatedTasks = Provider.of<TaskProvider>(context, listen: false).delegatedTasksUuid;
+
+      if (delegatedTasks != null && delegatedTasks.length > 0) {
+        await Provider.of<AttachmentProvider>(context, listen: false).getAllDelegatedAttachments(delegatedTasks);
+      }
     } catch (error) {
       print(error);
-    }
-
-    final List<String> delegatedTasks = Provider.of<TaskProvider>(context, listen: false).delegatedTasksUuid;
-
-    if (delegatedTasks != null && delegatedTasks.length > 0) {
-      await Provider.of<AttachmentProvider>(context, listen: false).getAllDelegatedAttachments(delegatedTasks);
     }
   }
 }

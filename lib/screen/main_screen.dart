@@ -44,9 +44,9 @@ class _MainScreenState extends State<MainScreen> {
 
   void listenNotifications() => Notifications.onNotifications.stream.listen(onClickedNotification);
 
-  void listenInternetChanges() => Connectivity().onConnectivityChanged.listen((connectionResult) async {
+  void listenInternetChanges(BuildContext ctx) => Connectivity().onConnectivityChanged.listen((connectionResult) async {
         if (checkInternetConnection(connectionResult)) {
-          await this.loadData(context);
+          await this.loadData(ctx);
         }
       });
 
@@ -78,7 +78,7 @@ class _MainScreenState extends State<MainScreen> {
     Notifications.initNotification();
 
     listenNotifications();
-    listenInternetChanges();
+    listenInternetChanges(context);
 
     WidgetsBinding.instance.addPostFrameCallback((_) => Data.notify(context));
   }
