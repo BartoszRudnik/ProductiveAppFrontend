@@ -3,7 +3,6 @@ final String tableSettings = "settings";
 class SettingsFields {
   static final List<String> values = [
     id,
-    showOnlyUnfinished,
     showOnlyDelegated,
     showOnlyWithLocalization,
     collaborators,
@@ -15,7 +14,6 @@ class SettingsFields {
   ];
 
   static final String id = "id";
-  static final String showOnlyUnfinished = "showOnlyUnfinished";
   static final String showOnlyDelegated = "showOnlyDelegated";
   static final String showOnlyWithLocalization = "showOnlyWithLocalization";
   static final String collaborators = "collaborators";
@@ -28,7 +26,6 @@ class SettingsFields {
 
 class Settings {
   int id;
-  bool showOnlyUnfinished;
   bool showOnlyDelegated;
   bool showOnlyWithLocalization;
   List<String> collaborators;
@@ -41,7 +38,6 @@ class Settings {
 
   Settings({
     this.id,
-    this.showOnlyUnfinished = false,
     this.showOnlyDelegated = false,
     this.showOnlyWithLocalization = false,
     this.locations,
@@ -92,7 +88,6 @@ class Settings {
 
   Settings copy({
     int id,
-    bool showOnlyUnfinished,
     bool showOnlyDelegated,
     bool showOnlyWithLocalization,
     List<String> collaborators,
@@ -105,7 +100,6 @@ class Settings {
   }) =>
       Settings(
         id: id ?? this.id,
-        showOnlyUnfinished: showOnlyUnfinished ?? this.showOnlyUnfinished,
         showOnlyDelegated: showOnlyDelegated ?? this.showOnlyDelegated,
         showOnlyWithLocalization: showOnlyWithLocalization ?? this.showOnlyWithLocalization,
         collaborators: collaborators ?? this.collaborators,
@@ -118,7 +112,6 @@ class Settings {
 
   static Settings fromJson(Map<String, Object> json) => Settings(
         id: json[SettingsFields.id] as int,
-        showOnlyUnfinished: json[SettingsFields.showOnlyUnfinished] == null ? 0 : json[SettingsFields.showOnlyUnfinished] == 1,
         showOnlyDelegated: json[SettingsFields.showOnlyDelegated] == null ? 0 : json[SettingsFields.showOnlyDelegated] == 1,
         showOnlyWithLocalization: json[SettingsFields.showOnlyWithLocalization] == null ? 0 : json[SettingsFields.showOnlyWithLocalization] == 1,
         collaborators: json[SettingsFields.collaborators] == null ? [] : splitStringList(json[SettingsFields.collaborators] as String),
@@ -132,11 +125,6 @@ class Settings {
   Map<String, dynamic> toJson() {
     return {
       SettingsFields.id: this.id,
-      SettingsFields.showOnlyUnfinished: this.showOnlyUnfinished == null
-          ? 0
-          : this.showOnlyUnfinished
-              ? 1
-              : 0,
       SettingsFields.showOnlyDelegated: this.showOnlyDelegated == null
           ? 0
           : this.showOnlyDelegated

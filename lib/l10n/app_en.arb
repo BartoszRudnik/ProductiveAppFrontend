@@ -356,5 +356,16 @@
   "collect": "Collect",
   "planDo": "Plan&Do",
   "state": "State",
-  "attributes": "Attributes"  
+  "attributes": "Attributes",
+  "saveLocation": "Save location",
+  "newTask": "New Task: ",
+  "newInvitation": "You have received a new invitation from user: ",
+  "userHasAcceptedInvitation": "User: {user} has accepted your invitation!",
+  "@userHasAcceptedInvitation":{
+    "placeholders":{
+      "user":{
+        "type": "String"
+      }
+    }
+  }  
 }

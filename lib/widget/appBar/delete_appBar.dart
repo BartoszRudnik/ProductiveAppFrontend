@@ -73,7 +73,6 @@ class _DeleteAppBarState extends State<DeleteAppBar> {
             ),
       systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: Colors.black),
       backgroundColor: Theme.of(context).accentColor,
-      backwardsCompatibility: false,
       iconTheme: Theme.of(context).iconTheme,
       brightness: Brightness.dark,
       leading: (widget.leadingButton != null) ? widget.leadingButton : null,
@@ -106,6 +105,9 @@ class _DeleteAppBarState extends State<DeleteAppBar> {
               tasks.forEach(
                 (element) {
                   String newLocation;
+
+                  element.taskState = "PLAN&DO";
+                  element.done = false;
 
                   if (element.delegatedEmail == null) {
                     if (element.startDate != null) {

@@ -14,6 +14,7 @@ class LocationFields {
     lastUpdated,
     isSelected,
     uuid,
+    saved,
   ];
 
   static final String id = "id";
@@ -26,6 +27,7 @@ class LocationFields {
   static final String lastUpdated = "lastUpdated";
   static final String isSelected = "isSelected";
   static final String uuid = "uuid";
+  static final String saved = "saved";
 }
 
 class Location {
@@ -39,6 +41,7 @@ class Location {
   DateTime lastUpdated;
   bool isSelected;
   String uuid;
+  bool saved;
 
   Location({
     this.lastUpdated,
@@ -50,6 +53,7 @@ class Location {
     @required this.locality,
     @required this.street,
     @required this.uuid,
+    @required this.saved,
     this.isSelected = false,
   });
 
@@ -64,6 +68,7 @@ class Location {
     DateTime lastUpdated,
     bool isSelected,
     String uuid,
+    bool saved,
   }) =>
       Location(
         uuid: uuid ?? this.uuid,
@@ -76,6 +81,7 @@ class Location {
         street: street ?? this.street,
         lastUpdated: DateTime.now(),
         isSelected: isSelected ?? this.isSelected,
+        saved: saved ?? this.saved,
       );
 
   static Location fromJson(Map<String, Object> json) => Location(
@@ -89,6 +95,7 @@ class Location {
         street: json[LocationFields.street] as String,
         isSelected: json[LocationFields.isSelected] == 1,
         lastUpdated: DateTime.parse(json[LocationFields.lastUpdated] as String),
+        saved: json[LocationFields.saved] == 1,
       );
 
   Map<String, dynamic> toJson() {
@@ -102,7 +109,8 @@ class Location {
       LocationFields.locality: this.locality,
       LocationFields.country: this.country,
       LocationFields.isSelected: this.isSelected ? 1 : 0,
-      LocationFields.lastUpdated: this.lastUpdated != null ? this.lastUpdated.toIso8601String() : DateTime.now().toIso8601String()
+      LocationFields.lastUpdated: this.lastUpdated != null ? this.lastUpdated.toIso8601String() : DateTime.now().toIso8601String(),
+      LocationFields.saved: this.saved ? 1 : 0,
     };
   }
 }

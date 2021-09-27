@@ -75,6 +75,7 @@ class InitDatabase {
       ${LocationFields.longitude} $doubleType,
       ${LocationFields.isSelected} $boolType,
       ${LocationFields.uuid} $textType,
+      ${LocationFields.saved} $boolType,
       $userEmail $textType
     )
     ''');
@@ -133,8 +134,7 @@ class InitDatabase {
       ${SettingsFields.locations} $textType,
       ${SettingsFields.priorities} $textType,
       ${SettingsFields.tags} $textType,
-      ${SettingsFields.showOnlyDelegated} $boolType,
-      ${SettingsFields.showOnlyUnfinished} $boolType,
+      ${SettingsFields.showOnlyDelegated} $boolType,      
       ${SettingsFields.showOnlyWithLocalization} $boolType,
       ${SettingsFields.sortingMode} $integerType,
       $userEmail $textType      

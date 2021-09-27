@@ -37,11 +37,6 @@ class FiltersScreen extends StatelessWidget {
               FiltersCollaborators(collaborators: userSettings.collaborators),
               FilterPriorities(priorities: userSettings.priorities),
               FilterSwitchListTile(
-                func: Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyUnfinished,
-                message: AppLocalizations.of(context).showOnlyUnfinished,
-                value: userSettings.showOnlyUnfinished,
-              ),
-              FilterSwitchListTile(
                 func: Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyDelegated,
                 message: AppLocalizations.of(context).showOnlyReceived,
                 value: userSettings.showOnlyDelegated,

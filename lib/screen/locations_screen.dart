@@ -89,6 +89,7 @@ class _LocationScreenState extends State<LocationsScreen> {
                       country: "",
                       locality: "",
                       street: "",
+                      saved: true,
                     ),
                   );
                 },

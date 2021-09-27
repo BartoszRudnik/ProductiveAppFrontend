@@ -110,12 +110,29 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     });
   }
 
+  void setIfDone() {
+    setState(() {
+      this.taskToEdit.done = !this.taskToEdit.done;
+
+      if (this.originalTask.done && !this.taskToEdit.done) {
+        this.setTaskState("PLAN&DO");
+      }
+
+      if (this.originalTask.done && this.taskToEdit.done) {
+        this.setTaskState("COMPLETED");
+      }
+    });
+  }
+
   void _chooseTaskList() {
     if (this.taskToEdit.taskState == null) {
       this.taskToEdit.taskState = 'COLLECT';
       this.taskToEdit.localization = 'INBOX';
     } else {
-      if (this.taskToEdit.taskState == 'COLLECT') {
+      if (this.taskToEdit.done && this.taskToEdit.taskState != 'COLLECT') {
+        this.taskToEdit.taskState = "COMPLETED";
+        this.taskToEdit.localization = "COMPLETED";
+      } else if (this.taskToEdit.taskState == 'COLLECT') {
         this.taskToEdit.localization = 'INBOX';
       } else if (this.taskToEdit.taskState == "COMPLETED") {
         if (this.taskToEdit.done) {
@@ -201,6 +218,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       taskToEdit.endDate = new DateTime(taskToEdit.endDate.year, taskToEdit.endDate.month, taskToEdit.endDate.day, 0, 0);
     }
 
+    this._chooseTaskList();
+
     isValid = await TaskValidate.validateTaskEdit(taskToEdit, originalTask, context);
 
     if (!isValid) {
@@ -210,8 +229,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     this._formKey.currentState.save();
 
     try {
-      this._chooseTaskList();
-
       final newLocalization = taskToEdit.localization;
 
       taskToEdit.localization = originalTask.localization;
@@ -233,6 +250,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
               taskToEdit.notificationOnExit,
               taskToEdit.title,
               taskToEdit.description,
+              taskToEdit.id,
             );
           }
         }
@@ -252,7 +270,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       }
 
       await Provider.of<AttachmentProvider>(context, listen: false).deleteFlaggedAttachments();
-      Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);
+
       this.changesSaved = true;
     } on SocketException catch (error) {
       print(error);
@@ -268,14 +286,17 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     if (accepted) {
       originalTask.done = taskToEdit.done;
       setTaskToEdit(originalTask);
+      taskToEdit.taskState = "COMPLETED";
+
+      String newLocalization;
       if (taskToEdit.done) {
-        taskToEdit.localization = "COMPLETED";
+        newLocalization = "COMPLETED";
       } else {
-        taskToEdit.localization = "TRASH";
+        newLocalization = "TRASH";
       }
       try {
         await Provider.of<AttachmentProvider>(context, listen: false).deleteFlaggedAttachments();
-        await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, taskToEdit.localization);
+        await Provider.of<TaskProvider>(context, listen: false).updateTask(taskToEdit, newLocalization);
         Provider.of<TaskProvider>(context, listen: false).deleteFromLocalization(originalTask);
       } catch (error) {
         await Dialogs.showWarningDialog(context, AppLocalizations.of(context).errorOccurred);
@@ -586,6 +607,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
           deleteTask: this.deleteTask,
           saveTask: this.saveTask,
           taskToEdit: taskToEdit,
+          setDone: this.setIfDone,
         ),
       ),
     );

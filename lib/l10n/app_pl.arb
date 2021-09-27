@@ -314,6 +314,14 @@
       }
     }
   },
+  "userHasAcceptedInvitation": "Użytkownik {user} zaakceptował twoje zaproszenie!",
+  "@userHasAcceptedInvitation":{
+    "placeholders":{
+      "user":{
+        "type": "String"
+      }
+    }
+  },
   "taskSent": "Wysłane",
   "waiting": "Oczekujące",
   "inProgress": "W trakcie",
@@ -356,5 +364,8 @@
   "collect": "Kolekcjonowanie",
   "planDo": "Realizacja",
   "state": "Stan",
-  "attributes": "Atrybuty" 
+  "attributes": "Atrybuty",
+  "saveLocation": "Zapisz lokalizacje",
+  "newTask": "Nowe zadanie: ",
+  "newInvitation": "Otrzymano nowe zaproszenie od użytkownika: " 
 }

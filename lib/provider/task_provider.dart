@@ -6,7 +6,10 @@ import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:productive_app/db/task_database.dart';
 import 'package:productive_app/model/location.dart';
+import 'package:productive_app/provider/attachment_provider.dart';
+import 'package:productive_app/provider/location_provider.dart';
 import 'package:productive_app/utils/internet_connection.dart';
+import 'package:provider/provider.dart';
 
 import '../model/tag.dart';
 import '../model/task.dart';
@@ -205,6 +208,30 @@ class TaskProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> sendSSE(String childTaskUuid, String collaboratorEmail) async {
+    if (childTaskUuid != null && childTaskUuid.length > 1) {
+      final notifyUrl = this._serverUrl + "delegatedTaskSSE/publish/$collaboratorEmail";
+
+      try {
+        await http.post(
+          notifyUrl,
+          body: json.encode(
+            {
+              'userMail': collaboratorEmail,
+              'taskUuid': childTaskUuid,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+      }
+    }
+  }
+
   Future<int> addTaskWithGeolocation(Task task, double latitude, double longitude) async {
     if (await InternetConnection.internetConnection()) {
       String url = this._serverUrl + 'task/add';
@@ -242,27 +269,23 @@ class TaskProvider with ChangeNotifier {
         final responseBody = json.decode(response.body);
 
         task.id = responseBody['taskId'];
-        task.position = responseBody['taskId'] + 1000.0;
+        task.position = task.id + 1000.0;
 
         task = await TaskDatabase.create(task, this.userMail);
 
         if (task.notificationLocalizationUuid != null) {
-          await Notifications.addGeofence(
-            task.uuid,
-            latitude,
-            longitude,
-            task.notificationLocalizationRadius,
-            task.notificationOnEnter,
-            task.notificationOnExit,
-            task.title,
-            task.description,
-          );
+          await Notifications.addGeofence(task.uuid, latitude, longitude, task.notificationLocalizationRadius, task.notificationOnEnter,
+              task.notificationOnExit, task.title, task.description, task.id);
         }
 
         this.taskList.add(task);
         this.addToLocalization(task);
 
         notifyListeners();
+
+        if (responseBody['childTaskUuid'] != null && responseBody['childTaskUuid'].length > 1) {
+          await this.sendSSE(responseBody['childTaskUuid'], task.delegatedEmail);
+        }
 
         return task.id;
       } catch (error) {
@@ -276,16 +299,8 @@ class TaskProvider with ChangeNotifier {
       await TaskDatabase.update(task, this.userMail);
 
       if (task.notificationLocalizationUuid != null) {
-        await Notifications.addGeofence(
-          task.uuid,
-          latitude,
-          longitude,
-          task.notificationLocalizationRadius,
-          task.notificationOnEnter,
-          task.notificationOnExit,
-          task.title,
-          task.description,
-        );
+        await Notifications.addGeofence(task.uuid, latitude, longitude, task.notificationLocalizationRadius, task.notificationOnEnter, task.notificationOnExit,
+            task.title, task.description, task.id);
       }
 
       this.taskList.add(task);
@@ -333,7 +348,7 @@ class TaskProvider with ChangeNotifier {
         final responseBody = json.decode(response.body);
 
         task.id = responseBody['taskId'];
-        task.position = responseBody['taskId'] + 1000.0;
+        task.position = task.id + 1000.0;
 
         task = await TaskDatabase.create(task, this.userMail);
 
@@ -341,6 +356,10 @@ class TaskProvider with ChangeNotifier {
         this.addToLocalization(task);
 
         notifyListeners();
+
+        if (responseBody['childTaskUuid'] != null && responseBody['childTaskUuid'].length > 1) {
+          await this.sendSSE(responseBody['childTaskUuid'], task.delegatedEmail);
+        }
 
         return task.id;
       } catch (error) {
@@ -411,15 +430,13 @@ class TaskProvider with ChangeNotifier {
       }
     }
 
+    this.deleteFromLocalization(task);
+    task.localization = newLocation;
+    this.addToLocalization(task);
+
     if (newLocation == 'TRASH' || newLocation == 'COMPLETED') {
       await Notifications.removeGeofence(task.uuid);
     }
-
-    this.deleteFromLocalization(task);
-
-    task.localization = newLocation;
-
-    this.addToLocalization(task);
 
     if (task.localization == 'INBOX') {
       this.sortByPosition(this._inboxTasks);
@@ -432,13 +449,13 @@ class TaskProvider with ChangeNotifier {
       this.sortByPosition(this._delegatedTasks);
     }
 
-    await TaskDatabase.update(task, this.userMail);
-
     notifyListeners();
+
+    await TaskDatabase.update(task, this.userMail);
 
     if (await InternetConnection.internetConnection()) {
       try {
-        await http.put(
+        final response = await http.put(
           url,
           body: json.encode(
             {
@@ -467,6 +484,15 @@ class TaskProvider with ChangeNotifier {
             'accept': 'application/json',
           },
         );
+
+        final responseBody = json.decode(response.body);
+
+        if (responseBody['childTaskUuid'] != null && responseBody['childTaskUuid'].length > 1) {
+          await this.sendSSE(responseBody['childTaskUuid'], task.delegatedEmail);
+        }
+        if (responseBody['parentTaskUuid'] != null && responseBody['parentTaskUuid'].length > 1) {
+          await this.sendSSE(responseBody['parentTaskUuid'], responseBody['parentTaskEmail']);
+        }
       } catch (error) {
         print(error);
         throw (error);
@@ -485,15 +511,13 @@ class TaskProvider with ChangeNotifier {
       }
     }
 
+    this.deleteFromLocalization(task);
+    task.localization = newLocation;
+    this.addToLocalization(task);
+
     if (newLocation == 'TRASH' || newLocation == 'COMPLETED') {
       await Notifications.removeGeofence(task.uuid);
     }
-
-    this.deleteFromLocalization(task);
-
-    task.localization = newLocation;
-
-    this.addToLocalization(task);
 
     if (task.localization == 'INBOX') {
       this.sortByPosition(this._inboxTasks);
@@ -516,6 +540,7 @@ class TaskProvider with ChangeNotifier {
         longitude,
         task.title,
         task.description,
+        task.id,
       );
     }
 
@@ -525,7 +550,7 @@ class TaskProvider with ChangeNotifier {
 
     if (await InternetConnection.internetConnection()) {
       try {
-        await http.put(
+        final response = await http.put(
           url,
           body: json.encode(
             {
@@ -554,6 +579,15 @@ class TaskProvider with ChangeNotifier {
             'accept': 'application/json',
           },
         );
+
+        final responseBody = json.decode(response.body);
+
+        if (responseBody['childTaskUuid'] != null && responseBody['childTaskUuid'].length > 1) {
+          await this.sendSSE(responseBody['childTaskUuid'], task.delegatedEmail);
+        }
+        if (responseBody['parentTaskUuid'] != null && responseBody['parentTaskUuid'].length > 1) {
+          await this.sendSSE(responseBody['parentTaskUuid'], responseBody['parentTaskEmail']);
+        }
       } catch (error) {
         print(error);
         throw (error);
@@ -561,7 +595,7 @@ class TaskProvider with ChangeNotifier {
     }
   }
 
-  Future<void> fetchSingleTaskFull(String taskUuid) async {
+  Future<Task> fetchSingleTaskFull(String taskUuid, BuildContext context) async {
     if (await InternetConnection.internetConnection()) {
       String url = this._serverUrl + 'task/getSingleTaskFull/${this.userMail}/$taskUuid';
 
@@ -611,11 +645,17 @@ class TaskProvider with ChangeNotifier {
           taskState: responseBody['tasks']['taskState'],
         );
 
+        if (taskStatus == 'Done') {
+          task.done = true;
+        }
+
         if (responseBody['tasks']['notificationLocalization'] != null) {
           task.notificationLocalizationUuid = responseBody['tasks']['notificationLocalization']['uuid'];
           task.notificationLocalizationRadius = responseBody['tasks']['localizationRadius'];
           task.notificationOnEnter = responseBody['tasks']['notificationOnEnter'];
           task.notificationOnExit = responseBody['tasks']['notificationOnExit'];
+
+          await Provider.of<LocationProvider>(context, listen: false).getSingleLocation(task.notificationLocalizationUuid);
         } else {
           task.notificationLocalizationUuid = null;
         }
@@ -628,14 +668,33 @@ class TaskProvider with ChangeNotifier {
           task.startDate = null;
         }
 
+        if (task.parentUuid != null) {
+          await Provider.of<AttachmentProvider>(context, listen: false).getDelegatedAttachmentsFromSingleUser([task.parentUuid]);
+        }
+
+        final bool isNew = -1 == this.taskList.indexWhere((element) => element.uuid == task.uuid);
+
         this.taskList.add(task);
+        this.deleteFromLocalization(task);
+        this.addToLocalization(task);
 
         notifyListeners();
+
+        await TaskDatabase.delete(task.uuid);
+        await TaskDatabase.create(task, this.userMail);
+
+        if (isNew) {
+          return task;
+        } else {
+          return null;
+        }
       } catch (error) {
         print(error);
         throw (error);
       }
     }
+
+    return null;
   }
 
   Future<void> fetchSingleTask(String taskUuid) async {
@@ -705,6 +764,7 @@ class TaskProvider with ChangeNotifier {
           task.notificationOnExit,
           task.title,
           task.description,
+          task.id,
         );
       } catch (error) {
         print(error);
@@ -748,25 +808,30 @@ class TaskProvider with ChangeNotifier {
         }
 
         Task task = Task(
-            uuid: element['tasks']['uuid'],
-            id: element['tasks']['id'],
-            title: element['tasks']['taskName'],
-            taskState: element['tasks']['taskState'],
-            description: element['tasks']['description'],
-            done: element['tasks']['ifDone'],
-            priority: element['tasks']['priority'],
-            endDate: element['tasks']['endDate'] != null ? DateTime.tryParse(element['tasks']['endDate']) : null,
-            startDate: element['tasks']['endDate'] != null ? DateTime.tryParse(element['tasks']['startDate']) : null,
-            tags: taskTags,
-            localization: element['tasks']['taskList'],
-            position: element['tasks']['position'],
-            delegatedEmail: element['tasks']['delegatedEmail'],
-            isDelegated: element['tasks']['isDelegated'],
-            taskStatus: taskStatus,
-            isCanceled: element['tasks']['isCanceled'],
-            supervisorEmail: supervisorEmail,
-            childUuid: element['childUuid'],
-            parentUuid: element['parentUuid']);
+          uuid: element['tasks']['uuid'],
+          id: element['tasks']['id'],
+          title: element['tasks']['taskName'],
+          taskState: element['tasks']['taskState'],
+          description: element['tasks']['description'],
+          done: element['tasks']['ifDone'],
+          priority: element['tasks']['priority'],
+          endDate: element['tasks']['endDate'] != null ? DateTime.tryParse(element['tasks']['endDate']) : null,
+          startDate: element['tasks']['endDate'] != null ? DateTime.tryParse(element['tasks']['startDate']) : null,
+          tags: taskTags,
+          localization: element['tasks']['taskList'],
+          position: element['tasks']['position'],
+          delegatedEmail: element['tasks']['delegatedEmail'],
+          isDelegated: element['tasks']['isDelegated'],
+          taskStatus: taskStatus,
+          isCanceled: element['tasks']['isCanceled'],
+          supervisorEmail: supervisorEmail,
+          childUuid: element['childUuid'],
+          parentUuid: element['parentUuid'],
+        );
+
+        if (taskStatus == 'Done') {
+          task.done = true;
+        }
 
         if (element['tasks']['notificationLocalization'] != null) {
           task.notificationLocalizationUuid = element['tasks']['notificationLocalization']['uuid'];
@@ -956,6 +1021,7 @@ class TaskProvider with ChangeNotifier {
         task.notificationOnExit,
         task.title,
         task.description,
+        task.id,
       );
     }
 
@@ -1136,17 +1202,17 @@ class TaskProvider with ChangeNotifier {
 
   void deleteFromLocalization(Task task) {
     if (task.localization == 'INBOX') {
-      this._inboxTasks.remove(task);
+      this._inboxTasks.removeWhere((element) => element.uuid == task.uuid);
     } else if (task.localization == 'ANYTIME') {
-      this._anytimeTasks.remove(task);
+      this._anytimeTasks.removeWhere((element) => element.uuid == task.uuid);
     } else if (task.localization == 'SCHEDULED') {
-      this._scheduledTasks.remove(task);
+      this._scheduledTasks.removeWhere((element) => element.uuid == task.uuid);
     } else if (task.localization == 'COMPLETED') {
-      this._completedTasks.remove(task);
+      this._completedTasks.removeWhere((element) => element.uuid == task.uuid);
     } else if (task.localization == 'TRASH') {
-      this._trashTasks.remove(task);
+      this._trashTasks.removeWhere((element) => element.uuid == task.uuid);
     } else if (task.localization == 'DELEGATED') {
-      this._delegatedTasks.remove(task);
+      this._delegatedTasks.removeWhere((element) => element.uuid == task.uuid);
     }
   }
 
@@ -1290,9 +1356,11 @@ class TaskProvider with ChangeNotifier {
   }
 
   void sortByPosition(List<Task> listToSort) {
-    listToSort.sort((a, b) {
-      return a.position.compareTo(b.position);
-    });
+    if (listToSort.length > 1) {
+      listToSort.sort((a, b) {
+        return a.position.compareTo(b.position);
+      });
+    }
   }
 
   List<Task> tasksBeforeToday() {
@@ -1419,11 +1487,11 @@ class TaskProvider with ChangeNotifier {
             : 1);
   }
 
-  void notificationChange(
-      String taskUuid, double notificationRadius, bool onExit, bool onEnter, double latitude, double longitude, String title, String description) async {
+  void notificationChange(String taskUuid, double notificationRadius, bool onExit, bool onEnter, double latitude, double longitude, String title,
+      String description, int taskId) async {
     await Notifications.removeGeofence(taskUuid);
     if (taskUuid != null && latitude != null && longitude != null && notificationRadius != null) {
-      await Notifications.addGeofence(taskUuid, latitude, longitude, notificationRadius, onEnter, onExit, title, description);
+      await Notifications.addGeofence(taskUuid, latitude, longitude, notificationRadius, onEnter, onExit, title, description, taskId);
     }
   }
 
