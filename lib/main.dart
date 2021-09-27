@@ -99,7 +99,8 @@ void main() async {
   Workmanager().initialize(callbackDispatcher);
   Workmanager().registerPeriodicTask('1', 'tasks');
   Workmanager().registerPeriodicTask('2', 'collaborators');
-  bg.BackgroundGeolocation.registerHeadlessTask(headlessTask);
+
+  await bg.BackgroundGeolocation.registerHeadlessTask(headlessTask);
 }
 
 class MyApp extends StatelessWidget {
