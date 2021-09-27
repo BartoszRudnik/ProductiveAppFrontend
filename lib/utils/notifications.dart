@@ -126,7 +126,7 @@ class Notifications {
     );
 
     const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-    await _notifications.show(int.parse(event.extras['id']), taskTitle, taskDescription, platformChannelSpecifics, payload: taskUuid);
+    await _notifications.show(event.extras['id'], taskTitle, taskDescription, platformChannelSpecifics, payload: taskUuid);
   }
 
   static Future _selectNotification(String payload) async {
