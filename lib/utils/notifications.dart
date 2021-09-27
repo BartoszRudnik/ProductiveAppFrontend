@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -15,7 +17,8 @@ class Notifications {
     bg.BackgroundGeolocation.ready(
       bg.Config(
         desiredAccuracy: bg.Config.DESIRED_ACCURACY_HIGH,
-        distanceFilter: 10.0,
+        distanceFilter: 5.0,
+        disableElasticity: true,
         stopOnTerminate: false,
         startOnBoot: true,
         logLevel: bg.Config.LOG_LEVEL_VERBOSE,
@@ -116,6 +119,11 @@ class Notifications {
     final taskUuid = event.extras['uuid'];
     final taskTitle = event.extras['title'];
     final taskDescription = event.extras['description'];
+    int id = event.extras['id'];
+
+    if (id == null) {
+      id = Random().nextInt(99999);
+    }
 
     const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
       '1',
@@ -126,7 +134,7 @@ class Notifications {
     );
 
     const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-    await _notifications.show(event.extras['id'], taskTitle, taskDescription, platformChannelSpecifics, payload: taskUuid);
+    await _notifications.show(id, taskTitle, taskDescription, platformChannelSpecifics, payload: taskUuid);
   }
 
   static Future _selectNotification(String payload) async {
