@@ -123,6 +123,7 @@ class InitDatabase {
       ${UserFields.userType} $textType,
       ${UserFields.localImage} $textType,
       ${UserFields.removed} $boolType,
+      ${UserFields.firstLogin} $boolType,
       $userEmail $textType
     )
     ''');

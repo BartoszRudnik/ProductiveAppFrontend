@@ -56,6 +56,8 @@ dependencies:
   sqflite: any
   uuid: any
   workmanager: any  
+  carousel_slider: any
+  smooth_page_indicator: any
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
