@@ -6,4 +6,5 @@ class Images {
   static String emptyTaskListLight = 'assets/images/EmptyTaskListLight.png';
   static String emptyTaskListDark = 'assets/images/EmptyTaskListDark.png';
   static String noInternet = 'assets/images/no_internet.png';
+  static String tutorialPlaceholder = 'assets/images/tutorialPlaceholder.png';
 }

@@ -241,6 +241,8 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
   @override
   Widget build(BuildContext context) {
     final isFirstLogin = Provider.of<AuthProvider>(context).firstLogin;
+    print('keke');
+    print(isFirstLogin);
 
     return isFirstLogin
         ? TutorialScreen()

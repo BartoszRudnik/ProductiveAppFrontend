@@ -1,87 +1,95 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:productive_app/config/color_themes.dart';
+import 'package:introduction_screen/introduction_screen.dart';
+import 'package:productive_app/config/images.dart';
 import 'package:productive_app/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-class TutorialScreen extends StatefulWidget {
-  @override
-  State<TutorialScreen> createState() => _TutorialScreenState();
-}
+class TutorialScreen extends StatelessWidget {
+  PageDecoration getPageDecoration() => PageDecoration(
+        titleTextStyle: TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.w500,
+        ),
+        bodyTextStyle: TextStyle(fontSize: 20),
+        descriptionPadding: EdgeInsets.all(16).copyWith(bottom: 0),
+        imagePadding: EdgeInsets.all(24),
+      );
 
-class _TutorialScreenState extends State<TutorialScreen> {
-  final controller = CarouselController();
-  int _activeImageIndex = 0;
-
-  void animateToImage(int index) => this.controller.jumpToPage(index);
+  DotsDecorator getDotDecorator(BuildContext ctx) => DotsDecorator(
+        color: Theme.of(ctx).primaryColorLight,
+        activeColor: Theme.of(ctx).primaryColor,
+        activeShape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        padding: EdgeInsets.symmetric(vertical: 20),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              CarouselSlider.builder(
-                carouselController: this.controller,
-                itemCount: 5,
-                itemBuilder: (ctx, index, realIndex) {
-                  Color color;
-
-                  if (index == 0) {
-                    color = Colors.red;
-                  } else if (index == 1) {
-                    color = Colors.green;
-                  } else if (index == 2) {
-                    color = Colors.blue;
-                  } else if (index == 3) {
-                    color = Colors.yellow;
-                  } else {
-                    color = Colors.pink;
-                  }
-
-                  return Container(
-                    margin: EdgeInsets.symmetric(horizontal: 12),
-                    width: double.infinity,
-                    color: color,
-                  );
-                },
-                options: CarouselOptions(
-                  initialPage: 0,
-                  height: MediaQuery.of(context).size.height * 0.75,
-                  enlargeCenterPage: true,
-                  enlargeStrategy: CenterPageEnlargeStrategy.height,
-                  onPageChanged: (index, reason) {
-                    setState(() {
-                      this._activeImageIndex = index;
-                    });
-                  },
-                ),
-              ),
-              AnimatedSmoothIndicator(
-                activeIndex: this._activeImageIndex,
-                count: 5,
-                onDotClicked: (index) {
-                  this.animateToImage(index);
-                },
-                effect: JumpingDotEffect(
-                  dotColor: Theme.of(context).primaryColorLight,
-                  activeDotColor: Theme.of(context).primaryColor,
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  Provider.of<AuthProvider>(context, listen: false).changeFirstLoginStatus();
-                },
-                child: Text('Skip tutorial'),
-                style: ColorThemes.loginButtonStyle(context),
-              ),
-            ],
+    return SafeArea(
+      child: IntroductionScreen(
+        showSkipButton: true,
+        dotsDecorator: this.getDotDecorator(context),
+        done: Text(
+          'Finish',
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
           ),
         ),
+        onDone: () async {
+          await Provider.of<AuthProvider>(context, listen: false).changeFirstLoginStatus();
+        },
+        skip: Text(
+          'Skip',
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        onSkip: () async {
+          await Provider.of<AuthProvider>(context, listen: false).changeFirstLoginStatus();
+        },
+        next: Icon(Icons.arrow_forward_outlined),
+        pages: [
+          PageViewModel(
+            title: 'Page 1 Title',
+            body: 'Page 1 body',
+            image: Center(
+              child: Image.asset(
+                Images.tutorialPlaceholder,
+              ),
+            ),
+            decoration: this.getPageDecoration(),
+          ),
+          PageViewModel(
+            title: 'Page 2 Title',
+            body: 'Page 2 body',
+            image: Center(
+              child: Image.asset(
+                Images.tutorialPlaceholder,
+              ),
+            ),
+            decoration: this.getPageDecoration(),
+          ),
+          PageViewModel(
+            title: 'Page 3 Title',
+            body: 'Page 3 body',
+            image: Center(
+              child: Image.asset(
+                Images.tutorialPlaceholder,
+              ),
+            ),
+            decoration: this.getPageDecoration(),
+          ),
+          PageViewModel(
+            title: 'Page 4 Title',
+            body: 'Page 4 body',
+            image: Center(
+              child: Image.asset(
+                Images.tutorialPlaceholder,
+              ),
+            ),
+            decoration: this.getPageDecoration(),
+          ),
+        ],
       ),
     );
   }

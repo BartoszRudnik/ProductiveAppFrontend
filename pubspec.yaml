@@ -56,8 +56,7 @@ dependencies:
   sqflite: any
   uuid: any
   workmanager: any  
-  carousel_slider: any
-  smooth_page_indicator: any
+  introduction_screen: any
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -93,9 +92,8 @@ flutter:
     - assets/images/EmptyTaskListDark.png
     - assets/images/EmptyTaskListLight.png
     - assets/images/no_internet.png
-    - assets/map/
-
-  
+    - assets/images/tutorialPlaceholder.png
+    - assets/map/  
     
   fonts:             
     - family: Lato

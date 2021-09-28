@@ -96,9 +96,9 @@ class AuthProvider with ChangeNotifier {
 
     this._user.firstLogin = false;
 
-    notifyListeners();
-
     await UserDatabase.update(this._user);
+
+    notifyListeners();
 
     if (await InternetConnection.internetConnection()) {
       try {
@@ -571,6 +571,7 @@ class AuthProvider with ChangeNotifier {
         'token': this._token,
         'expiryDate': this._expiryDate.toIso8601String(),
         'userType': this._user.userType,
+        'firstLogin': this._user.firstLogin,
       },
     );
     preferences.setString('userData', userData);
@@ -644,7 +645,7 @@ class AuthProvider with ChangeNotifier {
         email: this._email,
         userType: userType,
         id: extractedUserData['id'],
-        firstLogin: false,
+        firstLogin: extractedUserData['firstLogin'],
       );
 
       this._user = await UserDatabase.create(this._user);
