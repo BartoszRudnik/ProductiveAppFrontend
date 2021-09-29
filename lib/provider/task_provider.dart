@@ -1496,6 +1496,6 @@ class TaskProvider with ChangeNotifier {
   }
 
   int countInboxDelegated() {
-    return this._inboxTasks.where((task) => (task.isDelegated != null && task.isDelegated == true)).toList().length;
+    return this._inboxTasks.where((task) => (task.isDelegated != null && task.isDelegated == true && !task.done)).toList().length;
   }
 }

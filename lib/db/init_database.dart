@@ -1,4 +1,5 @@
 import 'package:path/path.dart';
+import 'package:productive_app/model/appVersion.dart';
 import 'package:productive_app/model/attachment.dart';
 import 'package:productive_app/model/collaborator.dart';
 import 'package:productive_app/model/collaboratorTask.dart';
@@ -41,6 +42,11 @@ class InitDatabase {
     final blob = 'BLOB';
     final userEmail = 'userMail';
 
+    await db.execute('''
+    CREATE TABLE $tableVersion(
+      ${VersionFields.version} $textType 
+    )
+    ''');
     await db.execute('''
     CREATE TABLE $tableTags (
       ${TagFields.id} $idType,
