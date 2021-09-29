@@ -3,6 +3,8 @@ import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:productive_app/provider/auth_provider.dart';
+import 'package:productive_app/screen/tutorial_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../provider/delegate_provider.dart';
@@ -238,109 +240,114 @@ class _TabsScreenState extends State<TabsScreen> with TickerProviderStateMixin<T
 
   @override
   Widget build(BuildContext context) {
-    return NotificationListener<ScrollNotification>(
-      onNotification: this._handleScrollNotification,
-      child: AnimatedContainer(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.6),
-              spreadRadius: 5,
-              blurRadius: 7,
-              offset: Offset(0, 3),
-            ),
-          ],
-        ),
-        transform: Matrix4.translationValues(offsetX, offsetY, 0)..scale(scale),
-        duration: Duration(milliseconds: 300),
-        child: GestureDetector(
-          onTap: () {
-            if (isDrawerVisible) _changeTranform(0, 0, 1);
-          },
-          onHorizontalDragEnd: (details) {
-            if (!isDrawerVisible) {
-              if (details.primaryVelocity < 0) {
-                _selectPage(_selectedPageIndex + 1);
-              }
-              if (details.primaryVelocity > 0) {
-                if (_selectedPageIndex == 0 && !isDrawerVisible) {
-                  _changeTranform(230, 70, 0.8);
-                }
-                _selectPage(_selectedPageIndex - 1);
-              }
-            } else {
-              if (details.primaryVelocity < 0) {
-                _changeTranform(0, 0, 1);
-              }
-            }
-          },
-          child: Scaffold(
-            appBar: NewTaskAppBar(
-              title: this._pages[_selectedPageIndex]['title'],
-              leadingButton: IconButton(
-                icon: Badge(
-                  position: BadgePosition.topStart(),
-                  showBadge: Provider.of<DelegateProvider>(context).received.length > 0 || Provider.of<DelegateProvider>(context).numberOfPermissionRequest > 0,
-                  badgeColor: Theme.of(context).primaryColor,
-                  child: Icon(Icons.menu),
-                ),
-                onPressed: () {
-                  isDrawerVisible ? _changeTranform(0, 0, 1) : _changeTranform(230, 70, 0.8);
-                },
-              ),
-            ),
-            body: this._pages[_selectedPageIndex]['page'],
-            floatingActionButton: ScaleTransition(
-              scale: this._hideFab,
-              alignment: Alignment.bottomCenter,
-              child: FloatingActionButton(
-                child: Icon(
-                  Icons.add,
-                  color: Colors.white,
-                  size: 50,
-                ),
-                onPressed: () {
-                  this._addNewTaskForm(context);
-                },
-              ),
-            ),
-            bottomNavigationBar: Container(
+    final isFirstLogin = Provider.of<AuthProvider>(context).firstLogin;
+
+    return isFirstLogin
+        ? TutorialScreen()
+        : NotificationListener<ScrollNotification>(
+            onNotification: this._handleScrollNotification,
+            child: AnimatedContainer(
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                border: Border(
-                  top: BorderSide(
-                    color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColorDark : Colors.black,
-                    width: 1.0,
-                  ),
-                ),
-              ),
-              child: BottomNavigationBar(
-                selectedFontSize: 0,
-                currentIndex: _selectedPageIndex,
-                type: BottomNavigationBarType.fixed,
-                items: [
-                  BottomNavigationBarItem(
-                    icon: _buildIconInbox(Icons.inbox_outlined, AppLocalizations.of(context).inbox, 0),
-                    title: SizedBox.shrink(),
-                  ),
-                  BottomNavigationBarItem(
-                    icon: _buildIcon(Icons.access_time, AppLocalizations.of(context).anytime, 1),
-                    title: SizedBox.shrink(),
-                  ),
-                  BottomNavigationBarItem(
-                    icon: _buildIcon(Icons.calendar_today, AppLocalizations.of(context).scheduled, 2),
-                    title: SizedBox.shrink(),
-                  ),
-                  BottomNavigationBarItem(
-                    icon: _buildIcon(Icons.person_outline_outlined, AppLocalizations.of(context).delegated, 3),
-                    title: SizedBox.shrink(),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.6),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: Offset(0, 3),
                   ),
                 ],
               ),
+              transform: Matrix4.translationValues(offsetX, offsetY, 0)..scale(scale),
+              duration: Duration(milliseconds: 300),
+              child: GestureDetector(
+                onTap: () {
+                  if (isDrawerVisible) _changeTranform(0, 0, 1);
+                },
+                onHorizontalDragEnd: (details) {
+                  if (!isDrawerVisible) {
+                    if (details.primaryVelocity < 0) {
+                      _selectPage(_selectedPageIndex + 1);
+                    }
+                    if (details.primaryVelocity > 0) {
+                      if (_selectedPageIndex == 0 && !isDrawerVisible) {
+                        _changeTranform(230, 70, 0.8);
+                      }
+                      _selectPage(_selectedPageIndex - 1);
+                    }
+                  } else {
+                    if (details.primaryVelocity < 0) {
+                      _changeTranform(0, 0, 1);
+                    }
+                  }
+                },
+                child: Scaffold(
+                  appBar: NewTaskAppBar(
+                    title: this._pages[_selectedPageIndex]['title'],
+                    leadingButton: IconButton(
+                      icon: Badge(
+                        position: BadgePosition.topStart(),
+                        showBadge:
+                            Provider.of<DelegateProvider>(context).received.length > 0 || Provider.of<DelegateProvider>(context).numberOfPermissionRequest > 0,
+                        badgeColor: Theme.of(context).primaryColor,
+                        child: Icon(Icons.menu),
+                      ),
+                      onPressed: () {
+                        isDrawerVisible ? _changeTranform(0, 0, 1) : _changeTranform(230, 70, 0.8);
+                      },
+                    ),
+                  ),
+                  body: this._pages[_selectedPageIndex]['page'],
+                  floatingActionButton: ScaleTransition(
+                    scale: this._hideFab,
+                    alignment: Alignment.bottomCenter,
+                    child: FloatingActionButton(
+                      child: Icon(
+                        Icons.add,
+                        color: Colors.white,
+                        size: 50,
+                      ),
+                      onPressed: () {
+                        this._addNewTaskForm(context);
+                      },
+                    ),
+                  ),
+                  bottomNavigationBar: Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor,
+                      border: Border(
+                        top: BorderSide(
+                          color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColorDark : Colors.black,
+                          width: 1.0,
+                        ),
+                      ),
+                    ),
+                    child: BottomNavigationBar(
+                      selectedFontSize: 0,
+                      currentIndex: _selectedPageIndex,
+                      type: BottomNavigationBarType.fixed,
+                      items: [
+                        BottomNavigationBarItem(
+                          icon: _buildIconInbox(Icons.inbox_outlined, AppLocalizations.of(context).inbox, 0),
+                          title: SizedBox.shrink(),
+                        ),
+                        BottomNavigationBarItem(
+                          icon: _buildIcon(Icons.access_time, AppLocalizations.of(context).anytime, 1),
+                          title: SizedBox.shrink(),
+                        ),
+                        BottomNavigationBarItem(
+                          icon: _buildIcon(Icons.calendar_today, AppLocalizations.of(context).scheduled, 2),
+                          title: SizedBox.shrink(),
+                        ),
+                        BottomNavigationBarItem(
+                          icon: _buildIcon(Icons.person_outline_outlined, AppLocalizations.of(context).delegated, 3),
+                          title: SizedBox.shrink(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
-      ),
-    );
+          );
   }
 }

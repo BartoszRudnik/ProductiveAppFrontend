@@ -13,6 +13,7 @@ class UserFields {
     lastUpdatedImage,
     lastUpdatedName,
     removed,
+    firstLogin,
   ];
 
   static final String id = 'id';
@@ -24,6 +25,7 @@ class UserFields {
   static final String lastUpdatedImage = "lastUpdatedImage";
   static final String lastUpdatedName = "lastUpdatedName";
   static final String removed = "removed";
+  static final String firstLogin = "firstLogin";
 }
 
 class User with ChangeNotifier {
@@ -36,10 +38,12 @@ class User with ChangeNotifier {
   DateTime lastUpdatedImage;
   DateTime lastUpdatedName;
   bool removed;
+  bool firstLogin;
 
   User({
     @required this.email,
     @required this.userType,
+    @required this.firstLogin,
     this.id,
     this.firstName,
     this.lastName,
@@ -59,6 +63,7 @@ class User with ChangeNotifier {
     DateTime lastUpdatedImage,
     DateTime lastUpdatedName,
     bool removed,
+    bool firstLogin,
   }) =>
       User(
         email: email ?? this.email,
@@ -70,6 +75,7 @@ class User with ChangeNotifier {
         lastUpdatedName: lastUpdatedName ?? this.lastUpdatedName,
         localImage: localImage ?? this.localImage,
         removed: removed ?? this.removed,
+        firstLogin: firstLogin ?? this.firstLogin,
       );
 
   Map<String, dynamic> toJson() {
@@ -83,6 +89,7 @@ class User with ChangeNotifier {
       UserFields.removed: this.removed ? 1 : 0,
       UserFields.lastUpdatedImage: this.lastUpdatedImage != null ? this.lastUpdatedImage.toIso8601String() : DateTime.now().toIso8601String(),
       UserFields.lastUpdatedName: this.lastUpdatedName != null ? this.lastUpdatedName.toIso8601String() : DateTime.now().toIso8601String(),
+      UserFields.firstLogin: this.firstLogin ? 1 : 0,
     };
   }
 
@@ -96,5 +103,6 @@ class User with ChangeNotifier {
         removed: json[UserFields.removed] == 1 ? true : false,
         lastUpdatedImage: DateTime.parse(json[UserFields.lastUpdatedImage] as String),
         lastUpdatedName: DateTime.parse(json[UserFields.lastUpdatedName] as String),
+        firstLogin: json[UserFields.firstLogin] == 1 ? true : false,
       );
 }

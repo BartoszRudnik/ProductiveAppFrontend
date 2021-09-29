@@ -40,6 +40,14 @@ class AuthProvider with ChangeNotifier {
     return token != null;
   }
 
+  bool get firstLogin {
+    if (this._user == null || this._user.firstLogin == true) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   User get user {
     return this._user;
   }
@@ -80,6 +88,30 @@ class AuthProvider with ChangeNotifier {
     } catch (error) {
       print(error);
       throw (error);
+    }
+  }
+
+  Future<void> changeFirstLoginStatus() async {
+    String url = this._serverUrl + 'userData/changeFirstLoginStatus/${this._email}';
+
+    this._user.firstLogin = false;
+
+    await UserDatabase.update(this._user);
+
+    notifyListeners();
+
+    if (await InternetConnection.internetConnection()) {
+      try {
+        await http.post(
+          url,
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+      }
     }
   }
 
@@ -222,6 +254,7 @@ class AuthProvider with ChangeNotifier {
           lastName: lastName,
           lastUpdatedImage: DateTime.now(),
           lastUpdatedName: DateTime.now(),
+          firstLogin: responseData['firstLogin'],
         );
 
         this._user = await UserDatabase.create(this._user);
@@ -279,6 +312,7 @@ class AuthProvider with ChangeNotifier {
           id: responseData['userId'],
           email: email,
           userType: 'mail',
+          firstLogin: responseData['firstLogin'],
         );
 
         this._email = email;
@@ -537,6 +571,7 @@ class AuthProvider with ChangeNotifier {
         'token': this._token,
         'expiryDate': this._expiryDate.toIso8601String(),
         'userType': this._user.userType,
+        'firstLogin': this._user.firstLogin,
       },
     );
     preferences.setString('userData', userData);
@@ -610,6 +645,7 @@ class AuthProvider with ChangeNotifier {
         email: this._email,
         userType: userType,
         id: extractedUserData['id'],
+        firstLogin: extractedUserData['firstLogin'],
       );
 
       this._user = await UserDatabase.create(this._user);
