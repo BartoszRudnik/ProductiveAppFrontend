@@ -207,12 +207,8 @@ class AttachmentProvider with ChangeNotifier {
   Future<void> setAttachments(List<File> attachments, String taskUuid, bool editMode) async {
     attachments.forEach(
       (attachment) async {
-        print('dupa1');
-
         final attachmentBytes = await attachment.readAsBytes();
         final uuid = Uuid();
-
-        print('dupa2');
 
         if (await InternetConnection.internetConnection()) {
           try {
@@ -231,15 +227,9 @@ class AttachmentProvider with ChangeNotifier {
 
             request.files.add(multipartFile);
 
-            print('dupa3');
-
             final response = await request.send();
 
-            print('dupa4');
-
             final respStr = await response.stream.bytesToString();
-
-            print('dupa5');
 
             newAttachment.id = int.parse(respStr);
             newAttachment = await AttachmentDatabase.create(newAttachment, this.userMail);
@@ -249,8 +239,6 @@ class AttachmentProvider with ChangeNotifier {
             if (editMode) {
               this.notSavedAttachments.add(newAttachment);
             }
-
-            print('dupa6');
 
             notifyListeners();
           } catch (error) {

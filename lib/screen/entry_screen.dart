@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:productive_app/db/version_database.dart';
@@ -9,6 +8,7 @@ import '../widget/appBar/login_appbar.dart';
 import '../widget/button/login_button.dart';
 import '../widget/button/sign_with_google.dart';
 import 'login_screen.dart';
+import 'package:path_provider/path_provider.dart';
 
 class EntryScreen extends StatefulWidget {
   static const routeName = 'entry-screen';
@@ -28,17 +28,21 @@ class _EntryScreenState extends State<EntryScreen> {
     } else {
       final String currentVersion = dbVersion.version;
 
-      print('new: ' + newVersion);
-      print('current: ' + currentVersion);
-
       if (newVersion != currentVersion) {
         await VersionDatabase.delete();
-        await Future.wait(
-          [
-            VersionDatabase.create(AppVersion(version: newVersion)),
-            DefaultCacheManager().emptyCache(),
-          ],
-        );
+
+        final cacheDir = await getTemporaryDirectory();
+        final appDir = await getApplicationSupportDirectory();
+
+        if (cacheDir.existsSync()) {
+          cacheDir.deleteSync(recursive: true);
+        }
+
+        if (appDir.existsSync()) {
+          appDir.deleteSync(recursive: true);
+        }
+
+        await VersionDatabase.create(AppVersion(version: newVersion));
       }
     }
   }

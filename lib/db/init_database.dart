@@ -26,11 +26,32 @@ class InitDatabase {
     return _database;
   }
 
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < newVersion) {
+      switch (newVersion) {
+        case 3:
+          await this._version3Update(db);
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  Future<void> _version3Update(Database db) async {
+    await db.execute("ALTER TABLE $tableUser ADD COLUMN ${UserFields.firstLogin} INTEGER;");
+    await db.execute('''
+      CREATE TABLE $tableVersion(
+        ${VersionFields.version} 'TEXT'
+      )
+      ''');
+  }
+
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
 
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+    return await openDatabase(path, version: 3, onCreate: this._createDB, onUpgrade: this._onUpgrade);
   }
 
   Future _createDB(Database db, int version) async {
