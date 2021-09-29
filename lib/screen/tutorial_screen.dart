@@ -16,6 +16,8 @@ class TutorialScreen extends StatelessWidget {
       );
 
   DotsDecorator getDotDecorator(BuildContext ctx) => DotsDecorator(
+        size: const Size.square(10.0),
+        activeSize: const Size(20.0, 10.0),
         color: Theme.of(ctx).primaryColorLight,
         activeColor: Theme.of(ctx).primaryColor,
         activeShape: RoundedRectangleBorder(
