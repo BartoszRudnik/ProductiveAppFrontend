@@ -217,7 +217,7 @@ class _NewTaskState extends State<NewTask> {
       localization: this._localization,
       delegatedEmail: this._delegatedEmail,
       isDelegated: false,
-      taskStatus: null,
+      taskStatus: 'Sent',
       isCanceled: false,
     );
 
