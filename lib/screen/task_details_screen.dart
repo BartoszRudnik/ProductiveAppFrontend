@@ -4,6 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_app/config/const_values.dart';
 import 'package:productive_app/provider/synchronize_provider.dart';
+import 'package:productive_app/utils/task_list.dart';
 import 'package:productive_app/utils/task_validate.dart';
 import 'package:productive_app/widget/task_details_state.dart';
 import 'package:productive_app/widget/task_details_description.dart';
@@ -124,34 +125,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     });
   }
 
-  void _chooseTaskList() {
-    if (this.taskToEdit.taskState == null) {
-      this.taskToEdit.taskState = 'COLLECT';
-      this.taskToEdit.localization = 'INBOX';
-    } else {
-      if (this.taskToEdit.done && this.taskToEdit.taskState != 'COLLECT') {
-        this.taskToEdit.taskState = "COMPLETED";
-        this.taskToEdit.localization = "COMPLETED";
-      } else if (this.taskToEdit.taskState == 'COLLECT') {
-        this.taskToEdit.localization = 'INBOX';
-      } else if (this.taskToEdit.taskState == "COMPLETED") {
-        if (this.taskToEdit.done) {
-          this.taskToEdit.localization = 'COMPLETED';
-        } else {
-          this.taskToEdit.localization = 'TRASH';
-        }
-      } else if (this.taskToEdit.taskState == "PLAN&DO") {
-        if (this.taskToEdit.delegatedEmail != null) {
-          this.taskToEdit.localization = 'DELEGATED';
-        } else if (this.taskToEdit.startDate != null) {
-          this.taskToEdit.localization = 'SCHEDULED';
-        } else {
-          this.taskToEdit.localization = 'ANYTIME';
-        }
-      }
-    }
-  }
-
   Future<void> selectStartTime() async {
     final TimeOfDay pickTime = await DateTimePickers.pickTime(context);
 
@@ -218,7 +191,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       taskToEdit.endDate = new DateTime(taskToEdit.endDate.year, taskToEdit.endDate.month, taskToEdit.endDate.day, 0, 0);
     }
 
-    this._chooseTaskList();
+    this.taskToEdit = TaskList.chooseTaskList(this.taskToEdit);
 
     isValid = await TaskValidate.validateTaskEdit(taskToEdit, originalTask, context);
 

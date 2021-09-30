@@ -34,13 +34,14 @@ class _TaskLocalizationState extends State<TaskLocalization> {
         });
       },
       itemBuilder: (context) {
-        return widget.localizations.map((e) {
-          print(e);
-          return PopupMenuItem(
-            child: Text(ConstValues.stateName(e, context)),
-            value: e,
-          );
-        }).toList();
+        return widget.localizations.map(
+          (e) {
+            return PopupMenuItem(
+              child: Text(ConstValues.stateName(e, context)),
+              value: e,
+            );
+          },
+        ).toList();
       },
     );
   }

@@ -142,7 +142,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                             ElevatedButton(
                               onPressed: () {
                                 if (!isArchived) {
-                                  String newLocation = this.widget.task.done ? 'COMPLETED' : 'TRASH';
+                                  String newLocation = 'TRASH';
                                   this.widget.task.taskState = "COMPLETED";
 
                                   Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);

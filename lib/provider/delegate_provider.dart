@@ -61,6 +61,19 @@ class DelegateProvider with ChangeNotifier {
     }
   }
 
+  Future<void> _deleteFromLocalList(String uuid) async {
+    try {
+      await CollaboratorDatabase.deleteByUuid(uuid);
+      this.collaborators.removeWhere((element) => element.uuid == uuid);
+
+      this.divideCollaborators(this.collaborators);
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+    }
+  }
+
   void subscribeCollaborators(BuildContext context) async {
     try {
       this._collaboratorClient = http.Client();
@@ -83,14 +96,20 @@ class DelegateProvider with ChangeNotifier {
 
                 final result = await this.getSingleCollaborator(uuid);
 
-                final Collaborator collaborator = result[0];
-                final bool existing = result[1];
-
-                if (collaborator != null) {
-                  if (existing) {
-                    await Notifications.acceptedInvitation(collaborator.id, context, collaborator.email);
+                if (result != null) {
+                  if (result[0] == 'delete') {
+                    await this._deleteFromLocalList(uuid);
                   } else {
-                    await Notifications.receivedInvitation(collaborator.id, context, collaborator.email);
+                    final Collaborator collaborator = result[0];
+                    final bool existing = result[1];
+
+                    if (collaborator != null) {
+                      if (existing) {
+                        await Notifications.acceptedInvitation(collaborator.id, context, collaborator.email);
+                      } else {
+                        await Notifications.receivedInvitation(collaborator.id, context, collaborator.email);
+                      }
+                    }
                   }
                 }
               }
@@ -420,6 +439,11 @@ class DelegateProvider with ChangeNotifier {
 
       try {
         final response = await http.get(requestUrl);
+
+        if (response.body == null || response.body.length <= 1) {
+          return ['delete', ''];
+        }
+
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
         bool isAskingForPermission = false;
@@ -570,8 +594,6 @@ class DelegateProvider with ChangeNotifier {
     this.collaborators.remove(collaborator);
     await CollaboratorDatabase.deleteByUuid(uuid);
 
-    notifyListeners();
-
     if (await InternetConnection.internetConnection()) {
       try {
         await http.delete(
@@ -581,11 +603,15 @@ class DelegateProvider with ChangeNotifier {
             'accept': 'application/json',
           },
         );
+
+        await this.sendSSE(uuid, collaborator.email);
       } catch (error) {
         print(error);
         throw (error);
       }
     }
+
+    notifyListeners();
   }
 
   Future<void> acceptInvitation(String uuid) async {
@@ -598,8 +624,6 @@ class DelegateProvider with ChangeNotifier {
     this._accepted.add(collaborator);
 
     await CollaboratorDatabase.update(collaborator);
-
-    notifyListeners();
 
     if (await InternetConnection.internetConnection()) {
       try {
@@ -617,6 +641,8 @@ class DelegateProvider with ChangeNotifier {
         throw (error);
       }
     }
+
+    notifyListeners();
   }
 
   Future<void> declineInvitation(String uuid) async {
@@ -624,10 +650,9 @@ class DelegateProvider with ChangeNotifier {
 
     final collaboratorEmail = this._received.firstWhere((element) => element.uuid == uuid).email;
 
+    this.collaborators.removeWhere((collaborator) => collaborator.uuid == uuid);
     this._received.removeWhere((collaborator) => collaborator.uuid == uuid);
     await CollaboratorDatabase.deleteByUuid(uuid);
-
-    notifyListeners();
 
     if (await InternetConnection.internetConnection()) {
       try {
@@ -645,6 +670,8 @@ class DelegateProvider with ChangeNotifier {
         throw (error);
       }
     }
+
+    notifyListeners();
   }
 
   bool checkIfCollaboratorAlreadyExist(String collaboratorMail) {
@@ -700,9 +727,9 @@ class DelegateProvider with ChangeNotifier {
         this.collaborators.insert(0, collaborator);
         this._send.insert(0, collaborator);
 
-        notifyListeners();
-
         await this.sendSSE(uuidCode, newCollaborator);
+
+        notifyListeners();
 
         return collaborator;
       } catch (error) {
