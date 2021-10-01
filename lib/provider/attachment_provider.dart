@@ -34,6 +34,10 @@ class AttachmentProvider with ChangeNotifier {
       this.attachments.remove(element);
     });
 
+    this.delegatedAttachments.where((element) => element.toDelete).toList().forEach((element) {
+      this.delegatedAttachments.remove(element);
+    });
+
     this.notSavedAttachments = [];
 
     notifyListeners();
@@ -56,10 +60,17 @@ class AttachmentProvider with ChangeNotifier {
         element.toDelete = false;
       },
     );
+
+    this.delegatedAttachments.where((element) => element.toDelete).toList().forEach(
+      (element) {
+        element.toDelete = false;
+      },
+    );
   }
 
   void setToDelete(String attachmentUuid) {
     this.attachments.firstWhere((attachment) => attachment.uuid == attachmentUuid).toDelete = true;
+    this.delegatedAttachments.firstWhere((attachment) => attachment.uuid == attachmentUuid).toDelete = true;
 
     notifyListeners();
   }
@@ -313,5 +324,10 @@ class AttachmentProvider with ChangeNotifier {
     await file.writeAsBytes(bytes, flush: true);
 
     return file;
+  }
+
+  int numberOfAttachmentsToDelete(taskUuid, parentTaskUuid) {
+    return this.attachments.where((element) => element.taskUuid == taskUuid && element.toDelete).length +
+        this.delegatedAttachments.where((element) => element.taskUuid == parentTaskUuid && element.toDelete).length;
   }
 }

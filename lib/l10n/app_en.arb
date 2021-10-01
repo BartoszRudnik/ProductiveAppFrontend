@@ -367,5 +367,7 @@
         "type": "String"
       }
     }
-  }  
+  },
+  "attachmentsSpace": "Not enough space for new attachment",
+  "used": "Used: "  
 }

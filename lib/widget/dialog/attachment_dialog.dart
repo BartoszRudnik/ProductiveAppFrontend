@@ -17,86 +17,147 @@ class AttachmentDialog extends StatefulWidget {
 }
 
 class _AttachmentDialogState extends State<AttachmentDialog> {
+  double actualBytes = 0.0;
+  double maxBytes = 1000000.0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    this.actualBytes = 0.0;
+
+    if (this.widget.files.length > 0) {
+      this.widget.files.forEach(
+        (file) {
+          this.actualBytes += file.lengthSync();
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(
-        AppLocalizations.of(context).addNewFiles,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontWeight: FontWeight.w500,
-          fontSize: 24,
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: AlertDialog(
+        title: Column(
+          children: [
+            Text(
+              AppLocalizations.of(context).addNewFiles,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 24,
+              ),
+            ),
+            SizedBox(height: 15),
+            LinearProgressIndicator(
+              backgroundColor: Theme.of(context).primaryColorLight,
+              color: Theme.of(context).primaryColor,
+              value: (actualBytes / maxBytes),
+            ),
+            SizedBox(height: 10),
+            Text(
+              AppLocalizations.of(context).used + ((actualBytes / maxBytes).toStringAsFixed(2)) + " MB / 1 MB",
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 16,
+              ),
+            ),
+          ],
         ),
-      ),
-      actionsAlignment: MainAxisAlignment.spaceEvenly,
-      actions: [
-        ElevatedButton(
-          onPressed: () async {
-            final result = await FilePicker.platform.pickFiles(
-              allowMultiple: true,
-              allowedExtensions: ['pdf', 'png', 'jpg', 'jpeg', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx'],
-              type: FileType.custom,
-            );
+        actionsAlignment: MainAxisAlignment.spaceEvenly,
+        actions: [
+          ElevatedButton(
+            onPressed: () async {
+              final result = await FilePicker.platform.pickFiles(
+                allowCompression: true,
+                allowMultiple: true,
+                allowedExtensions: ['pdf', 'png', 'jpg', 'jpeg', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx'],
+                type: FileType.custom,
+              );
 
-            result.files.forEach((file) {
-              this.widget.files.add(File(file.path));
-            });
+              result.files.forEach(
+                (file) {
+                  final newFile = File(file.path);
 
-            setState(() {});
-          },
-          child: Text(
-            AppLocalizations.of(context).addNewFile,
-            textAlign: TextAlign.start,
-          ),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.of(context).pop(this.widget.files);
-          },
-          child: Text(
-            AppLocalizations.of(context).save,
-            textAlign: TextAlign.end,
-          ),
-        ),
-      ],
-      content: SingleChildScrollView(
-        child: Container(
-          alignment: Alignment.center,
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height * 0.5,
-          child: ListView.builder(
-            itemCount: this.widget.files.length,
-            itemBuilder: (ctx, index) {
-              return Container(
-                height: 75,
-                child: Card(
-                  elevation: 2,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Flexible(
-                          child: Center(
-                            child: Text(
-                              basename(this.widget.files[index].path),
-                            ),
+                  if (this.actualBytes + newFile.lengthSync() <= this.maxBytes) {
+                    this.actualBytes += newFile.lengthSync();
+                    this.widget.files.add(newFile);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: Theme.of(context).primaryColorLight,
+                        duration: Duration(seconds: 2),
+                        content: Text(
+                          AppLocalizations.of(context).attachmentsSpace,
+                          style: TextStyle(
+                            color: Theme.of(context).primaryColor,
                           ),
                         ),
-                        IconButton(
-                          icon: Icon(Icons.cancel_outlined),
-                          onPressed: () {
-                            setState(() {
-                              this.widget.files.remove(this.widget.files[index]);
-                            });
-                          },
-                        ),
-                      ],
+                      ),
+                    );
+                  }
+                },
+              );
+
+              setState(() {});
+            },
+            child: Text(
+              AppLocalizations.of(context).addNewFile,
+              textAlign: TextAlign.start,
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop(this.widget.files);
+            },
+            child: Text(
+              AppLocalizations.of(context).save,
+              textAlign: TextAlign.end,
+            ),
+          ),
+        ],
+        content: SingleChildScrollView(
+          child: Container(
+            alignment: Alignment.center,
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height * 0.5,
+            child: ListView.builder(
+              itemCount: this.widget.files.length,
+              itemBuilder: (ctx, index) {
+                return Container(
+                  height: 75,
+                  child: Card(
+                    elevation: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Flexible(
+                            child: Center(
+                              child: Text(
+                                basename(this.widget.files[index].path),
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.cancel_outlined),
+                            onPressed: () {
+                              setState(() {
+                                this.actualBytes -= this.widget.files[index].lengthSync();
+                                this.widget.files.remove(this.widget.files[index]);
+                              });
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ),

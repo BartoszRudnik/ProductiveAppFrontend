@@ -35,6 +35,8 @@ class AttachmentDatabase {
       whereArgs: [uuid],
     );
 
+    print(maps.first);
+
     return maps.isNotEmpty && maps.first[AttachmentFields.localFile] != null;
   }
 

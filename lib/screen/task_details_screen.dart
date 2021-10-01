@@ -475,8 +475,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         bool result = false;
 
         if ((!this._checkEquals(this.originalTask, this.taskToEdit) ||
-                Provider.of<AttachmentProvider>(context, listen: false).notSavedAttachments.length > 0) &&
-            !this.changesSaved) {
+                    Provider.of<AttachmentProvider>(context, listen: false).notSavedAttachments.length > 0) &&
+                !this.changesSaved ||
+            Provider.of<AttachmentProvider>(context, listen: false).numberOfAttachmentsToDelete(this.taskToEdit.uuid, this.taskToEdit.parentUuid) > 0) {
           result = await Dialogs.showActionDialog(
             context,
             AppLocalizations.of(context).changes,
@@ -568,7 +569,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
                     editTags: this.editTags,
                   ),
                   TaskDetailsAttachments(
-                    attachments: attachments,
+                    parentUuid: taskToEdit.parentUuid,
                     taskUuid: taskToEdit.uuid,
                   ),
                 ],
