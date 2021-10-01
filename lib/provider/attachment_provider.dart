@@ -120,6 +120,7 @@ class AttachmentProvider with ChangeNotifier {
             fileName: element['fileName'],
             id: element['id'],
             taskUuid: element['taskUuid'],
+            synchronized: true,
           );
 
           if (!await AttachmentDatabase.checkIfExists(newAttachment.uuid)) {
@@ -166,28 +167,31 @@ class AttachmentProvider with ChangeNotifier {
 
       final responseBody = json.decode(response.body);
 
-      for (var element in responseBody) {
-        Attachment newAttachment = Attachment(
-          uuid: element['uuid'],
-          fileName: element['fileName'],
-          id: element['id'],
-          taskUuid: element['taskUuid'],
-        );
+      if (!responseBody.containsKey("error")) {
+        for (final element in responseBody) {
+          Attachment newAttachment = Attachment(
+            uuid: element['uuid'],
+            fileName: element['fileName'],
+            id: element['id'],
+            taskUuid: element['taskUuid'],
+            synchronized: true,
+          );
 
-        if (!await AttachmentDatabase.checkIfExists(newAttachment.uuid)) {
-          final file = await this.getFileBytes(newAttachment.uuid);
+          if (!await AttachmentDatabase.checkIfExists(newAttachment.uuid)) {
+            final file = await this.getFileBytes(newAttachment.uuid);
 
-          if (file != null) {
-            newAttachment.localFile = file;
+            if (file != null) {
+              newAttachment.localFile = file;
+            }
+
+            newAttachment = await AttachmentDatabase.create(newAttachment, this.userMail);
           }
-
-          newAttachment = await AttachmentDatabase.create(newAttachment, this.userMail);
         }
+
+        this.attachments = await AttachmentDatabase.readAll(this.userMail);
+
+        notifyListeners();
       }
-
-      this.attachments = await AttachmentDatabase.readAll(this.userMail);
-
-      notifyListeners();
     } catch (error) {
       print(error);
       throw (error);
@@ -243,6 +247,7 @@ class AttachmentProvider with ChangeNotifier {
             final respStr = await response.stream.bytesToString();
 
             newAttachment.id = int.parse(respStr);
+            newAttachment.synchronized = true;
             newAttachment = await AttachmentDatabase.create(newAttachment, this.userMail);
 
             this.attachments.add(newAttachment);

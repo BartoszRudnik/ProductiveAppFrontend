@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:global_configuration/global_configuration.dart';
@@ -142,8 +143,13 @@ class SynchronizeProvider with ChangeNotifier {
     if (user != null) {
       final finalUrl = this._serverUrl + "synchronize/synchronizeUser";
 
-      final file = File(user.localImage);
-      final fileBytes = await file.readAsBytes();
+      File file;
+      Uint8List fileBytes;
+
+      if (user.localImage != null) {
+        file = File(user.localImage);
+        fileBytes = await file.readAsBytes();
+      }
 
       try {
         await http.post(
@@ -157,7 +163,7 @@ class SynchronizeProvider with ChangeNotifier {
               "lastUpdatedName": user.lastUpdatedName.toIso8601String(),
               "removed": user.removed ? 1 : 0,
               "userType": user.userType,
-              "localImage": fileBytes,
+              "localImage": user.synchronized || user.localImage == null ? [] : fileBytes,
             },
           ),
           headers: {

@@ -13,6 +13,7 @@ class AttachmentFields {
     lastUpdated,
     localFile,
     uuid,
+    synchronized,
   ];
 
   static final String id = "id";
@@ -22,6 +23,7 @@ class AttachmentFields {
   static final String lastUpdated = "lastUpdated";
   static final String localFile = "localFile";
   static final String uuid = "uuid";
+  static final String synchronized = "synchronized";
 }
 
 class Attachment {
@@ -32,6 +34,7 @@ class Attachment {
   DateTime lastUpdated;
   Uint8List localFile;
   String uuid;
+  bool synchronized;
 
   Attachment({
     this.id,
@@ -41,6 +44,7 @@ class Attachment {
     this.lastUpdated,
     this.localFile,
     this.toDelete = false,
+    this.synchronized = false,
   });
 
   Attachment copy({
@@ -51,6 +55,7 @@ class Attachment {
     DateTime lastUpdated,
     Uint8List localFile,
     String uuid,
+    bool synchronized,
   }) =>
       Attachment(
         uuid: uuid ?? this.uuid,
@@ -60,6 +65,7 @@ class Attachment {
         lastUpdated: lastUpdated ?? this.lastUpdated,
         localFile: localFile ?? this.localFile,
         toDelete: toDelete ?? this.toDelete,
+        synchronized: synchronized ?? this.synchronized,
       );
 
   Map<String, dynamic> toJson() {
@@ -70,7 +76,8 @@ class Attachment {
       AttachmentFields.fileName: this.fileName,
       AttachmentFields.toDelete: this.toDelete ? 1 : 0,
       AttachmentFields.lastUpdated: this.lastUpdated != null ? this.lastUpdated.toIso8601String() : DateTime.now().toIso8601String(),
-      AttachmentFields.localFile: this.localFile
+      AttachmentFields.localFile: this.localFile,
+      AttachmentFields.synchronized: this.synchronized,
     };
   }
 
@@ -82,5 +89,6 @@ class Attachment {
         toDelete: json[AttachmentFields.toDelete] == 1 ? true : false,
         localFile: json[AttachmentFields.localFile],
         lastUpdated: DateTime.tryParse(json[AttachmentFields.lastUpdated] as String),
+        synchronized: json[AttachmentFields.synchronized] == 1 ? true : false,
       );
 }
