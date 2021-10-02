@@ -5,9 +5,11 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class GrantAccessListTile extends StatefulWidget {
   final email;
+  final uuid;
   bool grantAccess;
 
   GrantAccessListTile({
+    @required this.uuid,
     @required this.email,
     @required this.grantAccess,
   });
@@ -40,7 +42,7 @@ class _GrantAccessListTileState extends State<GrantAccessListTile> {
           setState(
             () {
               this.widget.grantAccess = value;
-              Provider.of<DelegateProvider>(context, listen: false).changePermission(this.widget.email);
+              Provider.of<DelegateProvider>(context, listen: false).changePermission(this.widget.email, this.widget.uuid);
             },
           );
         },

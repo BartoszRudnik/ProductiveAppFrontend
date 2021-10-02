@@ -24,7 +24,7 @@ class AskForActivityPermission extends StatelessWidget {
               if (this.collaborator.alreadyAsked) {
                 return Dialogs.showWarningDialog(context, AppLocalizations.of(context).alreadyAsked);
               } else {
-                Provider.of<DelegateProvider>(context, listen: false).askForPermission(this.collaborator.email);
+                Provider.of<DelegateProvider>(context, listen: false).askForPermission(this.collaborator.email, this.collaborator.uuid);
                 this.collaborator.alreadyAsked = true;
 
                 ScaffoldMessenger.of(context).showSnackBar(

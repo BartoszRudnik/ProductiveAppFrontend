@@ -38,6 +38,30 @@ class DelegateProvider with ChangeNotifier {
   http.Client _client;
   http.Client _collaboratorClient;
 
+  Future<void> sendPermissionSSE(String relationUUID, String collaboratorEmail, String action) async {
+    if (relationUUID != null && relationUUID.length > 1) {
+      final notifyUrl = this._serverUrl + "delegatedTaskSSE/publishPermission/$collaboratorEmail";
+
+      try {
+        await http.post(
+          notifyUrl,
+          body: json.encode(
+            {
+              'relationUuid': relationUUID,
+              'action': action,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+      }
+    }
+  }
+
   Future<void> sendSSE(String relationUUID, String collaboratorEmail) async {
     if (relationUUID != null && relationUUID.length > 1) {
       final notifyUrl = this._serverUrl + "delegatedTaskSSE/publishCollaborator/$collaboratorEmail";
@@ -69,6 +93,39 @@ class DelegateProvider with ChangeNotifier {
       this.divideCollaborators(this.collaborators);
 
       notifyListeners();
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  void subscribePermissions(BuildContext context) async {
+    try {
+      this._collaboratorClient = http.Client();
+
+      final request = http.Request("GET", Uri.parse(this._serverUrl + "delegatedTaskSSE/subscribePermissions/${this.userEmail}"));
+
+      Future<http.StreamedResponse> response = this._collaboratorClient.send(request);
+
+      response.asStream().listen(
+        (streamedResponse) {
+          streamedResponse.stream.listen(
+            (data) async {
+              final stringValue = utf8.decode(data);
+
+              if (stringValue.contains('event')) {
+                final message = stringValue.split(":");
+                String uuid = message[2].trim();
+
+                uuid = uuid.split("\n")[0];
+
+                final result = await this.getSingleCollaborator(uuid);
+
+                if (result != null && result[0] != 'delete') {}
+              }
+            },
+          );
+        },
+      );
     } catch (error) {
       print(error);
     }
@@ -211,7 +268,7 @@ class DelegateProvider with ChangeNotifier {
     return this.accepted.where((collaborator) => collaborator.isAskingForPermission && !collaborator.sentPermission).length;
   }
 
-  Future<void> askForPermission(String collaboratorEmail) async {
+  Future<void> askForPermission(String collaboratorEmail, String relationUUID) async {
     if (await InternetConnection.internetConnection()) {
       final requestUrl = this._serverUrl + 'delegate/askForPermission/${this.userEmail}/$collaboratorEmail';
 
@@ -223,6 +280,8 @@ class DelegateProvider with ChangeNotifier {
             'accept': 'application/json',
           },
         );
+
+        await this.sendPermissionSSE(relationUUID, collaboratorEmail, "ASKING");
       } catch (error) {
         print(error);
         throw (error);
@@ -251,7 +310,7 @@ class DelegateProvider with ChangeNotifier {
     }
   }
 
-  Future<void> declineAskForPermission(String collaboratorEmail) async {
+  Future<void> declineAskForPermission(String collaboratorEmail, String relationUUID) async {
     if (await InternetConnection.internetConnection()) {
       final requestUrl = this._serverUrl + 'delegate/declineAskForPermission/${this.userEmail}/$collaboratorEmail';
 
@@ -265,6 +324,8 @@ class DelegateProvider with ChangeNotifier {
         );
 
         this.collaborators.firstWhere((element) => element.email == collaboratorEmail).isAskingForPermission = false;
+
+        await this.sendPermissionSSE(relationUUID, collaboratorEmail, "DECLINED");
 
         notifyListeners();
       } catch (error) {
@@ -281,7 +342,7 @@ class DelegateProvider with ChangeNotifier {
     }
   }
 
-  Future<void> changePermission(String collaboratorEmail) async {
+  Future<void> changePermission(String collaboratorEmail, String relationUUID) async {
     if (await InternetConnection.internetConnection()) {
       final requestUrl = this._serverUrl + 'delegate/changePermission/${this.userEmail}/$collaboratorEmail';
 
@@ -296,6 +357,16 @@ class DelegateProvider with ChangeNotifier {
 
         this.collaborators.firstWhere((collaborator) => collaborator.email == collaboratorEmail).sentPermission =
             !this.collaborators.firstWhere((collaborator) => collaborator.email == collaboratorEmail).sentPermission;
+
+        String action = '';
+
+        if (this.collaborators.firstWhere((element) => element.email == collaboratorEmail).sentPermission) {
+          action = 'ACCEPTED';
+        } else {
+          action = 'DECLINED';
+        }
+
+        await this.sendPermissionSSE(relationUUID, collaboratorEmail, action);
 
         notifyListeners();
       } catch (error) {
