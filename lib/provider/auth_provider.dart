@@ -149,19 +149,21 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> clearAccountData(List<String> tasks) async {
-    await Future.wait([
-      AttachmentDatabase.deleteAll(this._email),
-      CollaboratorDatabase.deleteAll(this._email),
-      CollaboratorTaskDatabase.deleteAll(this._email),
-      GraphicDatabase.deleteAll(this._email),
-      LocaleDatabase.deleteAll(this._email),
-      LocationDatabase.deleteAll(this._email),
-      SettingsDatabase.delete(this._email),
-      TagDatabase.deleteAll(this._email),
-      TaskDatabase.deleteAll(this._email),
-      UserDatabase.delete(this._email),
-      Notifications.removeUserGeofences(tasks),
-    ]);
+    await Future.wait(
+      [
+        AttachmentDatabase.deleteAll(this._email),
+        CollaboratorDatabase.deleteAll(this._email),
+        CollaboratorTaskDatabase.deleteAll(this._email),
+        GraphicDatabase.deleteAll(this._email),
+        LocaleDatabase.deleteAll(this._email),
+        LocationDatabase.deleteAll(this._email),
+        SettingsDatabase.delete(this._email),
+        TagDatabase.deleteAll(this._email),
+        TaskDatabase.deleteAll(this._email),
+        UserDatabase.delete(this._email),
+        Notifications.removeUserGeofences(tasks),
+      ],
+    );
   }
 
   Future<void> deleteAccount(String token, List<String> tasks) async {
@@ -367,6 +369,7 @@ class AuthProvider with ChangeNotifier {
     this._user.localImage = null;
     this._user.removed = true;
     this._user.lastUpdatedImage = DateTime.now();
+    this._user.synchronized = false;
 
     await UserDatabase.update(this._user);
 
@@ -412,6 +415,7 @@ class AuthProvider with ChangeNotifier {
         final response = await request.send();
 
         this._user.lastUpdatedImage = DateTime.tryParse(json.decode(await response.stream.bytesToString()));
+        this._user.synchronized = true;
 
         await UserDatabase.update(this._user);
       } catch (error) {
@@ -422,6 +426,7 @@ class AuthProvider with ChangeNotifier {
       this._user.localImage = userImage.path;
       this._user.removed = false;
       this._user.lastUpdatedImage = DateTime.now();
+      this._user.synchronized = false;
 
       UserDatabase.update(this._user);
 
@@ -459,8 +464,9 @@ class AuthProvider with ChangeNotifier {
           file.writeAsBytesSync(response.bodyBytes);
 
           this._user.localImage = file.path;
-
           this._user.lastUpdatedImage = DateTime.now();
+          this._user.synchronized = true;
+
           await UserDatabase.update(this.user);
         }
       } else {

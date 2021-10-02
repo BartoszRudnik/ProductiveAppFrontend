@@ -367,5 +367,7 @@
   "attributes": "Atrybuty",
   "saveLocation": "Zapisz lokalizacje",
   "newTask": "Nowe zadanie: ",
-  "newInvitation": "Otrzymano nowe zaproszenie od użytkownika: " 
+  "newInvitation": "Otrzymano nowe zaproszenie od użytkownika: ",
+  "attachmentsSpace": "Brak wystarczającej przestrzeni na nowy załącznik",
+  "used": "Wykorzystano: " 
 }

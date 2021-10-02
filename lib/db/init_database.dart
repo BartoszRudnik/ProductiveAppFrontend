@@ -32,6 +32,12 @@ class InitDatabase {
         case 3:
           await this._version3Update(db);
           break;
+        case 4:
+          if (oldVersion < 3) {
+            await this._version3Update(db);
+          }
+          await this._version4Update(db);
+          break;
         default:
           break;
       }
@@ -47,11 +53,20 @@ class InitDatabase {
       ''');
   }
 
+  Future<void> _version4Update(Database db) async {
+    await Future.wait(
+      [
+        db.execute("ALTER TABLE $tableAttachment ADD COLUMN ${AttachmentFields.synchronized} INTEGER;"),
+        db.execute("ALTER TABLE $tableUser ADD COLUMN ${UserFields.synchronized} INTEGER;"),
+      ],
+    );
+  }
+
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
 
-    return await openDatabase(path, version: 3, onCreate: this._createDB, onUpgrade: this._onUpgrade);
+    return await openDatabase(path, version: 4, onCreate: this._createDB, onUpgrade: this._onUpgrade);
   }
 
   Future _createDB(Database db, int version) async {
@@ -87,6 +102,7 @@ class InitDatabase {
       ${AttachmentFields.lastUpdated} $textType,
       ${AttachmentFields.localFile} $blob,
       ${AttachmentFields.uuid} $textType,
+      ${AttachmentFields.synchronized} $boolType,
       $userEmail $textType
     )
     ''');
@@ -151,6 +167,7 @@ class InitDatabase {
       ${UserFields.localImage} $textType,
       ${UserFields.removed} $boolType,
       ${UserFields.firstLogin} $boolType,
+      ${UserFields.synchronized} $boolType,
       $userEmail $textType
     )
     ''');

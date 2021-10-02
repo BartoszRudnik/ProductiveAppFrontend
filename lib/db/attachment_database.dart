@@ -12,6 +12,19 @@ class AttachmentDatabase {
     );
   }
 
+  static Future<List<Attachment>> readAllNotSynchronized(String userMail) async {
+    final db = await InitDatabase.instance.database;
+
+    final result = await db.query(
+      tableAttachment,
+      columns: AttachmentFields.values,
+      where: 'userMail = ? AND ${AttachmentFields.synchronized} = ?',
+      whereArgs: [userMail, 0],
+    );
+
+    return result.map((e) => Attachment.fromJson(e)).toList();
+  }
+
   static Future<List<Attachment>> readAll(String userMail) async {
     final db = await InitDatabase.instance.database;
 
@@ -30,12 +43,12 @@ class AttachmentDatabase {
 
     final maps = await db.query(
       tableAttachment,
-      columns: [AttachmentFields.localFile],
+      columns: [AttachmentFields.uuid],
       where: '${AttachmentFields.uuid} = ?',
       whereArgs: [uuid],
     );
 
-    return maps.isNotEmpty && maps.first[AttachmentFields.localFile] != null;
+    return maps.isNotEmpty && maps.first[AttachmentFields.uuid] == uuid;
   }
 
   static Future<Attachment> read(int attachmentId) async {
