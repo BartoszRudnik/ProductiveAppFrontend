@@ -167,7 +167,7 @@ class AttachmentProvider with ChangeNotifier {
 
       final responseBody = json.decode(response.body);
 
-      if (!responseBody.containsKey("error")) {
+      if (responseBody is List || !responseBody.containsKey("error")) {
         for (final element in responseBody) {
           Attachment newAttachment = Attachment(
             uuid: element['uuid'],
