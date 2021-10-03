@@ -369,5 +369,8 @@
     }
   },
   "attachmentsSpace": "Not enough space for new attachment",
-  "used": "Used: "  
+  "used": "Used: ",
+  "askingNotificationPermission": " is asking for access to your activity",
+  "acceptedNotificationPermission": " has granted you access to his activity",
+  "revokedNotificationPermission": " has revoked your access to his activity"    
 }

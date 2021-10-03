@@ -369,5 +369,8 @@
   "newTask": "Nowe zadanie: ",
   "newInvitation": "Otrzymano nowe zaproszenie od użytkownika: ",
   "attachmentsSpace": "Brak wystarczającej przestrzeni na nowy załącznik",
-  "used": "Wykorzystano: " 
+  "used": "Wykorzystano: ",
+  "askingNotificationPermission": " prosi o dostęp do twojej aktywności",
+  "acceptedNotificationPermission": " przyznał Ci dostęp do swojej aktywności",
+  "revokedNotificationPermission": " odebrał Ci dostęp do swojej aktywności" 
 }

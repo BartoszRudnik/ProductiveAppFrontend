@@ -37,6 +37,7 @@ class DelegateProvider with ChangeNotifier {
 
   http.Client _client;
   http.Client _collaboratorClient;
+  http.Client _permissionClient;
 
   Future<void> sendPermissionSSE(String relationUUID, String collaboratorEmail, String action) async {
     if (relationUUID != null && relationUUID.length > 1) {
@@ -100,11 +101,11 @@ class DelegateProvider with ChangeNotifier {
 
   void subscribePermissions(BuildContext context) async {
     try {
-      this._collaboratorClient = http.Client();
+      this._permissionClient = http.Client();
 
-      final request = http.Request("GET", Uri.parse(this._serverUrl + "delegatedTaskSSE/subscribePermissions/${this.userEmail}"));
+      final request = http.Request("GET", Uri.parse(this._serverUrl + "delegatedTaskSSE/subscribePermission/${this.userEmail}"));
 
-      Future<http.StreamedResponse> response = this._collaboratorClient.send(request);
+      Future<http.StreamedResponse> response = this._permissionClient.send(request);
 
       response.asStream().listen(
         (streamedResponse) {
@@ -114,13 +115,32 @@ class DelegateProvider with ChangeNotifier {
 
               if (stringValue.contains('event')) {
                 final message = stringValue.split(":");
-                String uuid = message[2].trim();
 
-                uuid = uuid.split("\n")[0];
+                String data = message[2].trim();
+                data = data.split("\n")[0];
+
+                String uuid = data.split(" ")[0];
+                String asking = data.split(" ")[1];
 
                 final result = await this.getSingleCollaborator(uuid);
 
-                if (result != null && result[0] != 'delete') {}
+                if (result != null && result[0] != 'delete') {
+                  final Collaborator collaborator = result[0];
+
+                  String message;
+
+                  if (asking == "ASKING") {
+                    message = AppLocalizations.of(context).askingNotificationPermission;
+                  } else if (asking == "DECLINED") {
+                    message = AppLocalizations.of(context).revokedNotificationPermission;
+                  } else {
+                    message = AppLocalizations.of(context).acceptedNotificationPermission;
+                  }
+                  await Notifications.permissionNotificationRequest(
+                    collaborator.id,
+                    collaborator.email + message,
+                  );
+                }
               }
             },
           );
