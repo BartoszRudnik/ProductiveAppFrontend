@@ -147,7 +147,7 @@ class CollaboratorProfile extends StatelessWidget {
                             IconButton(
                               icon: Icon(Icons.cancel_outlined),
                               onPressed: () {
-                                Provider.of<DelegateProvider>(context, listen: false).declineAskForPermission(collaborator.email);
+                                Provider.of<DelegateProvider>(context, listen: false).declineAskForPermission(collaborator.email, collaborator.uuid);
                               },
                             )
                           ],
@@ -158,6 +158,7 @@ class CollaboratorProfile extends StatelessWidget {
                         height: 10,
                       ),
                     GrantAccessListTile(
+                      uuid: collaborator.uuid,
                       email: collaborator.email,
                       grantAccess: collaborator.sentPermission,
                     ),

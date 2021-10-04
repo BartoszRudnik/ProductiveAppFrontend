@@ -50,6 +50,32 @@ class Notifications {
     await _notifications.initialize(initializationSettings, onSelectNotification: _selectNotification);
   }
 
+  static Future<void> permissionNotificationRequest(int id, String message) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      '4',
+      'Permission from collaborator',
+      'Notification about new permission action',
+      importance: Importance.max,
+      priority: Priority.max,
+    );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    await _notifications.show(id, message, "", platformChannelSpecifics);
+  }
+
+  static Future<void> permissionNotification(int id) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      '4',
+      'Permission from collaborator',
+      'Notification about new permission action',
+      importance: Importance.max,
+      priority: Priority.max,
+    );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    await _notifications.show(id, "Collaborator changed your permission status!", "", platformChannelSpecifics);
+  }
+
   static Future<void> invitationNotification(int id) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
       '3',
