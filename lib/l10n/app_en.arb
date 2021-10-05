@@ -372,5 +372,6 @@
   "used": "Used: ",
   "askingNotificationPermission": " is asking for access to your activity",
   "acceptedNotificationPermission": " has granted you access to his activity",
-  "revokedNotificationPermission": " has revoked your access to his activity"    
+  "revokedNotificationPermission": " has revoked your access to his activity",
+  "version": "App Version"    
 }
