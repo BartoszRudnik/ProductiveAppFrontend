@@ -117,8 +117,7 @@ class ReceivedCollaborator extends StatelessWidget {
             ),
           );
         } else {
-          final tasks = await Provider.of<TaskProvider>(context, listen: false).getTasksFromCollaborator(this.collaborator.email);
-          await Provider.of<AttachmentProvider>(context, listen: false).getDelegatedAttachmentsFromSingleUser(tasks);
+          await Provider.of<TaskProvider>(context, listen: false).getTasksFromCollaborator(this.collaborator.email);
           await Provider.of<DelegateProvider>(context, listen: false).acceptInvitation(this.collaborator.uuid);
         }
       },

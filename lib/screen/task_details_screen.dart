@@ -32,6 +32,12 @@ import '../widget/task_details_map.dart';
 class TaskDetailScreen extends StatefulWidget {
   static const routeName = "/task-details";
 
+  final Task task;
+
+  TaskDetailScreen({
+    @required this.task,
+  });
+
   @override
   _TaskDetailScreenState createState() => _TaskDetailScreenState();
 }
@@ -439,11 +445,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
 
   @override
   Widget build(BuildContext context) {
-    final priorities = Provider.of<TaskProvider>(context, listen: false).priorities;
-    final states = Provider.of<TaskProvider>(context, listen: false).localizations;
-
-    if (taskToEdit == null) {
-      originalTask = ModalRoute.of(context).settings.arguments as Task;
+    if (taskToEdit == null && this.widget.task != null) {
+      originalTask = this.widget.task;
 
       setTaskToEdit(originalTask);
 
@@ -452,21 +455,16 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       }
     }
 
+    final priorities = Provider.of<TaskProvider>(context, listen: false).priorities;
+    final states = Provider.of<TaskProvider>(context, listen: false).localizations;
+
     double latitude = -1;
     double longitude = -1;
 
-    if (this.taskToEdit.notificationLocalizationUuid != null) {
+    if (this.taskToEdit != null && this.taskToEdit.notificationLocalizationUuid != null) {
       latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.taskToEdit.notificationLocalizationUuid);
       longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.taskToEdit.notificationLocalizationUuid);
     }
-
-    List<Attachment> attachments =
-        Provider.of<AttachmentProvider>(context).attachments.where((attachment) => attachment.taskUuid == taskToEdit.uuid && !attachment.toDelete).toList();
-
-    attachments.addAll(Provider.of<AttachmentProvider>(context)
-        .delegatedAttachments
-        .where((attachment) => attachment.taskUuid == taskToEdit.parentUuid && !attachment.toDelete)
-        .toList());
 
     return WillPopScope(
       // ignore: missing_return
@@ -512,7 +510,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
               child: Column(
                 children: [
                   TextFormField(
-                    initialValue: taskToEdit.title,
+                    initialValue: this.taskToEdit == null ? '' : this.taskToEdit.title,
                     style: TextStyle(fontSize: 25),
                     maxLines: null,
                     onSaved: (value) {

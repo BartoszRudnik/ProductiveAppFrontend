@@ -51,7 +51,7 @@ void callbackDispatcher() {
       final email = extractedUserData['email'];
 
       if (taskName == "tasks") {
-        final requestUrl = "http://192.168.1.120:8080/api/v1/delegatedTaskSSE/isNewTask/$email";
+        final requestUrl = "http://192.99.169.102:8080/api/v1/delegatedTaskSSE/isNewTask/$email";
         final response = await http.get(requestUrl);
         final responseBody = json.decode(response.body);
 
@@ -62,7 +62,7 @@ void callbackDispatcher() {
 
         return Future.value(true);
       } else if (taskName == "collaborators") {
-        final requestUrl = "http://192.168.1.120:8080/api/v1/delegatedTaskSSE/isNewCollaborator/$email";
+        final requestUrl = "http://192.99.169.102:8080/api/v1/delegatedTaskSSE/isNewCollaborator/$email";
         final response = await http.get(requestUrl);
         final responseBody = json.decode(response.body);
 
@@ -73,7 +73,7 @@ void callbackDispatcher() {
 
         return Future.value(true);
       } else {
-        final requestUrl = "http://192.168.1.120:8080/api/v1/delegatedTaskSSE/isNewPermission/$email";
+        final requestUrl = "http://192.99.169.102:8080/api/v1/delegatedTaskSSE/isNewPermission/$email";
 
         final response = await http.get(requestUrl);
         final responseBody = json.decode(response.body);

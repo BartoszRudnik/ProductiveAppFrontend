@@ -124,18 +124,11 @@ class Data {
           Provider.of<SettingsProvider>(context, listen: false).getFilterSettings(),
           Provider.of<AuthProvider>(context, listen: false).getUserData(),
           Provider.of<AuthProvider>(context, listen: false).checkIfAvatarExists(),
-          Provider.of<AttachmentProvider>(context, listen: false).getAttachments(),
           Provider.of<AuthProvider>(context, listen: false).getUserImage(),
           Provider.of<LocaleProvider>(context, listen: false).getLocale(),
           Provider.of<ThemeProvider>(context, listen: false).getUserMode(),
         ],
       );
-
-      final List<String> delegatedTasks = Provider.of<TaskProvider>(context, listen: false).delegatedTasksUuid;
-
-      if (delegatedTasks != null && delegatedTasks.length > 0) {
-        await Provider.of<AttachmentProvider>(context, listen: false).getAllDelegatedAttachments(delegatedTasks);
-      }
     } catch (error) {
       print(error);
     }

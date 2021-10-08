@@ -25,10 +25,9 @@ class TaskDetailsAttachments extends StatelessWidget {
     List<Attachment> attachments =
         Provider.of<AttachmentProvider>(context).attachments.where((attachment) => attachment.taskUuid == taskUuid && !attachment.toDelete).toList();
 
-    attachments.addAll(Provider.of<AttachmentProvider>(context)
-        .delegatedAttachments
-        .where((attachment) => attachment.taskUuid == parentUuid && !attachment.toDelete)
-        .toList());
+    attachments.addAll(
+      Provider.of<AttachmentProvider>(context).attachments.where((attachment) => attachment.taskUuid == parentUuid && !attachment.toDelete).toList(),
+    );
 
     return Column(
       children: [
