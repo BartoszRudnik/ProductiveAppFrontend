@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:productive_app/config/const_values.dart';
 import 'package:productive_app/provider/locale_provider.dart';
 import 'package:productive_app/provider/synchronize_provider.dart';
+import 'package:productive_app/screen/task_details_loading_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../model/task.dart';
@@ -61,7 +62,7 @@ class _TaskWidgetState extends State<TaskWidget> {
           onTap: () {
             if (this.widget.task.isCanceled == null || !this.widget.task.isCanceled) {
               Navigator.of(context).pushNamed(
-                TaskDetailScreen.routeName,
+                TaskDetailsLoadingScreen.routeName,
                 arguments: this.widget.task,
               );
             }

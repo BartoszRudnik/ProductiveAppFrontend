@@ -668,10 +668,6 @@ class TaskProvider with ChangeNotifier {
           task.startDate = null;
         }
 
-        if (task.parentUuid != null) {
-          await Provider.of<AttachmentProvider>(context, listen: false).getDelegatedAttachmentsFromSingleUser([task.parentUuid]);
-        }
-
         final bool isNew = -1 == this.taskList.indexWhere((element) => element.uuid == task.uuid);
 
         this.taskList.add(task);

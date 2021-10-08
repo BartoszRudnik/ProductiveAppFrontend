@@ -5,11 +5,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TaskValidate {
   static Future<bool> validateTaskEdit(Task taskToEdit, Task originalTask, BuildContext context) async {
-    if (originalTask.localization != "INBOX" && taskToEdit.localization == "INBOX") {
-      await Dialogs.showWarningDialog(context, AppLocalizations.of(context).cannotBackToInbox);
-      return false;
-    }
-
     if (taskToEdit.localization == 'DELEGATED' && (taskToEdit.delegatedEmail == null || taskToEdit.delegatedEmail.length <= 1)) {
       await Dialogs.showWarningDialog(context, AppLocalizations.of(context).delegateMustHavePerson);
       return false;

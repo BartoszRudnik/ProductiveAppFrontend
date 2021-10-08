@@ -95,6 +95,50 @@ class AttachmentProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> getTaskAttachments(String taskUuid, String parentTaskUuid) async {
+    if (await InternetConnection.internetConnection()) {
+      final finalUrl = this._serverUrl + "attachment/getTaskAttachments/$taskUuid/$parentTaskUuid";
+
+      try {
+        final response = await http.get(finalUrl);
+        final responseBody = json.decode(response.body);
+
+        for (final element in responseBody) {
+          Attachment newAttachment = Attachment(
+            uuid: element['uuid'],
+            fileName: element['fileName'],
+            id: element['id'],
+            taskUuid: element['taskUuid'],
+            synchronized: true,
+          );
+
+          if (!await AttachmentDatabase.checkIfExists(newAttachment.uuid)) {
+            final file = await this.getFileBytes(newAttachment.uuid);
+
+            if (file != null) {
+              newAttachment.localFile = file;
+            }
+
+            newAttachment = await AttachmentDatabase.create(newAttachment, this.userMail);
+          }
+
+          if (this.attachments != null) {
+            final exist = this.attachments.firstWhere((element) => element.uuid == newAttachment.uuid, orElse: () => null);
+
+            if (exist == null) {
+              this.attachments.add(newAttachment);
+            }
+          }
+        }
+
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        throw (error);
+      }
+    }
+  }
+
   Future<List<Attachment>> _getDelegatedAttachments(List<String> delegatedTasksUuid) async {
     if (await InternetConnection.internetConnection()) {
       final finalUrl = this._serverUrl + 'attachment/getDelegatedAttachments';
