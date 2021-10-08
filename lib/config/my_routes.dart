@@ -13,7 +13,6 @@ import 'package:productive_app/screen/settings_screen.dart';
 import 'package:productive_app/screen/tabs_screen.dart';
 import 'package:productive_app/screen/tags_screen.dart';
 import 'package:productive_app/screen/task_details_loading_screen.dart';
-import 'package:productive_app/screen/task_details_screen.dart';
 import 'package:productive_app/screen/task_map.dart';
 import 'package:productive_app/screen/trash_screen.dart';
 import 'package:productive_app/widget/image_viewer.dart';
@@ -26,7 +25,6 @@ class MyRoutes {
     LoginScreen.routeName: (ctx) => LoginScreen(),
     EntryScreen.routeName: (ctx) => EntryScreen(),
     ResetPassword.routeName: (ctx) => ResetPassword(),
-    TaskDetailScreen.routeName: (ctx) => TaskDetailScreen(),
     NewPassword.routeName: (ctx) => NewPassword(),
     TagsScreen.routeName: (ctx) => TagsScreen(),
     CompletedScreen.routeName: (ctx) => CompletedScreen(),
