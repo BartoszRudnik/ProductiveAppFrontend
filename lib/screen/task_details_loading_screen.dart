@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:productive_app/model/task.dart';
 import 'package:productive_app/provider/attachment_provider.dart';
 import 'package:productive_app/screen/task_details_screen.dart';
+import 'package:productive_app/screen/task_details_screen_shimmer.dart';
 import 'package:provider/provider.dart';
 
 class TaskDetailsLoadingScreen extends StatefulWidget {
@@ -37,10 +38,10 @@ class _TaskDetailsLoadingScreenState extends State<TaskDetailsLoadingScreen> {
     return FutureBuilder(
       future: this._future,
       builder: (ctx, loadResult) => loadResult.connectionState == ConnectionState.waiting
-          ? Scaffold(
-              body: CircularProgressIndicator(),
-            )
-          : TaskDetailScreen(task: this._task),
+          ? TaskDetailsScreenShimmer()
+          : TaskDetailScreen(
+              task: this._task,
+            ),
     );
   }
 }
