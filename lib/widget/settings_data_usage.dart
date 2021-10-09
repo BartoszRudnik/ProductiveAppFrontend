@@ -29,7 +29,7 @@ class SettingsDataUsage extends StatelessWidget {
               alignment: Alignment(-1.1, 0),
               child: Center(
                 child: Text(
-                  'Data Usage',
+                  AppLocalizations.of(context).dataUsage,
                   style: TextStyle(fontSize: 20),
                 ),
               ),

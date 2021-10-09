@@ -4,12 +4,17 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:productive_app/provider/attachment_provider.dart';
+import 'package:productive_app/provider/task_provider.dart';
+import 'package:provider/provider.dart';
 
 class AttachmentDialog extends StatefulWidget {
   final List<File> files;
+  double initBytes = 0;
 
   AttachmentDialog({
     @required this.files,
+    this.initBytes,
   });
 
   @override
@@ -19,12 +24,13 @@ class AttachmentDialog extends StatefulWidget {
 class _AttachmentDialogState extends State<AttachmentDialog> {
   double actualBytes = 0.0;
   double maxBytes = 1000000.0;
+  double accountMaxBytes = 50000000.0;
 
   @override
   void initState() {
     super.initState();
 
-    this.actualBytes = 0.0;
+    this.actualBytes = this.widget.initBytes;
 
     if (this.widget.files.length > 0) {
       this.widget.files.forEach(
@@ -37,6 +43,9 @@ class _AttachmentDialogState extends State<AttachmentDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final delegatedTasksUuid = Provider.of<TaskProvider>(context).receivedTasksUuid();
+    final actualUsedBytes = Provider.of<AttachmentProvider>(context).getAttachmentsSize(delegatedTasksUuid);
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: AlertDialog(
@@ -81,7 +90,8 @@ class _AttachmentDialogState extends State<AttachmentDialog> {
                 (file) {
                   final newFile = File(file.path);
 
-                  if (this.actualBytes + newFile.lengthSync() <= this.maxBytes) {
+                  if (this.actualBytes + newFile.lengthSync() <= this.maxBytes &&
+                      actualUsedBytes + this.actualBytes + newFile.lengthSync() <= this.accountMaxBytes) {
                     this.actualBytes += newFile.lengthSync();
                     this.widget.files.add(newFile);
                   } else {
