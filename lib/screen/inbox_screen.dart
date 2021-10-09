@@ -62,7 +62,6 @@ class InboxScreen extends StatelessWidget {
                     await Future.wait(
                       [
                         taskProvider.fetchTasks(),
-                        Provider.of<AttachmentProvider>(context, listen: false).getAllDelegatedAttachments(taskProvider.delegatedTasksUuid),
                         Provider.of<LocationProvider>(context, listen: false).getLocations(),
                       ],
                     );

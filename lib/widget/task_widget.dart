@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_app/config/const_values.dart';
+import 'package:productive_app/provider/attachment_provider.dart';
 import 'package:productive_app/provider/locale_provider.dart';
 import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:productive_app/screen/task_details_loading_screen.dart';
@@ -141,17 +142,19 @@ class _TaskWidgetState extends State<TaskWidget> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             ElevatedButton(
-                              onPressed: () {
+                              onPressed: () async {
                                 if (!isArchived) {
                                   String newLocation = 'TRASH';
                                   this.widget.task.taskState = "COMPLETED";
 
-                                  Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
+                                  await Provider.of<TaskProvider>(context, listen: false).updateTask(this.widget.task, newLocation);
                                 } else {
                                   Provider.of<SynchronizeProvider>(context, listen: false).addTaskToDelete(
                                     this.widget.task.uuid,
                                   );
-                                  Provider.of<TaskProvider>(context, listen: false).deleteTask(this.widget.task.uuid, this.widget.task.id);
+                                  Provider.of<AttachmentProvider>(context, listen: false)
+                                      .deleteTasksAttachments(this.widget.task.uuid, this.widget.task.parentUuid);
+                                  await Provider.of<TaskProvider>(context, listen: false).deleteTask(this.widget.task.uuid, this.widget.task.id);
                                 }
 
                                 Navigator.of(context).pop(true);

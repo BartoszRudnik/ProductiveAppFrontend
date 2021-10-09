@@ -14,7 +14,6 @@ import 'package:uuid/uuid.dart';
 
 class AttachmentProvider with ChangeNotifier {
   List<Attachment> attachments;
-  List<Attachment> delegatedAttachments;
   List<Attachment> notSavedAttachments = [];
   String userMail;
   String authToken;
@@ -23,19 +22,34 @@ class AttachmentProvider with ChangeNotifier {
 
   AttachmentProvider({
     @required this.attachments,
-    @required this.delegatedAttachments,
     @required this.userMail,
     @required this.authToken,
   });
+
+  int getAttachmentsSize(List<String> receivedTasksUuid) {
+    int size = 0;
+
+    this.attachments.forEach(
+      (element) {
+        if (element.localFile != null && !receivedTasksUuid.contains(element.taskUuid)) {
+          size += element.localFile.lengthInBytes;
+        }
+      },
+    );
+
+    return size;
+  }
+
+  void deleteTasksAttachments(String taskUuid, String parentTaskUuid) {
+    this.attachments.removeWhere((element) => element.taskUuid == taskUuid || element.taskUuid == parentTaskUuid);
+
+    notifyListeners();
+  }
 
   Future<void> deleteFlaggedAttachments() async {
     this.attachments.where((element) => element.toDelete).toList().forEach((element) {
       this._deleteAttachment(element.uuid);
       this.attachments.remove(element);
-    });
-
-    this.delegatedAttachments.where((element) => element.toDelete).toList().forEach((element) {
-      this.delegatedAttachments.remove(element);
     });
 
     this.notSavedAttachments = [];
@@ -60,37 +74,10 @@ class AttachmentProvider with ChangeNotifier {
         element.toDelete = false;
       },
     );
-
-    this.delegatedAttachments.where((element) => element.toDelete).toList().forEach(
-      (element) {
-        element.toDelete = false;
-      },
-    );
   }
 
   void setToDelete(String attachmentUuid) {
     this.attachments.firstWhere((attachment) => attachment.uuid == attachmentUuid).toDelete = true;
-    this.delegatedAttachments.firstWhere((attachment) => attachment.uuid == attachmentUuid).toDelete = true;
-
-    notifyListeners();
-  }
-
-  Future<void> getDelegatedAttachmentsFromSingleUser(List<String> delegatedTasksUuid) async {
-    final attachments = await this._getDelegatedAttachments(delegatedTasksUuid);
-
-    if (attachments.length > 0) {
-      this.delegatedAttachments.addAll(attachments);
-    }
-
-    notifyListeners();
-  }
-
-  Future<void> getAllDelegatedAttachments(List<String> delegatedTasksUuid) async {
-    final attachments = await this._getDelegatedAttachments(delegatedTasksUuid);
-
-    if (attachments.length > 0) {
-      this.delegatedAttachments = attachments;
-    }
 
     notifyListeners();
   }
@@ -346,7 +333,7 @@ class AttachmentProvider with ChangeNotifier {
 
   Future<File> loadAttachment(String uuid) async {
     try {
-      final allAttachments = this.attachments + this.delegatedAttachments;
+      final allAttachments = this.attachments;
       final choosenAttachment = allAttachments.firstWhere((element) => element.uuid == uuid);
 
       if (choosenAttachment.localFile == null) {
@@ -362,7 +349,7 @@ class AttachmentProvider with ChangeNotifier {
   }
 
   Future<File> _storeFile(List<int> bytes, String uuid) async {
-    final allAttachments = this.attachments + this.delegatedAttachments;
+    final allAttachments = this.attachments;
 
     String fileName = allAttachments.firstWhere((element) => element.uuid == uuid).fileName;
 
@@ -376,7 +363,6 @@ class AttachmentProvider with ChangeNotifier {
   }
 
   int numberOfAttachmentsToDelete(taskUuid, parentTaskUuid) {
-    return this.attachments.where((element) => element.taskUuid == taskUuid && element.toDelete).length +
-        this.delegatedAttachments.where((element) => element.taskUuid == parentTaskUuid && element.toDelete).length;
+    return this.attachments.where((element) => element.taskUuid == taskUuid && element.toDelete).length;
   }
 }
