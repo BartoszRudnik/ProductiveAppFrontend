@@ -509,67 +509,75 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
               key: this._formKey,
               child: Column(
                 children: [
-                  TextFormField(
-                    initialValue: this.taskToEdit == null ? '' : this.taskToEdit.title,
-                    style: TextStyle(fontSize: 25),
-                    maxLines: null,
-                    onSaved: (value) {
-                      taskToEdit.title = value;
-                    },
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return AppLocalizations.of(context).taskTitleEmpty;
-                      }
-                      return null;
-                    },
-                  ),
-                  TaskDetailsDescription(
-                    description: this.taskToEdit.description,
-                    descriptionFocus: this._descriptionFocus,
-                    isDescriptionInitial: this._isDescriptionInitial,
-                    isFocused: this._isFocused,
-                    onDescriptionChanged: this.onDescriptionChanged,
-                  ),
-                  TaskDetailsState(
-                    taskState: this.taskToEdit.taskState,
-                    setTaskState: this.setTaskState,
-                    states: states,
-                  ),
-                  TaskDetailsAttributes(
-                    taskToEdit: taskToEdit,
-                    priorities: priorities,
-                    setDelegatedEmail: setDelegatedEmail,
-                    setPriority: setPriority,
-                  ),
+                  if (this.taskToEdit != null)
+                    TextFormField(
+                      initialValue: this.taskToEdit.title,
+                      style: TextStyle(fontSize: 25),
+                      maxLines: null,
+                      onSaved: (value) {
+                        taskToEdit.title = value;
+                      },
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return AppLocalizations.of(context).taskTitleEmpty;
+                        }
+                        return null;
+                      },
+                    ),
+                  if (this.taskToEdit != null)
+                    TaskDetailsDescription(
+                      description: this.taskToEdit.description,
+                      descriptionFocus: this._descriptionFocus,
+                      isDescriptionInitial: this._isDescriptionInitial,
+                      isFocused: this._isFocused,
+                      onDescriptionChanged: this.onDescriptionChanged,
+                    ),
+                  if (this.taskToEdit != null)
+                    TaskDetailsState(
+                      taskState: this.taskToEdit.taskState,
+                      setTaskState: this.setTaskState,
+                      states: states,
+                    ),
+                  if (this.taskToEdit != null)
+                    TaskDetailsAttributes(
+                      taskToEdit: taskToEdit,
+                      priorities: priorities,
+                      setDelegatedEmail: setDelegatedEmail,
+                      setPriority: setPriority,
+                    ),
                   SizedBox(
                     height: 15,
                   ),
-                  TaskDetailsMap(
-                    setLocation: this.setLocation,
-                    setNotificationLocalization: this.setNotificationLocalization,
-                    taskToEdit: taskToEdit,
-                    originalTask: originalTask,
-                    latitude: latitude,
-                    longitude: longitude,
-                    locationChanged: this._locationChanged,
-                  ),
-                  TaskDetailsDates(
-                    selectEndDate: this.selectEndDate,
-                    selectStartDate: this.selectStartDate,
-                    taskToEdit: taskToEdit,
-                    endTime: endTime,
-                    startTime: startTime,
-                    selectEndTime: this.selectEndTime,
-                    selectStartTime: this.selectStartTime,
-                  ),
-                  TaskDetailsTags(
-                    tags: this.taskToEdit.tags,
-                    editTags: this.editTags,
-                  ),
-                  TaskDetailsAttachments(
-                    parentUuid: taskToEdit.parentUuid,
-                    taskUuid: taskToEdit.uuid,
-                  ),
+                  if (this.taskToEdit != null)
+                    TaskDetailsMap(
+                      setLocation: this.setLocation,
+                      setNotificationLocalization: this.setNotificationLocalization,
+                      taskToEdit: taskToEdit,
+                      originalTask: originalTask,
+                      latitude: latitude,
+                      longitude: longitude,
+                      locationChanged: this._locationChanged,
+                    ),
+                  if (this.taskToEdit != null)
+                    TaskDetailsDates(
+                      selectEndDate: this.selectEndDate,
+                      selectStartDate: this.selectStartDate,
+                      taskToEdit: taskToEdit,
+                      endTime: endTime,
+                      startTime: startTime,
+                      selectEndTime: this.selectEndTime,
+                      selectStartTime: this.selectStartTime,
+                    ),
+                  if (this.taskToEdit != null)
+                    TaskDetailsTags(
+                      tags: this.taskToEdit.tags,
+                      editTags: this.editTags,
+                    ),
+                  if (this.taskToEdit != null)
+                    TaskDetailsAttachments(
+                      parentUuid: taskToEdit.parentUuid,
+                      taskUuid: taskToEdit.uuid,
+                    ),
                 ],
               ),
             ),

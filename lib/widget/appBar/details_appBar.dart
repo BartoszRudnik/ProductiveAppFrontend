@@ -8,7 +8,11 @@ class DetailsAppBar extends StatefulWidget with PreferredSizeWidget {
   final String title;
   final IconButton leadingButton;
   final Task task;
-  DetailsAppBar({@required this.title, this.leadingButton, @required this.task});
+  DetailsAppBar({
+    @required this.title,
+    this.leadingButton,
+    @required this.task,
+  });
 
   @override
   Size get preferredSize => Size.fromHeight(50);
@@ -20,8 +24,8 @@ class DetailsAppBar extends StatefulWidget with PreferredSizeWidget {
 class _DetailsAppBarState extends State<DetailsAppBar> {
   @override
   Widget build(BuildContext context) {
-    if (widget.task.isDelegated == null) {
-      widget.task.isDelegated = false;
+    if (this.widget.task != null && this.widget.task.isDelegated == null) {
+      this.widget.task.isDelegated = false;
     }
     return AppBar(
       elevation: 0,
@@ -40,16 +44,16 @@ class _DetailsAppBarState extends State<DetailsAppBar> {
       backwardsCompatibility: false,
       leading: (widget.leadingButton != null) ? widget.leadingButton : null,
       actions: <Widget>[
-        if (this.widget.task.childUuid != null || this.widget.task.isDelegated)
+        if (this.widget.task != null && (this.widget.task.childUuid != null || this.widget.task.isDelegated))
           PopupMenuButton(
             onSelected: (value) {
               if (value == 'related') {
                 Navigator.of(context).pushNamed(RelatedTaskInfoScreen.routeName,
-                    arguments: this.widget.task.childUuid != null ? this.widget.task.childUuid : this.widget.task.parentUuid);
+                    arguments: this.widget.task != null && this.widget.task.childUuid != null ? this.widget.task.childUuid : this.widget.task.parentUuid);
               }
             },
             icon: Icon(Icons.more_vert),
-            itemBuilder: (this.widget.task.childUuid != null || this.widget.task.isDelegated)
+            itemBuilder: (this.widget.task != null && (this.widget.task.childUuid != null || this.widget.task.isDelegated))
                 ? (_) => [
                       PopupMenuItem(
                         child: Text(AppLocalizations.of(context).relatedTask),

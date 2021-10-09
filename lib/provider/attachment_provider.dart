@@ -14,7 +14,6 @@ import 'package:uuid/uuid.dart';
 
 class AttachmentProvider with ChangeNotifier {
   List<Attachment> attachments;
-  List<Attachment> delegatedAttachments;
   List<Attachment> notSavedAttachments = [];
   String userMail;
   String authToken;
@@ -23,19 +22,48 @@ class AttachmentProvider with ChangeNotifier {
 
   AttachmentProvider({
     @required this.attachments,
-    @required this.delegatedAttachments,
     @required this.userMail,
     @required this.authToken,
   });
+
+  int taskAttachmentsSize(String taskUuid) {
+    int size = 0;
+
+    this.attachments.where((element) => element.taskUuid == taskUuid && !element.toDelete).forEach(
+      (element) {
+        if (element.localFile != null) {
+          size += element.localFile.lengthInBytes;
+        }
+      },
+    );
+
+    return size;
+  }
+
+  int getAttachmentsSize(List<String> receivedTasksUuid) {
+    int size = 0;
+
+    this.attachments.forEach(
+      (element) {
+        if (element.localFile != null && !receivedTasksUuid.contains(element.taskUuid)) {
+          size += element.localFile.lengthInBytes;
+        }
+      },
+    );
+
+    return size;
+  }
+
+  void deleteTasksAttachments(String taskUuid, String parentTaskUuid) {
+    this.attachments.removeWhere((element) => element.taskUuid == taskUuid || element.taskUuid == parentTaskUuid);
+
+    notifyListeners();
+  }
 
   Future<void> deleteFlaggedAttachments() async {
     this.attachments.where((element) => element.toDelete).toList().forEach((element) {
       this._deleteAttachment(element.uuid);
       this.attachments.remove(element);
-    });
-
-    this.delegatedAttachments.where((element) => element.toDelete).toList().forEach((element) {
-      this.delegatedAttachments.remove(element);
     });
 
     this.notSavedAttachments = [];
@@ -60,37 +88,10 @@ class AttachmentProvider with ChangeNotifier {
         element.toDelete = false;
       },
     );
-
-    this.delegatedAttachments.where((element) => element.toDelete).toList().forEach(
-      (element) {
-        element.toDelete = false;
-      },
-    );
   }
 
   void setToDelete(String attachmentUuid) {
     this.attachments.firstWhere((attachment) => attachment.uuid == attachmentUuid).toDelete = true;
-    this.delegatedAttachments.firstWhere((attachment) => attachment.uuid == attachmentUuid).toDelete = true;
-
-    notifyListeners();
-  }
-
-  Future<void> getDelegatedAttachmentsFromSingleUser(List<String> delegatedTasksUuid) async {
-    final attachments = await this._getDelegatedAttachments(delegatedTasksUuid);
-
-    if (attachments.length > 0) {
-      this.delegatedAttachments.addAll(attachments);
-    }
-
-    notifyListeners();
-  }
-
-  Future<void> getAllDelegatedAttachments(List<String> delegatedTasksUuid) async {
-    final attachments = await this._getDelegatedAttachments(delegatedTasksUuid);
-
-    if (attachments.length > 0) {
-      this.delegatedAttachments = attachments;
-    }
 
     notifyListeners();
   }
@@ -139,57 +140,6 @@ class AttachmentProvider with ChangeNotifier {
     }
   }
 
-  Future<List<Attachment>> _getDelegatedAttachments(List<String> delegatedTasksUuid) async {
-    if (await InternetConnection.internetConnection()) {
-      final finalUrl = this._serverUrl + 'attachment/getDelegatedAttachments';
-
-      List<Attachment> loadedAttachments = [];
-      try {
-        final response = await http.post(
-          finalUrl,
-          body: json.encode({
-            "tasksUuid": delegatedTasksUuid,
-          }),
-          headers: {
-            'content-type': 'application/json',
-            'accept': 'application/json',
-          },
-        );
-
-        final responseBody = json.decode(response.body);
-
-        for (final element in responseBody) {
-          Attachment newAttachment = Attachment(
-            uuid: element['uuid'],
-            fileName: element['fileName'],
-            id: element['id'],
-            taskUuid: element['taskUuid'],
-            synchronized: true,
-          );
-
-          if (!await AttachmentDatabase.checkIfExists(newAttachment.uuid)) {
-            final file = await this.getFileBytes(newAttachment.uuid);
-
-            if (file != null) {
-              newAttachment.localFile = file;
-            }
-
-            newAttachment = await AttachmentDatabase.create(newAttachment, this.userMail);
-          }
-
-          loadedAttachments.add(newAttachment);
-        }
-
-        return loadedAttachments;
-      } catch (error) {
-        print(error);
-        throw (error);
-      }
-    } else {
-      return [];
-    }
-  }
-
   void notify() {
     notifyListeners();
   }
@@ -197,45 +147,6 @@ class AttachmentProvider with ChangeNotifier {
   Future<void> getAttachmentsOffline() async {
     try {
       this.attachments = await AttachmentDatabase.readAll(this.userMail);
-    } catch (error) {
-      print(error);
-      throw (error);
-    }
-  }
-
-  Future<void> getAttachments() async {
-    final finalUrl = this._serverUrl + 'attachment/getUserAttachments/${this.userMail}';
-
-    try {
-      final response = await http.get(finalUrl);
-
-      final responseBody = json.decode(response.body);
-
-      if (responseBody is List || !responseBody.containsKey("error")) {
-        for (final element in responseBody) {
-          Attachment newAttachment = Attachment(
-            uuid: element['uuid'],
-            fileName: element['fileName'],
-            id: element['id'],
-            taskUuid: element['taskUuid'],
-            synchronized: true,
-          );
-
-          if (!await AttachmentDatabase.checkIfExists(newAttachment.uuid)) {
-            final file = await this.getFileBytes(newAttachment.uuid);
-
-            if (file != null) {
-              newAttachment.localFile = file;
-            }
-
-            newAttachment = await AttachmentDatabase.create(newAttachment, this.userMail);
-          }
-        }
-
-        this.attachments = await AttachmentDatabase.readAll(this.userMail);
-
-        notifyListeners();
-      }
     } catch (error) {
       print(error);
       throw (error);
@@ -264,13 +175,49 @@ class AttachmentProvider with ChangeNotifier {
   }
 
   Future<void> setAttachments(List<File> attachments, String taskUuid, bool editMode) async {
-    attachments.forEach(
-      (attachment) async {
-        final attachmentBytes = await attachment.readAsBytes();
-        final uuid = Uuid();
+    if (attachments != null) {
+      attachments.forEach(
+        (attachment) async {
+          final attachmentBytes = await attachment.readAsBytes();
+          final uuid = Uuid();
 
-        if (await InternetConnection.internetConnection()) {
-          try {
+          if (await InternetConnection.internetConnection()) {
+            try {
+              Attachment newAttachment = Attachment(
+                uuid: uuid.v1(),
+                taskUuid: taskUuid,
+                fileName: basename(attachment.path),
+                localFile: attachmentBytes,
+              );
+
+              final fileName = basename(attachment.path);
+              final uri = Uri.parse(this._serverUrl + 'attachment/addAttachment/${this.userMail}/$taskUuid/$fileName/${newAttachment.uuid}');
+
+              final request = http.MultipartRequest('POST', uri);
+              final multipartFile = await http.MultipartFile.fromPath('multipartFile', attachment.path, filename: attachment.path);
+
+              request.files.add(multipartFile);
+
+              final response = await request.send();
+
+              final respStr = await response.stream.bytesToString();
+
+              newAttachment.id = int.parse(respStr);
+              newAttachment.synchronized = true;
+              newAttachment = await AttachmentDatabase.create(newAttachment, this.userMail);
+
+              this.attachments.add(newAttachment);
+
+              if (editMode) {
+                this.notSavedAttachments.add(newAttachment);
+              }
+
+              notifyListeners();
+            } catch (error) {
+              print(error);
+              throw (error);
+            }
+          } else {
             Attachment newAttachment = Attachment(
               uuid: uuid.v1(),
               taskUuid: taskUuid,
@@ -278,20 +225,6 @@ class AttachmentProvider with ChangeNotifier {
               localFile: attachmentBytes,
             );
 
-            final fileName = basename(attachment.path);
-            final uri = Uri.parse(this._serverUrl + 'attachment/addAttachment/${this.userMail}/$taskUuid/$fileName/${newAttachment.uuid}');
-
-            final request = http.MultipartRequest('POST', uri);
-            final multipartFile = await http.MultipartFile.fromPath('multipartFile', attachment.path, filename: attachment.path);
-
-            request.files.add(multipartFile);
-
-            final response = await request.send();
-
-            final respStr = await response.stream.bytesToString();
-
-            newAttachment.id = int.parse(respStr);
-            newAttachment.synchronized = true;
             newAttachment = await AttachmentDatabase.create(newAttachment, this.userMail);
 
             this.attachments.add(newAttachment);
@@ -301,30 +234,10 @@ class AttachmentProvider with ChangeNotifier {
             }
 
             notifyListeners();
-          } catch (error) {
-            print(error);
-            throw (error);
           }
-        } else {
-          Attachment newAttachment = Attachment(
-            uuid: uuid.v1(),
-            taskUuid: taskUuid,
-            fileName: basename(attachment.path),
-            localFile: attachmentBytes,
-          );
-
-          newAttachment = await AttachmentDatabase.create(newAttachment, this.userMail);
-
-          this.attachments.add(newAttachment);
-
-          if (editMode) {
-            this.notSavedAttachments.add(newAttachment);
-          }
-
-          notifyListeners();
-        }
-      },
-    );
+        },
+      );
+    }
   }
 
   Future<Uint8List> getFileBytes(String uuid) async {
@@ -346,7 +259,7 @@ class AttachmentProvider with ChangeNotifier {
 
   Future<File> loadAttachment(String uuid) async {
     try {
-      final allAttachments = this.attachments + this.delegatedAttachments;
+      final allAttachments = this.attachments;
       final choosenAttachment = allAttachments.firstWhere((element) => element.uuid == uuid);
 
       if (choosenAttachment.localFile == null) {
@@ -362,7 +275,7 @@ class AttachmentProvider with ChangeNotifier {
   }
 
   Future<File> _storeFile(List<int> bytes, String uuid) async {
-    final allAttachments = this.attachments + this.delegatedAttachments;
+    final allAttachments = this.attachments;
 
     String fileName = allAttachments.firstWhere((element) => element.uuid == uuid).fileName;
 
@@ -376,7 +289,6 @@ class AttachmentProvider with ChangeNotifier {
   }
 
   int numberOfAttachmentsToDelete(taskUuid, parentTaskUuid) {
-    return this.attachments.where((element) => element.taskUuid == taskUuid && element.toDelete).length +
-        this.delegatedAttachments.where((element) => element.taskUuid == parentTaskUuid && element.toDelete).length;
+    return this.attachments.where((element) => element.taskUuid == taskUuid && element.toDelete).length;
   }
 }

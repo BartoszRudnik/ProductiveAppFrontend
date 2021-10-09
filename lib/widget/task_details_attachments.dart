@@ -29,6 +29,8 @@ class TaskDetailsAttachments extends StatelessWidget {
       Provider.of<AttachmentProvider>(context).attachments.where((attachment) => attachment.taskUuid == parentUuid && !attachment.toDelete).toList(),
     );
 
+    final actualTaskAttachmentsSize = Provider.of<AttachmentProvider>(context).taskAttachmentsSize(this.taskUuid);
+
     return Column(
       children: [
         ListTile(
@@ -134,7 +136,7 @@ class TaskDetailsAttachments extends StatelessWidget {
                       final newAttachments = await showDialog(
                           context: context,
                           builder: (context) {
-                            return AttachmentDialog(files: []);
+                            return AttachmentDialog(files: [], initBytes: actualTaskAttachmentsSize.toDouble());
                           });
 
                       Provider.of<AttachmentProvider>(context, listen: false).setAttachments(newAttachments, this.taskUuid, true);

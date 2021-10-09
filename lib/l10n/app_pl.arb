@@ -373,5 +373,6 @@
   "askingNotificationPermission": " prosi o dostęp do twojej aktywności",
   "acceptedNotificationPermission": " przyznał Ci dostęp do swojej aktywności",
   "revokedNotificationPermission": " odebrał Ci dostęp do swojej aktywności",
-  "version": "Wersja aplikacji" 
+  "version": "Wersja aplikacji",
+  "dataUsage": "Pojemność załączników" 
 }

@@ -6,7 +6,6 @@ import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:productive_app/db/task_database.dart';
 import 'package:productive_app/model/location.dart';
-import 'package:productive_app/provider/attachment_provider.dart';
 import 'package:productive_app/provider/location_provider.dart';
 import 'package:productive_app/utils/internet_connection.dart';
 import 'package:provider/provider.dart';
@@ -182,6 +181,10 @@ class TaskProvider with ChangeNotifier {
 
   List<String> get localizations {
     return [...this._localizations];
+  }
+
+  List<String> receivedTasksUuid() {
+    return this.tasks.where((element) => element.parentUuid != null).map((e) => e.parentUuid).toList();
   }
 
   void clearLocationFromTasks(String locationUuid) {

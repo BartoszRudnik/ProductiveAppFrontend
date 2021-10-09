@@ -69,10 +69,6 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
 
-    Provider.of<DelegateProvider>(context, listen: false).subscribe(context);
-    Provider.of<DelegateProvider>(context, listen: false).subscribeCollaborators(context);
-    Provider.of<DelegateProvider>(context, listen: false).subscribePermissions(context);
-
     this.future = this.loadData(context);
 
     Notifications.initLocalization();
@@ -81,11 +77,17 @@ class _MainScreenState extends State<MainScreen> {
     listenNotifications();
     listenInternetChanges(context);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) => Data.notify(context));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Data.notify(context);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<DelegateProvider>(context, listen: false).subscribe(context);
+    Provider.of<DelegateProvider>(context, listen: false).subscribeCollaborators(context);
+    Provider.of<DelegateProvider>(context, listen: false).subscribePermissions(context);
+
     return FutureBuilder(
       future: this.future,
       builder: (ctx, loadResult) => loadResult.connectionState == ConnectionState.waiting
