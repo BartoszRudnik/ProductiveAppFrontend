@@ -479,14 +479,14 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> signUp(String email, String password) async {
     if (await InternetConnection.internetConnection()) {
-      this._authenticate(email, password, 'registration');
+      this._authenticate(email.trim(), password, 'registration');
       this._user = await UserDatabase.create(this._user);
     }
   }
 
   Future<void> signIn(String email, String password) async {
     if (await InternetConnection.internetConnection()) {
-      return this._authenticate(email, password, 'login');
+      return this._authenticate(email.trim(), password, 'login');
     }
   }
 

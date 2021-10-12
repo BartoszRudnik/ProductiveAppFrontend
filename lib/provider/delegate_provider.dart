@@ -785,7 +785,6 @@ class DelegateProvider with ChangeNotifier {
         }
 
         final uuid = Uuid();
-
         final uuidCode = uuid.v1();
 
         final response = await http.post(
@@ -793,7 +792,7 @@ class DelegateProvider with ChangeNotifier {
           body: json.encode(
             {
               'userEmail': this.userEmail,
-              'collaboratorEmail': newCollaborator,
+              'collaboratorEmail': newCollaborator.trim(),
               'uuid': uuidCode,
             },
           ),
