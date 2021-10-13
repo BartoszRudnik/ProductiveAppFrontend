@@ -474,7 +474,7 @@ class TaskProvider with ChangeNotifier {
               'localization': newLocation,
               'position': task.position,
               'delegatedEmail': task.delegatedEmail,
-              'isCanceled': task.isCanceled,
+              'canceled': task.isCanceled,
               'localizationUuid': task.notificationLocalizationUuid,
               'localizationRadius': task.notificationLocalizationRadius,
               'notificationOnEnter': task.notificationOnEnter,
@@ -569,7 +569,7 @@ class TaskProvider with ChangeNotifier {
               'localization': newLocation,
               'position': task.position,
               'delegatedEmail': task.delegatedEmail,
-              'isCanceled': task.isCanceled,
+              'canceled': task.isCanceled,
               'localizationUuid': task.notificationLocalizationUuid,
               'localizationRadius': task.notificationLocalizationRadius,
               'notificationOnEnter': task.notificationOnEnter,
@@ -1058,8 +1058,6 @@ class TaskProvider with ChangeNotifier {
         final response = await http.get(url);
 
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
-
-        print(responseBody);
 
         for (final element in responseBody) {
           List<Tag> taskTags = [];

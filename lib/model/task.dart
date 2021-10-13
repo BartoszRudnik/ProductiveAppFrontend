@@ -44,8 +44,8 @@ class TaskFields {
   static final String endDate = "endDate";
   static final String tags = "tags";
   static final String done = "done";
-  static final String isDelegated = "isDelegated";
-  static final String isCanceled = "isCanceled";
+  static final String isDelegated = "delegated";
+  static final String isCanceled = "canceled";
   static final String parentUuid = "parentUuid";
   static final String childUuid = "childUuid";
   static final String notificationLocalizationUuid = "notificationLocalizationUuid";
@@ -246,9 +246,6 @@ class Task {
           : this.done
               ? 1
               : 0,
-      TaskFields.localization: this.localization ?? null,
-      TaskFields.position: this.position ?? null,
-      TaskFields.delegatedEmail: this.delegatedEmail ?? null,
       TaskFields.isDelegated: this.isDelegated == null
           ? 0
           : this.isDelegated
@@ -259,6 +256,9 @@ class Task {
           : this.isCanceled
               ? 1
               : 0,
+      TaskFields.localization: this.localization ?? null,
+      TaskFields.position: this.position ?? null,
+      TaskFields.delegatedEmail: this.delegatedEmail ?? null,
       TaskFields.taskStatus: this.taskStatus ?? null,
       TaskFields.supervisorEmail: this.supervisorEmail ?? null,
       TaskFields.parentUuid: this.parentUuid ?? null,
