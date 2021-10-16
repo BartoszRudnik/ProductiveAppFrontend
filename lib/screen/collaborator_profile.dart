@@ -12,17 +12,17 @@ import '../widget/appBar/collaborator_profile_appBar.dart';
 import '../widget/switch_list_tile/grant_access_list_tile.dart';
 
 class CollaboratorProfile extends StatelessWidget {
-  final int collaboratorId;
+  final String collaboratorUuid;
 
   CollaboratorProfile({
-    @required this.collaboratorId,
+    @required this.collaboratorUuid,
   });
 
-  String _serverUrl = GlobalConfiguration().getValue("serverUrl");
+  final String _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
   @override
   Widget build(BuildContext context) {
-    final Collaborator collaborator = Provider.of<DelegateProvider>(context).accepted.firstWhere((element) => element.id == this.collaboratorId);
+    final Collaborator collaborator = Provider.of<DelegateProvider>(context).accepted.firstWhere((element) => element.uuid == this.collaboratorUuid);
 
     return Scaffold(
       appBar: CollaboratorProfileAppBar(),
