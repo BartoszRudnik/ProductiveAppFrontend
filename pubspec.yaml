@@ -24,8 +24,16 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_localizations:
-    sdk: flutter
-    
+    sdk: flutter  
+  
+  google_sign_in: any  
+
+  flutter_background_geolocation: any  
+  flutter_local_notifications: any  
+  file_picker: any
+  workmanager: any
+
+  google_maps_flutter: any  
   http: any
   provider: any
   shared_preferences: any
@@ -33,18 +41,12 @@ dependencies:
   global_configuration: any
   badges: any
   image_picker: any
-  google_maps_flutter: any  
-  geocoding: any 
-  flutter_map: any    
-  flutter_background_geolocation: any  
-  flutter_local_notifications: any
+  geocoding: any  
   flutter_launcher_icons: any
   infinite_scroll_pagination: any
-  rxdart: any
-  google_sign_in: any
+  rxdart: any  
   font_awesome_flutter: any
-  shimmer: any
-  file_picker: any
+  shimmer: any  
   path_provider: any
   flutter_pdfview: any
   mime: any
@@ -54,8 +56,7 @@ dependencies:
   internet_connection_checker: any
   connectivity_plus: any
   sqflite: any
-  uuid: any
-  workmanager: any  
+  uuid: any    
   introduction_screen: any
   package_info_plus: any 
  
