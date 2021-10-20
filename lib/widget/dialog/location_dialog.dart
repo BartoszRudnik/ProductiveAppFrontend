@@ -34,6 +34,7 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
     super.initState();
 
     this._loadMapStyles();
+    this.getUserLocation();
   }
 
   final _startPosition = CameraPosition(
@@ -73,22 +74,26 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
   }
 
   void getUserLocation() async {
-    if (this.widget.choosenLocation.latitude == 0.0 && this.widget.choosenLocation.longitude == 0.0) {
-      bg.Location location = await bg.BackgroundGeolocation.getCurrentPosition(
-        timeout: 3,
-        maximumAge: 10000,
-        desiredAccuracy: 100,
-        samples: 3,
-      );
+    try {
+      if (this.widget.choosenLocation.latitude == 0.0 && this.widget.choosenLocation.longitude == 0.0) {
+        bg.Location location = await bg.BackgroundGeolocation.getCurrentPosition(
+          timeout: 3,
+          maximumAge: 10000,
+          desiredAccuracy: 100,
+          samples: 3,
+        );
 
-      setState(() {
-        this.widget.choosenLocation.latitude = location.coords.latitude;
-        this.widget.choosenLocation.longitude = location.coords.longitude;
-        this.getAddress(location.coords.latitude, location.coords.longitude);
-      });
+        setState(() {
+          this.widget.choosenLocation.latitude = location.coords.latitude;
+          this.widget.choosenLocation.longitude = location.coords.longitude;
+          this.getAddress(location.coords.latitude, location.coords.longitude);
+        });
 
-      LatLng point = LatLng(this.widget.choosenLocation.latitude, this.widget.choosenLocation.longitude);
-      this._mapMove(point, 15);
+        LatLng point = LatLng(this.widget.choosenLocation.latitude, this.widget.choosenLocation.longitude);
+        this._mapMove(point, 15);
+      }
+    } catch (error) {
+      this._mapMove(LatLng(52, 21), 4);
     }
   }
 
@@ -116,8 +121,6 @@ class LocationDialogState extends State<LocationDialog> with TickerProviderState
 
   @override
   Widget build(BuildContext context) {
-    this.getUserLocation();
-
     return StatefulBuilder(
       builder: (context, setState) {
         return AlertDialog(

@@ -113,14 +113,18 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
         );
 
     if (this.tasks.length == 0) {
-      bg.Location location = await bg.BackgroundGeolocation.getCurrentPosition(
-        timeout: 3,
-        maximumAge: 10000,
-        desiredAccuracy: 100,
-        samples: 3,
-      );
+      try {
+        bg.Location location = await bg.BackgroundGeolocation.getCurrentPosition(
+          timeout: 3,
+          maximumAge: 10000,
+          desiredAccuracy: 100,
+          samples: 3,
+        );
 
-      this._mapMove(LatLng(location.coords.latitude, location.coords.longitude), 15);
+        this._mapMove(LatLng(location.coords.latitude, location.coords.longitude), 15);
+      } catch (error) {
+        this._mapMove(LatLng(52, 21), 4);
+      }
     } else {
       final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.tasks[0].notificationLocalizationUuid);
       final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.tasks[0].notificationLocalizationUuid);
