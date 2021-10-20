@@ -11,23 +11,14 @@ import '../provider/delegate_provider.dart';
 import '../widget/appBar/collaborator_profile_appBar.dart';
 import '../widget/switch_list_tile/grant_access_list_tile.dart';
 
-class CollaboratorProfile extends StatelessWidget {
-  final String collaboratorUuid;
-
-  CollaboratorProfile({
-    @required this.collaboratorUuid,
-  });
+class CollaboratorReceivedProfile extends StatelessWidget {
+  static String routeName = "/collaboratorReceivedProfile";
 
   final String _serverUrl = GlobalConfiguration().getValue("serverUrl");
 
   @override
   Widget build(BuildContext context) {
-    Collaborator collaborator =
-        Provider.of<DelegateProvider>(context).accepted.firstWhere((element) => element.uuid == this.collaboratorUuid, orElse: () => null);
-
-    if (collaborator == null) {
-      collaborator = Provider.of<DelegateProvider>(context).received.firstWhere((element) => element.uuid == this.collaboratorUuid);
-    }
+    Collaborator collaborator = ModalRoute.of(context).settings.arguments as Collaborator;
 
     return Scaffold(
       appBar: CollaboratorProfileAppBar(),
@@ -129,61 +120,6 @@ class CollaboratorProfile extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    if (collaborator.isAskingForPermission && !collaborator.sentPermission)
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColorDark,
-                          border: Border.all(
-                            color: Colors.grey.withOpacity(0.8),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Expanded(
-                              child: AutoSizeText(
-                                AppLocalizations.of(context).isAskingForPermission,
-                                maxLines: 2,
-                                minFontSize: 10,
-                                maxFontSize: 16,
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.cancel_outlined),
-                              onPressed: () {
-                                Provider.of<DelegateProvider>(context, listen: false).declineAskForPermission(collaborator.email, collaborator.uuid);
-                              },
-                            )
-                          ],
-                        ),
-                      ),
-                    if (collaborator.isAskingForPermission)
-                      SizedBox(
-                        height: 10,
-                      ),
-                    GrantAccessListTile(
-                      uuid: collaborator.uuid,
-                      email: collaborator.email,
-                      grantAccess: collaborator.sentPermission,
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 10),
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColorLight,
-                  border: Border.all(
-                    color: Theme.of(context).primaryColorDark,
-                    width: 2.5,
-                  ),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
                     ElevatedButton(
                       onPressed: () {
                         return showDialog(
@@ -191,14 +127,14 @@ class CollaboratorProfile extends StatelessWidget {
                           builder: (context) => AlertDialog(
                             title: Center(
                               child: Text(
-                                AppLocalizations.of(context).delete,
+                                AppLocalizations.of(context).decline,
                                 style: Theme.of(context).textTheme.headline3,
                               ),
                             ),
                             content: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(AppLocalizations.of(context).areYouSureDeleteCollab),
+                                Text(AppLocalizations.of(context).areYouSureDeclineInvitation),
                                 SizedBox(height: 10),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -206,7 +142,7 @@ class CollaboratorProfile extends StatelessWidget {
                                     ElevatedButton(
                                         onPressed: () async {
                                           Provider.of<SynchronizeProvider>(context, listen: false).addCollaboratorToDelete(collaborator.uuid);
-                                          await Provider.of<DelegateProvider>(context, listen: false).deleteCollaborator(collaborator.uuid);
+                                          await Provider.of<DelegateProvider>(context, listen: false).declineInvitation(collaborator.uuid);
                                           Navigator.of(context).pop(true);
                                           Navigator.of(context).pop(true);
                                         },
@@ -224,7 +160,7 @@ class CollaboratorProfile extends StatelessWidget {
                           ),
                         );
                       },
-                      child: Text(AppLocalizations.of(context).deleteFromCollaborators),
+                      child: Text(AppLocalizations.of(context).declineInvitation),
                     ),
                   ],
                 ),

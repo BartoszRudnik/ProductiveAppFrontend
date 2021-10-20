@@ -1,4 +1,6 @@
+import 'package:productive_app/screen/collaborator_profile.dart';
 import 'package:productive_app/screen/collaborator_profile_tabs.dart';
+import 'package:productive_app/screen/collaborator_received_profile.dart';
 import 'package:productive_app/screen/collaborators_screen.dart';
 import 'package:productive_app/screen/completed_screen.dart';
 import 'package:productive_app/screen/entry_screen.dart';
@@ -39,5 +41,6 @@ class MyRoutes {
     PDFViewer.routeName: (ctx) => PDFViewer(),
     ImageViewer.routeName: (ctx) => ImageViewer(),
     TaskDetailsLoadingScreen.routeName: (ctx) => TaskDetailsLoadingScreen(),
+    CollaboratorReceivedProfile.routeName: (ctx) => CollaboratorReceivedProfile(),
   };
 }

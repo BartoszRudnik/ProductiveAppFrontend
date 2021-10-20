@@ -4,6 +4,8 @@ import 'package:productive_app/provider/attachment_provider.dart';
 import 'package:productive_app/provider/location_provider.dart';
 import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:productive_app/provider/task_provider.dart';
+import 'package:productive_app/screen/collaborator_profile_tabs.dart';
+import 'package:productive_app/screen/collaborator_received_profile.dart';
 import 'package:provider/provider.dart';
 
 import '../model/collaborator.dart';
@@ -121,8 +123,13 @@ class ReceivedCollaborator extends StatelessWidget {
           await Provider.of<DelegateProvider>(context, listen: false).acceptInvitation(this.collaborator.uuid);
         }
       },
-      child: CollaboratorListElement(
-        collaborator: this.collaborator,
+      child: GestureDetector(
+        onTap: () {
+          Navigator.of(context).pushNamed(CollaboratorReceivedProfile.routeName, arguments: this.collaborator);
+        },
+        child: CollaboratorListElement(
+          collaborator: this.collaborator,
+        ),
       ),
     );
   }
