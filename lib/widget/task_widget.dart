@@ -11,7 +11,6 @@ import 'package:provider/provider.dart';
 import '../model/task.dart';
 import '../provider/location_provider.dart';
 import '../provider/task_provider.dart';
-import '../screen/task_details_screen.dart';
 import 'button/is_done_button.dart';
 import 'task_tags.dart';
 
@@ -237,8 +236,11 @@ class _TaskWidgetState extends State<TaskWidget> {
                           fontSize: 20,
                           fontWeight: FontWeight.w400,
                           fontFamily: 'RobotoCondensed',
-                          decoration:
-                              this.widget.task.done || (this.widget.task.isCanceled != null && this.widget.task.isCanceled) ? TextDecoration.lineThrough : null,
+                          decoration: this.widget.task.localization == "COMPLETED" ||
+                                  this.widget.task.done ||
+                                  (this.widget.task.isCanceled != null && this.widget.task.isCanceled)
+                              ? TextDecoration.lineThrough
+                              : null,
                           color: this.widget.task.done || (this.widget.task.isCanceled != null && this.widget.task.isCanceled)
                               ? Colors.grey
                               : Theme.of(context).primaryColor,
