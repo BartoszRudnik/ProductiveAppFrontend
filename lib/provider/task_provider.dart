@@ -6,7 +6,6 @@ import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'package:productive_app/db/task_database.dart';
 import 'package:productive_app/model/location.dart';
-import 'package:productive_app/provider/attachment_provider.dart';
 import 'package:productive_app/provider/location_provider.dart';
 import 'package:productive_app/utils/internet_connection.dart';
 import 'package:provider/provider.dart';
@@ -182,6 +181,10 @@ class TaskProvider with ChangeNotifier {
 
   List<String> get localizations {
     return [...this._localizations];
+  }
+
+  List<String> receivedTasksUuid() {
+    return this.tasks.where((element) => element.parentUuid != null).map((e) => e.parentUuid).toList();
   }
 
   void clearLocationFromTasks(String locationUuid) {
@@ -471,7 +474,7 @@ class TaskProvider with ChangeNotifier {
               'localization': newLocation,
               'position': task.position,
               'delegatedEmail': task.delegatedEmail,
-              'isCanceled': task.isCanceled,
+              'canceled': task.isCanceled,
               'localizationUuid': task.notificationLocalizationUuid,
               'localizationRadius': task.notificationLocalizationRadius,
               'notificationOnEnter': task.notificationOnEnter,
@@ -566,7 +569,7 @@ class TaskProvider with ChangeNotifier {
               'localization': newLocation,
               'position': task.position,
               'delegatedEmail': task.delegatedEmail,
-              'isCanceled': task.isCanceled,
+              'canceled': task.isCanceled,
               'localizationUuid': task.notificationLocalizationUuid,
               'localizationRadius': task.notificationLocalizationRadius,
               'notificationOnEnter': task.notificationOnEnter,
@@ -666,10 +669,6 @@ class TaskProvider with ChangeNotifier {
 
         if (task.startDate != null && task.startDate.difference(DateTime.fromMicrosecondsSinceEpoch(0)).inDays < 1) {
           task.startDate = null;
-        }
-
-        if (task.parentUuid != null) {
-          await Provider.of<AttachmentProvider>(context, listen: false).getDelegatedAttachmentsFromSingleUser([task.parentUuid]);
         }
 
         final bool isNew = -1 == this.taskList.indexWhere((element) => element.uuid == task.uuid);
@@ -1059,8 +1058,6 @@ class TaskProvider with ChangeNotifier {
         final response = await http.get(url);
 
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
-
-        print(responseBody);
 
         for (final element in responseBody) {
           List<Tag> taskTags = [];
@@ -1496,14 +1493,6 @@ class TaskProvider with ChangeNotifier {
   }
 
   int countInboxDelegated() {
-    List<Task> tmpList = [];
-
-    tmpList = [...this._inboxTasks.where((task) => (task.isDelegated != null && task.isDelegated == true))];
-
-    if (tmpList != null) {
-      return tmpList.length;
-    } else {
-      return 0;
-    }
+    return this._inboxTasks.where((task) => (task.isDelegated != null && task.isDelegated == true && !task.done)).toList().length;
   }
 }

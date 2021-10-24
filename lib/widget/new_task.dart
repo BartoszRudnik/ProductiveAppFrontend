@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:productive_app/utils/task_list.dart';
 import 'package:productive_app/utils/task_validate.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -171,31 +172,6 @@ class _NewTaskState extends State<NewTask> {
     });
   }
 
-  void _chooseTaskList() {
-    if (this._taskState == null) {
-      this._taskState = 'COLLECT';
-      this._localization = 'INBOX';
-    } else {
-      if (this._taskState == 'COLLECT') {
-        this._localization = 'INBOX';
-      } else if (this._taskState == "COMPLETED") {
-        if (this._isDone) {
-          this._localization = 'COMPLETED';
-        } else {
-          this._localization = 'TRASH';
-        }
-      } else if (this._taskState == "PLAN&DO") {
-        if (this._delegatedEmail != null) {
-          this._localization = 'DELEGATED';
-        } else if (this._startDate != null) {
-          this._localization = 'SCHEDULED';
-        } else {
-          this._localization = 'ANYTIME';
-        }
-      }
-    }
-  }
-
   Future<void> _addNewTask() async {
     bool isValidTitle = this.newTaskTitleKey.currentState.validate();
     bool isValidRest = await TaskValidate.validateNewTask(this._startDate, this._endDate, this._localization, this._isDone, this._delegatedEmail, context);
@@ -225,11 +201,9 @@ class _NewTaskState extends State<NewTask> {
       this._endDate = DateTime(this._endDate.year, this._endDate.month, this._endDate.day, this._endTime.hour, this._endTime.minute);
     }
 
-    this._chooseTaskList();
-
     final uuid = Uuid();
 
-    final newTask = Task(
+    Task newTask = Task(
       uuid: uuid.v1(),
       id: null,
       title: this._taskName,
@@ -243,9 +217,11 @@ class _NewTaskState extends State<NewTask> {
       localization: this._localization,
       delegatedEmail: this._delegatedEmail,
       isDelegated: false,
-      taskStatus: null,
+      taskStatus: 'Sent',
       isCanceled: false,
     );
+
+    newTask = TaskList.chooseTaskList(newTask);
 
     if (this._notificationLocalizationUuid != null) {
       newTask.notificationLocalizationUuid = this._notificationLocalizationUuid;
@@ -257,14 +233,12 @@ class _NewTaskState extends State<NewTask> {
     try {
       if (this._notificationLocalizationUuid == null) {
         await Provider.of<TaskProvider>(context, listen: false).addTask(newTask);
-
         await Provider.of<AttachmentProvider>(context, listen: false).setAttachments(this._files, newTask.uuid, false);
       } else {
         final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this._notificationLocalizationUuid);
         final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this._notificationLocalizationUuid);
 
         await Provider.of<TaskProvider>(context, listen: false).addTaskWithGeolocation(newTask, latitude, longitude);
-
         await Provider.of<AttachmentProvider>(context, listen: false).setAttachments(this._files, newTask.uuid, false);
       }
 

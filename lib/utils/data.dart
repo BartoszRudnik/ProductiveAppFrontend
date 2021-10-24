@@ -45,29 +45,33 @@ class Data {
       final provider = Provider.of<SynchronizeProvider>(context, listen: false);
       final userEmail = Provider.of<AuthProvider>(context, listen: false).email;
 
-      await Future.wait([
-        TagDatabase.readAll(userEmail).then((value) => tags = value),
-        CollaboratorDatabase.readAll(userEmail).then((value) => collaborators = value),
-        LocationDatabase.readAll(userEmail).then((value) => locations = value),
-        LocaleDatabase.read(userEmail).then((value) => locale = value),
-        GraphicDatabase.read(userEmail).then((value) => graphic = value),
-        UserDatabase.read(userEmail).then((value) => user = value),
-        SettingsDatabase.read(userEmail).then((value) => settings = value),
-        AttachmentDatabase.readAll(userEmail).then((value) => attachments = value),
-      ]);
+      await Future.wait(
+        [
+          TagDatabase.readAll(userEmail).then((value) => tags = value),
+          CollaboratorDatabase.readAll(userEmail).then((value) => collaborators = value),
+          LocationDatabase.readAll(userEmail).then((value) => locations = value),
+          LocaleDatabase.read(userEmail).then((value) => locale = value),
+          GraphicDatabase.read(userEmail).then((value) => graphic = value),
+          UserDatabase.read(userEmail).then((value) => user = value),
+          SettingsDatabase.read(userEmail).then((value) => settings = value),
+          AttachmentDatabase.readAllNotSynchronized(userEmail).then((value) => attachments = value),
+        ],
+      );
 
       await TaskDatabase.readAll(tags, userEmail).then((value) => tasks = value);
 
-      await Future.wait([
-        provider.synchronizeTags(tags),
-        provider.synchronizeCollaborators(collaborators),
-        provider.synchronizeLocations(locations),
-        provider.synchronizeLocale(locale),
-        provider.synchronizeGraphic(graphic),
-        provider.synchronizeUser(user),
-        provider.synchronizeSettings(settings),
-        provider.synchronizeTasks(tasks, attachments),
-      ]);
+      await Future.wait(
+        [
+          provider.synchronizeTags(tags),
+          provider.synchronizeCollaborators(collaborators),
+          provider.synchronizeLocations(locations),
+          provider.synchronizeLocale(locale),
+          provider.synchronizeGraphic(graphic),
+          provider.synchronizeUser(user),
+          provider.synchronizeSettings(settings),
+          provider.synchronizeTasks(tasks, attachments),
+        ],
+      );
     } catch (error) {
       print(error);
     }
@@ -120,18 +124,11 @@ class Data {
           Provider.of<SettingsProvider>(context, listen: false).getFilterSettings(),
           Provider.of<AuthProvider>(context, listen: false).getUserData(),
           Provider.of<AuthProvider>(context, listen: false).checkIfAvatarExists(),
-          Provider.of<AttachmentProvider>(context, listen: false).getAttachments(),
           Provider.of<AuthProvider>(context, listen: false).getUserImage(),
           Provider.of<LocaleProvider>(context, listen: false).getLocale(),
           Provider.of<ThemeProvider>(context, listen: false).getUserMode(),
         ],
       );
-
-      final List<String> delegatedTasks = Provider.of<TaskProvider>(context, listen: false).delegatedTasksUuid;
-
-      if (delegatedTasks != null && delegatedTasks.length > 0) {
-        await Provider.of<AttachmentProvider>(context, listen: false).getAllDelegatedAttachments(delegatedTasks);
-      }
     } catch (error) {
       print(error);
     }

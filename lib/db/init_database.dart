@@ -1,4 +1,5 @@
 import 'package:path/path.dart';
+import 'package:productive_app/model/appVersion.dart';
 import 'package:productive_app/model/attachment.dart';
 import 'package:productive_app/model/collaborator.dart';
 import 'package:productive_app/model/collaboratorTask.dart';
@@ -25,11 +26,47 @@ class InitDatabase {
     return _database;
   }
 
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < newVersion) {
+      switch (newVersion) {
+        case 3:
+          await this._version3Update(db);
+          break;
+        case 4:
+          if (oldVersion < 3) {
+            await this._version3Update(db);
+          }
+          await this._version4Update(db);
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  Future<void> _version3Update(Database db) async {
+    await db.execute("ALTER TABLE $tableUser ADD COLUMN ${UserFields.firstLogin} INTEGER;");
+    await db.execute('''
+      CREATE TABLE $tableVersion(
+        ${VersionFields.version} 'TEXT'
+      )
+      ''');
+  }
+
+  Future<void> _version4Update(Database db) async {
+    await Future.wait(
+      [
+        db.execute("ALTER TABLE $tableAttachment ADD COLUMN ${AttachmentFields.synchronized} INTEGER;"),
+        db.execute("ALTER TABLE $tableUser ADD COLUMN ${UserFields.synchronized} INTEGER;"),
+      ],
+    );
+  }
+
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
 
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+    return await openDatabase(path, version: 4, onCreate: this._createDB, onUpgrade: this._onUpgrade);
   }
 
   Future _createDB(Database db, int version) async {
@@ -41,6 +78,11 @@ class InitDatabase {
     final blob = 'BLOB';
     final userEmail = 'userMail';
 
+    await db.execute('''
+    CREATE TABLE $tableVersion(
+      ${VersionFields.version} $textType 
+    )
+    ''');
     await db.execute('''
     CREATE TABLE $tableTags (
       ${TagFields.id} $idType,
@@ -60,6 +102,7 @@ class InitDatabase {
       ${AttachmentFields.lastUpdated} $textType,
       ${AttachmentFields.localFile} $blob,
       ${AttachmentFields.uuid} $textType,
+      ${AttachmentFields.synchronized} $boolType,
       $userEmail $textType
     )
     ''');
@@ -123,6 +166,8 @@ class InitDatabase {
       ${UserFields.userType} $textType,
       ${UserFields.localImage} $textType,
       ${UserFields.removed} $boolType,
+      ${UserFields.firstLogin} $boolType,
+      ${UserFields.synchronized} $boolType,
       $userEmail $textType
     )
     ''');

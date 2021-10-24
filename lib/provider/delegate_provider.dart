@@ -37,6 +37,31 @@ class DelegateProvider with ChangeNotifier {
 
   http.Client _client;
   http.Client _collaboratorClient;
+  http.Client _permissionClient;
+
+  Future<void> sendPermissionSSE(String relationUUID, String collaboratorEmail, String action) async {
+    if (relationUUID != null && relationUUID.length > 1) {
+      final notifyUrl = this._serverUrl + "delegatedTaskSSE/publishPermission/$collaboratorEmail";
+
+      try {
+        await http.post(
+          notifyUrl,
+          body: json.encode(
+            {
+              'relationUuid': relationUUID,
+              'action': action,
+            },
+          ),
+          headers: {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+          },
+        );
+      } catch (error) {
+        print(error);
+      }
+    }
+  }
 
   Future<void> sendSSE(String relationUUID, String collaboratorEmail) async {
     if (relationUUID != null && relationUUID.length > 1) {
@@ -58,6 +83,71 @@ class DelegateProvider with ChangeNotifier {
       } catch (error) {
         print(error);
       }
+    }
+  }
+
+  Future<void> _deleteFromLocalList(String uuid) async {
+    try {
+      await CollaboratorDatabase.deleteByUuid(uuid);
+      this.collaborators.removeWhere((element) => element.uuid == uuid);
+
+      this.divideCollaborators(this.collaborators);
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  void subscribePermissions(BuildContext context) async {
+    try {
+      this._permissionClient = http.Client();
+
+      final request = http.Request("GET", Uri.parse(this._serverUrl + "delegatedTaskSSE/subscribePermission/${this.userEmail}"));
+
+      Future<http.StreamedResponse> response = this._permissionClient.send(request);
+
+      response.asStream().listen(
+        (streamedResponse) {
+          streamedResponse.stream.listen(
+            (data) async {
+              final stringValue = utf8.decode(data);
+
+              if (stringValue.contains('event')) {
+                final message = stringValue.split(":");
+
+                String data = message[2].trim();
+                data = data.split("\n")[0];
+
+                String uuid = data.split(" ")[0];
+                String asking = data.split(" ")[1];
+
+                final result = await this.getSingleCollaborator(uuid);
+
+                if (result != null && result[0] != 'delete') {
+                  final Collaborator collaborator = result[0];
+
+                  String message;
+
+                  if (asking == "ASKING") {
+                    message = AppLocalizations.of(context).askingNotificationPermission;
+                  } else if (asking == "DECLINED") {
+                    message = AppLocalizations.of(context).revokedNotificationPermission;
+                  } else {
+                    message = AppLocalizations.of(context).acceptedNotificationPermission;
+                  }
+                  await Notifications.permissionNotificationRequest(
+                    collaborator.id,
+                    collaborator.email + message,
+                  );
+                }
+              }
+            },
+          );
+        },
+      );
+    } catch (error) {
+      print(error);
     }
   }
 
@@ -83,14 +173,20 @@ class DelegateProvider with ChangeNotifier {
 
                 final result = await this.getSingleCollaborator(uuid);
 
-                final Collaborator collaborator = result[0];
-                final bool existing = result[1];
-
-                if (collaborator != null) {
-                  if (existing) {
-                    await Notifications.acceptedInvitation(collaborator.id, context, collaborator.email);
+                if (result != null) {
+                  if (result[0] == 'delete') {
+                    await this._deleteFromLocalList(uuid);
                   } else {
-                    await Notifications.receivedInvitation(collaborator.id, context, collaborator.email);
+                    final Collaborator collaborator = result[0];
+                    final bool existing = result[1];
+
+                    if (collaborator != null) {
+                      if (existing) {
+                        await Notifications.acceptedInvitation(collaborator.id, context, collaborator.email);
+                      } else {
+                        await Notifications.receivedInvitation(collaborator.id, context, collaborator.email);
+                      }
+                    }
                   }
                 }
               }
@@ -192,7 +288,7 @@ class DelegateProvider with ChangeNotifier {
     return this.accepted.where((collaborator) => collaborator.isAskingForPermission && !collaborator.sentPermission).length;
   }
 
-  Future<void> askForPermission(String collaboratorEmail) async {
+  Future<void> askForPermission(String collaboratorEmail, String relationUUID) async {
     if (await InternetConnection.internetConnection()) {
       final requestUrl = this._serverUrl + 'delegate/askForPermission/${this.userEmail}/$collaboratorEmail';
 
@@ -204,6 +300,8 @@ class DelegateProvider with ChangeNotifier {
             'accept': 'application/json',
           },
         );
+
+        await this.sendPermissionSSE(relationUUID, collaboratorEmail, "ASKING");
       } catch (error) {
         print(error);
         throw (error);
@@ -232,7 +330,7 @@ class DelegateProvider with ChangeNotifier {
     }
   }
 
-  Future<void> declineAskForPermission(String collaboratorEmail) async {
+  Future<void> declineAskForPermission(String collaboratorEmail, String relationUUID) async {
     if (await InternetConnection.internetConnection()) {
       final requestUrl = this._serverUrl + 'delegate/declineAskForPermission/${this.userEmail}/$collaboratorEmail';
 
@@ -246,6 +344,8 @@ class DelegateProvider with ChangeNotifier {
         );
 
         this.collaborators.firstWhere((element) => element.email == collaboratorEmail).isAskingForPermission = false;
+
+        await this.sendPermissionSSE(relationUUID, collaboratorEmail, "DECLINED");
 
         notifyListeners();
       } catch (error) {
@@ -262,7 +362,7 @@ class DelegateProvider with ChangeNotifier {
     }
   }
 
-  Future<void> changePermission(String collaboratorEmail) async {
+  Future<void> changePermission(String collaboratorEmail, String relationUUID) async {
     if (await InternetConnection.internetConnection()) {
       final requestUrl = this._serverUrl + 'delegate/changePermission/${this.userEmail}/$collaboratorEmail';
 
@@ -277,6 +377,16 @@ class DelegateProvider with ChangeNotifier {
 
         this.collaborators.firstWhere((collaborator) => collaborator.email == collaboratorEmail).sentPermission =
             !this.collaborators.firstWhere((collaborator) => collaborator.email == collaboratorEmail).sentPermission;
+
+        String action = '';
+
+        if (this.collaborators.firstWhere((element) => element.email == collaboratorEmail).sentPermission) {
+          action = 'ACCEPTED';
+        } else {
+          action = 'DECLINED';
+        }
+
+        await this.sendPermissionSSE(relationUUID, collaboratorEmail, action);
 
         notifyListeners();
       } catch (error) {
@@ -420,6 +530,11 @@ class DelegateProvider with ChangeNotifier {
 
       try {
         final response = await http.get(requestUrl);
+
+        if (response.body == null || response.body.length <= 1) {
+          return ['delete', ''];
+        }
+
         final responseBody = json.decode(utf8.decode(response.bodyBytes));
 
         bool isAskingForPermission = false;
@@ -570,8 +685,6 @@ class DelegateProvider with ChangeNotifier {
     this.collaborators.remove(collaborator);
     await CollaboratorDatabase.deleteByUuid(uuid);
 
-    notifyListeners();
-
     if (await InternetConnection.internetConnection()) {
       try {
         await http.delete(
@@ -581,11 +694,15 @@ class DelegateProvider with ChangeNotifier {
             'accept': 'application/json',
           },
         );
+
+        await this.sendSSE(uuid, collaborator.email);
       } catch (error) {
         print(error);
         throw (error);
       }
     }
+
+    notifyListeners();
   }
 
   Future<void> acceptInvitation(String uuid) async {
@@ -598,8 +715,6 @@ class DelegateProvider with ChangeNotifier {
     this._accepted.add(collaborator);
 
     await CollaboratorDatabase.update(collaborator);
-
-    notifyListeners();
 
     if (await InternetConnection.internetConnection()) {
       try {
@@ -617,6 +732,8 @@ class DelegateProvider with ChangeNotifier {
         throw (error);
       }
     }
+
+    notifyListeners();
   }
 
   Future<void> declineInvitation(String uuid) async {
@@ -624,10 +741,9 @@ class DelegateProvider with ChangeNotifier {
 
     final collaboratorEmail = this._received.firstWhere((element) => element.uuid == uuid).email;
 
+    this.collaborators.removeWhere((collaborator) => collaborator.uuid == uuid);
     this._received.removeWhere((collaborator) => collaborator.uuid == uuid);
     await CollaboratorDatabase.deleteByUuid(uuid);
-
-    notifyListeners();
 
     if (await InternetConnection.internetConnection()) {
       try {
@@ -645,6 +761,8 @@ class DelegateProvider with ChangeNotifier {
         throw (error);
       }
     }
+
+    notifyListeners();
   }
 
   bool checkIfCollaboratorAlreadyExist(String collaboratorMail) {
@@ -667,7 +785,6 @@ class DelegateProvider with ChangeNotifier {
         }
 
         final uuid = Uuid();
-
         final uuidCode = uuid.v1();
 
         final response = await http.post(
@@ -675,7 +792,7 @@ class DelegateProvider with ChangeNotifier {
           body: json.encode(
             {
               'userEmail': this.userEmail,
-              'collaboratorEmail': newCollaborator,
+              'collaboratorEmail': newCollaborator.trim(),
               'uuid': uuidCode,
             },
           ),
@@ -700,9 +817,9 @@ class DelegateProvider with ChangeNotifier {
         this.collaborators.insert(0, collaborator);
         this._send.insert(0, collaborator);
 
-        notifyListeners();
-
         await this.sendSSE(uuidCode, newCollaborator);
+
+        notifyListeners();
 
         return collaborator;
       } catch (error) {

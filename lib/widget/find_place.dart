@@ -24,9 +24,26 @@ class _FindPlaceState extends State<FindPlace> {
   List<MapEntry<Placemark, CoordinatesAndName>> placemarks = [];
   String searchString;
   final TextEditingController _textEditingController = TextEditingController();
+  bg.Location location;
 
   Future<void> getPlacemarks(BuildContext context, String search, String alternative) async {
     await Provider.of<LocationProvider>(context, listen: false).findNearLocationsFromQuery(search, alternative);
+  }
+
+  Future<void> getCurrentLocation() async {
+    this.location = await bg.BackgroundGeolocation.getCurrentPosition(
+      timeout: 3,
+      maximumAge: 10000,
+      desiredAccuracy: 200,
+      samples: 3,
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    this.getCurrentLocation();
   }
 
   @override
@@ -54,14 +71,11 @@ class _FindPlaceState extends State<FindPlace> {
                     searchString = search;
                   });
 
-                  bg.Location location = await bg.BackgroundGeolocation.getCurrentPosition(
-                    timeout: 3,
-                    maximumAge: 10000,
-                    desiredAccuracy: 200,
-                    samples: 3,
-                  );
+                  String searchQuery = '';
 
-                  final String searchQuery = search + " " + location.coords.latitude.toString() + " " + location.coords.longitude.toString();
+                  if (this.location != null) {
+                    searchQuery = search + " " + location.coords.latitude.toString() + " " + location.coords.longitude.toString();
+                  }
 
                   await getPlacemarks(context, searchQuery, search);
                 },

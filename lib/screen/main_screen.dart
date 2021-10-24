@@ -2,6 +2,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:productive_app/provider/delegate_provider.dart';
 import 'package:productive_app/screen/collaborators_screen.dart';
+import 'package:productive_app/screen/task_details_loading_screen.dart';
 import 'package:productive_app/utils/internet_connection.dart';
 import 'package:provider/provider.dart';
 
@@ -13,7 +14,6 @@ import '../utils/notifications.dart';
 import '../widget/drawer/main_drawer.dart';
 import 'loading_task_screen.dart';
 import 'tabs_screen.dart';
-import 'task_details_screen.dart';
 
 class MainScreen extends StatefulWidget {
   static const routeName = '/main-screen';
@@ -37,7 +37,7 @@ class _MainScreenState extends State<MainScreen> {
       }
 
       if (task != null && task.title != null) {
-        Navigator.of(context).pushNamed(TaskDetailScreen.routeName, arguments: task);
+        Navigator.of(context).pushNamed(TaskDetailsLoadingScreen.routeName, arguments: task);
       }
     }
   }
@@ -69,9 +69,6 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
 
-    Provider.of<DelegateProvider>(context, listen: false).subscribe(context);
-    Provider.of<DelegateProvider>(context, listen: false).subscribeCollaborators(context);
-
     this.future = this.loadData(context);
 
     Notifications.initLocalization();
@@ -80,11 +77,17 @@ class _MainScreenState extends State<MainScreen> {
     listenNotifications();
     listenInternetChanges(context);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) => Data.notify(context));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Data.notify(context);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<DelegateProvider>(context, listen: false).subscribe(context);
+    Provider.of<DelegateProvider>(context, listen: false).subscribeCollaborators(context);
+    Provider.of<DelegateProvider>(context, listen: false).subscribePermissions(context);
+
     return FutureBuilder(
       future: this.future,
       builder: (ctx, loadResult) => loadResult.connectionState == ConnectionState.waiting

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:productive_app/config/images.dart';
+import 'package:productive_app/screen/task_details_loading_screen.dart';
 import 'package:productive_app/utils/dialogs.dart';
 import 'package:productive_app/utils/internet_connection.dart';
 import 'package:provider/provider.dart';
@@ -112,14 +113,18 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
         );
 
     if (this.tasks.length == 0) {
-      bg.Location location = await bg.BackgroundGeolocation.getCurrentPosition(
-        timeout: 3,
-        maximumAge: 10000,
-        desiredAccuracy: 100,
-        samples: 3,
-      );
+      try {
+        bg.Location location = await bg.BackgroundGeolocation.getCurrentPosition(
+          timeout: 3,
+          maximumAge: 10000,
+          desiredAccuracy: 100,
+          samples: 3,
+        );
 
-      this._mapMove(LatLng(location.coords.latitude, location.coords.longitude), 15);
+        this._mapMove(LatLng(location.coords.latitude, location.coords.longitude), 15);
+      } catch (error) {
+        this._mapMove(LatLng(52, 21), 4);
+      }
     } else {
       final latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.tasks[0].notificationLocalizationUuid);
       final longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.tasks[0].notificationLocalizationUuid);
@@ -234,10 +239,12 @@ class TaskMapState extends State<TaskMap> with TickerProviderStateMixin {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.of(context).pushNamed(TaskDetailScreen.routeName, arguments: task).then((value) {
-                          setState(() {
-                            this._getTasks();
-                          });
+                        Navigator.of(context).pushNamed(TaskDetailsLoadingScreen.routeName, arguments: task).then((value) {
+                          setState(
+                            () {
+                              this._getTasks();
+                            },
+                          );
                           Navigator.of(context).pop('nextTask');
                           return this._onMarkerPressed(tasks.firstWhere((element) => element.id == task.id), previousTaskIndex, nextTaskIndex);
                         });

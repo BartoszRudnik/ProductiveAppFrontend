@@ -32,6 +32,7 @@ import 'utils/notifications.dart';
 import 'package:http/http.dart' as http;
 
 void callbackDispatcher() {
+  //TODO:
   Workmanager().executeTask(
     (taskName, inputData) async {
       final getPreferences = await SharedPreferences.getInstance();
@@ -50,11 +51,9 @@ void callbackDispatcher() {
       final email = extractedUserData['email'];
 
       if (taskName == "tasks") {
-        final requestUrl = "http://192.168.1.120:8080/api/v1/delegatedTaskSSE/isNewTask/$email";
+        final requestUrl = "http://192.99.169.102:8080/api/v1/delegatedTaskSSE/isNewTask/$email";
         final response = await http.get(requestUrl);
         final responseBody = json.decode(response.body);
-
-        print(responseBody);
 
         if (responseBody['result'] == 'true') {
           int id = Random().nextInt(999999);
@@ -62,16 +61,26 @@ void callbackDispatcher() {
         }
 
         return Future.value(true);
-      } else {
-        final requestUrl = "http://192.168.1.120:8080/api/v1/delegatedTaskSSE/isNewCollaborator/$email";
+      } else if (taskName == "collaborators") {
+        final requestUrl = "http://192.99.169.102:8080/api/v1/delegatedTaskSSE/isNewCollaborator/$email";
         final response = await http.get(requestUrl);
         final responseBody = json.decode(response.body);
-
-        print(responseBody);
 
         if (responseBody['result'] == 'true') {
           int id = Random().nextInt(999999);
           Notifications.invitationNotification(id);
+        }
+
+        return Future.value(true);
+      } else {
+        final requestUrl = "http://192.99.169.102:8080/api/v1/delegatedTaskSSE/isNewPermission/$email";
+
+        final response = await http.get(requestUrl);
+        final responseBody = json.decode(response.body);
+
+        if (responseBody['result'] == 'true') {
+          int id = Random().nextInt(999999);
+          Notifications.permissionNotification(id);
         }
 
         return Future.value(true);
@@ -99,6 +108,7 @@ void main() async {
   Workmanager().initialize(callbackDispatcher);
   Workmanager().registerPeriodicTask('1', 'tasks');
   Workmanager().registerPeriodicTask('2', 'collaborators');
+  Workmanager().registerPeriodicTask('3', 'permissions');
 
   await bg.BackgroundGeolocation.registerHeadlessTask(headlessTask);
 }
@@ -134,7 +144,6 @@ class MyApp extends StatelessWidget {
           create: null,
           update: (ctx, auth, previousAttachments) => AttachmentProvider(
             attachments: previousAttachments == null ? [] : previousAttachments.attachments,
-            delegatedAttachments: previousAttachments == null ? [] : previousAttachments.delegatedAttachments,
             authToken: auth.token,
             userMail: auth.email,
           ),

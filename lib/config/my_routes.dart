@@ -1,4 +1,6 @@
+import 'package:productive_app/screen/collaborator_profile.dart';
 import 'package:productive_app/screen/collaborator_profile_tabs.dart';
+import 'package:productive_app/screen/collaborator_received_profile.dart';
 import 'package:productive_app/screen/collaborators_screen.dart';
 import 'package:productive_app/screen/completed_screen.dart';
 import 'package:productive_app/screen/entry_screen.dart';
@@ -12,7 +14,7 @@ import 'package:productive_app/screen/reset_password_screen.dart';
 import 'package:productive_app/screen/settings_screen.dart';
 import 'package:productive_app/screen/tabs_screen.dart';
 import 'package:productive_app/screen/tags_screen.dart';
-import 'package:productive_app/screen/task_details_screen.dart';
+import 'package:productive_app/screen/task_details_loading_screen.dart';
 import 'package:productive_app/screen/task_map.dart';
 import 'package:productive_app/screen/trash_screen.dart';
 import 'package:productive_app/widget/image_viewer.dart';
@@ -25,7 +27,6 @@ class MyRoutes {
     LoginScreen.routeName: (ctx) => LoginScreen(),
     EntryScreen.routeName: (ctx) => EntryScreen(),
     ResetPassword.routeName: (ctx) => ResetPassword(),
-    TaskDetailScreen.routeName: (ctx) => TaskDetailScreen(),
     NewPassword.routeName: (ctx) => NewPassword(),
     TagsScreen.routeName: (ctx) => TagsScreen(),
     CompletedScreen.routeName: (ctx) => CompletedScreen(),
@@ -39,5 +40,7 @@ class MyRoutes {
     CollaboratorProfileTabs.routeName: (ctx) => CollaboratorProfileTabs(),
     PDFViewer.routeName: (ctx) => PDFViewer(),
     ImageViewer.routeName: (ctx) => ImageViewer(),
+    TaskDetailsLoadingScreen.routeName: (ctx) => TaskDetailsLoadingScreen(),
+    CollaboratorReceivedProfile.routeName: (ctx) => CollaboratorReceivedProfile(),
   };
 }

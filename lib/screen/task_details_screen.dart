@@ -4,6 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:productive_app/config/const_values.dart';
 import 'package:productive_app/provider/synchronize_provider.dart';
+import 'package:productive_app/utils/task_list.dart';
 import 'package:productive_app/utils/task_validate.dart';
 import 'package:productive_app/widget/task_details_state.dart';
 import 'package:productive_app/widget/task_details_description.dart';
@@ -30,6 +31,12 @@ import '../widget/task_details_map.dart';
 
 class TaskDetailScreen extends StatefulWidget {
   static const routeName = "/task-details";
+
+  final Task task;
+
+  TaskDetailScreen({
+    @required this.task,
+  });
 
   @override
   _TaskDetailScreenState createState() => _TaskDetailScreenState();
@@ -124,34 +131,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
     });
   }
 
-  void _chooseTaskList() {
-    if (this.taskToEdit.taskState == null) {
-      this.taskToEdit.taskState = 'COLLECT';
-      this.taskToEdit.localization = 'INBOX';
-    } else {
-      if (this.taskToEdit.done && this.taskToEdit.taskState != 'COLLECT') {
-        this.taskToEdit.taskState = "COMPLETED";
-        this.taskToEdit.localization = "COMPLETED";
-      } else if (this.taskToEdit.taskState == 'COLLECT') {
-        this.taskToEdit.localization = 'INBOX';
-      } else if (this.taskToEdit.taskState == "COMPLETED") {
-        if (this.taskToEdit.done) {
-          this.taskToEdit.localization = 'COMPLETED';
-        } else {
-          this.taskToEdit.localization = 'TRASH';
-        }
-      } else if (this.taskToEdit.taskState == "PLAN&DO") {
-        if (this.taskToEdit.delegatedEmail != null) {
-          this.taskToEdit.localization = 'DELEGATED';
-        } else if (this.taskToEdit.startDate != null) {
-          this.taskToEdit.localization = 'SCHEDULED';
-        } else {
-          this.taskToEdit.localization = 'ANYTIME';
-        }
-      }
-    }
-  }
-
   Future<void> selectStartTime() async {
     final TimeOfDay pickTime = await DateTimePickers.pickTime(context);
 
@@ -218,7 +197,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       taskToEdit.endDate = new DateTime(taskToEdit.endDate.year, taskToEdit.endDate.month, taskToEdit.endDate.day, 0, 0);
     }
 
-    this._chooseTaskList();
+    this.taskToEdit = TaskList.chooseTaskList(this.taskToEdit);
 
     isValid = await TaskValidate.validateTaskEdit(taskToEdit, originalTask, context);
 
@@ -466,11 +445,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
 
   @override
   Widget build(BuildContext context) {
-    final priorities = Provider.of<TaskProvider>(context, listen: false).priorities;
-    final states = Provider.of<TaskProvider>(context, listen: false).localizations;
-
-    if (taskToEdit == null) {
-      originalTask = ModalRoute.of(context).settings.arguments as Task;
+    if (taskToEdit == null && this.widget.task != null) {
+      originalTask = this.widget.task;
 
       setTaskToEdit(originalTask);
 
@@ -479,21 +455,16 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
       }
     }
 
+    final priorities = Provider.of<TaskProvider>(context, listen: false).priorities;
+    final states = Provider.of<TaskProvider>(context, listen: false).localizations;
+
     double latitude = -1;
     double longitude = -1;
 
-    if (this.taskToEdit.notificationLocalizationUuid != null) {
+    if (this.taskToEdit != null && this.taskToEdit.notificationLocalizationUuid != null) {
       latitude = Provider.of<LocationProvider>(context, listen: false).getLatitude(this.taskToEdit.notificationLocalizationUuid);
       longitude = Provider.of<LocationProvider>(context, listen: false).getLongitude(this.taskToEdit.notificationLocalizationUuid);
     }
-
-    List<Attachment> attachments =
-        Provider.of<AttachmentProvider>(context).attachments.where((attachment) => attachment.taskUuid == taskToEdit.uuid && !attachment.toDelete).toList();
-
-    attachments.addAll(Provider.of<AttachmentProvider>(context)
-        .delegatedAttachments
-        .where((attachment) => attachment.taskUuid == taskToEdit.parentUuid && !attachment.toDelete)
-        .toList());
 
     return WillPopScope(
       // ignore: missing_return
@@ -502,8 +473,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
         bool result = false;
 
         if ((!this._checkEquals(this.originalTask, this.taskToEdit) ||
-                Provider.of<AttachmentProvider>(context, listen: false).notSavedAttachments.length > 0) &&
-            !this.changesSaved) {
+                    Provider.of<AttachmentProvider>(context, listen: false).notSavedAttachments.length > 0) &&
+                !this.changesSaved ||
+            Provider.of<AttachmentProvider>(context, listen: false).numberOfAttachmentsToDelete(this.taskToEdit.uuid, this.taskToEdit.parentUuid) > 0) {
           result = await Dialogs.showActionDialog(
             context,
             AppLocalizations.of(context).changes,
@@ -537,67 +509,75 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> with TickerProvider
               key: this._formKey,
               child: Column(
                 children: [
-                  TextFormField(
-                    initialValue: taskToEdit.title,
-                    style: TextStyle(fontSize: 25),
-                    maxLines: null,
-                    onSaved: (value) {
-                      taskToEdit.title = value;
-                    },
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return AppLocalizations.of(context).taskTitleEmpty;
-                      }
-                      return null;
-                    },
-                  ),
-                  TaskDetailsDescription(
-                    description: this.taskToEdit.description,
-                    descriptionFocus: this._descriptionFocus,
-                    isDescriptionInitial: this._isDescriptionInitial,
-                    isFocused: this._isFocused,
-                    onDescriptionChanged: this.onDescriptionChanged,
-                  ),
-                  TaskDetailsState(
-                    taskState: this.taskToEdit.taskState,
-                    setTaskState: this.setTaskState,
-                    states: states,
-                  ),
-                  TaskDetailsAttributes(
-                    taskToEdit: taskToEdit,
-                    priorities: priorities,
-                    setDelegatedEmail: setDelegatedEmail,
-                    setPriority: setPriority,
-                  ),
+                  if (this.taskToEdit != null)
+                    TextFormField(
+                      initialValue: this.taskToEdit.title,
+                      style: TextStyle(fontSize: 25),
+                      maxLines: null,
+                      onSaved: (value) {
+                        taskToEdit.title = value;
+                      },
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return AppLocalizations.of(context).taskTitleEmpty;
+                        }
+                        return null;
+                      },
+                    ),
+                  if (this.taskToEdit != null)
+                    TaskDetailsDescription(
+                      description: this.taskToEdit.description,
+                      descriptionFocus: this._descriptionFocus,
+                      isDescriptionInitial: this._isDescriptionInitial,
+                      isFocused: this._isFocused,
+                      onDescriptionChanged: this.onDescriptionChanged,
+                    ),
+                  if (this.taskToEdit != null)
+                    TaskDetailsState(
+                      taskState: this.taskToEdit.taskState,
+                      setTaskState: this.setTaskState,
+                      states: states,
+                    ),
+                  if (this.taskToEdit != null)
+                    TaskDetailsAttributes(
+                      taskToEdit: taskToEdit,
+                      priorities: priorities,
+                      setDelegatedEmail: setDelegatedEmail,
+                      setPriority: setPriority,
+                    ),
                   SizedBox(
                     height: 15,
                   ),
-                  TaskDetailsMap(
-                    setLocation: this.setLocation,
-                    setNotificationLocalization: this.setNotificationLocalization,
-                    taskToEdit: taskToEdit,
-                    originalTask: originalTask,
-                    latitude: latitude,
-                    longitude: longitude,
-                    locationChanged: this._locationChanged,
-                  ),
-                  TaskDetailsDates(
-                    selectEndDate: this.selectEndDate,
-                    selectStartDate: this.selectStartDate,
-                    taskToEdit: taskToEdit,
-                    endTime: endTime,
-                    startTime: startTime,
-                    selectEndTime: this.selectEndTime,
-                    selectStartTime: this.selectStartTime,
-                  ),
-                  TaskDetailsTags(
-                    tags: this.taskToEdit.tags,
-                    editTags: this.editTags,
-                  ),
-                  TaskDetailsAttachments(
-                    attachments: attachments,
-                    taskUuid: taskToEdit.uuid,
-                  ),
+                  if (this.taskToEdit != null)
+                    TaskDetailsMap(
+                      setLocation: this.setLocation,
+                      setNotificationLocalization: this.setNotificationLocalization,
+                      taskToEdit: taskToEdit,
+                      originalTask: originalTask,
+                      latitude: latitude,
+                      longitude: longitude,
+                      locationChanged: this._locationChanged,
+                    ),
+                  if (this.taskToEdit != null)
+                    TaskDetailsDates(
+                      selectEndDate: this.selectEndDate,
+                      selectStartDate: this.selectStartDate,
+                      taskToEdit: taskToEdit,
+                      endTime: endTime,
+                      startTime: startTime,
+                      selectEndTime: this.selectEndTime,
+                      selectStartTime: this.selectStartTime,
+                    ),
+                  if (this.taskToEdit != null)
+                    TaskDetailsTags(
+                      tags: this.taskToEdit.tags,
+                      editTags: this.editTags,
+                    ),
+                  if (this.taskToEdit != null)
+                    TaskDetailsAttachments(
+                      parentUuid: taskToEdit.parentUuid,
+                      taskUuid: taskToEdit.uuid,
+                    ),
                 ],
               ),
             ),

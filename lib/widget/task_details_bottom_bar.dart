@@ -53,12 +53,12 @@ class TaskDetailsBottomBar extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 onPrimary: Theme.of(context).primaryColor,
               ),
-              icon: Icon(this.taskToEdit.done ? Icons.cancel : Icons.done),
+              icon: Icon(this.taskToEdit != null && this.taskToEdit.done ? Icons.cancel : Icons.done),
               label: Row(
                 children: [
                   Flexible(
                     child: AutoSizeText(
-                      this.taskToEdit.done ? AppLocalizations.of(context).unmarkAsDone : AppLocalizations.of(context).markAsDone,
+                      this.taskToEdit != null && this.taskToEdit.done ? AppLocalizations.of(context).unmarkAsDone : AppLocalizations.of(context).markAsDone,
                       minFontSize: 10,
                       maxFontSize: 16,
                       maxLines: 1,

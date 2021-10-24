@@ -12,16 +12,25 @@ import 'dialog/attachment_dialog.dart';
 import 'pdf_viewer.dart';
 
 class TaskDetailsAttachments extends StatelessWidget {
-  final List<Attachment> attachments;
   final String taskUuid;
+  final String parentUuid;
 
   TaskDetailsAttachments({
-    @required this.attachments,
     @required this.taskUuid,
+    @required this.parentUuid,
   });
 
   @override
   Widget build(BuildContext context) {
+    List<Attachment> attachments =
+        Provider.of<AttachmentProvider>(context).attachments.where((attachment) => attachment.taskUuid == taskUuid && !attachment.toDelete).toList();
+
+    attachments.addAll(
+      Provider.of<AttachmentProvider>(context).attachments.where((attachment) => attachment.taskUuid == parentUuid && !attachment.toDelete).toList(),
+    );
+
+    final actualTaskAttachmentsSize = Provider.of<AttachmentProvider>(context).taskAttachmentsSize(this.taskUuid);
+
     return Column(
       children: [
         ListTile(
@@ -41,7 +50,7 @@ class TaskDetailsAttachments extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              this.attachments.length > 0
+              attachments.length > 0
                   ? Card(
                       elevation: 2,
                       child: Container(
@@ -51,10 +60,10 @@ class TaskDetailsAttachments extends StatelessWidget {
                           scrollDirection: Axis.horizontal,
                           shrinkWrap: true,
                           physics: ClampingScrollPhysics(),
-                          itemCount: this.attachments.length,
+                          itemCount: attachments.length,
                           itemBuilder: (ctx, index) => TextButton(
                             onPressed: () async {
-                              final file = await Provider.of<AttachmentProvider>(context, listen: false).loadAttachment(this.attachments[index].uuid);
+                              final file = await Provider.of<AttachmentProvider>(context, listen: false).loadAttachment(attachments[index].uuid);
 
                               if (FileTypeHelper.isImage(file.path) || FileTypeHelper.isPDF(file.path)) {
                                 String routeName = '';
@@ -70,7 +79,7 @@ class TaskDetailsAttachments extends StatelessWidget {
                                   routeName,
                                   arguments: {
                                     'file': file,
-                                    'fileName': this.attachments[index].fileName,
+                                    'fileName': attachments[index].fileName,
                                   },
                                 );
                               } else {
@@ -92,7 +101,7 @@ class TaskDetailsAttachments extends StatelessWidget {
                                   Flexible(
                                     child: Center(
                                       child: Text(
-                                        this.attachments[index].fileName,
+                                        attachments[index].fileName,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           color: Theme.of(context).primaryColor,
@@ -103,10 +112,8 @@ class TaskDetailsAttachments extends StatelessWidget {
                                   IconButton(
                                     icon: Icon(Icons.cancel_outlined, color: Theme.of(context).primaryColor),
                                     onPressed: () {
-                                      Provider.of<SynchronizeProvider>(context, listen: false).addAttachmentToDelete(
-                                        this.attachments[index].uuid,
-                                      );
-                                      Provider.of<AttachmentProvider>(context, listen: false).setToDelete(this.attachments[index].uuid);
+                                      Provider.of<SynchronizeProvider>(context, listen: false).addAttachmentToDelete(attachments[index].uuid);
+                                      Provider.of<AttachmentProvider>(context, listen: false).setToDelete(attachments[index].uuid);
                                     },
                                   ),
                                 ],
@@ -129,7 +136,7 @@ class TaskDetailsAttachments extends StatelessWidget {
                       final newAttachments = await showDialog(
                           context: context,
                           builder: (context) {
-                            return AttachmentDialog(files: []);
+                            return AttachmentDialog(files: [], initBytes: actualTaskAttachmentsSize.toDouble());
                           });
 
                       Provider.of<AttachmentProvider>(context, listen: false).setAttachments(newAttachments, this.taskUuid, true);

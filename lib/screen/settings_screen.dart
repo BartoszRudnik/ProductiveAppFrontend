@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:productive_app/provider/task_provider.dart';
+import 'package:productive_app/widget/settings_data_usage.dart';
 import 'package:productive_app/widget/settings_language.dart';
+import 'package:productive_app/widget/settings_version.dart';
 import 'package:provider/provider.dart';
 
 import '../provider/auth_provider.dart';
@@ -318,6 +320,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SettingsGraphicSettings(),
                 SizedBox(height: 10),
                 SettingsLanguage(),
+                SizedBox(height: 10),
+                SettingsVersion(),
+                SizedBox(height: 10),
+                SettingsDataUsage(),
               ],
             ),
           ),

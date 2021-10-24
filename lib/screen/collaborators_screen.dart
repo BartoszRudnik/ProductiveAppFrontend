@@ -64,15 +64,15 @@ class _CollaboratorsScreenState extends State<CollaboratorsScreen> {
           },
         ),
         body: RefreshIndicator(
+          triggerMode: RefreshIndicatorTriggerMode.anywhere,
           backgroundColor: Theme.of(context).primaryColor,
           onRefresh: () => Provider.of<DelegateProvider>(context, listen: false).getCollaborators(),
           child: provider.accepted.length == 0 && provider.received.length == 0 && provider.send.length == 0
               ? EmptyList(message: AppLocalizations.of(context).emptyCollaborator)
               : SingleChildScrollView(
-                  physics: ScrollPhysics(),
+                  physics: AlwaysScrollableScrollPhysics(),
                   padding: const EdgeInsets.only(left: 21, right: 17, top: 10),
                   child: Container(
-                    height: MediaQuery.of(context).size.height,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [

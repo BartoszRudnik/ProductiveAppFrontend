@@ -1,13 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:productive_app/db/version_database.dart';
+import 'package:productive_app/model/appVersion.dart';
 import '../config/images.dart';
 import '../widget/appBar/login_appbar.dart';
 import '../widget/button/login_button.dart';
 import '../widget/button/sign_with_google.dart';
 import 'login_screen.dart';
+import 'package:path_provider/path_provider.dart';
 
-class EntryScreen extends StatelessWidget {
+class EntryScreen extends StatefulWidget {
   static const routeName = 'entry-screen';
+
+  @override
+  State<EntryScreen> createState() => _EntryScreenState();
+}
+
+class _EntryScreenState extends State<EntryScreen> {
+  void checkAppVersion() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    final String newVersion = packageInfo.version;
+
+    final dbVersion = await VersionDatabase.read();
+    if (dbVersion == null) {
+      VersionDatabase.create(AppVersion(version: newVersion));
+    } else {
+      final String currentVersion = dbVersion.version;
+
+      if (newVersion != currentVersion) {
+        await VersionDatabase.delete();
+
+        final cacheDir = await getTemporaryDirectory();
+        final appDir = await getApplicationSupportDirectory();
+
+        if (cacheDir.existsSync()) {
+          cacheDir.deleteSync(recursive: true);
+        }
+
+        if (appDir.existsSync()) {
+          appDir.deleteSync(recursive: true);
+        }
+
+        await VersionDatabase.create(AppVersion(version: newVersion));
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    this.checkAppVersion();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +62,7 @@ class EntryScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
+          children: [
             Container(
               width: double.infinity,
               height: 100,
