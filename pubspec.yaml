@@ -25,14 +25,14 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter  
+    
   
-  google_sign_in: any  
-
-  flutter_background_geolocation: any  
-  flutter_local_notifications: any  
   file_picker: any
+  
+  flutter_background_geolocation: any    
   workmanager: any
-
+  google_sign_in: any  
+  flutter_local_notifications: any  
   google_maps_flutter: any  
   http: any
   provider: any
@@ -84,6 +84,11 @@ flutter:
   # the material Icons class.
   generate: true
   uses-material-design: true
+
+  plugin:
+    platforms:
+      ios:
+        pluginClass: AppDelegate
   
   assets:
     - assets/cfg/

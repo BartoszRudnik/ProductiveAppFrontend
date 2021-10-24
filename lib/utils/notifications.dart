@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:productive_app/model/task.dart';
@@ -59,7 +60,9 @@ class Notifications {
       priority: Priority.max,
     );
 
-    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    const IOSNotificationDetails iosPlatformChannelSpecifics = IOSNotificationDetails();
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics, iOS: iosPlatformChannelSpecifics);
     await _notifications.show(id, message, "", platformChannelSpecifics);
   }
 
@@ -72,7 +75,9 @@ class Notifications {
       priority: Priority.max,
     );
 
-    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    const IOSNotificationDetails iosPlatformChannelSpecifics = IOSNotificationDetails();
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics, iOS: iosPlatformChannelSpecifics);
     await _notifications.show(id, "Collaborator changed your permission status!", "", platformChannelSpecifics);
   }
 
@@ -85,7 +90,9 @@ class Notifications {
       priority: Priority.max,
     );
 
-    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    const IOSNotificationDetails iosPlatformChannelSpecifics = IOSNotificationDetails();
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics, iOS: iosPlatformChannelSpecifics);
     await _notifications.show(id, "You have received a new invitation!", "", platformChannelSpecifics);
   }
 
@@ -98,7 +105,9 @@ class Notifications {
       priority: Priority.max,
     );
 
-    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    const IOSNotificationDetails iosPlatformChannelSpecifics = IOSNotificationDetails();
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics, iOS: iosPlatformChannelSpecifics);
     await _notifications.show(id, AppLocalizations.of(context).newInvitation + userName, "", platformChannelSpecifics, payload: "collaborator");
   }
 
@@ -111,7 +120,9 @@ class Notifications {
       priority: Priority.max,
     );
 
-    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    const IOSNotificationDetails iosPlatformChannelSpecifics = IOSNotificationDetails();
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics, iOS: iosPlatformChannelSpecifics);
     await _notifications.show(id, AppLocalizations.of(context).userHasAcceptedInvitation(userName), "", platformChannelSpecifics, payload: "collaborator");
   }
 
@@ -124,7 +135,9 @@ class Notifications {
       priority: Priority.max,
     );
 
-    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    const IOSNotificationDetails iosPlatformChannelSpecifics = IOSNotificationDetails();
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics, iOS: iosPlatformChannelSpecifics);
     await _notifications.show(id, "You have received a new task!", "", platformChannelSpecifics, payload: "collaborator");
   }
 
@@ -137,7 +150,9 @@ class Notifications {
       priority: Priority.max,
     );
 
-    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    const IOSNotificationDetails iosPlatformChannelSpecifics = IOSNotificationDetails();
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics, iOS: iosPlatformChannelSpecifics);
     await _notifications.show(task.id, title + task.title, task.description, platformChannelSpecifics, payload: task.uuid);
   }
 
@@ -158,8 +173,9 @@ class Notifications {
       importance: Importance.max,
       priority: Priority.max,
     );
+    const IOSNotificationDetails iosPlatformChannelSpecifics = IOSNotificationDetails();
 
-    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics, iOS: iosPlatformChannelSpecifics);
     await _notifications.show(id, taskTitle, taskDescription, platformChannelSpecifics, payload: taskUuid);
   }
 
