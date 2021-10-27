@@ -66,7 +66,7 @@ class InitDatabase {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
 
-    return await openDatabase(path, version: 4, onCreate: this._createDB, onUpgrade: this._onUpgrade);
+    return await openDatabase(path, version: 5, onCreate: this._createDB, onUpgrade: this._onUpgrade);
   }
 
   Future _createDB(Database db, int version) async {

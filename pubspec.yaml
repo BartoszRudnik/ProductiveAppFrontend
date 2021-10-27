@@ -15,7 +15,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.5+1
+version: 1.0.6+1
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -27,13 +27,6 @@ dependencies:
     sdk: flutter  
     
   
-  file_picker: any
-  
-  flutter_background_geolocation: any    
-  workmanager: any
-  google_sign_in: any  
-  flutter_local_notifications: any  
-  google_maps_flutter: any  
   http: any
   provider: any
   shared_preferences: any
@@ -41,12 +34,18 @@ dependencies:
   global_configuration: any
   badges: any
   image_picker: any
-  geocoding: any  
+  google_maps_flutter: any  
+  geocoding: any 
+  flutter_map: any    
+  flutter_background_geolocation: any  
+  flutter_local_notifications: any
   flutter_launcher_icons: any
   infinite_scroll_pagination: any
-  rxdart: any  
+  rxdart: any
+  google_sign_in: any
   font_awesome_flutter: any
-  shimmer: any  
+  shimmer: any
+  file_picker: any
   path_provider: any
   flutter_pdfview: any
   mime: any
@@ -56,7 +55,8 @@ dependencies:
   internet_connection_checker: any
   connectivity_plus: any
   sqflite: any
-  uuid: any    
+  uuid: any
+  workmanager: any  
   introduction_screen: any
   package_info_plus: any 
  
@@ -84,12 +84,7 @@ flutter:
   # the material Icons class.
   generate: true
   uses-material-design: true
-
-  plugin:
-    platforms:
-      ios:
-        pluginClass: AppDelegate
-  
+ 
   assets:
     - assets/cfg/
     - assets/images/clipboard.png

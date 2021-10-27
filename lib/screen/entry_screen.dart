@@ -51,7 +51,7 @@ class _EntryScreenState extends State<EntryScreen> {
   void initState() {
     super.initState();
 
-    this.checkAppVersion();
+    //this.checkAppVersion();
   }
 
   @override
