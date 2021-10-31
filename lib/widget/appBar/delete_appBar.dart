@@ -53,14 +53,6 @@ class _DeleteAppBarState extends State<DeleteAppBar> {
               decoration: ColorThemes.searchFormFieldDecoration(
                 context,
                 text,
-                () {
-                  this._formKey.currentState.reset();
-                  if (this.widget.title == AppLocalizations.of(context).completed) {
-                    provider.clearCompletedName();
-                  } else {
-                    provider.clearTrashName();
-                  }
-                },
               ),
             )
           : Text(
@@ -78,15 +70,16 @@ class _DeleteAppBarState extends State<DeleteAppBar> {
       leading: (widget.leadingButton != null) ? widget.leadingButton : null,
       actions: [
         IconButton(
-          icon: Icon(Icons.search_outlined),
+          icon: Icon(this._searchBarActive ? Icons.close_outlined : Icons.search_outlined),
           onPressed: () {
-            if (this._searchBarActive) {
+            if (this._formKey != null && this._formKey.currentState != null) {
               this._formKey.currentState.reset();
-              if (this.widget.title == AppLocalizations.of(context).completed) {
-                provider.clearCompletedName();
-              } else {
-                provider.clearTrashName();
-              }
+            }
+
+            if (this.widget.title == AppLocalizations.of(context).completed) {
+              provider.clearCompletedName();
+            } else {
+              provider.clearTrashName();
             }
 
             setState(() {
