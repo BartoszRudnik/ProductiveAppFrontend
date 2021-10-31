@@ -14,7 +14,7 @@ class AddTaskButton extends StatelessWidget {
     return ElevatedButton.icon(
       style: ColorThemes.addTaskButtonStyle(context),
       onPressed: () {
-        this.addNewTask();
+        this.addNewTask(true);
       },
       icon: Icon(Icons.subdirectory_arrow_left_outlined),
       label: Text(
