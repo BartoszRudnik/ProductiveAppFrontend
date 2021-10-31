@@ -107,10 +107,10 @@ class MainDrawer extends StatelessWidget {
                 title: AppLocalizations.of(context).tags,
                 routeName: TagsScreen.routeName,
               ),
-              DrawerListTile(
-                icon: Icons.analytics_outlined,
-                title: AppLocalizations.of(context).analytics,
-              ),
+              // DrawerListTile(
+              //   icon: Icons.analytics_outlined,
+              //   title: AppLocalizations.of(context).analytics,
+              // ),
               DrawerListTile(
                 icon: Icons.location_on,
                 title: AppLocalizations.of(context).locations,
