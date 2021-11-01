@@ -375,5 +375,6 @@
   "revokedNotificationPermission": " has revoked your access to his activity",
   "version": "App Version",
   "dataUsage": "Attachments data usage",
-  "decline": "Decline"    
+  "decline": "Decline",
+  "cancelInvitation": "Cancel invitation"    
 }

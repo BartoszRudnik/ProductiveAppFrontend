@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:productive_app/provider/attachment_provider.dart';
 import 'package:productive_app/provider/location_provider.dart';
 import 'package:productive_app/provider/synchronize_provider.dart';
 import 'package:productive_app/provider/task_provider.dart';
-import 'package:productive_app/screen/collaborator_profile_tabs.dart';
 import 'package:productive_app/screen/collaborator_received_profile.dart';
 import 'package:provider/provider.dart';
 
@@ -125,7 +123,13 @@ class ReceivedCollaborator extends StatelessWidget {
       },
       child: GestureDetector(
         onTap: () {
-          Navigator.of(context).pushNamed(CollaboratorReceivedProfile.routeName, arguments: this.collaborator);
+          Navigator.of(context).pushNamed(
+            CollaboratorReceivedProfile.routeName,
+            arguments: {
+              "collaborator": this.collaborator,
+              "isReceived": true,
+            },
+          );
         },
         child: CollaboratorListElement(
           collaborator: this.collaborator,
