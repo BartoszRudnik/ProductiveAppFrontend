@@ -310,7 +310,7 @@ class _NewTaskState extends State<NewTask> {
                   title: Row(
                     children: [
                       Expanded(
-                        flex: 166,
+                        flex: 400,
                         child: TaskTitle(
                           setTaskName: this.setTaskName,
                           newTaskTitleKey: this.newTaskTitleKey,
@@ -321,7 +321,6 @@ class _NewTaskState extends State<NewTask> {
                         child: Row(
                           children: [
                             AddTaskNoClosingButton(addTask: this._addNewTask),
-                            FullScreenButton(setFullScreen: this.setFullScreen),
                           ],
                         ),
                       ),

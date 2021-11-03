@@ -233,20 +233,6 @@ class _CollaboratorReceivedProfileState extends State<CollaboratorReceivedProfil
                             ),
                           if (isReceived)
                             ElevatedButton(
-                              onPressed: () async {
-                                setState(() {
-                                  this.isNavigating = true;
-                                });
-
-                                await Provider.of<TaskProvider>(context, listen: false).getTasksFromCollaborator(collaborator.email);
-                                await Provider.of<DelegateProvider>(context, listen: false).acceptInvitation(collaborator.uuid);
-
-                                Navigator.of(context).pushReplacementNamed(CollaboratorProfileTabs.routeName, arguments: collaborator);
-                              },
-                              child: Text(AppLocalizations.of(context).acceptInvitation),
-                            ),
-                          if (isReceived)
-                            ElevatedButton(
                               onPressed: () {
                                 return showDialog(
                                   context: context,
@@ -287,6 +273,20 @@ class _CollaboratorReceivedProfileState extends State<CollaboratorReceivedProfil
                                 );
                               },
                               child: Text(AppLocalizations.of(context).declineInvitation),
+                            ),
+                          if (isReceived)
+                            ElevatedButton(
+                              onPressed: () async {
+                                setState(() {
+                                  this.isNavigating = true;
+                                });
+
+                                await Provider.of<TaskProvider>(context, listen: false).getTasksFromCollaborator(collaborator.email);
+                                await Provider.of<DelegateProvider>(context, listen: false).acceptInvitation(collaborator.uuid);
+
+                                Navigator.of(context).pushReplacementNamed(CollaboratorProfileTabs.routeName, arguments: collaborator);
+                              },
+                              child: Text(AppLocalizations.of(context).acceptInvitation),
                             ),
                         ],
                       ),
