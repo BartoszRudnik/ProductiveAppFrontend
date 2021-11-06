@@ -44,7 +44,7 @@ class FiltersScreen extends StatelessWidget {
               FilterSwitchListTile(
                 func: Provider.of<SettingsProvider>(context, listen: false).changeShowOnlyWithLocalization,
                 message: AppLocalizations.of(context).showTasksWithLocalization,
-                value: userSettings.showOnlyWithLocalization,
+                value: userSettings == null ? false : userSettings.showOnlyWithLocalization,
               ),
             ],
           ),
