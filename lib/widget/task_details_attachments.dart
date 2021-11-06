@@ -134,6 +134,7 @@ class TaskDetailsAttachments extends StatelessWidget {
                   child: TextButton(
                     onPressed: () async {
                       final newAttachments = await showDialog(
+                          barrierDismissible: true,
                           context: context,
                           builder: (context) {
                             return AttachmentDialog(files: [], initBytes: actualTaskAttachmentsSize.toDouble());
