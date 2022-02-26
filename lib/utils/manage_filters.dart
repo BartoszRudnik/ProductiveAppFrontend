@@ -7,6 +7,9 @@ import '../provider/task_provider.dart';
 
 class ManageFilters {
   static List<Task> filter(List<Task> tasks, Settings userSettings, BuildContext context) {
+    if (userSettings == null) {
+      return [];
+    }
     if (userSettings.showOnlyWithLocalization != null && userSettings.showOnlyWithLocalization) {
       tasks = Provider.of<TaskProvider>(context, listen: false).onlyWithLocalization(tasks);
     }

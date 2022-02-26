@@ -477,12 +477,13 @@ class SettingsProvider with ChangeNotifier {
   Future<void> changeShowOnlyWithLocalization() async {
     final finalUrl = this._serverUrl + 'filterSettings/changeShowOnlyWithLocalization/${this.userMail}';
 
-    this.userSettings.showOnlyWithLocalization = !this.userSettings.showOnlyWithLocalization;
+    if (this.userSettings != null) {
+      this.userSettings.showOnlyWithLocalization = !this.userSettings.showOnlyWithLocalization;
 
-    await SettingsDatabase.create(this.userSettings, this.userMail);
+      await SettingsDatabase.create(this.userSettings, this.userMail);
 
-    notifyListeners();
-
+      notifyListeners();
+    }
     if (await InternetConnection.internetConnection()) {
       try {
         await http.post(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:productive_app/config/color_themes.dart';
 import 'package:productive_app/utils/internet_connection.dart';
 import 'package:provider/provider.dart';
@@ -37,6 +39,9 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
   bool notificationOnEnter = false;
   bool notificationOnExit = false;
   Location location;
+  GoogleMapController _mapController;
+  String _darkMapStyle = '';
+  String _lightMapStyle = '';
 
   bool deleted = false;
   bool saveLocation = false;
@@ -47,7 +52,13 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
       this.newLocation = true;
       this.location = choosenLocation;
       await Provider.of<LocationProvider>(context, listen: false).addLocation(choosenLocation);
+      await this._mapMove(LatLng(choosenLocation.latitude, choosenLocation.longitude), 14);
     }
+  }
+
+  Future _loadMapStyles() async {
+    this._darkMapStyle = await rootBundle.loadString('assets/map/darkMap.json');
+    this._lightMapStyle = await rootBundle.loadString('assets/map/lightMap.json');
   }
 
   @override
@@ -63,6 +74,26 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
     if (this.widget.notificationOnExit != null) {
       this.notificationOnExit = this.widget.notificationOnExit;
     }
+
+    this._loadMapStyles();
+  }
+
+  Future<void> _mapMove(LatLng point, double zoom) async {
+    await this._mapController.moveCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(target: point, zoom: zoom),
+          ),
+        );
+  }
+
+  void _onMapCreated(GoogleMapController _controller, LatLng point, double zoom) async {
+    this._mapController = _controller;
+
+    await this._mapController.setMapStyle(
+          Theme.of(context).brightness == Brightness.light ? this._lightMapStyle : this._darkMapStyle,
+        );
+
+    await this._mapMove(point, zoom);
   }
 
   @override
@@ -74,16 +105,18 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
       this.location = allLocations.firstWhere((element) => element.uuid == this.widget.notificationLocationUuid);
     }
 
-    double overallHeightNotNull = MediaQuery.of(context).size.height * 0.65;
-    double overallHeightNull = MediaQuery.of(context).size.height * 0.6;
+    double overallHeightNotNull = MediaQuery.of(context).size.height * 0.85;
+    double overallHeightNull = MediaQuery.of(context).size.height * 0.8;
     double heightNotNull = 130;
     double heightNull = 80;
 
-    if (this.newLocation) {
-      overallHeightNotNull = MediaQuery.of(context).size.height * 0.75;
-      overallHeightNull = MediaQuery.of(context).size.height * 0.7;
-      heightNotNull += 50;
+    if (this.location != null) {
+      overallHeightNotNull = MediaQuery.of(context).size.height * 0.85;
+      overallHeightNull = MediaQuery.of(context).size.height * 0.8;
+      heightNotNull += 200;
       heightNull += 50;
+    } else {
+      overallHeightNull -= 140;
     }
 
     return AlertDialog(
@@ -98,7 +131,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
             mainAxisSize: MainAxisSize.min,
             children: [
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4),
                 child: Card(
                   elevation: 8,
                   child: AnimatedContainer(
@@ -109,36 +142,6 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(AppLocalizations.of(context).locations),
-                        if (this.location != null)
-                          Flexible(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 10),
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  side: BorderSide(color: Theme.of(context).primaryColor),
-                                  primary: Theme.of(context).primaryColorLight,
-                                  onPrimary: Theme.of(context).primaryColor,
-                                ),
-                                onPressed: () async {
-                                  this.location.localizationName = await Dialogs.showTextFieldDialog(context, AppLocalizations.of(context).enterLocationName);
-
-                                  await Provider.of<LocationProvider>(context, listen: false)
-                                      .editLocationName(this.location.uuid, this.location.localizationName, true);
-
-                                  setState(() {});
-                                },
-                                child: Text(
-                                  this.location.localizationName +
-                                      (this.location.localizationName.length > 0 ? ": " : "") +
-                                      this.location.locality +
-                                      ", " +
-                                      this.location.street,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 3,
-                                ),
-                              ),
-                            ),
-                          ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
@@ -229,6 +232,8 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                                             this.deleted = false;
                                             this.location = value;
                                           });
+
+                                          await this._mapMove(LatLng(this.location.latitude, this.location.longitude), 14);
                                         },
                                       ),
                                     ),
@@ -238,6 +243,72 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                             ),
                           ],
                         ),
+                        if (this.location != null)
+                          Flexible(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 10),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  side: BorderSide(color: Theme.of(context).primaryColor),
+                                  primary: Theme.of(context).primaryColorLight,
+                                  onPrimary: Theme.of(context).primaryColor,
+                                ),
+                                onPressed: () async {
+                                  this.location.localizationName = await Dialogs.showTextFieldDialog(context, AppLocalizations.of(context).enterLocationName);
+
+                                  await Provider.of<LocationProvider>(context, listen: false)
+                                      .editLocationName(this.location.uuid, this.location.localizationName, true);
+
+                                  setState(() {});
+                                },
+                                child: Text(
+                                  this.location.localizationName +
+                                      (this.location.localizationName.length > 0 ? ": " : "") +
+                                      this.location.locality +
+                                      ", " +
+                                      this.location.street,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 3,
+                                ),
+                              ),
+                            ),
+                          ),
+                        if (this.location != null)
+                          SizedBox(
+                            height: 150,
+                            child: GoogleMap(
+                              compassEnabled: false,
+                              zoomControlsEnabled: false,
+                              mapType: MapType.normal,
+                              initialCameraPosition: CameraPosition(target: LatLng(this.location.latitude, this.location.longitude)),
+                              onMapCreated: (final controller) {
+                                this._onMapCreated(controller, LatLng(this.location.latitude, this.location.longitude), 14);
+                              },
+                              markers: Set<Marker>.of(
+                                [
+                                  Marker(
+                                    markerId: MarkerId("1"),
+                                    position: LatLng(
+                                      this.location.latitude,
+                                      this.location.longitude,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              circles: Set<Circle>.of(
+                                [
+                                  Circle(
+                                    circleId: CircleId("2"),
+                                    center: LatLng(this.location.latitude, this.location.longitude),
+                                    radius: this.notificationRadius * 1000,
+                                    fillColor: Theme.of(context).primaryColorDark.withOpacity(0.8),
+                                    strokeColor: Theme.of(context).primaryColor,
+                                    strokeWidth: 2,
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
                         if (this.newLocation)
                           SwitchListTile(
                             value: this.saveLocation,
@@ -278,7 +349,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4),
                 child: Card(
                   elevation: 8,
                   child: Column(
@@ -305,7 +376,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4),
                 child: Card(
                   elevation: 8,
                   child: SwitchListTile(
@@ -323,7 +394,7 @@ class _NotificationLocationDialogState extends State<NotificationLocationDialog>
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4),
                 child: Card(
                   elevation: 8,
                   child: SwitchListTile(
