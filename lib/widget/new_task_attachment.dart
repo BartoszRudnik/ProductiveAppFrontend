@@ -19,6 +19,7 @@ class NewTaskAttachment extends StatelessWidget {
       onPressed: () async {
         final attachments = await showDialog(
             context: context,
+            barrierDismissible: true,
             builder: (context) {
               return AttachmentDialog(files: this.files, initBytes: 0);
             });
