@@ -56,15 +56,6 @@ class _SearchAppBarState extends State<SearchAppBar> {
               decoration: ColorThemes.searchFormFieldDecoration(
                 context,
                 text,
-                () {
-                  this._formKey.currentState.reset();
-                  if (this.widget.searchingName == 'tag')
-                    Provider.of<TagProvider>(context, listen: false).clearSearchingText();
-                  else if (this.widget.searchingName == 'location')
-                    Provider.of<LocationProvider>(context, listen: false).clearSearchingText();
-                  else
-                    Provider.of<DelegateProvider>(context, listen: false).clearSearchingText();
-                },
               ),
             )
           : Text(
@@ -82,17 +73,18 @@ class _SearchAppBarState extends State<SearchAppBar> {
       brightness: Brightness.dark,
       actions: [
         IconButton(
-          icon: Icon(Icons.search_outlined),
+          icon: Icon(this.searchBarActive ? Icons.close_outlined : Icons.search_outlined),
           onPressed: () {
-            if (this.searchBarActive) {
+            if (this._formKey != null && this._formKey.currentState != null) {
               this._formKey.currentState.reset();
-              if (this.widget.searchingName == 'tag')
-                Provider.of<TagProvider>(context, listen: false).clearSearchingText();
-              else if (this.widget.searchingName == 'location')
-                Provider.of<LocationProvider>(context, listen: false).clearSearchingText();
-              else
-                Provider.of<DelegateProvider>(context, listen: false).clearSearchingText();
             }
+
+            if (this.widget.searchingName == 'tag')
+              Provider.of<TagProvider>(context, listen: false).clearSearchingText();
+            else if (this.widget.searchingName == 'location')
+              Provider.of<LocationProvider>(context, listen: false).clearSearchingText();
+            else
+              Provider.of<DelegateProvider>(context, listen: false).clearSearchingText();
 
             setState(() {
               this.searchBarActive = !this.searchBarActive;

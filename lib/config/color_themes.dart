@@ -181,7 +181,7 @@ class ColorThemes {
     );
   }
 
-  static InputDecoration searchFormFieldDecoration(BuildContext context, String labelText, Function onPressed) {
+  static InputDecoration searchFormFieldDecoration(BuildContext context, String labelText) {
     return InputDecoration(
       focusedBorder: InputBorder.none,
       enabledBorder: InputBorder.none,
@@ -194,13 +194,6 @@ class ColorThemes {
       ),
       labelStyle: TextStyle(color: Colors.grey[700]),
       labelText: labelText,
-      suffixIcon: IconButton(
-        color: Theme.of(context).primaryColor,
-        icon: Icon(Icons.close_outlined),
-        onPressed: () {
-          onPressed();
-        },
-      ),
     );
   }
 }

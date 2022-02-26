@@ -375,5 +375,6 @@
   "revokedNotificationPermission": " odebrał Ci dostęp do swojej aktywności",
   "version": "Wersja aplikacji",
   "dataUsage": "Pojemność załączników",
-  "decline": "Odrzuć"
+  "decline": "Odrzuć",
+  "cancelInvitation": "Cofnij zaproszenie"
 }

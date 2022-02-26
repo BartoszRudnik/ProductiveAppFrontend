@@ -15,6 +15,7 @@ class TaskTitle extends StatelessWidget {
     return Form(
       key: this.newTaskTitleKey,
       child: TextFormField(
+        autofocus: true,
         key: ValueKey('taskTitle'),
         validator: (value) {
           if (value.isEmpty) {

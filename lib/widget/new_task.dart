@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:productive_app/utils/task_list.dart';
 import 'package:productive_app/utils/task_validate.dart';
+import 'package:productive_app/widget/button/add_task_no_closing_button.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
@@ -40,7 +41,9 @@ class _NewTaskState extends State<NewTask> {
   double _screenHeight;
   bool _isFullScreen = false;
   bool _isValid = true;
-  bool _waiting = false;
+
+  bool _waitingClose = false;
+  bool _waitingNoClose = false;
 
   final newTaskTitleKey = GlobalKey<FormState>();
   final newTaskDescriptionKey = GlobalKey<FormState>();
@@ -172,7 +175,7 @@ class _NewTaskState extends State<NewTask> {
     });
   }
 
-  Future<void> _addNewTask() async {
+  Future<void> _addNewTask(bool isClosingWindow) async {
     bool isValidTitle = this.newTaskTitleKey.currentState.validate();
     bool isValidRest = await TaskValidate.validateNewTask(this._startDate, this._endDate, this._localization, this._isDone, this._delegatedEmail, context);
 
@@ -186,9 +189,15 @@ class _NewTaskState extends State<NewTask> {
       return;
     }
 
-    setState(() {
-      this._waiting = true;
-    });
+    setState(
+      () {
+        if (isClosingWindow) {
+          this._waitingClose = true;
+        } else {
+          this._waitingNoClose = true;
+        }
+      },
+    );
 
     this.newTaskTitleKey.currentState.save();
     this.newTaskDescriptionKey.currentState.save();
@@ -245,20 +254,27 @@ class _NewTaskState extends State<NewTask> {
       this.clearForm();
 
       setState(() {
-        this._waiting = false;
+        this._waitingClose = false;
+        this._waitingNoClose = false;
       });
     } on SocketException catch (_) {
       this.clearForm();
 
       setState(() {
-        this._waiting = false;
+        this._waitingClose = false;
+        this._waitingNoClose = false;
       });
     } catch (error) {
       setState(() {
-        this._waiting = false;
+        this._waitingClose = false;
+        this._waitingNoClose = false;
       });
       print(error);
       throw (error);
+    }
+
+    if (isClosingWindow) {
+      Navigator.of(context).pop();
     }
   }
 
@@ -273,7 +289,7 @@ class _NewTaskState extends State<NewTask> {
       duration: Duration(milliseconds: 300),
       height: this._screenHeight == null ? MediaQuery.of(context).size.height * 0.33 : this._screenHeight,
       padding: EdgeInsets.symmetric(
-        horizontal: 20,
+        horizontal: 13,
       ),
       child: SingleChildScrollView(
         child: Container(
@@ -291,8 +307,25 @@ class _NewTaskState extends State<NewTask> {
                     isDone: this._isDone,
                     changeIsDoneStatus: this.changeIsDone,
                   ),
-                  title: TaskTitle(setTaskName: this.setTaskName, newTaskTitleKey: this.newTaskTitleKey),
-                  trailing: FullScreenButton(setFullScreen: this.setFullScreen),
+                  title: Row(
+                    children: [
+                      Expanded(
+                        flex: 400,
+                        child: TaskTitle(
+                          setTaskName: this.setTaskName,
+                          newTaskTitleKey: this.newTaskTitleKey,
+                        ),
+                      ),
+                      Flexible(
+                        flex: 100,
+                        child: Row(
+                          children: [
+                            AddTaskNoClosingButton(addTask: this._addNewTask),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                   subtitle: TaskDescription(
                     setTaskDescription: this.setTaskDescription,
                     newTaskDescriptionKey: this.newTaskDescriptionKey,
@@ -350,7 +383,7 @@ class _NewTaskState extends State<NewTask> {
                         localizations: localizations,
                         setLocalization: this.setLocalization,
                       ),
-                      if (this._waiting == true)
+                      if (this._waitingClose == true)
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: CircularProgressIndicator(backgroundColor: Theme.of(context).primaryColor),
